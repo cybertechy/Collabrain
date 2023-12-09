@@ -1,0 +1,28 @@
+# Use multi-stage build to reduce image size
+# Step1: Build the frontend export
+# Step2: Copy the export to nginx image
+
+FROM node:20-alpine as build-stage
+
+WORKDIR /app
+
+COPY package*.json ./
+
+#use yarn to install dependencies and build the export of it
+RUN yarn install
+
+COPY . .
+
+RUN yarn build
+
+# Step 2
+FROM nginx:1.19.0-alpine
+
+COPY --from=build-stage /app/out /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
+
+
+

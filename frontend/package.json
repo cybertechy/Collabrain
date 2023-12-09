@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "serve": "npx serve@latest out"
   },
   "dependencies": {
     "@capacitor/android": "^5.5.1",
