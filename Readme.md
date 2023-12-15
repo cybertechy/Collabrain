@@ -12,7 +12,7 @@ This repository contains the code for a collaborative brainstorming platform nam
 
 To get started with the collaborative brainstorming platform, follow these steps:
 
-1. Clone the repository: `git clone https://github.com/your-username/your-repo.git`
+1. Clone the repository: `git clone https://github.com/your-username/collabrain.git`
 2. Install the necessary dependencies: `npm install`
 3. Start the development server: `npm start`
 4. Open your browser and navigate to `http://localhost:3000` to access the platform.
