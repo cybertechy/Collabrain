@@ -5,6 +5,7 @@ export default function Home() {
       <h1 className="text-xl font-bold">Hello World</h1>
       <p>Welcome to collabrain</p>
       <p>Lets build this collobaration platform</p>
+	  <p>Trees</p>
     </div>
   )
 }
