@@ -1,7 +1,9 @@
 # Collaborative Brainstorming Platform
 
 ## Video Example
-<!-- Fill a video here -->
+https://github.com/cybertechy/Collabrain/assets/58950397/2444681b-b487-482a-a84b-7b8530efef6c
+
+
 
 ### Steps
 1. Create a branch for implementing a new feature
