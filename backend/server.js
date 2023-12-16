@@ -3,6 +3,13 @@ const app = express();
 
 const port = 8080;
 
+// Get the Routes
+const AuthRoutes = require("./routes/Authentication.js");
+
+
+// Use the Routes
+app.use("/api/auth", AuthRoutes);
+
 app.get("/api/home", (req, res) =>
 {
 	res.json({message: "Hello World!"});
