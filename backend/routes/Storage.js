@@ -38,13 +38,13 @@ router.post("/addMedia", async (req, res) => {
     // Ensure data is in base64 format
     const base64Regex = /^data:([A-Za-z-+\/]+);base64,(.+)$/;
     if(!base64Regex.test(data)) {
-        return res.status(400).json({AM: "AM106", error: "Data is not in base64 format" });
+        return res.status(400).json({AM: "AM105", error: "Data is not in base64 format" });
     }
 
     // Ensure data is less than 10MB
     const dataInBytes = Buffer.byteLength(data, 'base64');
     if(dataInBytes > 10485760) {
-        return res.status(400).json({code: "AM107", error: "Data is too large" });
+        return res.status(400).json({code: "AM106", error: "Data is too large" });
     }
 
     const bucketName = "B1";
@@ -57,7 +57,7 @@ router.post("/addMedia", async (req, res) => {
     if(response.versionId){
         res.json({code: "AM200", message: "Success", mediaId: fileName});
     } else {
-        res.status(response.code).json(response);
+        res.json({code: "AM107", message: "Failed to add data"});
     }
 });
 
