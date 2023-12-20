@@ -37,7 +37,7 @@ jobs:
         DOCKER_USERNAME: ${{ secrets.DEV_DOCKER_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.DEV_DOCKER_PASSWORD }}
       run: |
-        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        echo -n "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
         # Buildx command to build for multiple platforms
         docker buildx create --use
