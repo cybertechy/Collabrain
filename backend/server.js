@@ -8,10 +8,12 @@ const port = 8080;
 
 // Get the Routes
 const AuthRoutes = require("./routes/Authentication.js");
+const strRoutes = require("./routes/Storage.js");
 
 
 // Use the Routes
 app.use("/api/auth", AuthRoutes);
+app.use("/api/str",strRoutes);
 
 app.get("/api/home", (req, res) =>
 {
