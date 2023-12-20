@@ -1,7 +1,0 @@
-[DEFAULT]
-user=ocid1.user.oc1..aaaaaaaa3ep3ygt2tf4u6uvfsnycknh65fksvqcucn7gb4szoowyj4sfnyva
-fingerprint=c9:1e:d2:ed:9f:73:2a:0b:9f:49:46:b1:e4:4b:d6:a8
-key_file=./utils/oci.pem
-tenancy=ocid1.tenancy.oc1..aaaaaaaaji3lwlxyrbygb3tcsp4y3x2wr63zih77el7zs6nb3jypv33vgjya
-region=uk-london-1
-pass_phrase=siddh963
