@@ -49,4 +49,4 @@ jobs:
           --platform linux/amd64,linux/arm64 \
           --push \
           -t siddh13/collabrainbackend1:latest \
-          -f backend/ .
+          -f ./backend .
