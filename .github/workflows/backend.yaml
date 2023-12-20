@@ -45,7 +45,6 @@ jobs:
 
         docker buildx build \
           --platform linux/amd64,linux/arm64 \
+          --push \
           -t siddh13/collabrainBA1:latest \
           .
-
-        docker push siddh13/collabrainBA1:latest
