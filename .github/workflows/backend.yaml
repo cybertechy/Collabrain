@@ -10,8 +10,8 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DOCKER_USERNAME: ${{ secrets.DEV_DOCKER_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DEV_DOCKER_PASSWORD }}
+      DOCKER_USERNAME: ${{ secrets.Dev_DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.Dev_DOCKER_PASSWORD }}
 
     
     steps:
@@ -19,7 +19,7 @@ jobs:
       run: |
         echo "DOCKER_USERNAME: $DOCKER_USERNAME"
         echo "DOCKER_PASSWORD: $DOCKER_PASSWORD"
-        
+
     - name: Checkout code
       uses: actions/checkout@v2
 
