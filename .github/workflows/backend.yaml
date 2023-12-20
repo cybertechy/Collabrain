@@ -21,8 +21,8 @@ jobs:
 
     - name: Build and push Docker image
       env:
-        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        DOCKER_USERNAME: ${{ secrets.DEV_DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DEV_DOCKER_PASSWORD }}
       run: |
         echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
