@@ -1,11 +1,13 @@
 "use client"
+
+const { app: firebase } = require("@app/firebaseCli.js");
 const { getAuth } = require("firebase/auth");
 const { useAuthState } = require("react-firebase-hooks/auth"); 
 const { useRouter } = require('next/navigation');
 
 export default function Dashboard()
 {
-	const auth = getAuth();
+	const auth = getAuth(firebase);
 
 	// Get user auth state (signed in or not)
 	const [user, loading] = useAuthState(auth);

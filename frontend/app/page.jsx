@@ -1,24 +1,24 @@
 "use client"
 
-const { app: firebase } = require('./firebaseCli.js');
-const { getAuth, signInWithPopup, GoogleAuthProvider, OAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword } = require("firebase/auth");
-const { useAuthState } = require("react-firebase-hooks/auth");
+const { app: firebase } = require("@app/firebaseCli.js"); // Required for all pages
+const { getAuth, signInWithPopup, GoogleAuthProvider, OAuthProvider,
+	signInWithEmailAndPassword, createUserWithEmailAndPassword,
+	EmailAuthProvider, linkWithPopup } = require("firebase/auth");
+const { useAuthState } = require("react-firebase-hooks/auth"); // Required for all pages
 const { useRouter } = require('next/navigation');
 
 export default function Home()
 {
-	const auth = getAuth(firebase);
-	const provider = new GoogleAuthProvider();
-	provider.setCustomParameters({
+	const googleProvider = new GoogleAuthProvider();
+	googleProvider.setCustomParameters({
 		prompt: 'select_account'
 	});
-
+	
 	const microsoftProvider = new OAuthProvider('microsoft.com');
-	provider.setCustomParameters({
-		prompt: 'consent'
-	});
-
+	
 	// Get user auth state (signed in or not)
+	// This is needed in every page
+	const auth = getAuth(firebase);
 	const [user, loading] = useAuthState(auth);
 
 	const router = useRouter();
@@ -45,8 +45,23 @@ export default function Home()
 		}
 		catch (err)
 		{
-			alert("User doesnt exist, creating new user");
-			result = await createUserWithEmailAndPassword(auth, email.value, password.value);
+			if (err.code === "auth/wrong-password" || err.code === "auth/invalid-email")
+			{
+				alert("Inccorect email or password");
+				return;
+			}
+
+			else if (err.code === "auth/user-not-found")
+			{
+				alert("User doesnt exist, creating new user");
+				result = await createUserWithEmailAndPassword(auth, email.value, password.value);
+			}
+
+			else // Other errors
+			{
+				alert(err.message);
+			}
+
 		}
 
 	}
@@ -56,21 +71,14 @@ export default function Home()
 		/** 
 		 * When signing in with a service, if the user doesn't exist, 
 		 * a new user is automatically created and signed in
-		*/ 
+		*/
 
-		let result;
-		switch (service)
-		{
-			case "microsoft":
-				result = await signInWithPopup(auth, microsoftProvider)
-				break;
-
-			default: // Google
-				result = await signInWithPopup(auth, provider)
-				break;
+		const providers = {
+			"microsoft": microsoftProvider,
+			"google": googleProvider
 		}
 
-		// const result = await signInWithPopup(auth, provider)
+		const result = await signInWithPopup(auth, providers[service]);
 	}
 
 	return (
@@ -83,10 +91,10 @@ export default function Home()
 				it would be probably better to implement the UI with a library of prebuilt components */}
 
 			<br />
-			<form onSubmit={emailSignIn} style={{textAlign: "center"}}>
-				<input style={{margin: 10, padding: 5, color: "black"}} type="email" name="email"/> <br/>
-				<input style={{margin: 10, padding: 5, color: "black"}} type="password" name="password"/> <br/>
-				<button style={{backgroundColor: "white", borderRadius: 5, color: "black", padding: "5px", margin: 10}} type="submit">Submit</button>
+			<form onSubmit={emailSignIn} style={{ textAlign: "center" }}>
+				<input style={{ margin: 10, padding: 5, color: "black" }} type="email" name="email" /> <br />
+				<input style={{ margin: 10, padding: 5, color: "black" }} type="password" name="password" /> <br />
+				<button style={{ backgroundColor: "white", borderRadius: 5, color: "black", padding: "5px", margin: 10 }} type="submit">Submit</button>
 			</form>
 
 			<button onClick={() => serviceSignIn("microsoft")}>Sign In with microsoft</button>
