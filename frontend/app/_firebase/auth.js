@@ -88,7 +88,13 @@ async function serviceSignIn(service)
 
 }
 
+async function getToken()
+{
+	return auth.currentUser.getIdToken(true)
+}
+
 module.exports = {
+	getToken,
 	signOut,
 	isAuth,
 	emailSignIn,

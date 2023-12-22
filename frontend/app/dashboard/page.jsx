@@ -1,6 +1,6 @@
 "use client"
 
-const { signOut, isAuth } = require("_firebase/auth"); // Import the authentication functions
+const { signOut, isAuth, getToken } = require("_firebase/auth"); // Import the authentication functions
 const { useRouter } = require('next/navigation');
 
 export default function Dashboard()
