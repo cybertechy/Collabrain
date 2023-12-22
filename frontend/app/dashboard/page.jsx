@@ -1,23 +1,12 @@
 "use client"
 
-const { app: firebase } = require("@app/firebaseCli.js");
-const { getAuth } = require("firebase/auth");
-const { useAuthState } = require("react-firebase-hooks/auth"); 
+const { signOut, isAuth } = require("_firebase/auth"); // Import the authentication functions
 const { useRouter } = require('next/navigation');
 
 export default function Dashboard()
 {
-	const auth = getAuth(firebase);
-
-	// Get user auth state (signed in or not)
-	const [user, loading] = useAuthState(auth);
-	
 	const router = useRouter();
-
-	if (loading)
-		return <h1 className="text-xl font-bold">Loading...</h1>
-
-	if (!user)
+	if (!isAuth())
 	{
 		router.push('/'); // Redirect to home page
 		return <h1 className="text-xl font-bold">Please sign in</h1>
@@ -28,7 +17,7 @@ export default function Dashboard()
 			<h1 className="text-xl font-bold">Dashboard</h1>
 			<p>This is your dashboard</p>
 			<p>There should be something here</p>
-			<button onClick={() => auth.signOut()}>Sign Out</button>
+			<button onClick={signOut}>Sign Out</button>
 		</div>
 	)
 }
