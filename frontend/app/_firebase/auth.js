@@ -1,4 +1,4 @@
-const { app: firebase } = require("@firebase/cli"); // Required for all pages
+const { app: firebase } = require("_firebase/cli"); // Required for all pages
 const { getAuth, signInWithPopup, GoogleAuthProvider, OAuthProvider,
 	signInWithEmailAndPassword, createUserWithEmailAndPassword,
 	EmailAuthProvider, linkWithPopup } = require("firebase/auth");
