@@ -14,7 +14,7 @@ jobs:
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       OCI_PEM: ${{ secrets.OCI_PEM }}
       OCI_CONFIG: ${{ secrets.OCI_CONFIG }}
-      WEBSITE_URL: "https://cb1.cybertech13.eu.org"
+      WEBSITE_URL: "https://cb1.cybertech13.eu.org/api/home"
       
     steps:
     - name: Checkout code
