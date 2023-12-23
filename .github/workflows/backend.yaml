@@ -55,8 +55,7 @@ jobs:
           -f ./backend/dockerfile ./backend
 
     - name: Restart Deployment in Kubernetes
-      run: |
-      kubectl rollout restart deployment collabrain-backend-deployment -n collabrain
+      run: kubectl rollout restart deployment collabrain-backend-deployment -n collabrain
 
     - name: Set up kubectl
       uses: azure/k8s-set-context@v1
