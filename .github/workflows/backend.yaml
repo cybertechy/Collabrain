@@ -72,6 +72,12 @@ jobs:
     - name: Wait for 10 seconds
       run: sleep 10
 
-    - name: Ping Website to confirm deployment
+    - name: Verify deployment
       run: |
-        curl -I --retry 5 --retry-delay 5 $WEBSITE_URL
+        HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" $WEBSITE_URL)
+        if [ $HTTP_STATUS -eq 200 ]; then
+          echo "Deployment successful"
+        else
+          echo "Deployment failed"
+          exit 1
+        fi
