@@ -22,7 +22,7 @@ jobs:
     - name: Create /utils folder and add PEM files
       run: |
         mkdir -p ./backend/utils
-        echo "$OCI_PEM > ./backend/utils/OCI_PEM.pem
+        echo "$OCI_PEM" > ./backend/utils/OCI_PEM.pem
         echo "$OCI_CONFIG" > ./backend/utils/OCI_CONFIG
 
     - name: Set up QEMU
