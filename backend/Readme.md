@@ -4,7 +4,7 @@
 
 ## Storage Endpoints
 
-### `/api/str/addMedia`
+### `/api/str/media`
 
 API endpoint for adding media to the storage bucket.
 
@@ -32,14 +32,16 @@ API endpoint for adding media to the storage bucket.
 
 
 
-### `/api/str/getMedia`
+### `/api/str/media/:mediaID?token=`
 
 API endpoint for getting media from the storage bucket.
 
-- Request Type: `POST`
+- Request Type: `GET`
 
-- Request Body: 
+- Request Params: 
     - `token` - JWT token for authentication
+    
+- Request ID
     - `mediaID` - ID of the media in the storage bucket
 
 - Response:
