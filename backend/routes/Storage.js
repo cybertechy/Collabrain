@@ -14,7 +14,7 @@ const ociOjectStorage = require('../utils/oracle');
     * @errors AM101, AM103, AM104, AM106, AM107
 
 */
-router.post("/addMedia", async (req, res) => {
+router.post("/media", async (req, res) => {
     const { token, MIMEtype, data } = req.body;
 
     // Check if the token exists
@@ -55,9 +55,9 @@ router.post("/addMedia", async (req, res) => {
     const response = await ociOjectStorage.AddData(bucketName, fileName,MIMEtype ,data, { userID });
 
     if(response.versionId){
-        res.json({code: "AM200", message: "Success", mediaId: fileName});
+        return res.json({code: "AM200", message: "Success", mediaId: fileName});
     } else {
-        res.json({code: "AM107", message: "Failed to add data"});
+        return res.status(503).json({code: "AM107", message: "Failed to add data"});
     }
 });
 
@@ -70,8 +70,10 @@ router.post("/addMedia", async (req, res) => {
     * @errors GM101, GM103, GM104, GM105
 */
 
-router.post("/getMedia", async (req, res) => {
-    const { token, mediaId } = req.body;
+router.get("/media/:mediaId", async (req, res) => {
+
+    const token = req.query.token;
+    const mediaId = req.params.mediaId;
 
     // Check if the token exists
     if(!token) {
@@ -86,19 +88,28 @@ router.post("/getMedia", async (req, res) => {
         return res.status(400).json({code:"GM103", error: "Missing mediaID" });
     }
 
+    //ensure mediaid is have the required length
+    if(mediaId.length!==22){
+        return res.status(400).json({code:"GM103", error: "Invalid mediaID" });
+    }
+
     const bucketName = "B1";
 
     const response = await ociOjectStorage.getData(bucketName, mediaId);
 
+    if(response.code && response.code!==200){
+        return res.status(404).json({code: "GM105", message: "Data not found"});
+    }
+
     if(response.opcMeta["opc-meta-userid"]!== userID){
-        return res.json({code: "GM104", message: "Validation Failed", data: response.data});
+        return res.status(403).json({code: "GM104", message: "Validation Failed", data: response.data});
     } 
 
     if(!response.eTag){
-        return res.json({code: "GM105", message: "Data not found"});
+        return res.status(404).json({code: "GM105", message: "Data not found"});
     } else {
         let data =  await ociOjectStorage.generateStringFromStream(response.value);
-        return res.json({code: "GM200", message: "Success", MIMEtype: response.contentType , datalength: response.contentLength , data: data});
+        return res.status(200).json({code: "GM200", message: "Success", MIMEtype: response.contentType , datalength: response.contentLength , data: data});
     }
 
     

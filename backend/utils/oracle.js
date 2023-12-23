@@ -67,7 +67,6 @@ const AddData = async (bucketName, fileName, MIMEtype,data, meta) => {
     opcMeta: meta
     
   };
-  console.log(request.putObjectBody)
   try {
     const response = await objectStorageClient.putObject(request);
     return response;
