@@ -61,6 +61,10 @@ jobs:
         kubeconfig: ${{ secrets.KUBE_CONFIG }}
         version: 'v1.21.0'
 
+    - name: Delete existing deployment
+      run: |
+        kubectl delete deployment collabrain-backend-deployment -n collabrain
+
     - name: Deploy to Kubernetes
       run: |
         kubectl apply -f ./backend/.kube/deployment.yaml
