@@ -50,3 +50,14 @@ jobs:
           --push \
           -t siddh13/collabrainbackend1:latest \
           -f ./backend/dockerfile ./backend
+
+    - name: Set up kubectl
+      uses: azure/k8s-set-context@v1
+      with:
+        method: kubeconfig
+        kubeconfig: ${{ secrets.KUBE_CONFIG }}
+        version: 'v1.21.0'
+
+    - name: Deploy to Kubernetes
+      run: |
+        kubectl apply -f ./backend/.kube/deployment.yaml
