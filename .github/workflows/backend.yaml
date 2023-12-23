@@ -14,6 +14,7 @@ jobs:
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       OCI_PEM: ${{ secrets.OCI_PEM }}
       OCI_CONFIG: ${{ secrets.OCI_CONFIG }}
+      WEBSITE_URL: "https://cb1.cybertech13.eu.org"
       
     steps:
     - name: Checkout code
@@ -63,3 +64,10 @@ jobs:
     - name: Deploy to Kubernetes
       run: |
         kubectl apply -f ./backend/.kube/deployment.yaml
+    
+    - name: Wait for 10 seconds
+      run: sleep 10
+
+    - name: Ping Website to confirm deployment
+      run: |
+        curl -I --retry 5 --retry-delay 5 $WEBSITE_URL
