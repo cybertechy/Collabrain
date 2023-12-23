@@ -12,19 +12,18 @@ jobs:
     env:
       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-
-    
+      OCI_PEM: ${{ secrets.OCI_PEM }}
+      OCI_CONFIG: ${{ secrets.OCI_CONFIG }}
+      
     steps:
-    - name: Print Environment Variables
-      run: |
-        env
-    - name: Print Environment Variables
-      run: |
-        echo "DOCKER_USERNAME: $DOCKER_USERNAME"
-        echo "DOCKER_PASSWORD: $DOCKER_PASSWORD"
-
     - name: Checkout code
       uses: actions/checkout@v2
+
+    - name: Create /utils folder and add PEM files
+      run: |
+        mkdir -p ./utils
+        echo "$OCI_PEM > ./utils/OCI_PEM.pem
+        echo "$OCI_CONFIG" > ./utils/OCI_CONFIG
 
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
@@ -38,8 +37,6 @@ jobs:
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       run: |
         echo -n "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-
-        ls
 
         # Buildx command to build for multiple platforms
         docker buildx create --use
