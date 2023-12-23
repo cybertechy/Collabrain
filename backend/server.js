@@ -15,7 +15,7 @@ app.use("/api/auth", AuthRoutes);
 
 app.get("/api/home", (req, res) =>
 {
-	res.json({code:200,message: "Hello World!"});
+	res.json({message: "Hello World!"});
 });
 
 app.listen(port, () =>
