@@ -38,10 +38,10 @@ API endpoint for getting media from the storage bucket.
 
 - Request Type: `GET`
 
-- Request Params: 
+- Request Query:
     - `token` - JWT token for authentication
 
-- Request ID
+- Request Params:
     - `mediaID` - ID of the media in the storage bucket
 
 - Response:
