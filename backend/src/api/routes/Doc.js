@@ -2,7 +2,10 @@ const express = require('express')
 const router = express.Router()
 const db = require("../helpers/firebase.js");
 
-router.get("/new", (req, res) =>
+// Doc api endpoints
+// NOTE: Need to be tested
+
+router.post("/new", (req, res) =>
 {
 	db.verifyUser(req.query.token).then(user =>
 	{
@@ -10,14 +13,14 @@ router.get("/new", (req, res) =>
 			res.json({ message: "Invalid token" });
 
 		// Get doc data and create it in Firestore
-		db.createDoc(`${user.uid}/docs`, { owner: user.uid, title: req.query.title, content: req.query.content })
+		db.createDoc(`${user.uid}/docs`, { title: req.query.title, content: req.query.content })
 			.then(() => { res.json({ message: "Success!" }); }).catch((error) => { res.json({ message: error }); });
-	});
 
-	res.json({ message: "Success!" });
+	}).catch((error) => { res.json({ message: error }); })
+
 });
 
-router.get("/remove", (req, res) =>
+router.post("/remove", (req, res) =>
 {
 	db.verifyUser(req.query.token).then(user =>
 	{
@@ -32,7 +35,7 @@ router.get("/remove", (req, res) =>
 	res.json({ message: "Success!" });
 });
 
-router.get("/update", (req, res) =>
+router.post("/update", (req, res) =>
 {
 	db.verifyUser(req.query.token).then(user =>
 	{
