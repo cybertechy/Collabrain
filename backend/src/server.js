@@ -2,13 +2,14 @@ const express = require('express');
 const app = express();
 const db = require("./api/helpers/firebase.js");
 const docRoute = require("./api/routes/Doc.js");
+const strRoute = require("./routes/Storage.js");
 
 const bodyParser = require('body-parser');
 const port = process.env.PORT || 8080;
 
 app.use(bodyParser.json());
-
 app.use("/api/doc", docRoute);
+app.use("/api/storage",strRoutes);
 
 app.get("/api/users", (req, res) =>
 {
