@@ -13,7 +13,7 @@ const strRoutes = require("./routes/Storage.js");
 
 // Use the Routes
 app.use("/api/auth", AuthRoutes);
-app.use("/api/str",strRoutes);
+app.use("/api/storage",strRoutes);
 
 app.get("/api/home", (req, res) =>
 {
