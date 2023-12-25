@@ -8,7 +8,7 @@ const port = 8080;
 
 // Get the Routes
 const AuthRoutes = require("./routes/Authentication.js");
-const strRoutes = require("./routes/Storage.js");
+const strRoutes = require("./src/api/routes/Storage.js");
 
 
 // Use the Routes
