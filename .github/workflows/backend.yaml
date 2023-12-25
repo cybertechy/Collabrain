@@ -1,0 +1,88 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - workflow
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    env:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      OCI_PEM: ${{ secrets.OCI_PEM }}
+      OCI_CONFIG: ${{ secrets.OCI_CONFIG }}
+      WEBSITE_URL: "https://cb1.cybertech13.eu.org/api/home"
+      
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Use Node.js 18
+      uses: actions/setup-node@v2
+      with:
+        node-version: '18'
+
+    - name: Create /utils folder and add PEM files
+      run: |
+        mkdir -p ./backend/utils
+        echo "$OCI_PEM" > ./backend/utils/OCI_PEM.pem
+        echo "$OCI_CONFIG" > ./backend/utils/OCI_CONFIG
+
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Update Timestamp in Deployment File
+      run: |
+       TIMESTAMP=$(date +'%Y%m%d-%H%M%S')
+       sed -i "s/timestamp: .*/timestamp: \"$TIMESTAMP\"/" ./backend/.kube/deployment.yaml
+
+    - name: Build and push Docker image
+      env:
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      run: |
+        echo -n "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
+        # Buildx command to build for multiple platforms
+        docker buildx create --use
+        docker buildx inspect --bootstrap
+
+        docker buildx build \
+          --platform linux/amd64,linux/arm64 \
+          --push \
+          -t siddh13/collabrainbackend1:latest \
+          -f ./backend/dockerfile ./backend
+          
+    - name: Set up kubectl
+      uses: azure/k8s-set-context@v1
+      with:
+        method: kubeconfig
+        kubeconfig: ${{ secrets.KUBE_CONFIG }}
+        version: 'v1.21.0'
+
+    - name: Delete existing deployment
+      run: |
+        kubectl delete deployment collabrain-backend-deployment -n collabrain
+
+    - name: Deploy to Kubernetes
+      run: |
+        kubectl apply -f ./backend/.kube/deployment.yaml
+    
+    - name: Wait for 10 seconds
+      run: sleep 10
+
+    - name: Verify deployment
+      run: |
+        HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" $WEBSITE_URL)
+        if [ $HTTP_STATUS -eq 200 ]; then
+          echo "Deployment successful"
+        else
+          echo "Deployment failed"
+          exit 1
+        fi
