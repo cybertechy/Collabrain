@@ -86,6 +86,11 @@ app.get("/api/users", (req, res) =>
 // 	res.json({ message: "Success!" });
 // });
 
+app.get("/api/home", (req, res) =>
+{
+	res.json({ message: "Running" });
+});
+
 app.listen(port, () =>
 {
 	console.log(`Server started at: http://localhost:${port}`);
