@@ -27,8 +27,8 @@ jobs:
 
     - name: add Secret files
       run: |
-        echo "$OCI_PEM" > ./src/api/helpers/oci.pem
-        echo "$OCI_CONFIG" > ./src/api/helpers/oci-config
+        echo "$OCI_PEM" > ./backend/src/api/helpers/oci.pem
+        echo "$OCI_CONFIG" > ./backend/src/api/helpers/oci-config
 
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
