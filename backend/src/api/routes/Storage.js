@@ -1,4 +1,5 @@
 const { Router } = require('express');
+const { verifyUser } = require("../helpers/firebase");
 
 const router = Router();
 
@@ -6,7 +7,7 @@ const ociOjectStorage = require("../helpers/oracle");
 
 
 /*
-	* @route POST /str/addMedia
+	* @route POST
 	* @desc Add media to the bucket
 	* @access Private
 	* @body token, MIMEtype, data
@@ -24,8 +25,12 @@ router.post("/media", async (req, res) =>
 		return res.status(400).json({ code: "AM101", error: "Missing token" });
 	}
 
-	//TODO: Check if the token is valid
-	const userID = "I101"
+	//Check if the token is valid
+	let user = await verifyUser(token)
+	if (user === null)
+	{	
+		return res.status(403).json({ code: "AM102", error: "Invalid token" });
+	}
 
 	// Check if the datatype eixsts and is of image/png or image/jpeg or image/gif
 	if (!MIMEtype || (MIMEtype !== "image/png" && MIMEtype !== "image/jpeg" && MIMEtype !== "image/gif"))
@@ -58,7 +63,9 @@ router.post("/media", async (req, res) =>
 	// Generate a random filename for the media uuid
 	const fileName = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 
-	const response = await ociOjectStorage.AddData(bucketName, fileName, MIMEtype, data, { userID });
+	const uid = user.uid;
+
+	const response = await ociOjectStorage.AddData(bucketName, fileName, MIMEtype, data, {uid});
 
 	if (response.versionId)
 	{
@@ -70,7 +77,7 @@ router.post("/media", async (req, res) =>
 });
 
 /*
-	* @route POST /str/getMedia
+	* @route GET
 	* @desc Get media from the bucket
 	* @access Private
 	* @body token, mediaId
@@ -90,8 +97,12 @@ router.get("/media/:mediaId", async (req, res) =>
 		return res.status(400).json({ code: "GM101", error: "Missing token" });
 	}
 
-	//TODO: Check if the token is valid
-	const userID = "I101"
+	//Check if the token is valid
+	let user = await verifyUser(token)
+	if (user === null)
+	{
+		return res.status(403).json({ code: "GM102", error: "Invalid token" });
+	}
 
 	// Check if the versionId exists
 	if (!mediaId)
@@ -100,7 +111,7 @@ router.get("/media/:mediaId", async (req, res) =>
 	}
 
 	//ensure mediaid is have the required length
-	if (mediaId.length !== 22)
+	if (mediaId.length < 20)
 	{
 		return res.status(400).json({ code: "GM103", error: "Invalid mediaID" });
 	}
@@ -114,7 +125,7 @@ router.get("/media/:mediaId", async (req, res) =>
 		return res.status(404).json({ code: "GM105", message: "Data not found" });
 	}
 
-	if (response.opcMeta["opc-meta-userid"] !== userID)
+	if (response.opcMeta["opc-meta-uid"] !== user.uid)
 	{
 		return res.status(403).json({ code: "GM104", message: "Validation Failed", data: response.data });
 	}
