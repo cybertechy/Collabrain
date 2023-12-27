@@ -27,7 +27,6 @@ jobs:
 
     - name: add Secret files
       run: |
-        mkdir -p ./backend/utils
         echo "$OCI_PEM" > ./src/api/helpers/oci.pem
         echo "$OCI_CONFIG" > ./src/api/helpers/oci-config
 
