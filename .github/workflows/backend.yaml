@@ -25,11 +25,11 @@ jobs:
       with:
         node-version: '18'
 
-    - name: Create /utils folder and add PEM files
+    - name: add Secret files
       run: |
         mkdir -p ./backend/utils
-        echo "$OCI_PEM" > ./backend/utils/OCI_PEM.pem
-        echo "$OCI_CONFIG" > ./backend/utils/OCI_CONFIG
+        echo "$OCI_PEM" > ./src/api/helpers/oci.pem
+        echo "$OCI_CONFIG" > ./src/api/helpers/oci-config
 
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
