@@ -1,5 +1,5 @@
-const express = require('express')
-const router = express.Router()
+const express = require('express');
+const router = express.Router();
 const db = require("../helpers/firebase.js");
 
 // Doc api endpoints
@@ -7,62 +7,56 @@ const db = require("../helpers/firebase.js");
 
 router.post("/new", (req, res) =>
 {
-	db.verifyUser(req.query.token).then(user =>
+	try
 	{
-		if (!user)
-			res.json({ message: "Invalid token" });
+		db.verifyUser(req.body.token).then(user =>
+		{
+			if (!user)
+				throw new Error("Unauthorized");
 
-		// Get doc data and create it in Firestore
-		db.createDoc(`${user.uid}/docs`, { title: req.query.title, content: req.query.content })
-			.then(() => { res.json({ message: "Success!" }); }).catch((error) => { res.json({ message: error }); });
+			db.createDoc(user.uid)
+				.then((ref) => { res.json({ message: "Document created", id: ref.id }); })
+				.catch((error) => { res.status(500).json({ message: "Failed" }); });
 
-	}).catch((error) => { res.json({ message: error }); })
-
+		});
+	}
+	catch (error) { res.status(401).json({ message: error }); }
 });
 
-router.post("/remove", (req, res) =>
+router.post("/:ref", (req, res) =>
 {
-	db.verifyUser(req.query.token).then(user =>
+	try
 	{
-		if (!user)
-			res.json({ message: "Invalid token" });
+		db.verifyUser(req.body.token).then(user =>
+		{
+			if (!user)
+				throw new Error("Unauthorized");
 
-		// Remove doc from Firestore
-		db.removeDoc(`${user.uid}/docs`, req.query.docID)
-			.then(() => { res.json({ message: "Success!" }); }).catch((error) => { res.json({ message: error }); });
-	});
+			db.updateDoc(user.uid, req.params.ref, req.body.title, req.body.content)
+				.then(() => { res.json({ message: "Document updated" }); })
+				.catch((error) => { res.status(500).json({ message: "Failed" }); });
 
-	res.json({ message: "Success!" });
+		});
+	}
+	catch (error) { res.status(401).json({ message: error }); }
 });
 
-router.post("/update", (req, res) =>
+router.post("/delete/:ref", (req, res) =>
 {
-	db.verifyUser(req.query.token).then(user =>
+	try
 	{
-		if (!user)
-			res.json({ message: "Invalid token" });
+		db.verifyUser(req.body.token).then(user =>
+		{
+			if (!user)
+				throw new Error("Unauthorized");
 
-		// Update doc in Firestore
-		db.updateDoc(`${user.uid}/docs`, req.query.docID, { title: req.query.title, content: req.query.content })
-			.then(() => { res.json({ message: "Success!" }); }).catch((error) => { res.json({ message: error }); });
-	});
+			db.removeDoc  (user.uid, req.params.ref)
+				.then(() => { res.json({ message: "Document deleted" }); })
+				.catch((error) => { res.status(500).json({ message: "Failed" }); });
 
-	res.json({ message: "Success!" });
+		});
+	}
+	catch (error) { res.status(401).json({ message: error }); }
 });
 
-router.get("/get", (req, res) =>
-{
-	db.verifyUser(req.query.token).then(user =>
-	{
-		if (!user)
-			res.json({ message: "Invalid token" });
-
-		// Get doc from Firestore
-		db.getDoc(`${user.uid}/docs`, req.query.docID)
-			.then(doc => { res.json(doc); }).catch((error) => { res.json({ message: error }); });
-	});
-
-	res.json({ message: "Success!" });
-});
-
-module.exports = router;
+module.exports = router;	

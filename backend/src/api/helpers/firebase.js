@@ -1,5 +1,4 @@
 const admin = require("firebase-admin");
-const { getFirestore }  = require("firebase-admin/firestore");
 const serviceAccount = require("./ServiceAccountKey.json");
 
 // Initialize Firebase admin
@@ -14,30 +13,24 @@ function verifyUser(token)
 }
 
 // Functions to manipulate docs in Firestore
-const db = getFirestore();
-async function createDoc(collectionName, data)
+const db = admin.firestore();
+async function createDoc(user)
 {
-	const ref = db.collection(collectionName).add(data).catch((error) => { console.log(error); })
-	console.log(`Document created: ${ref.id}`);
+	// Create new doc with generated ID
+	let ref = await db.collection(`users/${user}/docs`).add({});
+	return ref;
 }
 
-async function removeDoc(collectionName, docID)
+async function removeDoc(user, docID)
 {
-	db.collection(collectionName).doc(docID).delete().catch((error) => { console.log(error); })
-	console.log(`Document deleted`);
+	// Delete doc with given ID
+	db.collection(`users/${user}/docs`).doc(docID).delete();
 }
 
-async function updateDoc(collectionName, docID, data)
+async function updateDoc(user, docID, title, content)
 {
-	db.collection(collectionName).doc(docID).update(data).catch((error) => { console.log(error); })
-	console.log(`Document updated`);
-}
-
-async function getDoc(collectionName, docID)
-{
-	const doc = await db.collection(collectionName).doc(docID).get().catch((error) => { console.log(error); })
-	console.log(`Document retrieved`);
-	return doc.data();
+	// Update doc with given ID
+	db.collection(`users/${user}/docs`).doc(docID).update({ "title": title, "content": content });
 }
 
 module.exports = {
@@ -46,5 +39,4 @@ module.exports = {
 	createDoc,
 	removeDoc,
 	updateDoc,
-	getDoc
 };
