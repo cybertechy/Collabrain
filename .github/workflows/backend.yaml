@@ -15,6 +15,7 @@ jobs:
       OCI_PEM: ${{ secrets.OCI_PEM }}
       OCI_CONFIG: ${{ secrets.OCI_CONFIG }}
       WEBSITE_URL: "https://cb1.cybertech13.eu.org/api/home"
+      WAIT_TIMEOUT_SECONDS: 300
       
     steps:
     - name: Checkout code
@@ -73,8 +74,18 @@ jobs:
       run: |
         kubectl apply -f ./backend/.kube/deployment.yaml
     
-    - name: Wait for 10 seconds
-      run: sleep 10
+    - name: Wait for Deployment to be Ready
+      run: |
+        timeout=$((SECONDS+WAIT_TIMEOUT_SECONDS))
+        while [ $SECONDS -lt $timeout ]; do
+          if kubectl rollout status deployment collabrain-backend-deployment -n collabrain; then
+            echo "Deployment is ready."
+            break
+          else
+            echo "Waiting for deployment to be ready..."
+            sleep 10
+          fi
+        done
 
     - name: Verify deployment
       run: |
