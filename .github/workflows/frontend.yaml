@@ -35,7 +35,7 @@ jobs:
     - name: Update Timestamp in Deployment File
       run: |
        TIMESTAMP=$(date +'%Y%m%d-%H%M%S')
-       sed -i "s/timestamp: .*/timestamp: \"$TIMESTAMP\"/" ./backend/.kube/deployment.yaml
+       sed -i "s/timestamp: .*/timestamp: \"$TIMESTAMP\"/" ./frontend/.kube/deployment.yaml
 
     - name: Build and push Docker image
       env:
