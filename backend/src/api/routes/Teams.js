@@ -3,6 +3,12 @@ const router = express.Router();
 const fb = require("../helpers/firebase.js");
 const storage = require("../helpers/oracle.js");
 
+
+/*
+
+Endpoint for creating a new team
+
+*/
 router.post("/team", async (req, res) => {
 
     const {token, teamName, teamImage, MIMEtype} = req.body;
@@ -79,9 +85,52 @@ router.post("/team", async (req, res) => {
         return res.status(400).json({code:400, error: "Team creation failed"});
     }
 
-    return res.status(200).json({code:200, message: "Team created"});
+    return res.status(200).json({code:200, message: "Team created", teamID: teamID});
     
     
 });
+
+/*
+
+Endpoint for getting a team's data
+
+*/
+
+router.get("/team", async (req, res) => {
+    
+        const {token, teamID} = req.body;
+    
+        if(!token) {
+            return res.status(400).json({code:400, error: "Missing token"});
+        }
+    
+        if(!teamID) {
+            return res.status(400).json({code:400, error: "Missing team ID"});
+        }
+    
+        // verfiy token
+        let user = await fb.verifyUser(token);
+        if(!user){
+            return res.status(400).json({code:400, error: "Invalid token"});
+        }
+    
+        // get database references
+        let db = fb.admin.firestore();
+        let teamsRef = db.collection("teams");
+    
+        // get team data
+        let query = await teamsRef.doc(teamID).get();
+        if(!query.exists){
+            return res.status(400).json({code:400, error: "Team does not exist"});
+        }
+    
+        let teamData = query.data();
+
+        return res.status(200).json({code:200, data: teamData});
+    
+    });
+
+
+
 
 module.exports = router;
