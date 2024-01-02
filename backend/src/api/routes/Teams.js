@@ -58,16 +58,36 @@ router.post("/team", async (req, res) => {
     // get database references
     let db = fb.admin.firestore();
     let teamsRef = db.collection("teams");
+    let channelsRef = db.collection("channels");
 
     // check if team name is already taken
     let query = await teamsRef.where("teamName", "==", teamName).get();
     if(!query.empty){
         return res.status(400).json({code:400, error: "Team name already taken"});
     }
+    
+    
 
     // add team to database
     let teamRef = teamsRef.doc();
     let teamID = teamRef.id;
+
+    //create a general channel for the team
+    let channelRef = channelsRef.doc();
+    let channelID = channelRef.id;
+    let channelData = {
+        channelName: "General",
+        channelID: channelID,
+        teamID: teamID,
+        message: []
+    }
+    let channelCreation = await channelRef.set(channelData);
+
+    if(!channelCreation){
+        return res.status(400).json({code:400, error: "Channel creation failed"});
+    }
+
+    // create team data
     let teamData = {
         teamName: teamName,
         teamImageID: (teamImage && MIMEtype) ? ImageID : null,
@@ -81,7 +101,7 @@ router.post("/team", async (req, res) => {
             status: "active",
             email: email
         } },
-        channels: ["General"],
+        channels: { [channelID]: "General" },
         Visibility: "public"
     }
 
@@ -628,7 +648,6 @@ router.get("/adminof", async (req, res) => {
     return res.status(200).json({code:200, data: teams});
 
 });
-
 
 
 
