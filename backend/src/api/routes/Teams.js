@@ -101,7 +101,10 @@ router.post("/team", async (req, res) => {
             status: "active",
             email: email
         } },
-        channels: { [channelID]: "General" },
+        channels: { [channelData.channelName]: {
+            channelName: channelData.channelName,
+            channelID: channelData.channelID
+        } },
         Visibility: "public"
     }
 
@@ -655,6 +658,317 @@ router.get("/adminof", async (req, res) => {
     return res.status(200).json({code:200, data: teams});
 
 });
+
+/************************************************************/
+/*                   Channel CRUD operations                */
+/************************************************************/
+
+/* Endpoint for creating a new channel */
+router.post("/channel", async (req, res) => {
+    const {token, teamID, channelName} = req.body;
+
+    if(!token) {
+        return res.status(400).json({code:400, error: "Missing token"});
+    }
+
+    if(!teamID) {
+        return res.status(400).json({code:400, error: "Missing team ID"});
+    }
+
+    if(!channelName) {
+        return res.status(400).json({code:400, error: "Missing channel name"});
+    }
+
+    // verify token
+    let user = await fb.verifyUser(token);
+    if(!user){
+        return res.status(400).json({code:400, error: "Invalid token"});
+    }
+
+    // get database references
+    let db = fb.admin.firestore();
+    let teamsRef = db.collection("teams");
+    let channelsRef = db.collection("channels");
+
+    // get team data
+    let query = await teamsRef.doc(teamID).get();
+    if(!query.exists){
+        return res.status(400).json({code:400, error: "Team does not exist"});
+    }
+
+    let teamData = query.data();
+
+    // check if user is a administator of the team
+    if(teamData.members[user.uid].role != "administator"){
+        return res.status(400).json({code:400, error: "User is not a administator of the team"});
+    }
+
+    // check if channel name is already taken
+    if(teamData.channels[channelName]){
+        return res.status(400).json({code:400, error: "Channel name already taken"});
+    }
+
+    // create channel
+    let channelRef = channelsRef.doc();
+    let channelID = channelRef.id;
+
+    let channelData = {
+        channelName: channelName,
+        channelID: channelID,
+        teamID: teamID,
+        message: []
+    }
+
+    let creation = await channelRef.set(channelData);
+    if(!creation){
+        return res.status(400).json({code:400, error: "Channel creation failed"});
+    }
+
+    // add channel to team
+    teamData.channels[channelName] = {
+        channelName: channelName,
+        channelID: channelID
+    }
+
+    let update = await teamsRef.doc(teamID).update(teamData);
+
+    if(!update){
+        return res.status(400).json({code:400, error: "Channel addition failed"});
+    }
+
+    return res.status(200).json({code:200, message: "Channel created", channelID: channelID});
+
+});
+
+/* Endpoint for getting a channel's data */
+router.get("/channel", async (req, res) => {
+    const {token, teamID, channelID} = req.query;
+
+    if(!token) {
+        return res.status(400).json({code:400, error: "Missing token"});
+    }
+
+    if(!teamID) {
+        return res.status(400).json({code:400, error: "Missing team ID"});
+    }
+
+    if(!channelID) {
+        return res.status(400).json({code:400, error: "Missing channel ID"});
+    }
+
+    // verify token
+    let user = await fb.verifyUser(token);
+    if(!user){
+        return res.status(400).json({code:400, error: "Invalid token"});
+    }
+
+    // get database references
+    let db = fb.admin.firestore();
+    let teamsRef = db.collection("teams");
+    let channelsRef = db.collection("channels");
+
+    // get team data
+    let query = await teamsRef.doc(teamID).get();
+    if(!query.exists){
+        return res.status(400).json({code:400, error: "Team does not exist"});
+    }
+
+    let teamData = query.data();
+
+    // check if user is a member of the team
+    if(!teamData.members[user.uid]){
+        return res.status(400).json({code:400, error: "User is not a member of the team"});
+    }
+
+    // get channel data
+    let channelQuery = await channelsRef.doc(channelID).get();
+    if(!channelQuery.exists){
+        return res.status(400).json({code:400, error: "Channel does not exist"});
+    }
+
+    let channelData = channelQuery.data();
+
+    if(channelData.teamID != teamID){
+        return res.status(400).json({code:400, error: "Unauthorized access"});
+    }
+
+    return res.status(200).json({code:200, data: channelData});
+});
+
+/* Endpoint for updating a channel's data */
+router.put("/channel", async (req, res) => {
+
+    const {token, teamID, channelID, channelName} = req.body;
+
+    if(!token) {
+        return res.status(400).json({code:400, error: "Missing token"});
+    }
+
+    if(!teamID) {
+        return res.status(400).json({code:400, error: "Missing team ID"});
+    }
+
+    if(!channelID) {
+        return res.status(400).json({code:400, error: "Missing channel ID"});
+    }
+
+    if(!channelName) {
+        return res.status(400).json({code:400, error: "Missing channel name"});
+    }
+
+    // verify token
+    let user = await fb.verifyUser(token);
+    if(!user){
+        return res.status(400).json({code:400, error: "Invalid token"});
+    }
+
+    // get database references
+    let db = fb.admin.firestore();
+    let teamsRef = db.collection("teams");
+    let channelsRef = db.collection("channels");
+
+    // get team data
+    let query = await teamsRef.doc(teamID).get();
+    if(!query.exists){
+        return res.status(400).json({code:400, error: "Team does not exist"});
+    }
+
+    let teamData = query.data();
+
+    // check if user is a administator of the team
+    if(teamData.members[user.uid].role != "administator"){
+        return res.status(400).json({code:400, error: "User is not a administator of the team"});
+    }
+
+    // check if channel name is already taken
+    if(teamData.channels[channelName]){
+        return res.status(400).json({code:400, error: "Channel name already taken"});
+    }
+
+    // get channel data
+    let channelQuery = await channelsRef.doc(channelID).get();
+    if(!channelQuery.exists){
+        return res.status(400).json({code:400, error: "Channel does not exist"});
+    }
+
+    let channelData = channelQuery.data();
+
+    if(channelData.teamID != teamID){
+        return res.status(400).json({code:400, error: "Unauthorized access"});
+    }
+
+    //update Info in team by deleting the existing channel and adding the updated one
+    delete teamData.channels[channelData.channelName];
+
+    let updateTeam = await teamsRef.doc(teamID).update(teamData);
+
+    if(!updateTeam){
+        return res.status(400).json({code:400, error: "Channel update failed"});
+    }
+
+    // add channel to team
+    teamData.channels[channelName] = {
+        channelName: channelName,
+        channelID: channelID
+    }
+
+    let updateTeamChannel = await teamsRef.doc(teamID).update(teamData);
+
+    if(!updateTeamChannel){
+        return res.status(400).json({code:400, error: "Channel addition failed"});
+    }
+
+    // update channel data
+    channelData.channelName = channelName;
+
+    let update = await channelsRef.doc(channelID).update(channelData);
+    if(!update){
+        return res.status(400).json({code:400, error: "Channel update failed"});
+    }
+
+    return res.status(200).json({code:200, message: "Channel updated"});
+
+});
+
+/* Endpoint for deleting a channel */
+router.delete("/channel", async (req, res) => {
+
+    const {token, teamID, channelID} = req.body;
+
+    if(!token) {
+        return res.status(400).json({code:400, error: "Missing token"});
+    }
+
+    if(!teamID) {
+        return res.status(400).json({code:400, error: "Missing team ID"});
+    }
+
+    if(!channelID) {
+        return res.status(400).json({code:400, error: "Missing channel ID"});
+    }
+
+    // verify token
+    let user = await fb.verifyUser(token);
+    if(!user){
+        return res.status(400).json({code:400, error: "Invalid token"});
+    }
+
+    // get database references
+    let db = fb.admin.firestore();
+    let teamsRef = db.collection("teams");
+    let channelsRef = db.collection("channels");
+
+    // get team data
+    let query = await teamsRef.doc(teamID).get();
+    if(!query.exists){
+        return res.status(400).json({code:400, error: "Team does not exist"});
+    }
+
+    let teamData = query.data();
+
+    // check if user is a administator of the team
+    if(teamData.members[user.uid].role != "administator"){
+        return res.status(400).json({code:400, error: "User is not a administator of the team"});
+    }
+
+    // get channel data
+    let channelQuery = await channelsRef.doc(channelID).get();
+
+    if(!channelQuery.exists){
+        return res.status(400).json({code:400, error: "Channel does not exist"});
+    }
+
+    let channelData = channelQuery.data();
+
+    if(channelData.teamID != teamID){
+        return res.status(400).json({code:400, error: "Unauthorized access"});
+    }
+
+    // delete channel
+    let deletion = await channelsRef.doc(channelID).delete();
+
+    if(!deletion){
+        return res.status(400).json({code:400, error: "Channel deletion failed"});
+    }
+
+    // delete channel from team
+    delete teamData.channels[channelData.channelName];
+
+    let update = await teamsRef.doc(teamID).update(teamData);
+
+    if(!update){
+
+        return res.status(400).json({code:400, error: "Channel deletion failed"});
+
+    }
+
+    return res.status(200).json({code:200, message: "Channel deleted"});
+
+});
+
+    
+
+
 
 
 
