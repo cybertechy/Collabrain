@@ -172,7 +172,7 @@ router.put("/team", async (req, res) => {
             return res.status(400).json({code:400, error: "Missing update data"});
         }
     
-        // verfiy token
+        // verify token
         let user = await fb.verifyUser(token);
         if(!user){
             return res.status(400).json({code:400, error: "Invalid token"});
@@ -208,8 +208,15 @@ router.put("/team", async (req, res) => {
         }
 
         if(teamImage && MIMEtype){
-            teamData.teamImageID = teamName;
+            teamData.teamImageID = uuid.v4();
             teamData.MIMEtype = MIMEtype;
+
+            // upload the image to oracle
+            let imageID = await storage.AddData("B2",teamData.teamImageID,MIMEtype,teamImage,null)
+
+            if(!imageID){
+                return res.status(400).json({code:400, error: "Image upload failed"});
+            }
         }
 
         if(Visibility){

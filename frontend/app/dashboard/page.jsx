@@ -54,6 +54,7 @@ export default function Dashboard()
 			<h1 className="text-xl font-bold">Dashboard</h1>
 			<p>This is your dashboard</p>
 			<p>There should be something here</p>
+			<button onClick={()=> getToken().then(token => console.log(token))}>Get token</button>
 			<button onClick={signOut}>Sign Out</button>
 			<input id="doc-title" style={{ color: "black", padding: 10, marginTop: 10 }} type="text" />
 			<textarea id="doc-text" style={{ color: "black", padding: 10, marginTop: 10 }} name="text" cols="30" rows="10"></textarea>
