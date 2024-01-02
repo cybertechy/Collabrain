@@ -5,11 +5,12 @@ const storage = require("../helpers/oracle.js");
 const uuid = require("uuid");
 
 
-/*
+/************************************************************/
+/*                   Teams CRUD Operations                 */
+/************************************************************/
 
-Endpoint for creating a new team
+/* Endpoint for creating a new team */
 
-*/
 router.post("/team", async (req, res) => {
 
     const {token, teamName, teamImage, MIMEtype} = req.body;
@@ -94,11 +95,7 @@ router.post("/team", async (req, res) => {
     
 });
 
-/*
-
-Endpoint for getting a team's data
-
-*/
+/* Endpoint for getting a team's data */
 
 router.get("/team", async (req, res) => {
     
@@ -134,126 +131,10 @@ router.get("/team", async (req, res) => {
     
     });
 
-/*
-
-Get all teams that a user is a member of
-
-*/
-
-router.get("/memberof", async (req, res) => {
-    const {token} = req.query;
-
-    if(!token) {
-        return res.status(400).json({code:400, error: "Missing token"});
-    }
-
-    // verify token
-    let user = await fb.verifyUser(token);
-    if(!user){
-        return res.status(400).json({code:400, error: "Invalid token"});
-    }
-
-    // get database references
-    let db = fb.admin.firestore();
-    let teamsRef = db.collection("teams");
-
-    // get all teams that the user is a member of
-    let query = await teamsRef.where(`members.${user.uid}.status`, "==", "active").get();
-    if(query.empty){
-        return res.status(400).json({code:400, error: "User is not a member of any teams"});
-    }
-
-    let teams = [];
-    query.forEach(team => {
-        teams.push(team.data());
-    });
-
-    return res.status(200).json({code:200, data: teams});
-
-});
-
-/*
-
-Get all teams that a user owns
-
-*/
-
-router.get("/owned", async (req, res) => {
-    const {token} = req.query;
-
-    if(!token) {
-        return res.status(400).json({code:400, error: "Missing token"});
-    }
-
-    // verify token
-    let user = await fb.verifyUser(token);
-    if(!user){
-        return res.status(400).json({code:400, error: "Invalid token"});
-    }
-
-    // get database references
-    let db = fb.admin.firestore();
-    let teamsRef = db.collection("teams");
-
-    // get all teams that the user owns
-    let query = await teamsRef.where("owner.uid", "==", user.uid).get();
-    if(query.empty){
-        return res.status(400).json({code:400, error: "User does not own any teams"});
-    }
-
-    let teams = [];
-    query.forEach(team => {
-        teams.push(team.data());
-    });
-
-    return res.status(200).json({code:200, data: teams});
-
-});
-
-/*
-
-Get all the teams user is a administator of
-
-*/
-
-router.get("/adminof", async (req, res) => {
-    const {token} = req.query;
-
-    if(!token) {
-        return res.status(400).json({code:400, error: "Missing token"});
-    }
-
-    // verify token
-    let user = await fb.verifyUser(token);
-    if(!user){
-        return res.status(400).json({code:400, error: "Invalid token"});
-    }
-
-    // get database references
-    let db = fb.admin.firestore();
-    let teamsRef = db.collection("teams");
-
-    // get all teams that the user owns
-    let query = await teamsRef.where(`members.${user.uid}.role`, "==", "administator").get();
-    if(query.empty){
-        return res.status(400).json({code:400, error: "User is not a administator of any teams"});
-    }
-
-    let teams = [];
-    query.forEach(team => {
-        teams.push(team.data());
-    });
-
-    return res.status(200).json({code:200, data: teams});
-
-});
 
 
-/*
 
-Endpoint for updating a team's data
-
-*/
+/* Endpoint for updating a team's data */
 
 router.put("/team", async (req, res) => {
     
@@ -324,11 +205,7 @@ router.put("/team", async (req, res) => {
     
     });
 
-/*
-
-Endpoint for deleting a team
-
-*/
+/* Endpoint for deleting a team */
 
 router.delete("/team", async (req, res) => {
     
@@ -376,11 +253,95 @@ router.delete("/team", async (req, res) => {
     });
 
 
-/*
+/************************************************************/
+/*                   Members CRUD Operations                */
+/************************************************************/
 
-Endpoint for getting a team's members
 
-*/
+/* Endpoint for adding a member to a team*/
+
+router.post("/member", async (req, res) => {
+    
+    const {token, teamID, memberID, role, fName,lName,email} = req.body;
+
+    if(!token) {
+        return res.status(400).json({code:400, error: "Missing token"});
+    }
+
+    if(!teamID) {
+        return res.status(400).json({code:400, error: "Missing team ID"});
+    }
+
+    if(!memberID) {
+        return res.status(400).json({code:400, error: "Missing member ID"});
+    }
+
+    if(!role) {
+        return res.status(400).json({code:400, error: "Missing role"});
+    }
+
+    if(!fName) {
+        return res.status(400).json({code:400, error: "Missing first name"});
+    }
+
+    if(!lName) {
+        return res.status(400).json({code:400, error: "Missing last name"});
+    }
+
+    if(!email) {
+        return res.status(400).json({code:400, error: "Missing email"});
+    }
+
+    // verify token
+    let user = await fb.verifyUser(token);
+    if(!user){
+        return res.status(400).json({code:400, error: "Invalid token"});
+    }
+
+    // get database references
+    let db = fb.admin.firestore();
+    let teamsRef = db.collection("teams");
+
+    // get team data
+    let query = await teamsRef.doc(teamID).get();
+    if(!query.exists){
+        return res.status(400).json({code:400, error: "Team does not exist"});
+    }
+
+    let teamData = query.data();
+
+    // check if user is a administator of the team
+    if(teamData.members[user.uid].role != "administator"){
+        return res.status(400).json({code:400, error: "User is not a administator of the team"});
+    }
+
+    // check if member is already a member of the team
+    if(teamData.members[memberID]){
+        return res.status(400).json({code:400, error: "User is already a member of the team"});
+    }
+
+    // add member to team
+    teamData.members[memberID] = {
+        fname: fName,
+        lname: lName,
+        role: role,
+        status: "active",
+        email: email
+    }
+
+    let update = await teamsRef.doc(teamID).update(teamData);
+    if(!update){
+        return res.status(400).json({code:400, error: "Member addition failed"});
+    }
+
+    return res.status(200).json({code:200, message: "Member added"});
+
+});
+
+
+
+
+/* Endpoint for getting a team's members */
 
 router.get("/members", async (req, res) => {
         
@@ -426,90 +387,6 @@ router.get("/members", async (req, res) => {
             return res.status(200).json({code:200, data: members});
         
         });
-
-/*
-
-Endpoint for adding a member to a team
-
-*/
-
-router.post("/member", async (req, res) => {
-    
-        const {token, teamID, memberID, role, fName,lName,email} = req.body;
-    
-        if(!token) {
-            return res.status(400).json({code:400, error: "Missing token"});
-        }
-    
-        if(!teamID) {
-            return res.status(400).json({code:400, error: "Missing team ID"});
-        }
-
-        if(!memberID) {
-            return res.status(400).json({code:400, error: "Missing member ID"});
-        }
-
-        if(!role) {
-            return res.status(400).json({code:400, error: "Missing role"});
-        }
-
-        if(!fName) {
-            return res.status(400).json({code:400, error: "Missing first name"});
-        }
-
-        if(!lName) {
-            return res.status(400).json({code:400, error: "Missing last name"});
-        }
-
-        if(!email) {
-            return res.status(400).json({code:400, error: "Missing email"});
-        }
-    
-        // verify token
-        let user = await fb.verifyUser(token);
-        if(!user){
-            return res.status(400).json({code:400, error: "Invalid token"});
-        }
-    
-        // get database references
-        let db = fb.admin.firestore();
-        let teamsRef = db.collection("teams");
-    
-        // get team data
-        let query = await teamsRef.doc(teamID).get();
-        if(!query.exists){
-            return res.status(400).json({code:400, error: "Team does not exist"});
-        }
-    
-        let teamData = query.data();
-
-        // check if user is a administator of the team
-        if(teamData.members[user.uid].role != "administator"){
-            return res.status(400).json({code:400, error: "User is not a administator of the team"});
-        }
-
-        // check if member is already a member of the team
-        if(teamData.members[memberID]){
-            return res.status(400).json({code:400, error: "User is already a member of the team"});
-        }
-
-        // add member to team
-        teamData.members[memberID] = {
-            fname: fName,
-            lname: lName,
-            role: role,
-            status: "active",
-            email: email
-        }
-
-        let update = await teamsRef.doc(teamID).update(teamData);
-        if(!update){
-            return res.status(400).json({code:400, error: "Member addition failed"});
-        }
-
-        return res.status(200).json({code:200, message: "Member added"});
-    
-    });
 
 /*
 
@@ -586,11 +463,7 @@ router.put("/member", async (req, res) => {
         });
 
 
-/*
-
-Endpoint for deleting a member from a team
-
-*/
+/* Endpoint for deleting a member from a team */
 
 router.delete("/member", async (req, res) => {
 
@@ -645,6 +518,114 @@ router.delete("/member", async (req, res) => {
     }
 
     return res.status(200).json({code:200, message: "Member deleted"});
+
+});
+
+
+/************************************************************/
+/*                   Users associated teams                 */
+/************************************************************/
+
+
+/* Get all teams that a user is a member of */
+
+router.get("/memberof", async (req, res) => {
+    const {token} = req.query;
+
+    if(!token) {
+        return res.status(400).json({code:400, error: "Missing token"});
+    }
+
+    // verify token
+    let user = await fb.verifyUser(token);
+    if(!user){
+        return res.status(400).json({code:400, error: "Invalid token"});
+    }
+
+    // get database references
+    let db = fb.admin.firestore();
+    let teamsRef = db.collection("teams");
+
+    // get all teams that the user is a member of
+    let query = await teamsRef.where(`members.${user.uid}.status`, "==", "active").get();
+    if(query.empty){
+        return res.status(400).json({code:400, error: "User is not a member of any teams"});
+    }
+
+    let teams = [];
+    query.forEach(team => {
+        teams.push(team.data());
+    });
+
+    return res.status(200).json({code:200, data: teams});
+
+});
+
+/* Get all teams that a user owns */
+
+router.get("/owned", async (req, res) => {
+    const {token} = req.query;
+
+    if(!token) {
+        return res.status(400).json({code:400, error: "Missing token"});
+    }
+
+    // verify token
+    let user = await fb.verifyUser(token);
+    if(!user){
+        return res.status(400).json({code:400, error: "Invalid token"});
+    }
+
+    // get database references
+    let db = fb.admin.firestore();
+    let teamsRef = db.collection("teams");
+
+    // get all teams that the user owns
+    let query = await teamsRef.where("owner.uid", "==", user.uid).get();
+    if(query.empty){
+        return res.status(400).json({code:400, error: "User does not own any teams"});
+    }
+
+    let teams = [];
+    query.forEach(team => {
+        teams.push(team.data());
+    });
+
+    return res.status(200).json({code:200, data: teams});
+
+});
+
+/* Get all the teams user is a administator of */
+
+router.get("/adminof", async (req, res) => {
+    const {token} = req.query;
+
+    if(!token) {
+        return res.status(400).json({code:400, error: "Missing token"});
+    }
+
+    // verify token
+    let user = await fb.verifyUser(token);
+    if(!user){
+        return res.status(400).json({code:400, error: "Invalid token"});
+    }
+
+    // get database references
+    let db = fb.admin.firestore();
+    let teamsRef = db.collection("teams");
+
+    // get all teams that the user owns
+    let query = await teamsRef.where(`members.${user.uid}.role`, "==", "administator").get();
+    if(query.empty){
+        return res.status(400).json({code:400, error: "User is not a administator of any teams"});
+    }
+
+    let teams = [];
+    query.forEach(team => {
+        teams.push(team.data());
+    });
+
+    return res.status(200).json({code:200, data: teams});
 
 });
 
