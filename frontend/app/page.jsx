@@ -8,7 +8,7 @@ export default function Home()
 	const router = useRouter();
 
 	if (isAuth())
-		router.push('/dashboard'); // Redirect to dashboard
+		router.push('/chat'); // Redirect to dashboard
 
 	return (
 		<div className="flex flex-col justify-center items-center">
