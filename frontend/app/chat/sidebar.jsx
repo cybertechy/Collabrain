@@ -31,7 +31,7 @@ export default function Sidebar()
 			<List>
 				{/* use loop to create multiple list items */}
 				{["Bloop", "Chicorita", "Snoozefest"].map((text, index) => (
-					<ListItem>
+					<ListItem key={index}>
 						<ListItemButton>
 							<ListItemIcon>
 								<Groups3Icon />

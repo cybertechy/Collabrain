@@ -13,12 +13,14 @@ const microsoftProvider = new OAuthProvider('microsoft.com');
 
 const auth = getAuth(firebase);
 const signOut = () => auth.signOut();
+const getToken = () => auth.currentUser.getIdToken(true);
+const getUserID = () => auth.currentUser.uid;
 
 /**
  * Check user auth state
  * @return {boolean} - true if signed in, false if not
 */
-function isAuth()
+function useIsAuth()
 {
 	const [user, loading] = useAuthState(auth);
 	return (user) ? true : false;
@@ -68,7 +70,7 @@ async function serviceSignIn(service)
 	const providers = {
 		"microsoft": microsoftProvider,
 		"google": googleProvider
-	}
+	};
 
 	const result = await signInWithPopup(auth, providers[service])
 		.catch(err =>
@@ -88,15 +90,11 @@ async function serviceSignIn(service)
 
 }
 
-async function getToken()
-{
-	return auth.currentUser.getIdToken(true)
-}
-
 module.exports = {
 	getToken,
+	getUserID,
 	signOut,
-	isAuth,
+	useIsAuth,
 	emailSignIn,
 	serviceSignIn
-}
+};

@@ -1,14 +1,21 @@
 "use client"
 
-const { isAuth, emailSignIn, serviceSignIn } = require("_firebase/auth"); // Import the authentication functions
+const { useEffect } = require("react");
+const { useIsAuth, emailSignIn, serviceSignIn } = require("_firebase/auth"); // Import the authentication functions
 const { useRouter } = require('next/navigation');
+const { initializeSocket } = require('_socket/socket');
 
 export default function Home()
 {
 	const router = useRouter();
 
-	if (isAuth())
-		router.push('/chat'); // Redirect to dashboard
+	// if (useIsAuth())
+	// 	router.push('/chat'); // Redirect to dashboard
+
+	useEffect(() =>
+	{
+		initializeSocket('http://localhost:8080');
+	}, []);
 
 	return (
 		<div className="flex flex-col justify-center items-center">
@@ -29,5 +36,5 @@ export default function Home()
 			<button onClick={() => serviceSignIn("microsoft")}>Sign In with microsoft</button>
 			<button onClick={() => serviceSignIn("google")}>Sign In with google</button>
 		</div>
-	)
+	);
 }

@@ -4,7 +4,7 @@ import InfoBar from "./infoBar";
 import MessageBox from "./messageBox";
 import Sidebar from "./sidebar";
 
-const { isAuth } = require("_firebase/auth"); // Import the authentication functions
+const { useIsAuth } = require("_firebase/auth"); // Import the authentication functions
 const { useRouter } = require('next/navigation');
 
 export default function ChatRoom()

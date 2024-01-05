@@ -1,15 +1,15 @@
 "use client";
 
-const { signOut, isAuth, getToken } = require("_firebase/auth"); // Import the authentication functions
+const { signOut, useIsAuth, getToken } = require("_firebase/auth"); // Import the authentication functions
 const { useRouter } = require('next/navigation');
 const axios = require('axios');
 
 export default function Dashboard()
 {
 	const router = useRouter();
-	if (!isAuth())
+	if (!useIsAuth())
 	{
-		router.push('/'); // Redirect to home page
+		// router.push('/'); // Redirect to home page
 		return <h1 className="text-xl font-bold">Please sign in</h1>;
 	}
 
