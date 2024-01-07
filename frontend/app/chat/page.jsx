@@ -1,35 +1,59 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import InfoBar from "./infoBar";
 import MessageBox from "./messageBox";
 import Sidebar from "./sidebar";
+import Toolbar from '@mui/material/Toolbar';
 
-const { useIsAuth } = require("_firebase/auth"); // Import the authentication functions
 const { useRouter } = require('next/navigation');
+const fb = require("_firebase/firebase"); // Import the authentication functions
+const socket = require("_socket/socket");
 
 export default function ChatRoom()
 {
 	const router = useRouter();
 
-	// if (!isAuth())
-	// 	router.push('/'); // Redirect to dashboard
+	if (!fb.useIsAuth())
+	{
+		router.push('/'); // Redirect to dashboard
+		return <h1 className="text-xl font-bold">Please sign in</h1>;
+	}
+
+	const [text, setText] = useState([]);
+
+	async function sendTeamMsg(msg)
+	{
+		let data = {
+			sender: fb.getUserID(),
+			team: "MyTeam",
+			channel: "General",
+			msg: msg,
+			sentAt: fb.toFbTimestamp(new Date()),
+		};
+
+		setText((prevText) => [
+			...prevText,
+			<h1 key={prevText.length} className="text-white">{`${data.sender}: ${data.msg}`}</h1>,
+		]);
+
+		socket.emit('teamMsg', data);
+	};
 
 	return (
 		<div className="flex h-full w-full">
 			<Sidebar />
-			<div className="relative h-full w-full bg-white"> {/* Chat room */}
+			<div className="relative h-full w-full bg-[#282b30] overflow-y-auto"> {/* Chat room */}
+				<Toolbar>
+					<h1 className='text-2xl font-semibold text-white'>#General</h1>
+				</Toolbar>
 
-				<div className="flex flex-col h-full w-full">
-					<div className="flex-1 overflow-y-auto">
-						{/* Chat messages */}
-					</div>
-					<div className="flex-none">
-						{/* Message box */}
-					</div>
+				<div className="p-5">
+					{text}
 				</div>
 
-				<div className="absolute inset-x-0 bottom-5 mx-5 drop-shadow-lg shadow-slate-950">
-					<MessageBox />
+				<div className="absolute z-10 inset-x-0 bottom-5 mx-5 drop-shadow-lg shadow-slate-950">
+					<MessageBox callback={sendTeamMsg} />
 				</div>
 
 			</div>

@@ -2,6 +2,7 @@ const { app: firebase } = require("_firebase/cli"); // Required for all pages
 const { getAuth, signInWithPopup, GoogleAuthProvider, OAuthProvider,
 	signInWithEmailAndPassword, createUserWithEmailAndPassword,
 	EmailAuthProvider, linkWithPopup } = require("firebase/auth");
+const { Timestamp } = require("firebase/firestore");
 const { useAuthState } = require("react-firebase-hooks/auth"); // Required for all pages
 
 const googleProvider = new GoogleAuthProvider();
@@ -15,6 +16,8 @@ const auth = getAuth(firebase);
 const signOut = () => auth.signOut();
 const getToken = () => auth.currentUser.getIdToken(true);
 const getUserID = () => auth.currentUser.uid;
+const toFbTimestamp = (date) => Timestamp.fromDate(date);
+const fromFbTimestamp = (timestamp) => timestamp.toDate();
 
 /**
  * Check user auth state
@@ -96,5 +99,7 @@ module.exports = {
 	signOut,
 	useIsAuth,
 	emailSignIn,
-	serviceSignIn
+	serviceSignIn,
+	toFbTimestamp,
+	fromFbTimestamp
 };

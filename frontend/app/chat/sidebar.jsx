@@ -20,23 +20,24 @@ export default function Sidebar()
 				'& .MuiDrawer-paper': {
 					width: drawerWidth,
 					boxSizing: 'border-box',
+					backgroundColor: "#2f3137",
 				},
 			}}
 			variant="permanent"
 			anchor="left">
 			<Toolbar>
-				<h1 className='text-3xl font-semibold'>Teams</h1>
+				<h1 className='text-3xl font-semibold text-white'>Teams</h1>
 			</Toolbar>
 			<Divider />
 			<List>
 				{/* use loop to create multiple list items */}
-				{["Bloop", "Chicorita", "Snoozefest"].map((text, index) => (
+				{["MyTeam", "Chicorita", "Snoozefest"].map((text, index) => (
 					<ListItem key={index}>
 						<ListItemButton>
 							<ListItemIcon>
-								<Groups3Icon />
+								<Groups3Icon htmlColor='white' />
 							</ListItemIcon>
-							<ListItemText primary={text} />
+							<ListItemText primary={<h1 className='text-white'>{text}</h1>} />
 						</ListItemButton>
 					</ListItem>
 				))}

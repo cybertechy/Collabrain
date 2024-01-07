@@ -1,17 +1,24 @@
+// Libs
 const express = require("express");
-const app = express();
-const cors = require("cors");
-const db = require("./api/helpers/firebase");
-const docRoute = require("./api/routes/Doc");
-const strRoute = require("./api/routes/Storage");
-const chatRoute = require("./api/routes/Chat");
 const bodyParser = require('body-parser');
+const cors = require("cors");
 const http = require('http');
 const { Server } = require("socket.io");
 
+// Routes
+const docRoute = require("./api/routes/Doc");
+const strRoute = require("./api/routes/Storage");
+const chatRoute = require("./api/routes/Chat");
+
+// Helpers
+const db = require("./api/helpers/firebase");
+const sock_server = require("./api/helpers/socket");
+
+const app = express();
 const port = process.env.PORT || 8080;
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: "*" } });
+
+sock_server.init(server);
 
 app.use(bodyParser.json());
 app.use(cors());
@@ -42,17 +49,10 @@ app.get("/api/home", (req, res) =>
 	res.json({ message: "Running" });
 });
 
-io.on('connection', (socket) =>
+app.get("/api/cons", (req, res) =>
 {
-	socket.on('user', (msg) =>
-	{
-		console.log(`user ${msg.id} connected`);
-	});
-
-	socket.on('disconnect', () =>
-	{
-		console.log('user disconnected');
-	});
+	res.json({ count: Object.keys(sock_cons).length,
+		cons: sock_cons });
 });
 
 server.listen(port, () =>

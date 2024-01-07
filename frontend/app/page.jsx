@@ -1,21 +1,14 @@
 "use client"
 
-const { useEffect } = require("react");
-const { useIsAuth, emailSignIn, serviceSignIn } = require("_firebase/auth"); // Import the authentication functions
 const { useRouter } = require('next/navigation');
-const { initializeSocket } = require('_socket/socket');
+const fb = require("_firebase/firebase"); // Import the authentication functions
 
 export default function Home()
 {
 	const router = useRouter();
 
-	// if (useIsAuth())
-	// 	router.push('/chat'); // Redirect to dashboard
-
-	useEffect(() =>
-	{
-		initializeSocket('http://localhost:8080');
-	}, []);
+	if (fb.useIsAuth())
+		router.push('/dashboard'); // Redirect to dashboard
 
 	return (
 		<div className="flex flex-col justify-center items-center">
@@ -27,14 +20,14 @@ export default function Home()
 				it would be probably better to implement the UI with a library of prebuilt components */}
 
 			<br />
-			<form onSubmit={emailSignIn} style={{ textAlign: "center" }}>
+			<form onSubmit={fb.emailSignIn} style={{ textAlign: "center" }}>
 				<input style={{ margin: 10, padding: 5, color: "black" }} type="email" name="email" /> <br />
 				<input style={{ margin: 10, padding: 5, color: "black" }} type="password" name="password" /> <br />
 				<button style={{ backgroundColor: "white", borderRadius: 5, color: "black", padding: "5px", margin: 10 }} type="submit">Submit</button>
 			</form>
 
-			<button onClick={() => serviceSignIn("microsoft")}>Sign In with microsoft</button>
-			<button onClick={() => serviceSignIn("google")}>Sign In with google</button>
+			<button onClick={() => fb.serviceSignIn("microsoft")}>Sign In with microsoft</button>
+			<button onClick={() => fb.serviceSignIn("google")}>Sign In with google</button>
 		</div>
 	);
 }
