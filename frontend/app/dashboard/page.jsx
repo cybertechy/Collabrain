@@ -44,21 +44,23 @@ export default function Dashboard()
 	{
 		console.log(currentDoc);
 		const token = await getToken();
-		let res = await axios.post(`http://localhost:8080/api/doc/delete/${currentDoc}`, {
-			"token": token
+		let res = await axios.delete(`http://localhost:8080/api/doc/${currentDoc}`, {
+			data: {
+				"token": token
+			}
 		}).catch(err => console.log(err));
-	}
+	};
 
 	return (
 		<div className="flex flex-col justify-center items-center">
 			<h1 className="text-xl font-bold">Dashboard</h1>
 			<p>This is your dashboard</p>
 			<p>There should be something here</p>
-			<button onClick={()=> getToken().then(token => console.log(token))}>Get token</button>
+			<button onClick={() => getToken().then(token => console.log(token))}>Get token</button>
 			<button onClick={signOut}>Sign Out</button>
 			<input id="doc-title" style={{ color: "black", padding: 10, marginTop: 10 }} type="text" />
 			<textarea id="doc-text" style={{ color: "black", padding: 10, marginTop: 10 }} name="text" cols="30" rows="10"></textarea>
-			<div style={{display: "flex"}}>
+			<div style={{ display: "flex" }}>
 				<button onClick={createDoc} style={{ color: "black", backgroundColor: "white", padding: 10, borderRadius: 5, margin: 10 }}>Save doc</button>
 				<button onClick={deleteDoc} style={{ color: "black", backgroundColor: "white", padding: 10, borderRadius: 5, margin: 10 }}>Delete doc</button>
 			</div>
