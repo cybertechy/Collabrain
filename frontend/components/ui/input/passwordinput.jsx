@@ -120,7 +120,7 @@ const PasswordInput = ({ isConfirm }) => {
                         color: "white",
                         backgroundColor: "#972FFF",
                         WebkitTextSecurity: showPassword ? "none" : "disc",
-                        "&:focus-visible": {
+                        "&:focusVisible": {
                             outline: "none",
                         },
                     }}

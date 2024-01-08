@@ -14,7 +14,7 @@ export default function Register() {
         <div>
             <div className="justify-center items-center flex flex-col">
                 <img
-                    className="w-28 fixed top-2"
+                    className="w-28 "
                     src=".//assets/images/logo_whitebackground.png"
                 />
                 <div className="bg-secondary drop-shadow-lg flex flex-col justify-center items-center px-16 py-10 rounded-2xl">

@@ -17,7 +17,7 @@ export default function Home() {
         <div>
             <div className="justify-center items-center flex flex-col">
                 <img
-                    className="w-28 fixed top-2"
+                    className="w-28 "
                     src=".//assets/images/logo_whitebackground.png"
                 />
                 <div className="bg-secondary drop-shadow-lg flex flex-col justify-center items-center px-16 py-10 rounded-2xl">
@@ -38,7 +38,7 @@ export default function Home() {
                         <PasswordInput />
                         <br />
                         <p className="text-xs text-gray-600 font-poppins text-left ml-2">
-                            <a>Forgot your password?</a>
+                            <a href = "">Forgot your password?</a>
                         </p>
                         <Button
                             text="Log In"
@@ -65,21 +65,12 @@ export default function Home() {
                             <AppleIcon className="h-8 w-8 text-gray-500"></AppleIcon>
                         </button>
                     </span>
+                     <p className="text-xs text-gray-600 font-poppins text-left ml-2">
+                            Need an account?<a href = "/register" className="underline"> SIGN UP</a>
+                        </p>
                 </div>
             </div>
-            <div className="bg-secondary drop-shadow-lg flex flex-col justify-center items-center px-16 py-10 rounded-2xl mt-5">
-                <h1 className="text-2xl text-black font-poppins mb-2">
-                    Don't Have An Account?
-                </h1>
-
-                <Button
-                    text="Register"
-                    color="teritary"
-                    onClick={() => {
-                        router.push("/register");
-                    }}
-                />
-            </div>
+            
         </div>
     );
 }

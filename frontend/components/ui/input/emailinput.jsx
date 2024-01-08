@@ -64,7 +64,7 @@ const EmailInputField = ({ placeholder }) => {
                         color: "white",
                         backgroundColor: "#972FFF",
                         padding: "10px 14px", // Adjust padding to maintain size
-                        "&:focus-visible": {
+                        "&:focusVisible": {
                             outline: "none",
                         },
                     },
