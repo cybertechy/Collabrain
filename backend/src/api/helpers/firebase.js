@@ -34,6 +34,7 @@ async function updateDoc(user, docID, title, content)
 }
 
 module.exports = {
+	db,
 	admin,
 	verifyUser,
 	createDoc,

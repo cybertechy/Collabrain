@@ -65,7 +65,7 @@ const getBuckets = async () =>
 };
 
 // Add data to a bucket
-const AddData = async (bucketName, fileName, MIMEtype, data, meta) =>
+const addData = async (bucketName, fileName, MIMEtype, data, meta) =>
 {
 	const request = {
 		namespaceName: "lrr6fvwwjb9p",
@@ -113,4 +113,6 @@ const getFileBucket = async (fileName) =>
 	return bucket;
 }
 
-module.exports = { getBuckets, AddData, getData, getFileBucket, generateStreamFromString, generateStringFromStream };
+module.exports = {
+	getBuckets, addData, getData, getFileBucket, generateStreamFromString, generateStringFromStream
+};

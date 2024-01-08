@@ -11,155 +11,88 @@ const uuid = require("uuid");
 
 /* Endpoint for creating a new team */
 
-router.post("/team", async (req, res) => {
+router.post("/", async (req, res) => {
 
-    const {token, teamName, teamImage, MIMEtype} = req.body;
-
-    if(!token) {
-        return res.status(400).json({code:400, error: "Missing token"});
-    }
-
-    if(!teamName) {
-        return res.status(400).json({code:400, error: "Missing team name"});
-    }
-
-    // check if team image and MIME type are both present
-    if(teamImage && !MIMEtype) {
-        return res.status(400).json({code:400, error: "Missing MIME type"});
-    }
-
-    if(!teamImage && MIMEtype) {
-        return res.status(400).json({code:400, error: "Missing team image"});
-    }
+    const { token, name, image } = req.body;
 
     // verfiy token
     let user = await fb.verifyUser(token);
-    if(!user){
-        return res.status(400).json({code:400, error: "Invalid token"});
-    }
+    if(!user)
+        return res.status(401).json({error: "Unauthorized"});
 
-    // get user data
-    let uid = user.uid;
-    let fname = user.name.split(" ")[0];
-    let lname = user.name.split(" ")[1];
-    let email = user.email;
+	// Get user id to set them as the owner
+	let uid = user.uid;
+
+	// ----------
 
     //generate a unique ImageID uuid
     let ImageID = uuid.v4();
 
     // upload the image to oracle if it exists
     if(teamImage && MIMEtype){
-        let imageID = await storage.AddData("B2",ImageID,MIMEtype,teamImage,null)
+        let imageID = await storage.addData("B2",ImageID,MIMEtype,teamImage,null)
         if(!imageID){
             return res.status(400).json({code:400, error: "Image upload failed"});
         }
     }
 
-    // get database references
-    let db = fb.admin.firestore();
-    let teamsRef = db.collection("teams");
-    let channelsRef = db.collection("channels");
+	// ----------
 
-    // check if team name is already taken
-    let query = await teamsRef.where("teamName", "==", teamName).get();
-    if(!query.empty){
-        return res.status(400).json({code:400, error: "Team name already taken"});
-    }
-    
-    
+	// Team data
+	let data = {
+		name: name,
+		teamImageID: (teamImage && MIMEtype) ? ImageID : null,
+		MIMEtype: (teamImage && MIMEtype) ? MIMEtype : null,
+		owner: uid,
+		members : { [uid]: {
+			role: "administator",
+		} },
+		Visibility: "public"
+	}
 
-    // add team to database
-    let teamRef = teamsRef.doc();
-    let teamID = teamRef.id;
+	// Create team
+	fb.db.collection("teams").add(data)
+		.then(ref => {
+			// Create general channel
+			ref.collection("channels").add({name: "General"})
+			.then(ref => {
+				ref.collection("messages").add({
+					message: "Welcome to the General channel!",
+					sender: "System",
+					timestamp: new Date().getSeconds()
+				})
+			})
+			
+			// Add the team to the user's teams
+			fb.db.collection("users").doc(uid).update({
+				teams: fb.admin.firestore.FieldValue.arrayUnion(ref.id)
+			})
 
-    //create a general channel for the team
-    let channelRef = channelsRef.doc();
-    let channelID = channelRef.id;
-    let channelData = {
-        channelName: "General",
-        channelID: channelID,
-        teamID: teamID,
-        message: []
-    }
-    let channelCreation = await channelRef.set(channelData);
-
-    if(!channelCreation){
-        return res.status(400).json({code:400, error: "Channel creation failed"});
-    }
-
-    // create team data
-    let teamData = {
-        teamName: teamName,
-        teamImageID: (teamImage && MIMEtype) ? ImageID : null,
-        MIMEtype: (teamImage && MIMEtype) ? MIMEtype : null,
-        teamID: teamID,
-        owner: { uid: uid, fname: fname, lname: lname },
-        members: { [uid]: {
-            fname: fname,
-            lname: lname,
-            role: "administator",
-            status: "active",
-            email: email
-        } },
-        channels: { [channelData.channelName]: {
-            channelName: channelData.channelName,
-            channelID: channelData.channelID
-        } },
-        Visibility: "public"
-    }
-
-    let creation = await teamRef.set(teamData);
-    if(!creation){
-        return res.status(400).json({code:400, error: "Team creation failed"});
-    }
-
-    return res.status(200).json({code:200, message: "Team created", teamID: teamID});
-    
-    
+			return res.status(200).json({message: "Team created", teamID: ref.id});
+		})
+		.catch(err => { return res.status(500).json({error: "Team creation failed"}); });
 });
 
 /* Endpoint for getting a team's data */
 
-router.get("/team", async (req, res) => {
+router.get("/:team", async (req, res) => {
     
-        const {token, teamID} = req.body;
-    
-        if(!token) {
-            return res.status(400).json({code:400, error: "Missing token"});
-        }
-    
-        if(!teamID) {
-            return res.status(400).json({code:400, error: "Missing team ID"});
-        }
-    
-        // verfiy token
-        let user = await fb.verifyUser(token);
-        if(!user){
-            return res.status(400).json({code:400, error: "Invalid token"});
-        }
-    
-        // get database references
-        let db = fb.admin.firestore();
-        let teamsRef = db.collection("teams");
-    
-        // get team data
-        let query = await teamsRef.doc(teamID).get();
-        if(!query.exists){
-            return res.status(400).json({code:400, error: "Team does not exist"});
-        }
-    
-        let teamData = query.data();
+	// verfiy token
+	let user = await fb.verifyUser(token);
+	if(!user)
+		return res.status(401).json({error: "Unauthorized"});
 
-        return res.status(200).json({code:200, data: teamData});
-    
-    });
-
-
+	fb.db.doc(`teams/${req.params.team}`).get()
+		.then(doc => {
+			return res.status(200).json(doc.data());
+		})
+		.catch(err => { return res.status(400).json({error: "Team not found"}); });
+});
 
 
 /* Endpoint for updating a team's data */
 
-router.put("/team", async (req, res) => {
+router.put("/:team", async (req, res) => {
     
         const {token, teamID, teamName, teamImage, MIMEtype, Visibility} = req.body;
     
@@ -367,8 +300,6 @@ router.post("/member", async (req, res) => {
     return res.status(200).json({code:200, message: "Member added"});
 
 });
-
-
 
 
 /* Endpoint for getting a team's members */
@@ -966,10 +897,6 @@ router.delete("/channel", async (req, res) => {
 
 });
 
-    
-
-
-
-
-
-module.exports = router;
+module.exports = {
+	router
+};
