@@ -63,6 +63,15 @@ router.post("/team", async (req, res) => {
     // check if team name is already taken
     let query = await teamsRef.where("teamName", "==", teamName).get();
     if(!query.empty){
+
+        //delete the image from oracle if it exists
+        if(teamImage && MIMEtype){
+            let deletion = await storage.DeleteData("B2",ImageID);
+            if(!deletion){
+                return res.status(400).json({code:400, error: "Image deletion failed"});
+            }
+        }
+
         return res.status(400).json({code:400, error: "Team name already taken"});
     }
     
@@ -84,6 +93,15 @@ router.post("/team", async (req, res) => {
     let channelCreation = await channelRef.set(channelData);
 
     if(!channelCreation){
+
+        //delete the image from oracle if it exists
+        if(teamImage && MIMEtype){
+            let deletion = await storage.DeleteData("B2",ImageID);
+            if(!deletion){
+                return res.status(400).json({code:400, error: "Image deletion failed"});
+            }
+        }
+
         return res.status(400).json({code:400, error: "Channel creation failed"});
     }
 
@@ -110,6 +128,15 @@ router.post("/team", async (req, res) => {
 
     let creation = await teamRef.set(teamData);
     if(!creation){
+
+        //delete the image from oracle if it exists
+        if(teamImage && MIMEtype){
+            let deletion = await storage.DeleteData("B2",ImageID);
+            if(!deletion){
+                return res.status(400).json({code:400, error: "Image deletion failed"});
+            }
+        }
+
         return res.status(400).json({code:400, error: "Team creation failed"});
     }
 
@@ -192,6 +219,7 @@ router.put("/team", async (req, res) => {
         }
     
         let teamData = query.data();
+        let BackupTeamData = teamData;
 
         // check if user is a administator of the team
         if(teamData.members[user.uid].role != "administator"){
@@ -206,6 +234,8 @@ router.put("/team", async (req, res) => {
             let query = await teamsRef.where("teamName", "==", teamName).get();
             if(!query.empty){
                 return res.status(400).json({code:400, error: "Team name already taken"});
+            } else {
+                teamData.teamName = BackupTeamData.teamName;
             }
 
         }
@@ -219,6 +249,9 @@ router.put("/team", async (req, res) => {
 
             if(!imageID){
                 return res.status(400).json({code:400, error: "Image upload failed"});
+            } else {
+                teamData.teamImageID = BackupTeamData.teamImageID;
+                teamData.MIMEtype = BackupTeamData.MIMEtype;
             }
         }
 
