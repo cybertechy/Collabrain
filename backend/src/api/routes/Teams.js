@@ -113,7 +113,7 @@ router.patch("/:team", async (req, res) => {
 
 /* Endpoint for deleting a team */
 
-router.delete("/team", async (req, res) => {
+router.delete("/:team", async (req, res) => {
 	// verfiy token
 	let user = await fb.verifyUser(req.body.token);
 	if(!user){

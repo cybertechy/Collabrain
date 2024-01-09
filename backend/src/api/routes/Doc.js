@@ -20,7 +20,7 @@ router.post("/", (req, res) =>
 
 		});
 	}
-	catch (error) { res.status(401).json({ message: error }); }
+	catch (error) { res.status(401).json({ error: error }); }
 });
 
 router.post("/:ref", (req, res) =>
@@ -34,11 +34,11 @@ router.post("/:ref", (req, res) =>
 
 			db.updateDoc(user.uid, req.params.ref, req.body.title, req.body.content)
 				.then(() => { res.json({ message: "Document updated" }); })
-				.catch((error) => { res.status(500).json({ message: "Failed" }); });
+				.catch((error) => { res.status(500).json({ error: "Failed to create doc" }); });
 
 		});
 	}
-	catch (error) { res.status(401).json({ message: error }); }
+	catch (error) { res.status(401).json({ error: error }); }
 });
 
 router.delete("/:ref", (req, res) =>
@@ -52,7 +52,7 @@ router.delete("/:ref", (req, res) =>
 
 			db.removeDoc(user.uid, req.params.ref)
 				.then(() => { res.json({ message: "Document deleted" }); })
-				.catch((error) => { res.status(500).json({ message: "Failed" }); });
+				.catch((error) => { res.status(500).json({ error: "Failed to delete doc" }); });
 
 		});
 	}
