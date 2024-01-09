@@ -2,7 +2,7 @@
 
 const { isAuth } = require("_firebase/auth"); // Import the authentication functions
 const { useRouter } = require("next/navigation");
-import Button from "../../components/ui/button";
+import Button from "../../components/ui/button/button";
 import InputField from "../../components/ui/input/input";
 import { useEffect, useState } from 'react';
 export default function OTP() {

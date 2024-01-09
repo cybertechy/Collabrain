@@ -3,14 +3,15 @@
 const { signOut, isAuth, getToken } = require("_firebase/auth"); // Import the authentication functions
 const { useRouter } = require("next/navigation");
 const axios = require("axios");
+import Sidebar from '../../components/ui/sidebar/sidebar';
 
 export default function Dashboard() {
     const router = useRouter();
+    
     if (!isAuth()) {
-        // router.push('/'); // Redirect to home page
+        router.push('/'); // Redirect to home page
         return <h1 className="text-xl font-bold">Please sign in</h1>;
     }
-
     // NOTE: Not finished
     // Needs to be tested with backend
 
@@ -51,11 +52,15 @@ export default function Dashboard() {
     };
 
     return (
-        <div className="flex flex-col justify-center items-center">
+        <div className="flex h-screen bg-gray-100 overflow-hidden">
+            <div className="flex-none">
+                <Sidebar />
+            </div>
+            <div className='flex-grow flex flex-col items-center justify-center'>
             <h1 className="text-xl font-bold">Dashboard</h1>
             <p>This is your dashboard</p>
             <p>There should be something here</p>
-            <button onClick={signOut}>Sign Out</button>
+            <button className =  "text-black"onClick={signOut}>Sign Out</button>
             <input
                 id="doc-title"
                 style={{ color: "black", padding: 10, marginTop: 10 }}
@@ -93,6 +98,7 @@ export default function Dashboard() {
                 >
                     Delete doc
                 </button>
+            </div>
             </div>
         </div>
     );

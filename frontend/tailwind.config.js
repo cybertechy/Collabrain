@@ -1,26 +1,33 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    './pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './components/**/*.{js,ts,jsx,tsx,mdx}',
-    './app/**/*.{js,ts,jsx,tsx,mdx}',
-  ],
-  theme: {
-    fontFamily: {
-      poppins: ['Poppins', 'sans-serif'],
+    content: [
+        "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+        "./components/**/*.{js,ts,jsx,tsx,mdx}",
+        "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    ],
+    theme: {
+        fontFamily: {
+            poppins: ["Poppins", "sans-serif"],
+        },
+        extend: {
+            boxShadow: {
+                custom: "7px 7px 18px 0 rgba(197, 138, 255, 1)",
+            },
+            borderRadius: {
+                custom: "4px", // Custom border-radius
+            },
+            colors: {
+                primary: "#972FFF",
+                secondary: "#EBD7FF",
+                tertiary: "#C58AFF",
+                unselected: "#9DA5AF",
+            },
+            backgroundImage: {
+                "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
+                "gradient-conic":
+                    "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+            },
+        },
     },
-    extend: {
-      colors: {
-        primary: '#972FFF',
-        secondary: '#EBD7FF',
-        tertiary: '#C58AFF',
-      },
-      backgroundImage: {
-        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-conic':
-          'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
-      },
-    },
-  },
-  plugins: [],
-}
+    plugins: [],
+};

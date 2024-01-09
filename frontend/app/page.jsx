@@ -2,10 +2,10 @@
 
 const { isAuth, emailSignIn, serviceSignIn } = require("_firebase/auth"); // Import the authentication functions
 const { useRouter } = require("next/navigation");
-import Button from "../components/ui/button";
-import GoogleIcon from "../public/assets/svg/google.svg";
-import MicrosoftIcon from "../public/assets/svg/microsoft.svg";
-import AppleIcon from "../public/assets/svg/apple.svg";
+import Button from "../components/ui/button/button";
+import GoogleIcon from "../public/assets/svg/socials/google.svg";
+import MicrosoftIcon from "../public/assets/svg/socials/microsoft.svg";
+import AppleIcon from "../public/assets/svg/socials/apple.svg";
 import PasswordInput from "../components/ui/input/passwordinput";
 import EmailInputField from "../components/ui/input/emailinput";
 import { useEffect, useState } from 'react';

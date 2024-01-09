@@ -2,7 +2,7 @@
 
 const { isAuth, emailSignIn } = require("_firebase/auth");
 const { useRouter } = require("next/navigation");
-import Button from "../../components/ui/button";
+import Button from "../../components/ui/button/button";
 import InputField from "../../components/ui/input/input";
 import PasswordInput from "../../components/ui/input/passwordinput";
 import EmailInputField from "../../components/ui/input/emailinput";
