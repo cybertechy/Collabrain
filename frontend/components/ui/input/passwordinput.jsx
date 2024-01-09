@@ -10,6 +10,13 @@ import {
     FormHelperText,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import PropTypes from "prop-types";
+
+const colorClasses = {
+    primary: "bg-primary", // Tailwind class for primary background
+    secondary: "bg-secondary", // Tailwind class for secondary background
+    tertiary: "bg-tertiary", // Tailwind class for tertiary background
+};
 
 const theme = createTheme({
     components: {
@@ -60,10 +67,11 @@ const theme = createTheme({
     },
 });
 
-const PasswordInput = ({ isConfirm }) => {
+const PasswordInput = ({ isConfirm, color }) => {
     const [showPassword, setShowPassword] = useState(false);
     const [password, setPassword] = useState("");
     const [error, setError] = useState(false);
+    const backgroundColorClass = colorClasses[color] || colorClasses.primary;
     const validatePassword = (value) => {
         const hasNumber = /[0-9]/.test(value);
         const hasUppercase = /[A-Z]/.test(value);
@@ -90,7 +98,7 @@ const PasswordInput = ({ isConfirm }) => {
 
     return (
         <ThemeProvider theme={theme}>
-            <FormControl sx={{ m: 1, width: "37ch" }} variant="outlined">
+            <FormControl sx={{ m: 1, width: "37ch" }} variant="outlined" className={backgroundColorClass}>
                 <InputLabel htmlFor="outlined-adornment-password">
                     {isConfirm ? "Confirm Password" : "Password"}
                 </InputLabel>
@@ -118,7 +126,6 @@ const PasswordInput = ({ isConfirm }) => {
                     label={isConfirm ? "Confirm Password" : "Password"}
                     sx={{
                         color: "white",
-                        backgroundColor: "#972FFF",
                         WebkitTextSecurity: showPassword ? "none" : "disc",
                         "&:focusVisible": {
                             outline: "none",
@@ -135,5 +142,8 @@ const PasswordInput = ({ isConfirm }) => {
         </ThemeProvider>
     );
 };
-
+PasswordInput.propTypes = {
+    isConfirm: PropTypes.bool,
+    color: PropTypes.oneOf(["primary", "secondary", "tertiary"]),
+};
 export default PasswordInput;

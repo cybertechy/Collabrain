@@ -1,6 +1,12 @@
 import { createTheme, ThemeProvider, TextField } from "@mui/material";
 import { useState } from "react";
+import PropTypes from "prop-types";
 
+const colorClasses = {
+    primary: "bg-primary", // Replace with your primary color
+    secondary: "bg-secondary", // Replace with your secondary color
+    tertiary: "bg-tertiary", // Replace with your tertiary color
+};
 const theme = createTheme({
     components: {
         MuiInputBase: {
@@ -36,9 +42,10 @@ const theme = createTheme({
     },
 });
 
-const EmailInputField = ({ placeholder }) => {
+const EmailInputField = ({ placeholder, color }) => {
     const [email, setEmail] = useState("");
     const [error, setError] = useState(false);
+    const backgroundColorClass = colorClasses[color] || colorClasses.primary;
 
     const handleChange = (event) => {
         const enteredEmail = event.target.value;
@@ -50,6 +57,7 @@ const EmailInputField = ({ placeholder }) => {
     return (
         <ThemeProvider theme={theme}>
             <TextField
+                className={backgroundColorClass}
                 variant="outlined"
                 size="small"
                 fullWidth
@@ -62,8 +70,7 @@ const EmailInputField = ({ placeholder }) => {
                 InputProps={{
                     style: {
                         color: "white",
-                        backgroundColor: "#972FFF",
-                        padding: "10px 14px", // Adjust padding to maintain size
+                        padding: "10px 14px",
                         "&:focusVisible": {
                             outline: "none",
                         },
@@ -74,6 +81,11 @@ const EmailInputField = ({ placeholder }) => {
             />
         </ThemeProvider>
     );
+};
+
+EmailInputField.propTypes = {
+    placeholder: PropTypes.string.isRequired,
+    color: PropTypes.oneOf(["primary", "secondary", "tertiary"]),
 };
 
 export default EmailInputField;

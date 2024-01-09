@@ -8,11 +8,36 @@ import MicrosoftIcon from "../public/assets/svg/microsoft.svg";
 import AppleIcon from "../public/assets/svg/apple.svg";
 import PasswordInput from "../components/ui/input/passwordinput";
 import EmailInputField from "../components/ui/input/emailinput";
+import { useEffect, useState } from 'react';
 export default function Home() {
     const router = useRouter();
+    const [backgroundLoaded, setBackgroundLoaded] = useState(false);
 
-    if (isAuth()) router.push("/dashboard"); // Redirect to dashboard
+    useEffect(() => {
+        // Preload the background image
+        const img = new Image();
+        img.src = '/assets/images/background.jpg'; // Adjust the path to your background image
+        img.onload = () => {
+            setBackgroundLoaded(true);
+            document.body.classList.add('custom-background');
+        };
 
+        // Remove the custom background class when the component unmounts
+        return () => {
+            document.body.classList.remove('custom-background');
+        };
+    }, []);
+    if (isAuth()) {
+        router.push("/dashboard"); // Redirect to dashboard
+        return null; // Prevents rendering the rest of the component
+    }
+    if (!backgroundLoaded) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="loader"></div>
+            </div>
+        );
+    }
     return (
         <div>
             <div className="justify-center items-center flex flex-col">
@@ -33,9 +58,9 @@ export default function Home() {
                         onSubmit={emailSignIn}
                         style={{ textAlign: "center" }}
                     >
-                        <EmailInputField placeholder="Email Address" />
+                        <EmailInputField placeholder="Email Address" color = "tertiary" />
                         <br />
-                        <PasswordInput />
+                        <PasswordInput color = "tertiary"/>
                         <br />
                         <p className="text-xs text-gray-600 font-poppins text-left ml-2">
                             <a href = "">Forgot your password?</a>

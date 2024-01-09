@@ -1,5 +1,11 @@
 import { createTheme, ThemeProvider, TextField } from "@mui/material";
+import PropTypes from "prop-types";
 
+const colorClasses = {
+    primary: "bg-primary", // Replace with your primary color
+    secondary: "bg-secondary", // Replace with your secondary color
+    tertiary: "bg-tertiary", // Replace with your tertiary color
+};
 const theme = createTheme({
     components: {
         MuiInputBase: {
@@ -31,7 +37,9 @@ const theme = createTheme({
     },
 });
 
-const InputField = ({ placeholder }) => {
+const InputField = ({ placeholder, color }) => {
+    const backgroundColorClass = colorClasses[color] || colorClasses.primary;
+
     return (
         <ThemeProvider theme={theme}>
             <TextField
@@ -40,10 +48,10 @@ const InputField = ({ placeholder }) => {
                 fullWidth
                 InputLabelProps={{ style: { color: "white" } }}
                 InputProps={{
+                    className: backgroundColorClass,
                     style: {
                         color: "white",
-                        backgroundColor: "#972FFF",
-                        padding: "10px 14px", // Adjust padding to maintain size
+                        padding: "10px 14px",
                         "&:focusVisible": {
                             outline: "none",
                         },
@@ -54,6 +62,11 @@ const InputField = ({ placeholder }) => {
             />
         </ThemeProvider>
     );
+};
+
+InputField.propTypes = {
+    placeholder: PropTypes.string.isRequired,
+    color: PropTypes.oneOf(["primary", "secondary", "tertiary"]),
 };
 
 export default InputField;
