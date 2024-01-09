@@ -123,8 +123,12 @@ router.post("/team", async (req, res) => {
             channelName: channelData.channelName,
             channelID: channelData.channelID
         } },
-        Visibility: "public"
+        Visibility: "public",
+        creationDate: Date.now(),
+        lastUpdated: Date.now(),
+        Score: 0
     }
+    
 
     let creation = await teamRef.set(teamData);
     if(!creation){
@@ -138,6 +142,21 @@ router.post("/team", async (req, res) => {
         }
 
         return res.status(400).json({code:400, error: "Team creation failed"});
+    }
+
+    //create collection associated with the team for channels
+    let collectionCreation = await db.collection(teamID).doc("channels").set({});
+    if(!collectionCreation){
+            
+            //delete the image from oracle if it exists
+            if(teamImage && MIMEtype){
+                let deletion = await storage.DeleteData("B2",ImageID);
+                if(!deletion){
+                    return res.status(400).json({code:400, error: "Image deletion failed"});
+                }
+            }
+    
+            return res.status(400).json({code:400, error: "Team creation failed"});
     }
 
     return res.status(200).json({code:200, message: "Team created", teamID: teamID});
@@ -258,6 +277,8 @@ router.put("/team", async (req, res) => {
         if(Visibility){
             teamData.Visibility = Visibility;
         }
+
+        teamData.lastUpdated = Date.now();
 
         let update = await teamsRef.doc(teamID).update(teamData);
         if(!update){
@@ -392,6 +413,8 @@ router.post("/member", async (req, res) => {
         email: email
     }
 
+    teamData.lastUpdated = Date.now();
+
     let update = await teamsRef.doc(teamID).update(teamData);
     if(!update){
         return res.status(400).json({code:400, error: "Member addition failed"});
@@ -515,6 +538,8 @@ router.put("/member", async (req, res) => {
             if(status){
                 teamData.members[memberID].status = status;
             }
+
+            teamData.lastUpdated = Date.now();
     
             let update = await teamsRef.doc(teamID).update(teamData);
             if(!update){
@@ -574,6 +599,8 @@ router.delete("/member", async (req, res) => {
 
     // delete member from team
     delete teamData.members[memberID];
+
+    teamData.lastUpdated = Date.now();
 
     let update = await teamsRef.doc(teamID).update(teamData);
     if(!update){
@@ -763,6 +790,8 @@ router.post("/channel", async (req, res) => {
         channelID: channelID
     }
 
+    teamData.lastUpdated = Date.now();
+
     let update = await teamsRef.doc(teamID).update(teamData);
 
     if(!update){
@@ -905,6 +934,8 @@ router.put("/channel", async (req, res) => {
         channelID: channelID
     }
 
+    teamData.lastUpdated = Date.now();
+
     let updateTeamChannel = await teamsRef.doc(teamID).update(teamData);
 
     if(!updateTeamChannel){
@@ -987,6 +1018,8 @@ router.delete("/channel", async (req, res) => {
     // delete channel from team
     delete teamData.channels[channelData.channelName];
 
+    teamData.lastUpdated = Date.now();
+
     let update = await teamsRef.doc(teamID).update(teamData);
 
     if(!update){
@@ -999,7 +1032,80 @@ router.delete("/channel", async (req, res) => {
 
 });
 
+/************************************************************/
+/*                     General operations                   */
+/************************************************************/
+
+/* Endpoint for getting all teams using index and no.of teams, also toggle of sort, to sort by Score of team */
+
+router.get("/", async (req, res) => {
     
+        let {token, index, noOfTeams, sort} = req.query;
+    
+        if(!token) {
+            return res.status(400).json({code:400, error: "Missing token"});
+        }
+    
+        if(!index) {
+            return res.status(400).json({code:400, error: "Missing index"});
+        }
+    
+        if(!noOfTeams) {
+            return res.status(400).json({code:400, error: "Missing no.of teams"});
+        }
+    
+        if(!sort) {
+            sort = "false";
+        }
+    
+        // verify token
+        let user = await fb.verifyUser(token);
+    
+        if(!user){
+            return res.status(400).json({code:400, error: "Invalid token"});
+        }
+    
+        // get database references
+        let db = fb.admin.firestore();
+    
+        let teamsRef = db.collection("teams");
+    
+        // get all teams
+        let query = null;
+
+        //Get only public teams
+        if(sort==="true"){
+            query = await teamsRef.where("Visibility","==","Public").orderBy("Score","desc").offset(parseInt(index)).limit(parseInt(noOfTeams)).get();
+        }else{
+            query = await teamsRef.offset(parseInt(index)).limit(parseInt(noOfTeams)).get();
+        }
+    
+        if(query.empty){
+            return res.status(400).json({code:400, error: "No teams found"});
+        }
+    
+        let teams = [];
+        query.forEach(team => {
+            teams.push(team.data());
+        });
+
+        // Show only public teams, and only its name, image and score
+        teams = teams.filter(team => team.Visibility === "public");
+
+        teams = teams.map(team => {
+            return {
+                teamName: team.teamName,
+                teamImageID: team.teamImageID,
+                MIMEtype: team.MIMEtype,
+                Score: team.Score,
+                teamID: team.teamID
+            }
+        });
+    
+        return res.status(200).json({code:200, data: teams});
+    
+    });
+
 
 
 
