@@ -13,7 +13,15 @@ const uuid = require("uuid");
 
 router.post("/team", async (req, res) => {
 
-    const {token, teamName, teamImage, MIMEtype} = req.body;
+    const auth = req.headers.authorization;
+
+    const {teamName, teamImage, MIMEtype, Visibility} = req.body;
+
+    if(!auth) {
+        return res.status(400).json({code:400, error: "Missing token"});
+    }
+
+    const token = auth.split(" ")[1];
 
     if(!token) {
         return res.status(400).json({code:400, error: "Missing token"});
@@ -30,6 +38,14 @@ router.post("/team", async (req, res) => {
 
     if(!teamImage && MIMEtype) {
         return res.status(400).json({code:400, error: "Missing team image"});
+    }
+
+    if(Visibility && Visibility != "public" && Visibility != "private") {
+        return res.status(400).json({code:400, error: "Invalid visibility"});
+    }
+
+    if(!Visibility) {
+        Visibility = "public";
     }
 
     // verfiy token
@@ -123,7 +139,7 @@ router.post("/team", async (req, res) => {
             channelName: channelData.channelName,
             channelID: channelData.channelID
         } },
-        Visibility: "public",
+        Visibility: Visibility,
         creationDate: Date.now(),
         lastUpdated: Date.now(),
         Score: 0
@@ -168,7 +184,15 @@ router.post("/team", async (req, res) => {
 
 router.get("/team", async (req, res) => {
     
-        const {token, teamID} = req.body;
+        const {teamID} = req.query;
+
+        const headers = req.headers.authorization;  
+
+        if(!headers) {
+            return res.status(400).json({code:400, error: "Missing token"});
+        }
+
+        const token = headers.split(" ")[1];
     
         if(!token) {
             return res.status(400).json({code:400, error: "Missing token"});
@@ -178,7 +202,7 @@ router.get("/team", async (req, res) => {
             return res.status(400).json({code:400, error: "Missing team ID"});
         }
     
-        // verfiy token
+        // verify token
         let user = await fb.verifyUser(token);
         if(!user){
             return res.status(400).json({code:400, error: "Invalid token"});
@@ -207,7 +231,14 @@ router.get("/team", async (req, res) => {
 
 router.put("/team", async (req, res) => {
     
-        const {token, teamID, teamName, teamImage, MIMEtype, Visibility} = req.body;
+        const { teamID, teamName, teamImage, MIMEtype, Visibility, Score} = req.body;
+        const auth = req.headers.authorization;
+
+        if(!auth) {
+            return res.status(400).json({code:400, error: "Missing token"});
+        }
+
+        const token = auth.split(" ")[1];
     
         if(!token) {
             return res.status(400).json({code:400, error: "Missing token"});
@@ -278,6 +309,10 @@ router.put("/team", async (req, res) => {
             teamData.Visibility = Visibility;
         }
 
+        if(Score){
+            teamData.Score = Score;
+        }
+
         teamData.lastUpdated = Date.now();
 
         let update = await teamsRef.doc(teamID).update(teamData);
@@ -293,7 +328,14 @@ router.put("/team", async (req, res) => {
 
 router.delete("/team", async (req, res) => {
     
-        const {token, teamID} = req.body;
+        const { teamID} = req.body;
+        const auth = req.headers.authorization;
+
+        if(!auth) {
+            return res.status(400).json({code:400, error: "Missing token"});
+        }
+
+        const token = auth.split(" ")[1];
     
         if(!token) {
             return res.status(400).json({code:400, error: "Missing token"});
@@ -346,7 +388,14 @@ router.delete("/team", async (req, res) => {
 
 router.post("/member", async (req, res) => {
     
-    const {token, teamID, memberID, role, fName,lName,email} = req.body;
+    const { teamID, memberID, role, fName,lName,email} = req.body;
+    const auth = req.headers.authorization;
+
+    if(!auth) {
+        return res.status(400).json({code:400, error: "Missing token"});
+    }
+
+    const token = auth.split(" ")[1];
 
     if(!token) {
         return res.status(400).json({code:400, error: "Missing token"});
@@ -431,7 +480,14 @@ router.post("/member", async (req, res) => {
 
 router.get("/members", async (req, res) => {
         
-            const {token, teamID} = req.query;
+            const {teamID} = req.query;
+            const auth = req.headers.authorization;
+
+            if(!auth) {
+                return res.status(400).json({code:400, error: "Missing token"});
+            }
+
+            const token = auth.split(" ")[1];
         
             if(!token) {
                 return res.status(400).json({code:400, error: "Missing token"});
@@ -484,7 +540,15 @@ Updates: Role or Status of the user
 
 router.put("/member", async (req, res) => {
         
-            const {token, teamID, memberID, role, status} = req.body;
+            const {teamID, memberID, role, status} = req.body;
+
+            const auth = req.headers.authorization;
+
+            if(!auth) {
+                return res.status(400).json({code:400, error: "Missing token"});
+            }
+
+            const token = auth.split(" ")[1];
         
             if(!token) {
                 return res.status(400).json({code:400, error: "Missing token"});
@@ -555,7 +619,15 @@ router.put("/member", async (req, res) => {
 
 router.delete("/member", async (req, res) => {
 
-    const {token, teamID, memberID} = req.body;
+    const { teamID, memberID} = req.body;
+
+    const auth = req.headers.authorization;
+
+    if(!auth) {
+        return res.status(400).json({code:400, error: "Missing token"});
+    }
+
+    const token = auth.split(" ")[1];
 
     if(!token) {
         return res.status(400).json({code:400, error: "Missing token"});
@@ -620,7 +692,14 @@ router.delete("/member", async (req, res) => {
 /* Get all teams that a user is a member of */
 
 router.get("/memberof", async (req, res) => {
-    const {token} = req.query;
+
+    const auth = req.headers.authorization;
+
+    if(!auth) {
+        return res.status(400).json({code:400, error: "Missing token"});
+    }
+
+    const token = auth.split(" ")[1];
 
     if(!token) {
         return res.status(400).json({code:400, error: "Missing token"});
@@ -654,7 +733,13 @@ router.get("/memberof", async (req, res) => {
 /* Get all teams that a user owns */
 
 router.get("/owned", async (req, res) => {
-    const {token} = req.query;
+    const auth = req.headers.authorization;
+
+    if(!auth) {
+        return res.status(400).json({code:400, error: "Missing token"});
+    }
+
+    const token = auth.split(" ")[1];
 
     if(!token) {
         return res.status(400).json({code:400, error: "Missing token"});
@@ -688,7 +773,13 @@ router.get("/owned", async (req, res) => {
 /* Get all the teams user is a administator of */
 
 router.get("/adminof", async (req, res) => {
-    const {token} = req.query;
+    const auth = req.headers.authorization;
+
+    if(!auth) {
+        return res.status(400).json({code:400, error: "Missing token"});
+    }
+
+    const token = auth.split(" ")[1];
 
     if(!token) {
         return res.status(400).json({code:400, error: "Missing token"});
@@ -725,7 +816,14 @@ router.get("/adminof", async (req, res) => {
 
 /* Endpoint for creating a new channel */
 router.post("/channel", async (req, res) => {
-    const {token, teamID, channelName} = req.body;
+    const { teamID, channelName} = req.body;
+    const auth = req.headers.authorization;
+
+    if(!auth) {
+        return res.status(400).json({code:400, error: "Missing token"});
+    }
+
+    const token = auth.split(" ")[1];
 
     if(!token) {
         return res.status(400).json({code:400, error: "Missing token"});
@@ -804,7 +902,15 @@ router.post("/channel", async (req, res) => {
 
 /* Endpoint for getting a channel's data */
 router.get("/channel", async (req, res) => {
-    const {token, teamID, channelID} = req.query;
+    const { teamID, channelID} = req.query;
+
+    const auth = req.headers.authorization;
+
+    if(!auth) {
+        return res.status(400).json({code:400, error: "Missing token"});
+    }
+
+    const token = auth.split(" ")[1];
 
     if(!token) {
         return res.status(400).json({code:400, error: "Missing token"});
@@ -860,7 +966,15 @@ router.get("/channel", async (req, res) => {
 /* Endpoint for updating a channel's data */
 router.put("/channel", async (req, res) => {
 
-    const {token, teamID, channelID, channelName} = req.body;
+    const { teamID, channelID, channelName} = req.body;
+
+    const auth = req.headers.authorization;
+
+    if(!auth) {
+        return res.status(400).json({code:400, error: "Missing token"});
+    }
+
+    const token = auth.split(" ")[1];
 
     if(!token) {
         return res.status(400).json({code:400, error: "Missing token"});
@@ -957,7 +1071,15 @@ router.put("/channel", async (req, res) => {
 /* Endpoint for deleting a channel */
 router.delete("/channel", async (req, res) => {
 
-    const {token, teamID, channelID} = req.body;
+    const { teamID, channelID} = req.body;
+
+    const auth = req.headers.authorization;
+
+    if(!auth) {
+        return res.status(400).json({code:400, error: "Missing token"});
+    }
+
+    const token = auth.split(" ")[1];
 
     if(!token) {
         return res.status(400).json({code:400, error: "Missing token"});
@@ -1040,7 +1162,14 @@ router.delete("/channel", async (req, res) => {
 
 router.get("/", async (req, res) => {
     
-        let {token, index, noOfTeams, sort} = req.query;
+        let { index, noOfTeams, sort} = req.query;
+        const auth = req.headers.authorization;
+
+        if(!auth) {
+            return res.status(400).json({code:400, error: "Missing token"});
+        }
+
+        const token = auth.split(" ")[1];
     
         if(!token) {
             return res.status(400).json({code:400, error: "Missing token"});
