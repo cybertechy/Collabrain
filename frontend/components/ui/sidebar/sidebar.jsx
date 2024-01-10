@@ -2,67 +2,76 @@ import Link from "next/link";
 const { useRouter } = require("next/navigation");
 import ButtonIcon from "../button/buttonWithIcon";
 import PlusIcon from "../../../public/assets/svg/sidebaricons/plusicon.svg";
+import FolderIcon from '@mui/icons-material/Folder';
+import SidebarItem from "./sidebarSubComponents/sidebarItem";
+import PeopleIcon from '@mui/icons-material/People';
+import HistoryIcon from '@mui/icons-material/History';
+import StarRateIcon from '@mui/icons-material/StarRate';
+import GroupsIcon from '@mui/icons-material/Groups';
+import ForumIcon from '@mui/icons-material/Forum';
+import CallIcon from '@mui/icons-material/Call';
 // Define the sidebar navigation items
-const navigationItems = [
-    { name: "New Project", href: "/new-project", icon: "plus", button: true },
-    { name: "My Brain", href: "/my-brain", icon: "brain" },
-    { name: "Shared With Me", href: "/shared-with-me", icon: "users" },
-    // ...other navigation items
+import { usePathname } from 'next/navigation'
+const navigationItems1 = [
+    { name: "My Brain", href: "/dashboard", icon: FolderIcon },
+    { name: "Shared With Me", href: "/shared-with-me", icon: PeopleIcon },
+    { name: "Recent", href: "/recent", icon: HistoryIcon },
+    { name: "Starred", href: "/starred", icon: StarRateIcon },
+
+  
+];
+const navigationItems2 = [
+    { name: "Teams", href: "/teams", icon: GroupsIcon },
+    { name: "Messages", href: "/messages", icon: ForumIcon },
+    { name: "Calls", href: "/calls", icon: CallIcon },
+  
 ];
 const Sidebar = () => {
-    const router = useRouter(); // Corrected to useRouter
-
+    const router = useRouter();
+    const pathname = usePathname();
     return (
-        <aside className="w-64 bg-white text-black h-screen">
+        <aside className="w-72 bg-white text-black h-screen">
             <div className="flex flex-col">
                 {/* Logo or title */}
+                {console.log(router.pathname)}
+                {console.log(router)
+}
                 <div className="flex items-center justify-center h-20 ">
-            {/* Use a div instead of span to be able to apply flex */}
-            <div className="flex items-center justify-center space-x-2"> 
-                <img
-                    className="w-12 mb-2"
-                    src="/assets/images/logo_whitebackground.png" // Make sure the path is correct
-                    alt="Collabrain Logo" // Always include an alt for accessibility
-                />
-                <p className="text-xl font-poppins">Collabrain</p>
-            </div>
-            
-        </div>
-        <hr className="border-t-1 mx-4 border-solid border-gray-400 opacity-30"></hr>
+                    <div className="flex items-center justify-center space-x-2">
+                        <img className="w-12 mb-2" src="/assets/images/logo_whitebackground.png" alt="Collabrain Logo" />
+                        <p className="text-xl font-poppins">Collabrain</p>
+                    </div>
+                </div>
+                <hr className="border-t-1 mx-4 border-solid border-gray-400 opacity-30"></hr>
                 {/* Navigation items */}
                 <nav className="flex flex-col p-4">
-                    {navigationItems.map((item) =>
-                        item.button ? (
-                            <ButtonIcon
-                                key={item.name}
-                                text={item.name}
-                                color="primary"
-                                withShadow = {true}
-                                onClick={() => router.push(item.href)}
-                                Icon={() => (
-                                    <PlusIcon className="h-4 w-4 text-gray-500"></PlusIcon>
-                                )} // Replace with actual icon component
-                            />
-                        ) : (
-                            <Link href={item.href} key={item.name} passHref>
-                                <span
-                                    className={`flex items-center p-2 my-2 transition-colors duration-200 justify-start cursor-pointer ${
-                                        router.pathname === item.href
-                                            ? "bg-black"
-                                            : "bg-unselected"
-                                    }`}
-                                >
-                                    <span
-                                        className={`bi bi-${item.icon} text-lg`}
-                                    ></span>{" "}
-                                    {/* Replace with actual icon component */}
-                                    <span className="mx-4 text-sm font-normal">
-                                        {item.name}
-                                    </span>
-                                </span>
-                            </Link>
-                        )
-                    )}
+                    <ButtonIcon
+                        key={"New Project"}
+                        text={"New Project"}
+                        color="primary"
+                        withShadow={true}
+                        onClick={() => router.push("/new-project")}
+                        Icon={() => <PlusIcon className="h-4 w-4 text-gray-500"></PlusIcon>}
+                    />
+                    {navigationItems1.map((item) => (
+                        <SidebarItem
+                            key={item.name}
+                            href={item.href}
+                            icon={item.icon}
+                            text={item.name}
+                            isSelected={pathname === item.href}
+                        />
+                    ))}
+                     <hr className="border-t-1 mx-4 my-6 border-solid border-gray-400 opacity-30"></hr>
+                     {navigationItems2.map((item) => (
+                        <SidebarItem
+                            key={item.name}
+                            href={item.href}
+                            icon={item.icon}
+                            text={item.name}
+                            isSelected={pathname === item.href}
+                        />
+                    ))}
                 </nav>
             </div>
         </aside>

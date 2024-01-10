@@ -9,7 +9,7 @@ export default function Dashboard() {
     const router = useRouter();
     
     if (!isAuth()) {
-        router.push('/'); // Redirect to home page
+        //router.push('/'); // Redirect to home page
         return <h1 className="text-xl font-bold">Please sign in</h1>;
     }
     // NOTE: Not finished
