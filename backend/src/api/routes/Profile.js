@@ -107,6 +107,8 @@ router.put("/",async (req, res) => {
 
     if(bio && typeof(bio)==="string") data.bio = bio;
 
+    data.lastUpdated = new Date().toISOString();
+
     await firestore.collection("users").doc(user.uid).set(data);
 
     return res.json(data);
