@@ -722,9 +722,25 @@ router.get("/memberof", async (req, res) => {
     }
 
     let teams = [];
+    // insert only teamID, teamName, teamImageID, MIMEtype, Visibility, role of the user, and status of the user
+
     query.forEach(team => {
-        teams.push(team.data());
-    });
+        let teamData = team.data();
+        let teamMembers = teamData.members;
+        let teamMember = teamMembers[user.uid];
+        let teamMemberData = {
+            teamID: teamData.teamID,
+            teamName: teamData.teamName,
+            teamImageID: teamData.teamImageID,
+            MIMEtype: teamData.MIMEtype,
+            Visibility: teamData.Visibility,
+            role: teamMember.role,
+            status: teamMember.status
+        }
+        teams.push(teamMemberData);
+    }
+    );
+
 
     return res.status(200).json({code:200, data: teams});
 
@@ -762,8 +778,22 @@ router.get("/owned", async (req, res) => {
     }
 
     let teams = [];
+    // insert only teamID, teamName, teamImageID, MIMEtype, Visibility, role of the user, and status of the user
+
     query.forEach(team => {
-        teams.push(team.data());
+        let teamData = team.data();
+        let teamMembers = teamData.members;
+        let teamMember = teamMembers[user.uid];
+        let teamMemberData = {
+            teamID: teamData.teamID,
+            teamName: teamData.teamName,
+            teamImageID: teamData.teamImageID,
+            MIMEtype: teamData.MIMEtype,
+            Visibility: teamData.Visibility,
+            role: teamMember.role,
+            status: teamMember.status
+        }
+        teams.push(teamMemberData);
     });
 
     return res.status(200).json({code:200, data: teams});
@@ -802,9 +832,23 @@ router.get("/adminof", async (req, res) => {
     }
 
     let teams = [];
+    // insert only teamID, teamName, teamImageID, MIMEtype, Visibility, role of the user, and status of the user
     query.forEach(team => {
-        teams.push(team.data());
+        let teamData = team.data();
+        let teamMembers = teamData.members;
+        let teamMember = teamMembers[user.uid];
+        let teamMemberData = {
+            teamID: teamData.teamID,
+            teamName: teamData.teamName,
+            teamImageID: teamData.teamImageID,
+            MIMEtype: teamData.MIMEtype,
+            Visibility: teamData.Visibility,
+            role: teamMember.role,
+            status: teamMember.status
+        }
+        teams.push(teamMemberData);
     });
+
 
     return res.status(200).json({code:200, data: teams});
 
