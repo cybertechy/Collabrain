@@ -1060,15 +1060,15 @@ router.put("/channel", async (req, res) => {
         return res.status(400).json({code:400, error: "User is not a administator of the team"});
     }
 
+     // get channel data
+     let channelQuery = await channelsRef.doc(channelID).get();
+     if(!channelQuery.exists){
+         return res.status(400).json({code:400, error: "Channel does not exist"});
+     }
+
     // check if channel name is already taken
     if(teamData.channels[channelName]){
         return res.status(400).json({code:400, error: "Channel name already taken"});
-    }
-
-    // get channel data
-    let channelQuery = await channelsRef.doc(channelID).get();
-    if(!channelQuery.exists){
-        return res.status(400).json({code:400, error: "Channel does not exist"});
     }
 
     let channelData = channelQuery.data();
