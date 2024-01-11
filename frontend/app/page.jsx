@@ -49,7 +49,6 @@ export default function Home() {
         event.preventDefault();
         let result = await emailSignIn(email, password);
         if(!result.success) {
-            console.log(result);
             toast.error(result.error,{
                 position: "top-center",
                 autoClose: 5000,

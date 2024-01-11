@@ -36,6 +36,8 @@ async function emailSignIn(email, password)
 	try
 	{
 		result = await signInWithEmailAndPassword(auth, email, password);
+
+		return {error: null, success: true};
 	}
 	catch (err)
 	{
