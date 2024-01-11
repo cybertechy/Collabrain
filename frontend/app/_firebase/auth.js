@@ -45,15 +45,47 @@ async function emailSignIn(email, password)
 		{
 			return {error: "Incorrect email or password", success: false};
 		}
-
-		else if (err.code === "auth/user-not-found")
-		{
-			result = await createUserWithEmailAndPassword(auth, email, password);
-			return {error: null, success: true};
-		}
-
 		else // Other errors
 		{
+			console.log(err);
+			return {error: "Something went wrong, Please try again later", success: false};
+		}
+
+	}
+
+}
+
+async function emailSignUp(email, password, confirmPassword, username, firstname, lastname){
+
+	if(!email || !password || !confirmPassword || !username || !firstname || !lastname)
+		return {error: "Please fill out all fields", success: false};
+
+	if(password !== confirmPassword)
+		return {error: "Passwords do not match", success: false};
+
+	let result;
+	try
+	{
+		result = await createUserWithEmailAndPassword(auth,email,password);
+		console.log("Result: "+result.code);
+		// TODO: Add user to database here
+
+		return {error: null, success: true};
+	}
+	catch (err)
+	{
+		// email already in use / invalid email / invalid password then return error
+		if ( err.code === "auth/invalid-email" || err.code === "auth/weak-password")
+		{
+			return {error: "Incorrect email or password", success: false};
+		} 
+		else if( err.code === "auth/email-already-in-use"){
+
+			return {error: "A user already exists with this email, consider signing up", success:false , route:"/"}
+		}
+		else // Other errors
+		{
+			console.log("Error: "+err);
 			return {error: "Something went wrong, Please try again later", success: false};
 		}
 
@@ -101,5 +133,6 @@ module.exports = {
 	signOut,
 	isAuth,
 	emailSignIn,
-	serviceSignIn
+	serviceSignIn,
+	emailSignUp
 }
