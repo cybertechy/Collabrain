@@ -15,8 +15,9 @@ const ButtonIcon = ({ text, color, withShadow = false, Icon, onClick }) => (
         }`}
         onClick={onClick}
     >
-       <span className="flex-grow text-center">{text}</span>
-        {Icon && <Icon className="flex-shrink-0 ml-2" />} {/* Add margin-left to icon */}
+        <span className="flex-grow text-center">{text}</span>
+        {Icon && <Icon className="flex-shrink-0 ml-2" />}{" "}
+        {/* Add margin-left to icon */}
     </button>
 );
 

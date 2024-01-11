@@ -15,7 +15,7 @@ const Button = ({ text, color, withShadow = false, onClick }) => (
         }`}
         onClick={onClick}
     >
-        {text} 
+        {text}
     </button>
 );
 

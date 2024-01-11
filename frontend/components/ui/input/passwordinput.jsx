@@ -98,7 +98,11 @@ const PasswordInput = ({ isConfirm, color }) => {
 
     return (
         <ThemeProvider theme={theme}>
-            <FormControl sx={{ m: 1, width: "37ch" }} variant="outlined" className={backgroundColorClass}>
+            <FormControl
+                sx={{ m: 1, width: "37ch" }}
+                variant="outlined"
+                className={backgroundColorClass}
+            >
                 <InputLabel htmlFor="outlined-adornment-password">
                     {isConfirm ? "Confirm Password" : "Password"}
                 </InputLabel>

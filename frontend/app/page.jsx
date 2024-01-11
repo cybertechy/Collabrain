@@ -8,7 +8,7 @@ import MicrosoftIcon from "../public/assets/svg/socials/microsoft.svg";
 import AppleIcon from "../public/assets/svg/socials/apple.svg";
 import PasswordInput from "../components/ui/input/passwordinput";
 import EmailInputField from "../components/ui/input/emailinput";
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 export default function Home() {
     const router = useRouter();
     const [backgroundLoaded, setBackgroundLoaded] = useState(false);
@@ -16,15 +16,15 @@ export default function Home() {
     useEffect(() => {
         // Preload the background image
         const img = new Image();
-        img.src = '/assets/images/background.jpg'; // Adjust the path to your background image
+        img.src = "/assets/images/background.jpg"; // Adjust the path to your background image
         img.onload = () => {
             setBackgroundLoaded(true);
-            document.body.classList.add('custom-background');
+            document.body.classList.add("custom-background");
         };
 
         // Remove the custom background class when the component unmounts
         return () => {
-            document.body.classList.remove('custom-background');
+            document.body.classList.remove("custom-background");
         };
     }, []);
     if (isAuth()) {
@@ -58,12 +58,15 @@ export default function Home() {
                         onSubmit={emailSignIn}
                         style={{ textAlign: "center" }}
                     >
-                        <EmailInputField placeholder="Email Address" color = "tertiary" />
+                        <EmailInputField
+                            placeholder="Email Address"
+                            color="tertiary"
+                        />
                         <br />
-                        <PasswordInput color = "tertiary"/>
+                        <PasswordInput color="tertiary" />
                         <br />
                         <p className="text-xs text-gray-600 font-poppins text-left ml-2">
-                            <a href = "">Forgot your password?</a>
+                            <a href="">Forgot your password?</a>
                         </p>
                         <Button
                             text="Log In"
@@ -90,12 +93,15 @@ export default function Home() {
                             <AppleIcon className="h-8 w-8 text-gray-500"></AppleIcon>
                         </button>
                     </span>
-                     <p className="text-xs text-gray-600 font-poppins text-left ml-2">
-                            Need an account?<a href = "/register" className="underline"> SIGN UP</a>
-                        </p>
+                    <p className="text-xs text-gray-600 font-poppins text-left ml-2">
+                        Need an account?
+                        <a href="/register" className="underline">
+                            {" "}
+                            SIGN UP
+                        </a>
+                    </p>
                 </div>
             </div>
-            
         </div>
     );
 }

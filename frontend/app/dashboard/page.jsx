@@ -3,11 +3,11 @@
 const { signOut, isAuth, getToken } = require("_firebase/auth"); // Import the authentication functions
 const { useRouter } = require("next/navigation");
 const axios = require("axios");
-import Sidebar from '../../components/ui/sidebar/sidebar';
-import Navbar from '../../components/ui/navbar/navbar';
+import Sidebar from "../../components/ui/sidebar/sidebar";
+import Navbar from "../../components/ui/navbar/navbar";
 export default function Dashboard() {
     const router = useRouter();
-    
+
     if (!isAuth()) {
         //router.push('/'); // Redirect to home page
         return <h1 className="text-xl font-bold">Please sign in</h1>;
@@ -52,55 +52,57 @@ export default function Dashboard() {
     };
 
     return (
-      <div className="flex flex-col h-screen bg-gray-100 overflow-hidden">
-    <Navbar /> {/* This ensures Navbar is at the top and full width */}
-    <div className="flex flex-grow overflow-hidden">
-      <Sidebar />
-      <div className='flex-grow flex flex-col items-center justify-center'>
-            <h1 className="text-xl font-bold">Dashboard</h1>
-            <p>This is your dashboard</p>
-            <p>There should be something here</p>
-            <button className =  "text-black"onClick={signOut}>Sign Out</button>
-            <input
-                id="doc-title"
-                style={{ color: "black", padding: 10, marginTop: 10 }}
-                type="text"
-            />
-            <textarea
-                id="doc-text"
-                style={{ color: "black", padding: 10, marginTop: 10 }}
-                name="text"
-                cols="30"
-                rows="10"
-            ></textarea>
-            <div style={{ display: "flex" }}>
-                <button
-                    onClick={createDoc}
-                    style={{
-                        color: "black",
-                        backgroundColor: "white",
-                        padding: 10,
-                        borderRadius: 5,
-                        margin: 10,
-                    }}
-                >
-                    Save doc
-                </button>
-                <button
-                    onClick={deleteDoc}
-                    style={{
-                        color: "black",
-                        backgroundColor: "white",
-                        padding: 10,
-                        borderRadius: 5,
-                        margin: 10,
-                    }}
-                >
-                    Delete doc
-                </button>
+        <div className="flex flex-col h-screen bg-gray-100 overflow-hidden">
+            <Navbar /> {/* This ensures Navbar is at the top and full width */}
+            <div className="flex flex-grow overflow-hidden">
+                <Sidebar />
+                <div className="flex-grow flex flex-col items-center justify-center">
+                    <h1 className="text-xl font-bold">Dashboard</h1>
+                    <p>This is your dashboard</p>
+                    <p>There should be something here</p>
+                    <button className="text-black" onClick={signOut}>
+                        Sign Out
+                    </button>
+                    <input
+                        id="doc-title"
+                        style={{ color: "black", padding: 10, marginTop: 10 }}
+                        type="text"
+                    />
+                    <textarea
+                        id="doc-text"
+                        style={{ color: "black", padding: 10, marginTop: 10 }}
+                        name="text"
+                        cols="30"
+                        rows="10"
+                    ></textarea>
+                    <div style={{ display: "flex" }}>
+                        <button
+                            onClick={createDoc}
+                            style={{
+                                color: "black",
+                                backgroundColor: "white",
+                                padding: 10,
+                                borderRadius: 5,
+                                margin: 10,
+                            }}
+                        >
+                            Save doc
+                        </button>
+                        <button
+                            onClick={deleteDoc}
+                            style={{
+                                color: "black",
+                                backgroundColor: "white",
+                                padding: 10,
+                                borderRadius: 5,
+                                margin: 10,
+                            }}
+                        >
+                            Delete doc
+                        </button>
+                    </div>
+                </div>
             </div>
-            </div>
-        </div>
         </div>
     );
 }
