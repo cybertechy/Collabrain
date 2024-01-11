@@ -3,7 +3,7 @@ const { getAuth, signInWithPopup, GoogleAuthProvider, OAuthProvider,
 	signInWithEmailAndPassword, createUserWithEmailAndPassword,
 	EmailAuthProvider, linkWithPopup } = require("firebase/auth");
 const { useAuthState } = require("react-firebase-hooks/auth"); // Required for all pages
-const {toast} = require("react-toastify"); 
+
 
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({
@@ -29,9 +29,9 @@ async function emailSignIn(email, password)
 {
 	// This fucntion should be adjusted to seperate log in and sign up
 
-	console.log("Signing in with email and password");
-	console.log(email, password);
-
+	if(!email || !password)
+		return {error: "Please enter an email and password", success: false};
+	
 	let result;
 	try
 	{
