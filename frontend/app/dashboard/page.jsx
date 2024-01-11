@@ -16,13 +16,24 @@ export default function Dashboard() {
     // Needs to be tested with backend
 
     let currentDoc;
+    let currentDoc;
 
     const createDoc = async () => {
         // Create a new document
         const title = document.querySelector("#doc-title").value;
         const content = document.querySelector("#doc-text").value;
         const token = await getToken();
+    const createDoc = async () => {
+        // Create a new document
+        const title = document.querySelector("#doc-title").value;
+        const content = document.querySelector("#doc-text").value;
+        const token = await getToken();
 
+        let res = await axios
+            .post("http://localhost:8080/api/doc/new", {
+                token: token,
+            })
+            .catch((err) => console.log(err));
         let res = await axios
             .post("http://localhost:8080/api/doc/new", {
                 token: token,
@@ -40,7 +51,27 @@ export default function Dashboard() {
                 .catch((err) => console.log(err));
         }
     };
+        if (res.status == 200) {
+            currentDoc = res.data.id;
+            res = await axios
+                .post(`http://localhost:8080/api/doc/${currentDoc}`, {
+                    token: token,
+                    title: title,
+                    content: content,
+                })
+                .catch((err) => console.log(err));
+        }
+    };
 
+    const deleteDoc = async () => {
+        console.log(currentDoc);
+        const token = await getToken();
+        let res = await axios
+            .post(`http://localhost:8080/api/doc/delete/${currentDoc}`, {
+                token: token,
+            })
+            .catch((err) => console.log(err));
+    };
     const deleteDoc = async () => {
         console.log(currentDoc);
         const token = await getToken();

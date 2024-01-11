@@ -1,4 +1,5 @@
 "use client";
+"use client";
 
 const { isAuth, emailSignIn, serviceSignIn } = require("_firebase/auth"); // Import the authentication functions
 const { useRouter } = require("next/navigation");
@@ -50,6 +51,7 @@ export default function Home() {
                         Log into Collabrain
                     </h1>
 
+                    {/* The following code is just an example to show what functions to call for authentication
                     {/* The following code is just an example to show what functions to call for authentication
 				it would be probably better to implement the UI with a library of prebuilt components */}
 
