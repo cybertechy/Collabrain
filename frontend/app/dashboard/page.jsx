@@ -4,7 +4,7 @@ const { signOut, isAuth, getToken } = require("_firebase/auth"); // Import the a
 const { useRouter } = require("next/navigation");
 const axios = require("axios");
 import Sidebar from '../../components/ui/sidebar/sidebar';
-
+import Navbar from '../../components/ui/navbar/navbar';
 export default function Dashboard() {
     const router = useRouter();
     
@@ -52,11 +52,11 @@ export default function Dashboard() {
     };
 
     return (
-        <div className="flex h-screen bg-gray-100 overflow-hidden">
-            <div className="flex-none">
-                <Sidebar />
-            </div>
-            <div className='flex-grow flex flex-col items-center justify-center'>
+      <div className="flex flex-col h-screen bg-gray-100 overflow-hidden">
+    <Navbar /> {/* This ensures Navbar is at the top and full width */}
+    <div className="flex flex-grow overflow-hidden">
+      <Sidebar />
+      <div className='flex-grow flex flex-col items-center justify-center'>
             <h1 className="text-xl font-bold">Dashboard</h1>
             <p>This is your dashboard</p>
             <p>There should be something here</p>
@@ -100,6 +100,7 @@ export default function Dashboard() {
                 </button>
             </div>
             </div>
+        </div>
         </div>
     );
 }

@@ -23,7 +23,7 @@ SidebarItem.propTypes = {
   isSelected: PropTypes.bool,
   isExpanded: PropTypes.bool
 };
-
+1
 SidebarItem.defaultProps = {
   isSelected: false,
   isExpanded: true

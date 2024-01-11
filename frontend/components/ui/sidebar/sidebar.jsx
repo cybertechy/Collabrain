@@ -37,7 +37,7 @@ const Sidebar = () => {
     };
     const pathname = usePathname(); // corrected from 'usePathname()'
     return (
-        <aside className={`transition-all duration-500 ease-in-out ${isOpen ? 'w-72' : 'w-20'} bg-white text-black h-screen`}>
+        <aside className={`transition-all shadow-md h-screen pt-[height_of_navbar] z-10 duration-500 ease-in-out ${isOpen ? 'w-72' : 'w-20'} bg-white text-black`}>
             <div className="flex flex-col">
                 <div className="flex items-center justify-center h-24">
                     <div className="flex items-center justify-center">
