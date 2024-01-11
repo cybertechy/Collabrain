@@ -8,10 +8,16 @@ import MicrosoftIcon from "../public/assets/svg/microsoft.svg";
 import AppleIcon from "../public/assets/svg/apple.svg";
 import PasswordInput from "../components/ui/input/passwordinput";
 import EmailInputField from "../components/ui/input/emailinput";
+import { ToastContainer, toast } from 'react-toastify';
 import { useEffect, useState } from 'react';
 export default function Home() {
     const router = useRouter();
     const [backgroundLoaded, setBackgroundLoaded] = useState(false);
+
+    // Data States
+    const [email, setemail] = useState("");
+    const [password, setpassword] = useState("");
+    
 
     useEffect(() => {
         // Preload the background image
@@ -38,8 +44,29 @@ export default function Home() {
             </div>
         );
     }
+
+    const formSignin =  async (event) => {
+        event.preventDefault();
+        let result = await emailSignIn(email, password);
+        if(!result.success) {
+            console.log(result);
+            toast.error(result.error,{
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                theme: "colored",
+            });
+        } else {
+            router.push("/dashboard");
+        }
+    };
+
+
     return (
         <div>
+            <ToastContainer />
             <div className="justify-center items-center flex flex-col">
                 <img
                     className="w-28 "
@@ -55,20 +82,20 @@ export default function Home() {
 
                     <br />
                     <form
-                        onSubmit={emailSignIn}
+                        onSubmit={formSignin}
                         style={{ textAlign: "center" }}
                     >
-                        <EmailInputField placeholder="Email Address" color = "tertiary" />
+                        <EmailInputField email={email} setEmail={setemail} placeholder="Email Address" color="tertiary" />
                         <br />
-                        <PasswordInput color = "tertiary"/>
+                        <PasswordInput password={password} setPassword={setpassword} color="tertiary" />
                         <br />
                         <p className="text-xs text-gray-600 font-poppins text-left ml-2">
-                            <a href = "">Forgot your password?</a>
+                            <a href="">Forgot your password?</a>
                         </p>
                         <Button
                             text="Log In"
                             color="primary"
-                            onClick={emailSignIn}
+                            
                         />
                         <hr className="border-t-1 border-solid border-gray-400"></hr>
                     </form>
@@ -90,12 +117,12 @@ export default function Home() {
                             <AppleIcon className="h-8 w-8 text-gray-500"></AppleIcon>
                         </button>
                     </span>
-                     <p className="text-xs text-gray-600 font-poppins text-left ml-2">
-                            Need an account?<a href = "/register" className="underline"> SIGN UP</a>
-                        </p>
+                    <p className="text-xs text-gray-600 font-poppins text-left ml-2">
+                        Need an account?<a href="/register" className="underline"> SIGN UP</a>
+                    </p>
                 </div>
             </div>
-            
+
         </div>
     );
 }

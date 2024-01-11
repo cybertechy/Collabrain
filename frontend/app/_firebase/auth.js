@@ -3,6 +3,7 @@ const { getAuth, signInWithPopup, GoogleAuthProvider, OAuthProvider,
 	signInWithEmailAndPassword, createUserWithEmailAndPassword,
 	EmailAuthProvider, linkWithPopup } = require("firebase/auth");
 const { useAuthState } = require("react-firebase-hooks/auth"); // Required for all pages
+const {toast} = require("react-toastify"); 
 
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({
@@ -24,34 +25,34 @@ function isAuth()
 	return (user) ? true : false;
 }
 
-async function emailSignIn(e)
+async function emailSignIn(email, password)
 {
 	// This fucntion should be adjusted to seperate log in and sign up
-	e.preventDefault();
-	const { email, password } = e.target.elements;
+
+	console.log("Signing in with email and password");
+	console.log(email, password);
 
 	let result;
 	try
 	{
-		result = await signInWithEmailAndPassword(auth, email.value, password.value);
+		result = await signInWithEmailAndPassword(auth, email, password);
 	}
 	catch (err)
 	{
-		if (err.code === "auth/wrong-password" || err.code === "auth/invalid-email")
+		if (err.code === "auth/wrong-password" || err.code === "auth/invalid-email"|| err.code === "auth/invalid-credential")
 		{
-			alert("Inccorect email or password");
-			return;
+			return {error: "Incorrect email or password", success: false};
 		}
 
 		else if (err.code === "auth/user-not-found")
 		{
-			alert("User doesnt exist, creating new user");
-			result = await createUserWithEmailAndPassword(auth, email.value, password.value);
+			result = await createUserWithEmailAndPassword(auth, email, password);
+			return {error: null, success: true};
 		}
 
 		else // Other errors
 		{
-			alert(err.message);
+			return {error: "Something went wrong, Please try again later", success: false};
 		}
 
 	}
