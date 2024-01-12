@@ -54,7 +54,7 @@ router.post("/", async (req, res) => {
 			ref.collection("channels").add({name: "General"})
 			.then(ref => {
 				ref.collection("messages").add({
-					message: "Welcome to the General channel!",
+					message: "Welcome to General!",
 					sender: "System",
 					timestamp: new Date().getSeconds()
 				})
@@ -159,11 +159,11 @@ router.post("/:team/user", async (req, res) => {
 
     // verify token and authority
     let user = await fb.verifyUser(req.body.token);
-    if(!user || user.uid != req.body.user)
+    if(!user)
         return res.status(401).json({error: "Unauthorized"});
 
 	// Check if user is part of the team already
-	let doc = await fb.db.doc(`users/${req.body.user}`).get()
+	let doc = await fb.db.doc(`users/${user.uid}`).get()
 	if (doc.data().teams.includes(req.params.team))
 		return res.status(400).json({error: "User is already part of the team"});
 
@@ -171,13 +171,13 @@ router.post("/:team/user", async (req, res) => {
 	try
 	{
 		fb.db.doc(`teams/${req.params.team}`).update({
-			[`members.${req.body.user}`]: {
+			[`members.${user.uid}`]: {
 				role: "member"
 			}
 		})
 
 		// Add team to user's teams list
-		fb.db.collection("users").doc(req.body.user).update({
+		fb.db.collection("users").doc(user.uid).update({
 			teams: fb.admin.firestore.FieldValue.arrayUnion(req.params.team)
 		})
 	}
@@ -195,11 +195,11 @@ router.delete("/:team/user", async (req, res) => {
 
     // verify token and authority
     let user = await fb.verifyUser(req.body.token);
-    if(!user || user.uid != req.body.user)
+    if(!user)
         return res.status(401).json({error: "Unauthorized"});
 
 	// Check if user is part of the team
-	let doc = await fb.db.doc(`users/${req.body.user}`).get()
+	let doc = await fb.db.doc(`users/${user.uid}`).get()
 	if (!doc.data().teams.includes(req.params.team))
 		return res.status(400).json({error: "User is not part of the team"});
 
@@ -212,11 +212,11 @@ router.delete("/:team/user", async (req, res) => {
 	try
 	{
 		fb.db.doc(`teams/${req.params.team}`).update({
-			[`members.${req.body.user}`]: fb.admin.firestore.FieldValue.delete()
+			[`members.${user.uid}`]: fb.admin.firestore.FieldValue.delete()
 		})
 
 		// Remove team from user's teams list
-		fb.db.collection("users").doc(req.body.user).update({
+		fb.db.collection("users").doc(user.uid).update({
 			teams: fb.admin.firestore.FieldValue.arrayRemove(req.params.team)
 		})
 	}
@@ -230,306 +230,98 @@ router.delete("/:team/user", async (req, res) => {
 /************************************************************/
 
 /* Endpoint for creating a new channel */
-router.post("/channel", async (req, res) => {
-    const {token, teamID, channelName} = req.body;
-
-    if(!token) {
-        return res.status(400).json({code:400, error: "Missing token"});
-    }
-
-    if(!teamID) {
-        return res.status(400).json({code:400, error: "Missing team ID"});
-    }
-
-    if(!channelName) {
-        return res.status(400).json({code:400, error: "Missing channel name"});
-    }
+router.post("/:team/channel", async (req, res) => {
+	// Make sure all required fields are present
+	if(!req.body.token || !req.body.channel)
+		return res.status(400).json({error: "Missing required data"});
 
     // verify token
-    let user = await fb.verifyUser(token);
-    if(!user){
-        return res.status(400).json({code:400, error: "Invalid token"});
-    }
+    let user = await fb.verifyUser(req.body.token);
+    if(!user)
+        return res.status(401).json({error: "Unauthorized"});
 
-    // get database references
-    let db = fb.admin.firestore();
-    let teamsRef = db.collection("teams");
-    let channelsRef = db.collection("channels");
+	// Check if user is a admin of the team
+	let team = await fb.db.doc(`teams/${req.params.team}`).get()
+	if (team.data().members[user.uid].role != "admin")
+		return res.status(401).json({error: "Unauthorized"});
 
-    // get team data
-    let query = await teamsRef.doc(teamID).get();
-    if(!query.exists){
-        return res.status(400).json({code:400, error: "Team does not exist"});
-    }
-
-    let teamData = query.data();
-
-    // check if user is a administator of the team
-    if(teamData.members[user.uid].role != "administator"){
-        return res.status(400).json({code:400, error: "User is not a administator of the team"});
-    }
-
-    // check if channel name is already taken
-    if(teamData.channels[channelName]){
-        return res.status(400).json({code:400, error: "Channel name already taken"});
-    }
-
-    // create channel
-    let channelRef = channelsRef.doc();
-    let channelID = channelRef.id;
-
-    let channelData = {
-        channelName: channelName,
-        channelID: channelID,
-        teamID: teamID,
-        message: []
-    }
-
-    let creation = await channelRef.set(channelData);
-    if(!creation){
-        return res.status(400).json({code:400, error: "Channel creation failed"});
-    }
-
-    // add channel to team
-    teamData.channels[channelName] = {
-        channelName: channelName,
-        channelID: channelID
-    }
-
-    let update = await teamsRef.doc(teamID).update(teamData);
-
-    if(!update){
-        return res.status(400).json({code:400, error: "Channel addition failed"});
-    }
-
-    return res.status(200).json({code:200, message: "Channel created", channelID: channelID});
-
-});
-
-/* Endpoint for getting a channel's data */
-router.get("/channel", async (req, res) => {
-    const {token, teamID, channelID} = req.query;
-
-    if(!token) {
-        return res.status(400).json({code:400, error: "Missing token"});
-    }
-
-    if(!teamID) {
-        return res.status(400).json({code:400, error: "Missing team ID"});
-    }
-
-    if(!channelID) {
-        return res.status(400).json({code:400, error: "Missing channel ID"});
-    }
-
-    // verify token
-    let user = await fb.verifyUser(token);
-    if(!user){
-        return res.status(400).json({code:400, error: "Invalid token"});
-    }
-
-    // get database references
-    let db = fb.admin.firestore();
-    let teamsRef = db.collection("teams");
-    let channelsRef = db.collection("channels");
-
-    // get team data
-    let query = await teamsRef.doc(teamID).get();
-    if(!query.exists){
-        return res.status(400).json({code:400, error: "Team does not exist"});
-    }
-
-    let teamData = query.data();
-
-    // check if user is a member of the team
-    if(!teamData.members[user.uid]){
-        return res.status(400).json({code:400, error: "User is not a member of the team"});
-    }
-
-    // get channel data
-    let channelQuery = await channelsRef.doc(channelID).get();
-    if(!channelQuery.exists){
-        return res.status(400).json({code:400, error: "Channel does not exist"});
-    }
-
-    let channelData = channelQuery.data();
-
-    if(channelData.teamID != teamID){
-        return res.status(400).json({code:400, error: "Unauthorized access"});
-    }
-
-    return res.status(200).json({code:200, data: channelData});
+	// Create channel
+	fb.db.collection(`teams/${req.params.team}/channels`).add({name: req.body.channel})
+		.then(ref => { return res.status(200).json({message: "Channel created", channelID: ref.id}); })
+		.catch(err => { return res.status(500).json({error: "Channel creation failed"}); });
 });
 
 /* Endpoint for updating a channel's data */
-router.put("/channel", async (req, res) => {
+router.patch("/:team/channel/:channel", async (req, res) => {
+	// Make sure all required fields are present
+	if(!req.body.token || !req.body.data)
+		return res.status(400).json({error: "Missing required data"});
 
-    const {token, teamID, channelID, channelName} = req.body;
+	// verify token
+	let user = await fb.verifyUser(req.body.token);
+	if(!user)
+		return res.status(401).json({error: "Unauthorized"});
 
-    if(!token) {
-        return res.status(400).json({code:400, error: "Missing token"});
-    }
+	// Check if user is a admin of the team
+	let team = await fb.db.doc(`teams/${req.params.team}`).get()
+	if (team.data().members[user.uid].role != "admin")
+		return res.status(401).json({error: "Unauthorized"});
 
-    if(!teamID) {
-        return res.status(400).json({code:400, error: "Missing team ID"});
-    }
-
-    if(!channelID) {
-        return res.status(400).json({code:400, error: "Missing channel ID"});
-    }
-
-    if(!channelName) {
-        return res.status(400).json({code:400, error: "Missing channel name"});
-    }
-
-    // verify token
-    let user = await fb.verifyUser(token);
-    if(!user){
-        return res.status(400).json({code:400, error: "Invalid token"});
-    }
-
-    // get database references
-    let db = fb.admin.firestore();
-    let teamsRef = db.collection("teams");
-    let channelsRef = db.collection("channels");
-
-    // get team data
-    let query = await teamsRef.doc(teamID).get();
-    if(!query.exists){
-        return res.status(400).json({code:400, error: "Team does not exist"});
-    }
-
-    let teamData = query.data();
-
-    // check if user is a administator of the team
-    if(teamData.members[user.uid].role != "administator"){
-        return res.status(400).json({code:400, error: "User is not a administator of the team"});
-    }
-
-    // check if channel name is already taken
-    if(teamData.channels[channelName]){
-        return res.status(400).json({code:400, error: "Channel name already taken"});
-    }
-
-    // get channel data
-    let channelQuery = await channelsRef.doc(channelID).get();
-    if(!channelQuery.exists){
-        return res.status(400).json({code:400, error: "Channel does not exist"});
-    }
-
-    let channelData = channelQuery.data();
-
-    if(channelData.teamID != teamID){
-        return res.status(400).json({code:400, error: "Unauthorized access"});
-    }
-
-    //update Info in team by deleting the existing channel and adding the updated one
-    delete teamData.channels[channelData.channelName];
-
-    let updateTeam = await teamsRef.doc(teamID).update(teamData);
-
-    if(!updateTeam){
-        return res.status(400).json({code:400, error: "Channel update failed"});
-    }
-
-    // add channel to team
-    teamData.channels[channelName] = {
-        channelName: channelName,
-        channelID: channelID
-    }
-
-    let updateTeamChannel = await teamsRef.doc(teamID).update(teamData);
-
-    if(!updateTeamChannel){
-        return res.status(400).json({code:400, error: "Channel addition failed"});
-    }
-
-    // update channel data
-    channelData.channelName = channelName;
-
-    let update = await channelsRef.doc(channelID).update(channelData);
-    if(!update){
-        return res.status(400).json({code:400, error: "Channel update failed"});
-    }
-
-    return res.status(200).json({code:200, message: "Channel updated"});
-
+	try
+	{
+		fb.db.doc(`teams/${req.params.team}/channels/${req.params.channel}`).update(req.body.data)
+			.then(() => { return res.status(200).json({message: "Channel updated"}); })
+	}
+	catch(err) { return res.status(400).json({error: "Channel update failed"}); }
 });
 
 /* Endpoint for deleting a channel */
-router.delete("/channel", async (req, res) => {
+router.delete("/:team/channel/:channel", async (req, res) => {
+	// Make sure all required fields are present
+	if(!req.body.token)
+		return res.status(400).json({error: "Missing required data"});
 
-    const {token, teamID, channelID} = req.body;
+	// verify token
+	let user = await fb.verifyUser(req.body.token);
+	if(!user)
+		return res.status(401).json({error: "Unauthorized"});
 
-    if(!token) {
-        return res.status(400).json({code:400, error: "Missing token"});
-    }
+	// Check if user is a admin of the team
+	let team = await fb.db.doc(`teams/${req.params.team}`).get()
+	if (team.data().members[user.uid].role != "admin")
+		return res.status(401).json({error: "Unauthorized"});
 
-    if(!teamID) {
-        return res.status(400).json({code:400, error: "Missing team ID"});
-    }
+	// Delete subcollection of messages
+	fb.deleteCollection(`teams/${req.params.team}/channels/${req.params.channel}/messages`)
+		.catch(err => { return res.status(400).json({error: "Channel deletion failed"}); })
 
-    if(!channelID) {
-        return res.status(400).json({code:400, error: "Missing channel ID"});
-    }
-
-    // verify token
-    let user = await fb.verifyUser(token);
-    if(!user){
-        return res.status(400).json({code:400, error: "Invalid token"});
-    }
-
-    // get database references
-    let db = fb.admin.firestore();
-    let teamsRef = db.collection("teams");
-    let channelsRef = db.collection("channels");
-
-    // get team data
-    let query = await teamsRef.doc(teamID).get();
-    if(!query.exists){
-        return res.status(400).json({code:400, error: "Team does not exist"});
-    }
-
-    let teamData = query.data();
-
-    // check if user is a administator of the team
-    if(teamData.members[user.uid].role != "administator"){
-        return res.status(400).json({code:400, error: "User is not a administator of the team"});
-    }
-
-    // get channel data
-    let channelQuery = await channelsRef.doc(channelID).get();
-
-    if(!channelQuery.exists){
-        return res.status(400).json({code:400, error: "Channel does not exist"});
-    }
-
-    let channelData = channelQuery.data();
-
-    if(channelData.teamID != teamID){
-        return res.status(400).json({code:400, error: "Unauthorized access"});
-    }
-
-    // delete channel
-    let deletion = await channelsRef.doc(channelID).delete();
-
-    if(!deletion){
-        return res.status(400).json({code:400, error: "Channel deletion failed"});
-    }
-
-    // delete channel from team
-    delete teamData.channels[channelData.channelName];
-
-    let update = await teamsRef.doc(teamID).update(teamData);
-
-    if(!update){
-
-        return res.status(400).json({code:400, error: "Channel deletion failed"});
-
-    }
-
-    return res.status(200).json({code:200, message: "Channel deleted"});
+	// Delete channel
+	fb.db.doc(`teams/${req.params.team}/channels/${req.params.channel}`).delete()
+		.then(() => { return res.status(200).json({message: "Channel deleted"}); })
+		.catch(err => { return res.status(400).json({error: "Channel deletion failed"}); });
 
 });
+
+/* Endpoint for new message in channel */
+router.post("/:team/channel/:channel/message", async (req, res) => {
+	// Make sure all required fields are present
+	if(!req.body.token || !req.body.message)
+		return res.status(400).json({error: "Missing required data"});
+
+	// verify token
+	let user = await fb.verifyUser(req.body.token);
+	if(!user)
+		return res.status(401).json({error: "Unauthorized"});
+
+	// Add message to channel
+	fb.db.collection(`teams/${req.params.team}/channels/${req.params.channel}/messages`).add({
+		message: req.body.message,
+		sender: user.uid,
+		timestamp: new Date().getSeconds()
+	})
+	.catch(err => { return res.status(500).json({error: "Message creation failed"}); });
+
+	return res.status(200).json({message: "Message sent"});
+}); 
 
 module.exports = router;
