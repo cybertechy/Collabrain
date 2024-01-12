@@ -131,17 +131,17 @@ router.delete("/:team", async (req, res) => {
 		return res.status(400).json({code:401, error: "Unauthorized"});
 
 	// Check if user is a administator of the team
-	await fb.db.doc(`teams/${req.params.team}`).get()
-	.then(doc => {
-		if(doc.data().members[user.uid].role != "administator")
-			return res.status(400).json({error: "Unauthorized"});
+	let doc = await fb.db.doc(`teams/${req.params.team}`).get()
+	if(doc.data().members[user.uid].role != "admin")
+		return res.status(400).json({error: "Unauthorized"});
 
-		// Delete team
-		fb.db.doc(`teams/${req.params.team}`).delete()
-			.then(() => { return res.status(200).json({message: "Team deleted"}); })
-			.catch(err => { return res.status(500).json({error: "Team deletion failed"}); });
-	})
-	.catch(err => { return res.status(400).json({error: "Team not found"}); })
+	// Delete subcollection of channels
+	fb.deleteCollection(`teams/${req.params.team}/channels`)
+
+	// Delete team
+	fb.db.doc(`teams/${req.params.team}`).delete()
+		.then(() => { return res.status(200).json({message: "Team deleted"}); })
+		.catch(err => { return res.status(500).json({error: "Team deletion failed"}); });
 });
 
 
@@ -232,7 +232,7 @@ router.delete("/:team/user", async (req, res) => {
 /* Endpoint for creating a new channel */
 router.post("/:team/channel", async (req, res) => {
 	// Make sure all required fields are present
-	if(!req.body.token || !req.body.channel)
+	if(!req.body.token || !req.body.name)
 		return res.status(400).json({error: "Missing required data"});
 
     // verify token
@@ -246,7 +246,7 @@ router.post("/:team/channel", async (req, res) => {
 		return res.status(401).json({error: "Unauthorized"});
 
 	// Create channel
-	fb.db.collection(`teams/${req.params.team}/channels`).add({name: req.body.channel})
+	fb.db.collection(`teams/${req.params.team}/channels`).add({name: req.body.name})
 		.then(ref => { return res.status(200).json({message: "Channel created", channelID: ref.id}); })
 		.catch(err => { return res.status(500).json({error: "Channel creation failed"}); });
 });
@@ -319,9 +319,34 @@ router.post("/:team/channel/:channel/message", async (req, res) => {
 		sender: user.uid,
 		timestamp: new Date().getSeconds()
 	})
+	.then(ref => { return res.status(200).json({message: "Message sent", messageID: ref.id}); })
 	.catch(err => { return res.status(500).json({error: "Message creation failed"}); });
-
-	return res.status(200).json({message: "Message sent"});
 }); 
+
+/* Endpoint for editing a message */
+router.patch("/:team/channel/:channel/message/:message", async (req, res) => {
+	// Make sure all required fields are present
+	if(!req.body.token || !req.body.message)
+		return res.status(400).json({error: "Missing required data"});
+
+	// verify token
+	let user = await fb.verifyUser(req.body.token);
+	if(!user)
+		return res.status(401).json({error: "Unauthorized"});
+
+	// Check if user is the sender of the message
+	let message = await fb.db.doc(`teams/${req.params.team}/channels/${req.params.channel}/messages/${req.params.message}`).get()
+	if (message.data().sender != user.uid)
+		return res.status(401).json({error: "Unauthorized"});
+
+	// Update message
+	fb.db.doc(`teams/${req.params.team}/channels/${req.params.channel}/messages/${req.params.message}`).update({
+		message: req.body.message,
+		edited: true
+	})
+	.catch(err => { return res.status(500).json({error: "Message update failed"}); });
+
+	return res.status(200).json({message: "Message updated"});
+});
 
 module.exports = router;
