@@ -5,6 +5,7 @@ const db = require("./api/helpers/firebase");
 const docRoute = require("./api/routes/Doc");
 const strRoute = require("./api/routes/Storage");
 const teamsRoute = require("./api/routes/Teams");
+const userRoute = require("./api/routes/User");
 
 const bodyParser = require('body-parser');
 const port = process.env.PORT || 8080;
@@ -13,7 +14,8 @@ app.use(bodyParser.json());
 app.use(cors());
 app.use("/api/doc", docRoute);
 app.use("/api/storage",strRoute);
-app.use("/api/teams",teamsRoute);
+app.use("/api/team",teamsRoute);
+app.use("/api/user",userRoute);
 
 app.get("/api/users", (req, res) =>
 {
