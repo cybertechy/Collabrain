@@ -55,6 +55,7 @@ export default function Dashboard() {
             <h1 className="text-xl font-bold">Dashboard</h1>
             <p>This is your dashboard</p>
             <p>There should be something here</p>
+            <button className="text-black" onClick={()=>getToken().then((token)=>console.log(token))}>Get token</button>
             <button onClick={signOut}>Sign Out</button>
             <input
                 id="doc-title"

@@ -1,7 +1,7 @@
 const { app: firebase } = require("_firebase/cli"); // Required for all pages
 const { getAuth, signInWithPopup, GoogleAuthProvider, OAuthProvider,
 	signInWithEmailAndPassword, createUserWithEmailAndPassword,
-	EmailAuthProvider, linkWithPopup } = require("firebase/auth");
+	EmailAuthProvider, linkWithPopup, onAuthStateChanged } = require("firebase/auth");
 const { useAuthState } = require("react-firebase-hooks/auth"); // Required for all pages
 
 
@@ -125,7 +125,8 @@ async function serviceSignIn(service)
 
 async function getToken()
 {
-	return auth.currentUser.getIdToken(true)
+
+	return auth?.currentUser?.getIdToken(true)
 }
 
 module.exports = {
