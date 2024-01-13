@@ -44,7 +44,8 @@ router.post("/", async (req, res) => {
 		members : { [uid]: {
 			role: "admin",
 		} },
-		visibility: req.body.visibility
+		visibility: req.body.visibility,
+		score: 0,
 	}
 
 	// Create team
@@ -77,7 +78,7 @@ router.get("/:team", async (req, res) => {
 	if(!req.body.token)
 		return res.status(400).json({error: "Missing required data"});
     
-	// verfiy token
+	// verify token
 	let user = await fb.verifyUser(req.body.token);
 	if(!user)
 		return res.status(401).json({error: "Unauthorized"});
@@ -348,5 +349,91 @@ router.patch("/:team/channel/:channel/message/:message", async (req, res) => {
 
 	return res.status(200).json({message: "Message updated"});
 });
+
+/************************************************************/
+/*                     General operations                   */
+/************************************************************/
+
+/* Endpoint for getting all teams using index and no.of teams, also toggle of sort, to sort by Score of team */
+
+router.get("/", async (req, res) => {
+    
+        let { index, noOfTeams, sort} = req.query;
+        const auth = req.headers.authorization;
+
+        if(!auth) {
+            return res.status(400).json({code:400, error: "Missing token"});
+        }
+
+        const token = auth.split(" ")[1];
+    
+        if(!token) {
+            return res.status(400).json({code:400, error: "Missing token"});
+        }
+    
+        if(!index) {
+            return res.status(400).json({code:400, error: "Missing index"});
+        }
+    
+        if(!noOfTeams) {
+            return res.status(400).json({code:400, error: "Missing no.of teams"});
+        }
+    
+        if(!sort) {
+            sort = "false";
+        }
+    
+        // verify token
+        let user = await fb.verifyUser(token);
+    
+        if(!user){
+            return res.status(400).json({code:400, error: "Invalid token"});
+        }
+    
+        // get database references
+        let db = fb.admin.firestore();
+    
+        let teamsRef = db.collection("teams");
+    
+        // get all teams
+        let query = null;
+
+        //Get only public teams
+        if(sort==="true"){
+            query = await teamsRef.where("Visibility","==","Public").orderBy("Score","desc").offset(parseInt(index)).limit(parseInt(noOfTeams)).get();
+        }else{
+            query = await teamsRef.offset(parseInt(index)).limit(parseInt(noOfTeams)).get();
+        }
+    
+        if(query.empty){
+            return res.status(400).json({code:400, error: "No teams found"});
+        }
+    
+        let teams = [];
+        query.forEach(team => {
+            teams.push(team.data());
+        });
+
+        // Show only public teams, and only its name, image and score
+        teams = teams.filter(team => team.Visibility === "public");
+
+        teams = teams.map(team => {
+            return {
+                teamName: team.teamName,
+                teamImageID: team.teamImageID,
+                MIMEtype: team.MIMEtype,
+                Score: team.Score,
+                teamID: team.teamID
+            }
+        });
+    
+        return res.status(200).json({code:200, data: teams});
+    
+    });
+
+
+
+
+
 
 module.exports = router;
