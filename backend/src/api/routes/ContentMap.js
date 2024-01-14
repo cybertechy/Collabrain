@@ -19,9 +19,9 @@ router.post("/", async (req, res) =>
     }
 
     // Check if the request has the required data
-    if (!data || !name )
+    if ( !name )
     {
-        return res.status(400).json({ code: "AM104", error: "Missing data or name of the content map" });
+        return res.status(400).json({ code: "AM104", error: "Missing name of the content map" });
     }
 
     //verify user
@@ -155,9 +155,9 @@ router.put("/:id", async (req, res) => {
     }
 
     // Check if the request has the required data
-    if (!data || !name )
+    if (!name )
     {
-        return res.status(400).json({ code: 400, error: "Missing data or name of the content map" });
+        return res.status(400).json({ code: 400, error: "Missing  name of the content map" });
     }
 
     if(share && (share!=="r" || share!=="rw")){
@@ -192,8 +192,11 @@ router.put("/:id", async (req, res) => {
 
     const updatedContentMap = {
         name: name,
-        data: JSON.stringify(data),
         updatedAt: fb.admin.firestore.FieldValue.serverTimestamp(),
+    }
+
+    if(data){
+        updatedContentMap.data = JSON.stringify(data);
     }
 
     if(share){

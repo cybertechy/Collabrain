@@ -9,7 +9,7 @@ const contentMapRoute = require("./api/routes/ContentMap");
 const bodyParser = require('body-parser');
 const port = process.env.PORT || 8080;
 
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit: '50mb'}));
 app.use(cors());
 app.use("/api/doc", docRoute);
 app.use("/api/storage",strRoute);
