@@ -38,11 +38,6 @@ async function deleteDoc()
 	}).catch(err => console.log(err));
 };
 
-async function joinTeamChat()
-{
-	
-};
-
 export default function Dashboard()
 {
 	useEffect(() =>
@@ -57,13 +52,11 @@ export default function Dashboard()
 		return <h1 className="text-xl font-bold">Please sign in</h1>;
 	}
 
-	router.push('/chat'); // temp for testing
-
 	return (
 		<div className="flex flex-col justify-center items-center">
-			<h1 className="text-xl font-bold">Dashboard</h1>
-			<p>This is your dashboard</p>
-			<p>There should be something here</p>
+			<h1 className="text-xl font-bold text-black">Dashboard</h1>
+			<p className='text-black'>This is your dashboard</p>
+			<p className='text-black'>There should be something here</p>
 			<div className="grid grid-cols-2 gap-5 my-5">
 				<button onClick={() => { router.push("/chat"); }} className="bg-sky-500 text-white font-semibold p-3 rounded-lg">Chat</button>
 				<button onClick={fb.signOut} className="bg-red-400 text-white font-semibold p-3 rounded-lg">Sign Out</button>

@@ -1,5 +1,6 @@
 const { Router } = require('express');
 const { verifyUser } = require("../helpers/firebase");
+const uuid = require("uuid");
 
 const router = Router();
 
@@ -61,7 +62,7 @@ router.post("/media", async (req, res) =>
 	const bucketName = "B1";
 
 	// Generate a random filename for the media uuid
-	const fileName = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+	const fileName = uuid.v4();
 
 	const userid = user.uid;
 
@@ -141,6 +142,59 @@ router.get("/media/:mediaId", async (req, res) =>
 
 
 });
+
+router.delete("/media/:mediaId", async (req, res) => {
+
+	const token = req.query.token;
+
+	const mediaId = req.params.mediaId;
+
+	// Check if the token exists
+	if (!token)
+	{
+		return res.status(400).json({ code: "DM101", error: "Missing token" });
+	}
+
+	//Check if the token is valid
+	const user = await verifyUser(token);
+	if (!user)
+	{
+		return res.status(403).json({ code: "DM102", error: "Invalid token" });
+	}
+
+	// Check if the mediaID exists
+	if (!mediaId)
+	{
+		return res.status(400).json({ code: "DM103", error: "Missing mediaID" });
+	}
+
+	
+	//ensure mediaid is having the minimum required length
+	if (mediaId.length < 15)
+	{
+		return res.status(400).json({ code: "DM103", error: "Invalid mediaID" });
+	}
+
+	const bucketName = "B1";
+
+	const response = await ociOjectStorage.deleteFile(bucketName, mediaId);
+
+	if (response.code && response.code !== 204)
+	{
+		return res.status(404).json({ code: "DM104", message: "Data not found" });
+	}
+
+	if (!response.opcRequestId)
+	{
+		return res.status(404).json({ code: "DM104", message: "Data not found" });
+	} else
+	{
+		return res.status(200).json({ code: "DM200", message: "Success" });
+	}
+
+});
+
+
 
 module.exports = router;
 

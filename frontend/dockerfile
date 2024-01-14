@@ -16,7 +16,7 @@ COPY . .
 RUN yarn build
 
 # Step 2
-FROM nginx:1.19.0-alpine
+FROM nginx
 
 COPY --from=build-stage /app/out /usr/share/nginx/html
 

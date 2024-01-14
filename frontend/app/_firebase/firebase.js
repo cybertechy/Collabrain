@@ -1,9 +1,10 @@
 const { app: firebase } = require("_firebase/cli"); // Required for all pages
 const { getAuth, signInWithPopup, GoogleAuthProvider, OAuthProvider,
 	signInWithEmailAndPassword, createUserWithEmailAndPassword,
-	EmailAuthProvider, linkWithPopup } = require("firebase/auth");
+	EmailAuthProvider, getAdditionalUserInfo } = require("firebase/auth");
 const { Timestamp } = require("firebase/firestore");
 const { useAuthState } = require("react-firebase-hooks/auth"); // Required for all pages
+const axios = require("axios");
 
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({
@@ -31,7 +32,7 @@ function useIsAuth()
 
 async function emailSignIn(e)
 {
-	// This fucntion should be adjusted to seperate log in and sign up
+	// This function should be adjusted to seperate log in and sign up
 	e.preventDefault();
 	const { email, password } = e.target.elements;
 
@@ -52,6 +53,18 @@ async function emailSignIn(e)
 		{
 			alert("User doesnt exist, creating new user");
 			result = await createUserWithEmailAndPassword(auth, email.value, password.value);
+			axios.post("/api/user", {
+				email: email.value,
+				fname: fname.value,
+				lname: lname.value,
+				username: null,
+				photo: null,
+				uid: result.user.uid
+			})
+				.catch(err =>
+				{
+					alert(err.message);
+				});
 		}
 
 		else // Other errors
@@ -91,6 +104,23 @@ async function serviceSignIn(service)
 
 		});
 
+	const userInfo = getAdditionalUserInfo(result);
+	// Add user to database if new user
+	if (userInfo.isNewUser)
+	{
+		axios.post("http://localhost:8080/api/user", {
+			uid: result.user.uid,
+			email: result.user.email,
+			fname: userInfo.profile.given_name,
+			lname: userInfo.profile.family_name,
+			username: null,
+			photo: (result.user.photoURL) ? result.user.photoURL : null
+		})
+			.catch(err =>
+			{
+				alert(err.message);
+			});
+	}
 }
 
 module.exports = {

@@ -9,10 +9,12 @@ const { Server } = require("socket.io");
 const docRoute = require("./api/routes/Doc");
 const strRoute = require("./api/routes/Storage");
 const chatRoute = require("./api/routes/Chat");
+const teamsRoute = require("./api/routes/Teams");
 
 // Helpers
 const db = require("./api/helpers/firebase");
 const sock_server = require("./api/helpers/socket");
+const userRoute = require("./api/routes/User");
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -25,6 +27,8 @@ app.use(cors());
 app.use("/api/doc", docRoute);
 app.use("/api/storage", strRoute);
 app.use("/api/chat", chatRoute);
+app.use("/api/team",teamsRoute);
+app.use("/api/user",userRoute);
 
 app.get("/api/user", (req, res) =>
 {
