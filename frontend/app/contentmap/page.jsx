@@ -73,14 +73,19 @@ function page({ IntialDataContent }) {
 
         setid(id);
 
-        // pass token in header authorization as bearer to authenticate
-        const res = await axios.get(`http://localhost:8080/api/contentmap/${id}`, {
-            headers: {
-                authorization: `Bearer ${token}`,
-            },
-        });
-
-        return res.data;
+        try {
+            const res = await axios.get(`http://localhost:8080/api/contentmap/${id}`, {
+                headers: {
+                    authorization: `Bearer ${token}`,
+                },
+            });
+            if (res.status !== 200) return null;
+            return res.data;
+        }
+        catch (err) {
+            console.log(err);
+            return null;
+        }
     }
 
 
@@ -103,7 +108,7 @@ function page({ IntialDataContent }) {
 
         </div>
         <div className="w-screen h-[88%] flex justify-center items-center">
-            {id && Excalidraw && <Excalidraw
+            {id && IntialData && Excalidraw && <Excalidraw
                 renderTopRightUI={() => (
                     <>
                     <button className="bg-blue-600 py-1 px-3  text-white rounded-xl" onClick={() => setCollabaration(Collabaration => !Collabaration)}>
@@ -118,8 +123,9 @@ function page({ IntialDataContent }) {
                 initialData={IntialData ? JSON.parse(IntialData?.data) : null}
                 onPointerUpdate={(payload) => setPointerState(payload)}
             />}
-            {!id && <h1 className="text-2xl font-bold text-purple-500"> Searching the cloud, Please wait ..</h1>}
-            {id && !Excalidraw && <h1 className="text-2xl font-bold text-purple-500">Loading...</h1>}
+            {!id && <h1 className="text-2xl font-bold text-purple-500 animate-pulse"> Searching the cloud, Please wait ..</h1>}
+            {id && !Excalidraw && <h1 className="text-2xl font-bold text-purple-500 animate-pulse ">Loading...</h1>}
+            {id && Excalidraw && !IntialData && <h1 className="text-2xl font-bold text-purple-500">Network Error, Try refreshing...</h1>}
         </div>
     </div>
 }
