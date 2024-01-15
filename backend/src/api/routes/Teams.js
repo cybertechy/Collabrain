@@ -70,7 +70,7 @@ router.post("/", async (req, res) =>
 		imageID = uuid.v4();
 		let res = await storage.addData("B2", imageID, req.body.MIMEtype, req.body.image, null);
 		if (!imageID)
-			return res.status(400).json({ code: 400, error: "Image upload failed" });
+			return res.status(500).json({ error: "Image upload failed" });
 	}
 
 	// Team data
@@ -110,7 +110,7 @@ router.post("/", async (req, res) =>
 
 			return res.status(200).json({ message: "Team created", teamID: ref.id });
 		})
-		.catch(err => { return res.status(500).json({ error: "Team creation failed" }); });
+		.catch(err => { return res.status(500).json({ error: err }); });
 });
 
 /* Endpoint for getting a team's data */
@@ -131,7 +131,7 @@ router.get("/:team", async (req, res) =>
 		{
 			return res.status(200).json(doc.data());
 		})
-		.catch(err => { return res.status(400).json({ error: "Team not found" }); });
+		.catch(err => { return res.status(500).json({ error: err }); });
 });
 
 
@@ -154,15 +154,15 @@ router.patch("/:team", async (req, res) =>
 		await fb.db.doc(`teams/${req.params.team}`).get()
 			.then(doc =>
 			{
-				if (doc.data().members[user.uid].role != "administator")
-					return res.status(400).json({ error: "User is not a administator of the team" });
+				if (doc.data().members[user.uid].role != "admin")
+					return res.status(401).json({ error: "Unauthorized" });
 			});
 
 		fb.db.doc(`teams/${req.params.team}`).update(req.body.data)
 			.then(() => { return res.status(200).json({ message: "Team updated" }); });
 
 	}
-	catch (err) { return res.status(400).json({ error: "Team update failed" }); }
+	catch (err) { return res.status(500).json({ error: err }); }
 });
 
 /* Endpoint for deleting a team */
@@ -181,7 +181,7 @@ router.delete("/:team", async (req, res) =>
 	// Check if user is a administator of the team
 	let doc = await fb.db.doc(`teams/${req.params.team}`).get();
 	if (doc.data().members[user.uid].role != "admin")
-		return res.status(400).json({ error: "Unauthorized" });
+		return res.status(401).json({ error: "Unauthorized" });
 
 	// Delete subcollection of channels
 	fb.deleteCollection(`teams/${req.params.team}/channels`);
@@ -189,7 +189,7 @@ router.delete("/:team", async (req, res) =>
 	// Delete team
 	fb.db.doc(`teams/${req.params.team}`).delete()
 		.then(() => { return res.status(200).json({ message: "Team deleted" }); })
-		.catch(err => { return res.status(500).json({ error: "Team deletion failed" }); });
+		.catch(err => { return res.status(500).json({ error: err }); });
 });
 
 
@@ -230,7 +230,7 @@ router.post("/:team/user", async (req, res) =>
 			teams: fb.admin.firestore.FieldValue.arrayUnion(req.params.team)
 		});
 	}
-	catch (err) { return res.status(500).json({ error: "Failed to join team" }); }
+	catch (err) { return res.status(500).json({ error: err }); }
 
 	return res.status(200).json({ message: "Member added" });
 });
@@ -270,9 +270,36 @@ router.delete("/:team/user", async (req, res) =>
 			teams: fb.admin.firestore.FieldValue.arrayRemove(req.params.team)
 		});
 	}
-	catch (err) { return res.status(500).json({ error: "Failed to leave team" }); }
+	catch (err) { return res.status(500).json({ error: err }); }
 
 	return res.status(200).json({ message: "Member removed" });
+});
+
+/* Endpoint for getting a team's members */
+
+router.get("/:team/users", async (req, res) =>
+{
+	// Make sure all required fields are present
+	if (!req.body.token)
+		return res.status(400).json({ error: "Missing required data" });
+
+	// verify token and authority
+	let user = await fb.verifyUser(req.body.token);
+	if (!user)
+		return res.status(401).json({ error: "Unauthorized" });
+
+	// Check if user is part of the team
+	let doc = await fb.db.doc(`users/${user.uid}`).get();
+	if (!doc.data().teams.includes(req.params.team))
+		return res.status(400).json({ error: "User is not part of the team" });	
+
+	// Get team members
+	fb.db.doc(`teams/${req.params.team}`).get()
+		.then(doc =>
+		{
+			return res.status(200).json(doc.data().members);
+		})
+		.catch(err => { return res.status(500).json({ error: err }); });
 });
 
 /************************************************************/
@@ -299,7 +326,7 @@ router.post("/:team/channel", async (req, res) =>
 	// Create channel
 	fb.db.collection(`teams/${req.params.team}/channels`).add({ name: req.body.name })
 		.then(ref => { return res.status(200).json({ message: "Channel created", channelID: ref.id }); })
-		.catch(err => { return res.status(500).json({ error: "Channel creation failed" }); });
+		.catch(err => { return res.status(500).json({ error: err }); });
 });
 
 /* Endpoint for updating a channel's data */
@@ -324,7 +351,7 @@ router.patch("/:team/channel/:channel", async (req, res) =>
 		fb.db.doc(`teams/${req.params.team}/channels/${req.params.channel}`).update(req.body.data)
 			.then(() => { return res.status(200).json({ message: "Channel updated" }); });
 	}
-	catch (err) { return res.status(400).json({ error: "Channel update failed" }); }
+	catch (err) { return res.status(500).json({ error: err }); }
 });
 
 /* Endpoint for deleting a channel */
@@ -346,12 +373,12 @@ router.delete("/:team/channel/:channel", async (req, res) =>
 
 	// Delete subcollection of messages
 	fb.deleteCollection(`teams/${req.params.team}/channels/${req.params.channel}/messages`)
-		.catch(err => { return res.status(400).json({ error: "Channel deletion failed" }); });
+		.catch(err => { return res.status(500).json({ error: err }); });
 
 	// Delete channel
 	fb.db.doc(`teams/${req.params.team}/channels/${req.params.channel}`).delete()
 		.then(() => { return res.status(200).json({ message: "Channel deleted" }); })
-		.catch(err => { return res.status(400).json({ error: "Channel deletion failed" }); });
+		.catch(err => { return res.status(500).json({ error: err }); });
 
 });
 
@@ -374,7 +401,7 @@ router.post("/:team/channel/:channel/message", async (req, res) =>
 		timestamp: new Date().getSeconds()
 	})
 		.then(ref => { return res.status(200).json({ message: "Message sent", messageID: ref.id }); })
-		.catch(err => { return res.status(500).json({ error: "Message creation failed" }); });
+		.catch(err => { return res.status(500).json({ error: err }); });
 });
 
 /* Endpoint for editing a message */
@@ -399,7 +426,7 @@ router.patch("/:team/channel/:channel/message/:message", async (req, res) =>
 		message: req.body.message,
 		edited: true
 	})
-		.catch(err => { return res.status(500).json({ error: "Message update failed" }); });
+		.catch(err => { return res.status(500).json({ error: err }); });
 
 	return res.status(200).json({ message: "Message updated" });
 });
