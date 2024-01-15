@@ -39,7 +39,7 @@ body {
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
-  filter: blur(3px); /* blur level */
+  filter: blur(9px); /* blur level */
   z-index: -1; /* so it stays behind the content */
 }
 .loader {
