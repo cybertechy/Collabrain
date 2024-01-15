@@ -2,6 +2,29 @@ const express = require('express');
 const router = express.Router();
 const fb = require("../helpers/firebase.js");
 
+router.get("/", (req, res) =>
+{
+	// Get up to 1000 users
+	// fb.admin.auth().listUsers().then(records =>
+	// {
+	// 	res.json(records.users);
+	// });
+
+	fb.db.collection("users").limit(1000).get().then(records =>
+	{
+		let users = [];
+		records.forEach(doc => { users.push(doc.data()); });
+		res.json(users);
+	});
+});
+
+router.get("/:user", (req, res) =>
+{
+	fb.db.doc(`users/${req.params.user}`).get()
+		.then(doc => { res.json(doc.data()); })
+		.catch(err => { return res.status(500).json({ error: err }); });
+});
+
 router.post("/", (req, res) =>
 {
 	// Add user to database
