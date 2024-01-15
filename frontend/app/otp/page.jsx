@@ -36,7 +36,7 @@ export default function OTP() {
     }
     return (
         <div>
-            <div className="justify-center items-center flex flex-col">
+            <div className="justify-center items-center flex flex-col min-h-screen">
                 <img
                     className="w-28 "
                     src=".//assets/images/logo_whitebackground.png"

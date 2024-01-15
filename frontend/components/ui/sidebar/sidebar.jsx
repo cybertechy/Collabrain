@@ -56,14 +56,16 @@ const Sidebar = () => {
                                     Collabrain
                                 </p>
                                 <CloseIcon
-                                    className="text-lg ml-16 text-black transition-all duration-1000 ease-in-out cursor-pointer"
+                                    className="text-lg ml-16 text-primary transition-all duration-1000 ease-in-out cursor-pointer"
                                     onClick={toggleSidebar}
+                                    fontSize="large"
                                 />
                             </div>
                         ) : (
                             <MenuIcon
-                                className="h-6 w-6 mb-2 text-lg transition-all duration-500 ease-in-out cursor-pointer"
+                                className="h-6 w-6 mb-2 text-lg text-primary transition-all duration-500 ease-in-out cursor-pointer"
                                 onClick={toggleSidebar}
+                                fontSize="large"
                             />
                         )}
                     </div>

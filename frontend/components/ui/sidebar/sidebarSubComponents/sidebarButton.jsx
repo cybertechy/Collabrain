@@ -35,7 +35,8 @@ const SidebarButtonIcon = ({
             {isExpanded ? text : ""}
         </span>
         {Icon && (
-            <Icon className="py-4 ml-2 transition-all duration-500 ease-in-out " />
+            <Icon className="py-4 ml-2 transition-all duration-445 ease-in-out " />
+        
         )}
     </button>
 );

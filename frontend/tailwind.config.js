@@ -24,6 +24,7 @@ module.exports = {
                 secondary: "#EBD7FF",
                 tertiary: "#C58AFF",
                 unselected: "#9DA5AF",
+                kindagrey: "#F5F5F5",
             },
             backgroundImage: {
                 "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",

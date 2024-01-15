@@ -6,8 +6,9 @@ import SearchBar from "./navbarSubComponents/NavbarSearchbar"; // Import the Sea
 
 const Navbar = () => {
     return (
-        <nav className="fixed top-0 left-0 right-0 z-10 bg-purple-600 p-4 flex items-center justify-between">
-            <div className="flex-grow flex justify-center items-center mx-4">
+        // fixed top-0 left-0 right-0 z-10
+        <nav className=" bg-purple-600 p-4 flex items-center justify-between">
+            <div className="flex-grow flex justify-center items-center mx-16">
                 <SearchBar /> {/* Use the SearchBar component */}
             </div>
             <div className="flex items-center space-x-10">

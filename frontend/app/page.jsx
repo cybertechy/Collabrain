@@ -40,8 +40,8 @@ export default function Home() {
         );
     }
     return (
-        <div>
-            <div className="justify-center items-center flex flex-col">
+        <div className="w-full md:w-3/4 lg:w-1/2 mx-auto">
+            <div className="justify-center items-center flex flex-col min-h-screen">
                 <img
                     className="w-28 "
                     src=".//assets/images/logo_whitebackground.png"
