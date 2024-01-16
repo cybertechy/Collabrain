@@ -1,9 +1,9 @@
 const { app: firebase } = require("_firebase/cli"); // Required for all pages
 const { getAuth, signInWithPopup, GoogleAuthProvider, OAuthProvider,
 	signInWithEmailAndPassword, createUserWithEmailAndPassword,
-	EmailAuthProvider, linkWithPopup } = require("firebase/auth");
+	EmailAuthProvider, getAdditionalUserInfo } = require("firebase/auth");
 const { useAuthState } = require("react-firebase-hooks/auth"); // Required for all pages
-
+const axios = require("axios");
 
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({
@@ -51,38 +51,24 @@ async function emailSignIn(email, password)
 			return {error: "Something went wrong, Please try again later", success: false};
 		}
 
-	}
-
-}
-
-async function emailSignUp(email, password, confirmPassword, username, firstname, lastname){
-
-	if(!email || !password || !confirmPassword || !username || !firstname || !lastname)
-		return {error: "Please fill out all fields", success: false};
-
-	if(password !== confirmPassword)
-		return {error: "Passwords do not match", success: false};
-
-	let result;
-	try
-	{
-		result = await createUserWithEmailAndPassword(auth,email,password);
-		console.log("Result: "+result.code);
-		// TODO: Add user to database here
-
-		return {error: null, success: true};
-	}
-	catch (err)
-	{
-		// email already in use / invalid email / invalid password then return error
-		if ( err.code === "auth/invalid-email" || err.code === "auth/weak-password")
+		if (err.code === "auth/user-not-found")
 		{
-			return {error: "Incorrect email or password", success: false};
-		} 
-		else if( err.code === "auth/email-already-in-use"){
-
-			return {error: "A user already exists with this email, consider signing up", success:false , route:"/"}
+			alert("User doesnt exist, creating new user");
+			result = await createUserWithEmailAndPassword(auth, email.value, password.value);
+			axios.post("/api/user", {
+				email: email.value,
+				fname: fname.value,
+				lname: lname.value,
+				username: null,
+				photo: null,
+				uid: result.user.uid
+			})
+				.catch(err =>
+				{
+					alert(err.message);
+				});
 		}
+
 		else // Other errors
 		{
 			console.log("Error: "+err);
@@ -103,7 +89,7 @@ async function serviceSignIn(service)
 	const providers = {
 		"microsoft": microsoftProvider,
 		"google": googleProvider
-	}
+	};
 
 	const result = await signInWithPopup(auth, providers[service])
 		.catch(err =>
@@ -121,11 +107,28 @@ async function serviceSignIn(service)
 
 		});
 
+	const userInfo = getAdditionalUserInfo(result);
+	// Add user to database if new user
+	if (userInfo.isNewUser)
+	{
+		axios.post("http://localhost:8080/api/user", {
+			uid: result.user.uid,
+			email: result.user.email,
+			fname: userInfo.profile.given_name,
+			lname: userInfo.profile.family_name,
+			username: null,
+			photo: (result.user.photoURL) ? result.user.photoURL : null
+		})
+			.catch(err =>
+			{
+				alert(err.message);
+			});
+	}
 }
 
 async function getToken()
 {
-	return auth.currentUser.getIdToken(true)
+	return auth.currentUser.getIdToken(true);
 }
 
 module.exports = {
@@ -133,6 +136,5 @@ module.exports = {
 	signOut,
 	isAuth,
 	emailSignIn,
-	serviceSignIn,
-	emailSignUp
-}
+	serviceSignIn
+};

@@ -49,15 +49,16 @@ export default function Dashboard() {
         }
     };
 
-    const deleteDoc = async () => {
-        console.log(currentDoc);
-        const token = await getToken();
-        let res = await axios
-            .post(`http://localhost:8080/api/doc/delete/${currentDoc}`, {
-                token: token,
-            })
-            .catch((err) => console.log(err));
-    };
+	const deleteDoc = async () =>
+	{
+		console.log(currentDoc);
+		const token = await getToken();
+		let res = await axios.delete(`http://localhost:8080/api/doc/${currentDoc}`, {
+			data: {
+				"token": token
+			}
+		}).catch(err => console.log(err));
+	};
 
     return (
         <div className="flex flex-col h-screen bg-gray-100 overflow-hidden">
