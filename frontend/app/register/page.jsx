@@ -2,11 +2,11 @@
 
 const { isAuth,  emailSignUp } = require("_firebase/auth");
 const { useRouter } = require("next/navigation");
-import Button from "../../components/ui/button";
+import Button from "../../components/ui/button/button";
 import InputField from "../../components/ui/input/input";
 import PasswordInput from "../../components/ui/input/passwordinput";
 import EmailInputField from "../../components/ui/input/emailinput";
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import { ToastContainer, toast } from 'react-toastify';
 export default function Register() {
     const router = useRouter();
@@ -26,22 +26,22 @@ export default function Register() {
     useEffect(() => {
         // Preload the background image
         const img = new Image();
-        img.src = '/assets/images/background.jpg'; // Adjust the path to your background image
+        img.src = "/assets/images/background.jpg"; // Adjust the path to your background image
         img.onload = () => {
             setBackgroundLoaded(true);
-            document.body.classList.add('custom-background');
+            document.body.classList.add("custom-background");
         };
 
         // Remove the custom background class when the component unmounts
         return () => {
-            document.body.classList.remove('custom-background');
+            document.body.classList.remove("custom-background");
         };
     }, []);
     if (isAuth()) {
         router.push("/dashboard"); // Redirect to dashboard
         return null; // Prevents rendering the rest of the component
     }
-    
+
     if (!backgroundLoaded) {
         return (
             <div className="flex items-center justify-center min-h-screen">
@@ -81,7 +81,7 @@ export default function Register() {
                 />
                 <div className="bg-secondary drop-shadow-lg p-10 rounded-2xl mt-4">
                     <h1 className="text-2xl text-black font-poppins mb-6 text-center">
-                      Create Your Collabrain Account
+                        Create Your Collabrain Account
                     </h1>
 
                     <form className="flex flex-col gap-4 max-w-md">
@@ -98,7 +98,11 @@ export default function Register() {
                             <PasswordInput password={confirmPassword} setPassword={setconfirmPassword} isConfirm={true} placeholder="Confirm Password" color = "tertiary" />
                         </div>
                         <p className="text-xs text-gray-600 text-left font-poppins ml-2">
-                            Already have an account?<a href = "/" className="underline"> Log In</a>
+                            Already have an account?
+                            <a href="/" className="underline">
+                                {" "}
+                                Log In
+                            </a>
                         </p>
                         <Button
                             text="Create Account"

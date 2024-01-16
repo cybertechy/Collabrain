@@ -1,15 +1,16 @@
+
 "use client";
 
 const { isAuth, emailSignIn, serviceSignIn } = require("_firebase/auth"); // Import the authentication functions
 const { useRouter } = require("next/navigation");
-import Button from "../components/ui/button";
-import GoogleIcon from "../public/assets/svg/google.svg";
-import MicrosoftIcon from "../public/assets/svg/microsoft.svg";
-import AppleIcon from "../public/assets/svg/apple.svg";
+import Button from "../components/ui/button/button";
+import GoogleIcon from "../public/assets/svg/socials/google.svg";
+import MicrosoftIcon from "../public/assets/svg/socials/microsoft.svg";
+import AppleIcon from "../public/assets/svg/socials/apple.svg";
 import PasswordInput from "../components/ui/input/passwordinput";
 import EmailInputField from "../components/ui/input/emailinput";
 import { ToastContainer, toast } from 'react-toastify';
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 export default function Home() {
     const router = useRouter();
     const [backgroundLoaded, setBackgroundLoaded] = useState(false);
@@ -22,15 +23,15 @@ export default function Home() {
     useEffect(() => {
         // Preload the background image
         const img = new Image();
-        img.src = '/assets/images/background.jpg'; // Adjust the path to your background image
+        img.src = "/assets/images/background.jpg"; // Adjust the path to your background image
         img.onload = () => {
             setBackgroundLoaded(true);
-            document.body.classList.add('custom-background');
+            document.body.classList.add("custom-background");
         };
 
         // Remove the custom background class when the component unmounts
         return () => {
-            document.body.classList.remove('custom-background');
+            document.body.classList.remove("custom-background");
         };
     }, []);
     if (isAuth()) {
@@ -64,9 +65,9 @@ export default function Home() {
 
 
     return (
-        <div>
+        <div className="w-full md:w-3/4 lg:w-1/2 mx-auto">
             <ToastContainer />
-            <div className="justify-center items-center flex flex-col">
+            <div className="justify-center items-center flex flex-col min-h-screen">
                 <img
                     className="w-28 "
                     src=".//assets/images/logo_whitebackground.png"
@@ -76,6 +77,7 @@ export default function Home() {
                         Log into Collabrain
                     </h1>
 
+                    {/* The following code is just an example to show what functions to call for authentication
                     {/* The following code is just an example to show what functions to call for authentication
 				it would be probably better to implement the UI with a library of prebuilt components */}
 
@@ -87,6 +89,7 @@ export default function Home() {
                         <EmailInputField email={email} setEmail={setemail} placeholder="Email Address" color="tertiary" />
                         <br />
                         <PasswordInput password={password} setPassword={setpassword} color="tertiary" />
+                     
                         <br />
                         <p className="text-xs text-gray-600 font-poppins text-left ml-2">
                             <a href="">Forgot your password?</a>
@@ -94,7 +97,7 @@ export default function Home() {
                         <Button
                             text="Log In"
                             color="primary"
-                            
+                            onClick={emailSignIn}
                         />
                         <hr className="border-t-1 border-solid border-gray-400"></hr>
                     </form>
@@ -117,11 +120,14 @@ export default function Home() {
                         </button>
                     </span>
                     <p className="text-xs text-gray-600 font-poppins text-left ml-2">
-                        Need an account?<a href="/register" className="underline"> SIGN UP</a>
+                        Need an account?
+                        <a href="/register" className="underline">
+                            {" "}
+                            SIGN UP
+                        </a>
                     </p>
                 </div>
             </div>
-
         </div>
     );
 }
