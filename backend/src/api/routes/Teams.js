@@ -11,10 +11,10 @@ const uuid = require("uuid");
 
 /* Endpoint for getting teams with filters */
 
-router.get("/", async (req, res) =>
+router.get("/search", async (req, res) =>
 {
 	// Make sure all required fields are present
-	if (!req.body.token || !req.body.filters)
+	if (!req.body.token)
 		return res.status(400).json({ error: "Missing required data" });
 
 	// verify token
@@ -24,13 +24,9 @@ router.get("/", async (req, res) =>
 
 	// Go through filters and apply them
 	let result = fb.db.collection("teams").where("visibility", "==", "public"); // Get all public teams
-	for (let filter in req.body.filters)
-	{
-		if (filter == "name")
-			// result = result.where("name", "==", req.body.filters[filter]);
-			result = result.orderBy("name", "asc").where("name", ">=", req.body.filters.name)
-				.where("name", "<=", req.body.filters.name + "\uf8ff");
-	}
+	if (req.query.name)
+		result = result.orderBy("name", "asc").where("name", ">=", req.query.name)
+			.where("name", "<=", req.query.name + "\uf8ff");
 
 	// Sort by score and limit to 100
 	let limit = 100;
@@ -291,7 +287,7 @@ router.get("/:team/users", async (req, res) =>
 	// Check if user is part of the team
 	let doc = await fb.db.doc(`users/${user.uid}`).get();
 	if (!doc.data().teams.includes(req.params.team))
-		return res.status(400).json({ error: "User is not part of the team" });	
+		return res.status(400).json({ error: "User is not part of the team" });
 
 	// Get team members
 	fb.db.doc(`teams/${req.params.team}`).get()
