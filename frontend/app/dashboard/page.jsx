@@ -6,7 +6,9 @@ const axios = require("axios");
 import Sidebar from "../../components/ui/sidebar/sidebar";
 import Navbar from "../../components/ui/navbar/navbar";
 import DashboardInfoBar from "../../components/ui/dashboardComponents/dashboardInfoBar";
+import DashboardFolder from "../../components/ui/dashboardComponents/dashboardFolder";
 import DropdownDashboard from '../../components/ui/dashboardComponents/dropdownDashboard'; // Adjust the import path as needed
+import DashboardNewFolder from '../../components/ui/dashboardComponents/dashboardNewFolder'
 export default function Dashboard() {
     const router = useRouter();
     const typeItems = ['Type 1', 'Type 2', 'Type 3'];
@@ -72,58 +74,23 @@ export default function Dashboard() {
                    
                 </div>
                 <div className="px-4 py-2 ">
-                        <div className="flex content-end items-end w-full justify-end space-x-4">
+                        <div className="flex content-start items-start w-full justify-start space-x-8">
                             <DropdownDashboard title="Type" items={typeItems} hasBorders={true} />
                             <DropdownDashboard title="People" items={peopleItems} hasBorders={true} />
                             <DropdownDashboard title="Modified" items={modifiedItems} hasBorders={true} />
                         </div>
                     </div>
                 {/* Content area */}
-                <div className="flex-grow p-4 flex flex-col justify-center items-center">
-    <h1 className="text-xl font-bold text-black">Dashboard</h1>
-    <p className = "text-black">This is your dashboard</p>
-    <p className = "text-black">There should be something here</p>
-    <button className="text-black" onClick={signOut}>
-        Sign Out
-    </button>
-    <input
-        id="doc-title"
-        style={{ color: "black", padding: 10, marginTop: 10 }}
-        type="text"
-    />
-    <textarea
-        id="doc-text"
-        style={{ color: "black", padding: 10, marginTop: 10 }}
-        name="text"
-        cols="30"
-        rows="10"
-    ></textarea>
-    <div style={{ display: "flex", justifyContent: "center" }}>
-        <button
-            onClick={createDoc}
-            style={{
-                color: "black",
-                backgroundColor: "white",
-                padding: 10,
-                borderRadius: 5,
-                margin: 10,
-            }}
-        >
-            Save doc
-        </button>
-        <button
-            onClick={deleteDoc}
-            style={{
-                color: "black",
-                backgroundColor: "white",
-                padding: 10,
-                borderRadius: 5,
-                margin: 10,
-            }}
-        >
-            Delete doc
-        </button>
-    </div>
+                <div className="flex-grow p-4 flex flex-col">
+                <div> 
+                <p className="text-2xl text-left text-primary ml-4 mb-4" >Folders</p>
+                
+                <div className="flex content-start items-start w-full justify-start space-x-8">
+                <DashboardFolder title="Folder 1" folder="folder1" onClick={()=>{}} />
+                <DashboardFolder title="Folder 1" folder="folder1" onClick={()=>{}} />
+                <DashboardNewFolder onClick={()=>{}} />
+                        </div>
+                </div>
 </div>
             </div>
         </div>
