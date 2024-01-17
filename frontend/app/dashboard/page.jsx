@@ -9,6 +9,7 @@ import DashboardInfoBar from "../../components/ui/dashboardComponents/dashboardI
 import DashboardFolder from "../../components/ui/dashboardComponents/dashboardFolder";
 import DropdownDashboard from '../../components/ui/dashboardComponents/dropdownDashboard'; // Adjust the import path as needed
 import DashboardNewFolder from '../../components/ui/dashboardComponents/dashboardNewFolder'
+import DashboardProjectButton from '../../components/ui/dashboardComponents/dashboardProjectButton'
 export default function Dashboard() {
     const router = useRouter();
     const typeItems = ['Type 1', 'Type 2', 'Type 3'];
@@ -80,17 +81,25 @@ export default function Dashboard() {
                             <DropdownDashboard title="Modified" items={modifiedItems} hasBorders={true} />
                         </div>
                     </div>
-                {/* Content area */}
-                <div className="flex-grow p-4 flex flex-col">
-                <div> 
-                <p className="text-2xl text-left text-primary ml-4 mb-4" >Folders</p>
-                
-                <div className="flex content-start items-start w-full justify-start space-x-8">
-                <DashboardFolder title="Folder 1" folder="folder1" onClick={()=>{}} />
-                <DashboardFolder title="Folder 1" folder="folder1" onClick={()=>{}} />
-                <DashboardNewFolder onClick={()=>{}} />
-                        </div>
-                </div>
+                    <div className="flex-grow p-4">
+    <div> 
+        <p className="text-2xl text-left text-primary ml-4 mb-4 mt-5">Projects</p>
+        
+        {/* Responsive flex container for projects */}
+        <div className="flex flex-wrap gap-4 justify-start">
+            <DashboardProjectButton title="Project 1" project="project1" type="Mind Map" onClick={()=>{}} imageSrc="/assets/images/imagenotFound.jpg" />
+            {/* Add more DashboardProjectButton components here */}
+            <DashboardProjectButton title="Project 2" project="project2" type="Document" onClick={()=>{}} imageSrc="/assets/images/imagenotFound.jpg" />
+            <DashboardProjectButton title="Project 3" project="project3" type="Mind Map" onClick={()=>{}} imageSrc="/assets/images/imagenotFound.jpg" />
+            <DashboardProjectButton title="Project 4" project="project4" type="Document" onClick={()=>{}} imageSrc="/assets/images/imagenotFound.jpg" />
+            <DashboardProjectButton title="Project 5" project="project5" type="Document" onClick={()=>{}} imageSrc="/assets/images/imagenotFound.jpg" />
+            <DashboardProjectButton title="Project 6" project="project6" type="Document" onClick={()=>{}} imageSrc="/assets/images/imagenotFound.jpg" />
+            <DashboardProjectButton title="Project 7" project="project7" type="Document" onClick={()=>{}} imageSrc="/assets/images/imagenotFound.jpg" />
+            <DashboardProjectButton title="Project 8" project="project8" type="Mind Map" onClick={()=>{}} imageSrc="/assets/images/imagenotFound.jpg" />
+            <DashboardProjectButton title="Project 9" project="project9" type="Mind Map" onClick={()=>{}} imageSrc="/assets/images/imagenotFound.jpg" />
+            {/* ... more projects as needed ... */}
+        </div>
+    </div>
 </div>
             </div>
         </div>

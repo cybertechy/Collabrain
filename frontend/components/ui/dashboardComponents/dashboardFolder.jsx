@@ -8,10 +8,10 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 const DashboardFolder = ({ title, folder, onClick }) => {
     // TODO: onClick(folder);
     return (
-        <div className="bg-tertiary flex items-center justify-center rounded-xl w-min p-2 hover:opacity-80 duration-300">
-            <IconButton color="inherit">
+        <div className="bg-tertiary flex items-center justify-center rounded-xl w-min  p-2 hover:opacity-80 duration-300">
+            
                 <FolderIcon  fontSize="large" style={{ color: 'white' }} />
-            </IconButton>
+           
             <span className='mx-5 w-24 text-lg text-semibold mr-10'>{title}</span>
             <IconButton color="inherit">
                 <MoreVertIcon  fontSize="large"/>
