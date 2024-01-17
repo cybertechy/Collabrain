@@ -81,8 +81,19 @@ export default function Dashboard() {
                             <DropdownDashboard title="Modified" items={modifiedItems} hasBorders={true} />
                         </div>
                     </div>
-                    <div className="flex-grow p-4">
-    <div> 
+                {/* Content area */}
+                <div className="flex-grow p-4 flex flex-col">
+                <div> 
+                <p className="text-2xl text-left text-primary ml-4 mb-4" >Folders</p>
+                
+                <div className="flex flex-wrap content-start items-start w-full justify-start gap-8">
+                <DashboardFolder title="Folder 1" folder="folder1" onClick={()=>{}} />
+                <DashboardFolder title="Folder 1" folder="folder1" onClick={()=>{}} />
+                <DashboardNewFolder onClick={()=>{}} />
+                        </div>
+                </div>
+                 <div> 
+
         <p className="text-2xl text-left text-primary ml-4 mb-4 mt-5">Projects</p>
         
         {/* Responsive flex container for projects */}
