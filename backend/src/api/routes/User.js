@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const fb = require("../helpers/firebase.js");
+const fb = require("../helpers/firebase");
 
 router.get("/", (req, res) =>
 {

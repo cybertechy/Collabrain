@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const fb = require("../helpers/firebase.js");
-const storage = require("../helpers/oracle.js");
+const fb = require("../helpers/firebase");
+const storage = require("../helpers/oracle");
 const uuid = require("uuid");
 
 
@@ -290,11 +290,8 @@ router.get("/:team/users", async (req, res) =>
 		return res.status(400).json({ error: "User is not part of the team" });
 
 	// Get team members
-	fb.db.doc(`teams/${req.params.team}`).get()
-		.then(doc =>
-		{
-			return res.status(200).json(doc.data().members);
-		})
+	fb.getTeamMembers(req.params.team)
+		.then(members => { return res.status(200).json(members); })
 		.catch(err => { return res.status(500).json({ error: err }); });
 });
 
