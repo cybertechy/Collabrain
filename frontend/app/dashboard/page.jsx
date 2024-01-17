@@ -64,14 +64,14 @@ export default function Dashboard() {
 	};
 
     return (
-        <div className="flex flex-col h-screen bg-gray-100 overflow-hidden">
+        <div className="flex flex-col h-screen bg-gray-100 ">
         <div className="flex flex-grow overflow-hidden">
             <Sidebar />
             <div className="flex-grow flex flex-col">
                 <div className="w-full">
                     <Navbar />
                     <DashboardInfoBar />
-                    {/* Container for dropdowns */}
+                   
                    
                 </div>
                 <div className="px-4 py-2 ">
@@ -96,19 +96,16 @@ export default function Dashboard() {
 
         <p className="text-2xl text-left text-primary ml-4 mb-4 mt-5">Projects</p>
         
-        {/* Responsive flex container for projects */}
         <div className="flex flex-wrap gap-4 justify-start">
             <DashboardProjectButton title="Project 1" project="project1" type="Mind Map" onClick={()=>{}} imageSrc="/assets/images/imagenotFound.jpg" />
-            {/* Add more DashboardProjectButton components here */}
             <DashboardProjectButton title="Project 2" project="project2" type="Document" onClick={()=>{}} imageSrc="/assets/images/imagenotFound.jpg" />
             <DashboardProjectButton title="Project 3" project="project3" type="Mind Map" onClick={()=>{}} imageSrc="/assets/images/imagenotFound.jpg" />
             <DashboardProjectButton title="Project 4" project="project4" type="Document" onClick={()=>{}} imageSrc="/assets/images/imagenotFound.jpg" />
             <DashboardProjectButton title="Project 5" project="project5" type="Document" onClick={()=>{}} imageSrc="/assets/images/imagenotFound.jpg" />
-            <DashboardProjectButton title="Project 6" project="project6" type="Document" onClick={()=>{}} imageSrc="/assets/images/imagenotFound.jpg" />
+            {/* <DashboardProjectButton title="Project 6" project="project6" type="Document" onClick={()=>{}} imageSrc="/assets/images/imagenotFound.jpg" />
             <DashboardProjectButton title="Project 7" project="project7" type="Document" onClick={()=>{}} imageSrc="/assets/images/imagenotFound.jpg" />
             <DashboardProjectButton title="Project 8" project="project8" type="Mind Map" onClick={()=>{}} imageSrc="/assets/images/imagenotFound.jpg" />
-            <DashboardProjectButton title="Project 9" project="project9" type="Mind Map" onClick={()=>{}} imageSrc="/assets/images/imagenotFound.jpg" />
-            {/* ... more projects as needed ... */}
+            <DashboardProjectButton title="Project 9" project="project9" type="Mind Map" onClick={()=>{}} imageSrc="/assets/images/imagenotFound.jpg" /> */}
         </div>
     </div>
 </div>
