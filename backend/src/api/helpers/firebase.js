@@ -34,23 +34,10 @@ async function updateDoc(user, docID, title, content)
 	db.collection(`users/${user}/docs`).doc(docID).update({ "title": title, "content": content });
 }
 
-async function getTeamMembers(team, msg)
+async function getTeamMembers(teamID)
 {
-	console.log(team);
-	// Get all users in the same team
-	// Users are stored as a map named members in teams/teamname
-	let teamRef = db.collection('teams').doc(team);
-	let teamDoc = await teamRef.get()
-		.then(doc =>
-		{
-			if (!doc.exists)
-			{
-				console.log('No such document!');
-			} else
-			{
-				console.log('Document data:', doc.data());
-			}
-		});
+	let doc = await db.doc(`teams/${teamID}`).get();
+	return doc.data().members;
 }
 
 async function deleteCollection(collectionPath, batchSize = 5)
@@ -92,6 +79,19 @@ async function deleteQueryBatch(query, resolve)
 	});
 }
 
+async function saveTeamMsg(data)
+{
+	console.log(data);
+	let channels = (await db.collection(`teams/${data.team}/channels/`).where("name", "==", data.channel).get());
+	let channelID = channels.docs[0].id;
+	db.collection(`teams/${data.team}/channels/${channelID}/messages`)
+		.add({
+			"message": data.msg,
+			"sender": data.sender,
+			"sentAt": data.sentAt,
+		});
+}
+
 module.exports = {
 	db,
 	admin,
@@ -101,4 +101,5 @@ module.exports = {
 	updateDoc,
 	getTeamMembers,
 	deleteCollection,
+	saveTeamMsg
 };

@@ -14,7 +14,7 @@ export default function Home()
 {
 	const router = useRouter();
 	const [backgroundLoaded, setBackgroundLoaded] = useState(false);
-
+	const [user, loading] = fb.useAuthState();
 	useEffect(() =>
 	{
 		// Preload the background image
@@ -33,7 +33,7 @@ export default function Home()
 		};
 	}, []);
 
-	if (fb.useIsAuth())
+	if (user)
 	{
 		router.push("/dashboard"); // Redirect to dashboard
 		return null; // Prevents rendering the rest of the component

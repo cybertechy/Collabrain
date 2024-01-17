@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import InfoBar from "./infoBar";
 import MessageBox from "./messageBox";
 import Sidebar from "./sidebar";
@@ -13,32 +13,58 @@ const socket = require("_socket/socket");
 export default function ChatRoom()
 {
 	const router = useRouter();
+	const [user, loading] = fb.useAuthState();
 
-	if (!fb.useIsAuth())
+	// Setup listener for new messages
+	// Only listen when on chat page
+	let sock_cli = useRef(null);
+	useEffect(() =>
 	{
-		router.push('/'); // Redirect to dashboard
-		return <h1 className="text-xl font-bold">Please sign in</h1>;
-	}
+		if (!user)
+			return;
+
+		sock_cli.current = socket.init('http://localhost:8080');
+		sock_cli.current.on('teamMsg', (data) =>
+		{
+			console.log("Received message from server");
+			setText((prevText) => [
+				...prevText,
+				<h1 key={prevText.length} className="text-white">{`${data.sender}: ${data.msg}`}</h1>,
+			]);
+		});
+
+		// return () => sock_cli.current.off('teamMsg');
+	}, [user]);
 
 	const [text, setText] = useState([]);
 
-	async function sendTeamMsg(msg)
+	const sendTeamMsg = async (msg) =>
 	{
+		if (!sock_cli.current)
+		{
+			console.log('Socket is not initialized yet.');
+			return;
+		}
+		console.log(sock_cli.current);
 		let data = {
 			sender: fb.getUserID(),
-			team: "MyTeam",
+			team: "LoH1iHOGowBzcYDXEqnu",
 			channel: "General",
 			msg: msg,
 			sentAt: fb.toFbTimestamp(new Date()),
 		};
 
+		// Add the message to the real-time socket chat
 		setText((prevText) => [
 			...prevText,
 			<h1 key={prevText.length} className="text-white">{`${data.sender}: ${data.msg}`}</h1>,
 		]);
 
-		socket.emit('teamMsg', data);
+		sock_cli.current.emit('teamMsg', data); // Send the message to the server
 	};
+
+	if (loading)
+		return <h1 className="text-xl font-bold  text-black">Please sign in</h1>;
 
 	return (
 		<div className="flex h-full w-full">

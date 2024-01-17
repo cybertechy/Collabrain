@@ -1,5 +1,5 @@
 const { Server } = require("socket.io");
-const db = require("./firebase");
+const fb = require("./firebase");
 
 /** @type Server */
 let io;
@@ -16,34 +16,46 @@ function init(server)
 		socket.on('user', (msg) =>
 		{
 			console.log(`user ${msg.id} connected`);
-			curr_links[socket.id] = msg.id;
+			curr_links[msg.id] = socket.id;
 		});
 
 		socket.on('disconnect', () =>
 		{
-			delete curr_links[socket.id];
+			// Find the user and delete it
+			let ref = Object.keys(curr_links).find((key) => curr_links[key] === socket.id);
+			delete curr_links[ref];
+			// delete curr_links[socket.id];
 			console.log('user disconnected');
 		});
 
 		socket.on('teamMsg', (data) =>
 		{
-			console.log(`teamMsg: ${data.msg}`);
-			broadcastTeamChat(data.team, data.msg);
+			broadcastTeamChat(data);
 		});
 	});
 }
 
-function broadcastTeamChat(teamName, msg)
+async function broadcastTeamChat(data)
 {
-	// Find all users in the same team from firebase
-	db.getTeamMembers(teamName, msg);
-}
+	let members = await fb.getTeamMembers(data.team);
+	let membersList = Object.keys(members);
 
-function sendMsg(msg)
-{
-	io.emit("msg", msg);
+	// Remove the sender
+	const index = membersList.indexOf(data.sender);
+	if (index > -1) // only splice array when item is found
+		membersList.splice(index, 1); // 2nd parameter means remove one item only
+
+	// Send to all online members
+	membersList.forEach((member) =>
+	{
+		if (Object.keys(curr_links).includes(member))
+			io.to(curr_links[member]).emit('teamMsg', data);
+	});
+
+	fb.saveTeamMsg(data);
 }
 
 module.exports = {
-	init
+	init,
+	curr_links
 };

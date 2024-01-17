@@ -30,24 +30,6 @@ app.use("/api/chat", chatRoute);
 app.use("/api/team",teamsRoute);
 app.use("/api/user",userRoute);
 
-app.get("/api/user", (req, res) =>
-{
-	// Get up to 1000 users
-	db.admin.auth().listUsers().then(records =>
-	{
-		res.json(records.users);
-	});
-});
-
-app.get("/api/user/:id", (req, res) =>
-{
-	// Get specific user
-	db.admin.auth().getUser(req.params.id).then(user => 
-	{
-		res.json(user);
-	});
-});
-
 app.get("/api/home", (req, res) =>
 {
 	res.json({ message: "Running" });
@@ -55,8 +37,8 @@ app.get("/api/home", (req, res) =>
 
 app.get("/api/cons", (req, res) =>
 {
-	res.json({ count: Object.keys(sock_cons).length,
-		cons: sock_cons });
+	res.json({ count: Object.keys(sock_server.curr_links).length,
+		cons: sock_server.curr_links });
 });
 
 server.listen(port, () =>

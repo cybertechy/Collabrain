@@ -3,7 +3,7 @@ const { getAuth, signInWithPopup, GoogleAuthProvider, OAuthProvider,
 	signInWithEmailAndPassword, createUserWithEmailAndPassword,
 	EmailAuthProvider, getAdditionalUserInfo } = require("firebase/auth");
 const { Timestamp } = require("firebase/firestore");
-const { useAuthState } = require("react-firebase-hooks/auth"); // Required for all pages
+const authHook = require("react-firebase-hooks/auth"); // Required for all pages
 const axios = require("axios");
 
 const googleProvider = new GoogleAuthProvider();
@@ -19,16 +19,7 @@ const getToken = () => auth.currentUser.getIdToken(true);
 const getUserID = () => auth.currentUser.uid;
 const toFbTimestamp = (date) => Timestamp.fromDate(date);
 const fromFbTimestamp = (timestamp) => timestamp.toDate();
-
-/**
- * Check user auth state
- * @return {boolean} - true if signed in, false if not
-*/
-function useIsAuth()
-{
-	const [user, loading] = useAuthState(auth);
-	return (user) ? true : false;
-}
+const useAuthState = () => authHook.useAuthState(auth);
 
 async function emailSignIn(e)
 {
@@ -127,7 +118,7 @@ module.exports = {
 	getToken,
 	getUserID,
 	signOut,
-	useIsAuth,
+	useAuthState,
 	emailSignIn,
 	serviceSignIn,
 	toFbTimestamp,

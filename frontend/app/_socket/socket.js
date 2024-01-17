@@ -1,27 +1,29 @@
 const { io } = require('socket.io-client');
 const { getUserID } = require('_firebase/firebase');
 
-let socket;
-
-const emit = (event, data) => socket.emit(event, data);
+let cli;
 
 function init(url)
 {
-	socket = io(url);
+	if (cli)
+		return cli;
 
-	socket.on('connect', () =>
+	cli = io(url);
+
+	cli.on('connect', () =>
 	{
 		console.log('Connected to server');
-		socket.emit('user', { id: getUserID() });
+		cli.emit('user', { id: getUserID() });
 	});
 
-	socket.on('disconnect ', () =>
+	cli.on('disconnect ', () =>
 	{
 		console.log('Disconnected from server');
 	});
+
+	return cli;
 }
 
 module.exports = {
 	init,
-	emit
 };
