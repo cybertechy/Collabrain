@@ -392,12 +392,11 @@ router.get("/:team/channel/:channel/messages", async (req, res) =>
 		.where("name", "==", req.params.channel).get()).docs[0].id;
 
 	fb.db.collection(`teams/${req.params.team}/channels/${channelID}/messages`)
-		.orderBy("sentAt", "desc").limit(100).get()
+		.orderBy("sentAt", "asc").limit(100).get()
 		.then(snapshot =>
 		{
 			let messages = [];
 			snapshot.forEach(doc => messages.push(doc.data()));
-			console.log(messages);
 			return res.status(200).json(messages);
 		})
 		.catch(err => { return res.status(500).json({ error: err }); });

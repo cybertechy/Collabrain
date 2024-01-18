@@ -7,8 +7,9 @@ const fb = require("_firebase/firebase"); // Import the authentication functions
 export default function Home()
 {
 	const [token, setToken] = useState(null); // Create a state for the token
+	const [user, loading] = fb.useAuthState(); // Get the user and loading status
 
-	if (!fb.useIsAuth()) // If the user is authenticated
+	if (!user) // If the user is authenticated
 	{
 		return (
 			<div className="flex flex-col justify-center items-center text-black">

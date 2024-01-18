@@ -7,6 +7,7 @@ import Sidebar from "./sidebar";
 import Toolbar from '@mui/material/Toolbar';
 
 const { useRouter } = require('next/navigation');
+const axios = require("axios");
 const fb = require("_firebase/firebase"); // Import the authentication functions
 const socket = require("_socket/socket");
 
@@ -17,14 +18,14 @@ export default function ChatRoom()
 
 	// Setup listener for new messages
 	// Only listen when on chat page
-	let sock_cli = useRef(null);
+	let sockCli = useRef(null);
 	useEffect(() =>
 	{
 		if (!user)
 			return;
 
-		sock_cli.current = socket.init('http://localhost:8080');
-		sock_cli.current.on('teamMsg', (data) =>
+		sockCli.current = socket.init('http://localhost:8080');
+		sockCli.current.on('teamMsg', (data) =>
 		{
 			console.log("Received message from server");
 			setText((prevText) => [
@@ -33,19 +34,44 @@ export default function ChatRoom()
 			]);
 		});
 
-		// return () => sock_cli.current.off('teamMsg');
+		return () => sockCli.current.off('teamMsg');
+	}, [user]);
+
+	// Get previous messages
+	useEffect(() =>
+	{
+		if (!user)
+			return;
+
+		fb.getToken().then((token) =>
+		{
+			// Get the messages from the server
+			axios.get(`http://localhost:8080/api/team/LoH1iHOGowBzcYDXEqnu/channel/General/messages`,
+				{ headers: { "Authorization": "Bearer " + token } })
+				.then((res) =>
+				{
+					let data = res.data;
+					let msgs = [];
+					for (let i = 0; i < data.length; i++)
+					{
+						msgs.push(<h1 key={i} className="text-white">{`${data[i].sender}: ${data[i].message}`}</h1>);
+					}
+					setText(msgs);
+				})
+				.catch((err) => console.log(err));
+		});
 	}, [user]);
 
 	const [text, setText] = useState([]);
 
 	const sendTeamMsg = async (msg) =>
 	{
-		if (!sock_cli.current)
+		if (!sockCli.current)
 		{
 			console.log('Socket is not initialized yet.');
 			return;
 		}
-		console.log(sock_cli.current);
+
 		let data = {
 			sender: fb.getUserID(),
 			team: "LoH1iHOGowBzcYDXEqnu",
@@ -60,7 +86,7 @@ export default function ChatRoom()
 			<h1 key={prevText.length} className="text-white">{`${data.sender}: ${data.msg}`}</h1>,
 		]);
 
-		sock_cli.current.emit('teamMsg', data); // Send the message to the server
+		sockCli.current.emit('teamMsg', data); // Send the message to the server
 	};
 
 	if (loading)
