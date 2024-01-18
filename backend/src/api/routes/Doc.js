@@ -16,7 +16,7 @@ router.post("/", (req, res) =>
 
 			db.createDoc(user.uid)
 				.then((ref) => { res.json({ message: "Document created", id: ref.id }); })
-				.catch((error) => { res.status(500).json({ message: "Failed" }); });
+				.catch((err) => { res.status(500).json({ error: err }); });
 
 		});
 	}
@@ -34,11 +34,11 @@ router.post("/:ref", (req, res) =>
 
 			db.updateDoc(user.uid, req.params.ref, req.body.title, req.body.content)
 				.then(() => { res.json({ message: "Document updated" }); })
-				.catch((error) => { res.status(500).json({ error: "Failed to create doc" }); });
+				.catch((err) => { res.status(500).json({ error: err}); });
 
 		});
 	}
-	catch (error) { res.status(401).json({ error: error }); }
+	catch (err) { res.status(401).json({ error: err }); }
 });
 
 router.delete("/:ref", (req, res) =>

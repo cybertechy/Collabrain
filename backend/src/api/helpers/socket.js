@@ -5,7 +5,7 @@ const fb = require("./firebase");
 let io;
 
 // Current connections
-let curr_links = {};
+let currLinks = {};
 
 function init(server)
 {
@@ -16,15 +16,14 @@ function init(server)
 		socket.on('user', (msg) =>
 		{
 			console.log(`user ${msg.id} connected`);
-			curr_links[msg.id] = socket.id;
+			currLinks[msg.id] = socket.id;
 		});
 
 		socket.on('disconnect', () =>
 		{
 			// Find the user and delete it
-			let ref = Object.keys(curr_links).find((key) => curr_links[key] === socket.id);
-			delete curr_links[ref];
-			// delete curr_links[socket.id];
+			let ref = Object.keys(currLinks).find((key) => currLinks[key] === socket.id);
+			delete currLinks[ref];
 			console.log('user disconnected');
 		});
 
@@ -48,8 +47,8 @@ async function broadcastTeamChat(data)
 	// Send to all online members
 	membersList.forEach((member) =>
 	{
-		if (Object.keys(curr_links).includes(member))
-			io.to(curr_links[member]).emit('teamMsg', data);
+		if (Object.keys(currLinks).includes(member))
+			io.to(currLinks[member]).emit('teamMsg', data);
 	});
 
 	fb.saveTeamMsg(data);
@@ -57,5 +56,5 @@ async function broadcastTeamChat(data)
 
 module.exports = {
 	init,
-	curr_links
+	currLinks
 };
