@@ -2,14 +2,18 @@ const express = require('express');
 const router = express.Router();
 const fb = require("../helpers/firebase");
 
-router.get("/", (req, res) =>
+router.get("/", async (req, res) =>
 {
-	// Get up to 1000 users
-	// fb.admin.auth().listUsers().then(records =>
-	// {
-	// 	res.json(records.users);
-	// });
+	// Make sure all required fields are present
+	if (!req.headers.authorization)
+		return res.status(400).json({ error: "Missing required data" });
 
+	// Verify token
+	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
+	if (!user)
+		return res.status(401).json({ error: "Unauthorized" });
+
+	// Get up to 1000 users
 	fb.db.collection("users").limit(1000).get().then(records =>
 	{
 		let users = [];
@@ -18,8 +22,17 @@ router.get("/", (req, res) =>
 	});
 });
 
-router.get("/:user", (req, res) =>
+router.get("/:user", async (req, res) =>
 {
+	// Make sure all required fields are present
+	if (!req.headers.authorization)
+		return res.status(400).json({ error: "Missing required data" });
+
+	// Verify token
+	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
+	if (!user)
+		return res.status(401).json({ error: "Unauthorized" });
+
 	fb.db.doc(`users/${req.params.user}`).get()
 		.then(doc => { res.json(doc.data()); })
 		.catch(err => { return res.status(500).json({ error: err }); });
@@ -27,6 +40,10 @@ router.get("/:user", (req, res) =>
 
 router.post("/", (req, res) =>
 {
+	// Make sure all required fields are present
+	if (!req.body.email || !req.body.fname || !req.body.lname || !req.body.username || !req.body.photo)
+		return res.status(400).json({ error: "Missing required data" });
+
 	// Add user to database
 	fb.db.doc(`users/${req.body.uid}`).set(
 		{
@@ -45,8 +62,12 @@ router.post("/", (req, res) =>
 
 router.delete("/:user", async (req, res) =>
 {
+	// Make sure all required fields are present
+	if (!req.headers.authorization || !req.params.user)
+		return res.status(400).json({ error: "Missing required data" });
+
 	// verfiy token
-	let user = await fb.verifyUser(req.body.token);
+	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
 	if (!user)
 		return res.status(401).json({ error: "Unauthorized" });
 
