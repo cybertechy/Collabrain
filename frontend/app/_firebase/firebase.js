@@ -44,7 +44,7 @@ async function emailSignIn(e)
 		{
 			alert("User doesnt exist, creating new user");
 			result = await createUserWithEmailAndPassword(auth, email.value, password.value);
-			axios.post("/api/user", {
+			axios.post("http://localhost:8080/api/user", {
 				email: email.value,
 				fname: fname.value,
 				lname: lname.value,
