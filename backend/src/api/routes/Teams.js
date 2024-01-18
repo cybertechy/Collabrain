@@ -392,7 +392,7 @@ router.get("/:team/channel/:channel/messages", async (req, res) =>
 		.where("name", "==", req.params.channel).get()).docs[0].id;
 
 	fb.db.collection(`teams/${req.params.team}/channels/${channelID}/messages`)
-		.orderBy("sentAt", "asc").limit(100).get()
+		.orderBy("sentAt.seconds").limit(100).get()
 		.then(snapshot =>
 		{
 			let messages = [];

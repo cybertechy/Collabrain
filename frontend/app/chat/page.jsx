@@ -5,6 +5,7 @@ import InfoBar from "./infoBar";
 import MessageBox from "./messageBox";
 import Sidebar from "./sidebar";
 import Toolbar from '@mui/material/Toolbar';
+import { Timestamp } from "firebase/firestore";
 
 const { useRouter } = require('next/navigation');
 const axios = require("axios");
@@ -50,15 +51,21 @@ export default function ChatRoom()
 				{ headers: { "Authorization": "Bearer " + token } })
 				.then((res) =>
 				{
+					console.log(res.data);
 					let data = res.data;
 					let msgs = [];
 					for (let i = 0; i < data.length; i++)
 					{
-						msgs.push(<h1 key={i} className="text-white">{`${data[i].sender}: ${data[i].message}`}</h1>);
+						/**@type Date */
+						let msgDate = fb.fromFbTimestamp(new Timestamp(data[i].sentAt.seconds, data[i].sentAt.nanoseconds))
+						msgs.push(
+							<h1 key={i} className="text-white">
+								{`${data[i].sender}@${msgDate.toLocaleTimeString()}: ${data[i].message}`}
+							</h1>);
 					}
 					setText(msgs);
 				})
-				.catch((err) => console.log(err));
+				.catch((err) => console.log(err));	
 		});
 	}, [user]);
 

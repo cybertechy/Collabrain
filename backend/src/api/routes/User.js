@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const fb = require("../helpers/firebase");
 
-router.get("/", async (req, res) =>
+router.get("/", async (req, res) => 
 {
 	// Make sure all required fields are present
 	if (!req.headers.authorization)
@@ -63,7 +63,7 @@ router.post("/", (req, res) =>
 router.delete("/:user", async (req, res) =>
 {
 	// Make sure all required fields are present
-	if (!req.headers.authorization || !req.params.user)
+	if (!req.headers.authorization)
 		return res.status(400).json({ error: "Missing required data" });
 
 	// verfiy token
