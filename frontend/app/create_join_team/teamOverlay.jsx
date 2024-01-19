@@ -1,13 +1,10 @@
 import React, { useState } from "react";
-import "./createJoin.css";
-import HomeScreen from "./createJoin";
-import CreateTeamScreen from "./create";
-import JoinTeamScreen from "./join";
-import './App.css';
-// import Navbar from "./Navbar";
+import CreateJoinTeamScreen from "./Components/createJoinTeam";
+import CreateTeamOverlay from "./Components/createTeam";
+import JoinTeamOverlay from "./Components/joinTeam";
 
  
-export default function App() {
+export default function TeamOverlay() {
   const [modalVisible, setModalVisible] = useState(false);
   const [currentScreen, setCurrentScreen] = useState("home");
  
@@ -30,19 +27,14 @@ export default function App() {
  
   return (
     <>
-   
-    {/* <div> <Navbar/></div> */}
     <div> </div>
     <div>
-      {/* <p>click here to open the create and join team modal</p> */}
       <button onClick={toggleModal}>+</button>
       {modalVisible && (
         <div>
-          {currentScreen === "home" && (
-            <HomeScreen setOpenModal={toggleModal} switchToCreateTeam={switchToCreateTeam} switchToJoinTeam={switchToJoinTeam} />
-          )}
-          {currentScreen === "create" && <CreateTeamScreen switchToHome={switchToHome} />}
-          {currentScreen === "join" && <JoinTeamScreen switchToHome={switchToHome} />}
+          {currentScreen === "home" && ( <CreateJoinTeamScreen setOpenModal={toggleModal} switchToCreateTeam={switchToCreateTeam} switchToJoinTeam={switchToJoinTeam} />)}
+          {currentScreen === "create" && <CreateTeamOverlay switchToHome={switchToHome} />}
+          {currentScreen === "join" && <JoinTeamOverlay switchToHome={switchToHome} />}
         </div>
       )}
     </div>
