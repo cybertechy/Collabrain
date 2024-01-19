@@ -57,7 +57,7 @@ export default function ChatRoom()
 					for (let i = 0; i < data.length; i++)
 					{
 						/**@type Date */
-						let msgDate = fb.fromFbTimestamp(new Timestamp(data[i].sentAt.seconds, data[i].sentAt.nanoseconds))
+						let msgDate = fb.fromFbTimestamp(new Timestamp(data[i].sentAt.seconds, data[i].sentAt.nanoseconds));
 						msgs.push(
 							<h1 key={i} className="text-white">
 								{`${data[i].sender}@${msgDate.toLocaleTimeString()}: ${data[i].message}`}
@@ -65,7 +65,7 @@ export default function ChatRoom()
 					}
 					setText(msgs);
 				})
-				.catch((err) => console.log(err));	
+				.catch((err) => console.log(err));
 		});
 	}, [user]);
 
@@ -79,18 +79,22 @@ export default function ChatRoom()
 			return;
 		}
 
+		let userData = axios.get(`http://localhost:8080/api/user/${user.uid}`,
+			{ headers: { "Authorization": "Bearer " + token } });
+
+		let sentAt = new Date();
 		let data = {
-			sender: fb.getUserID(),
+			sender: userData.username,
 			team: "LoH1iHOGowBzcYDXEqnu",
 			channel: "General",
 			msg: msg,
-			sentAt: fb.toFbTimestamp(new Date()),
+			sentAt: fb.toFbTimestamp(sentAt),
 		};
 
 		// Add the message to the real-time socket chat
 		setText((prevText) => [
 			...prevText,
-			<h1 key={prevText.length} className="text-white">{`${data.sender}: ${data.msg}`}</h1>,
+			<h1 key={prevText.length} className="text-white">{`${data.sender}@${sentAt.toLocaleTimeString}: ${data.msg}`}</h1>,
 		]);
 
 		sockCli.current.emit('teamMsg', data); // Send the message to the server
