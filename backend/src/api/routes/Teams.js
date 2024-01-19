@@ -100,7 +100,7 @@ router.post("/", async (req, res) =>
 				});
 
 			// Add the team to the user's teams
-			fb.db.collection("users").doc(uid).update({
+			fb.db.doc(`users/${uid}`).update({
 				teams: fb.admin.firestore.FieldValue.arrayUnion(ref.id)
 			});
 

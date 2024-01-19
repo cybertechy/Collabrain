@@ -81,10 +81,19 @@ async function deleteQueryBatch(query, resolve)
 
 async function saveTeamMsg(data)
 {
-	console.log(data);
 	let channels = (await db.collection(`teams/${data.team}/channels/`).where("name", "==", data.channel).get());
 	let channelID = channels.docs[0].id;
 	db.collection(`teams/${data.team}/channels/${channelID}/messages`)
+		.add({
+			"message": data.msg,
+			"sender": data.sender,
+			"sentAt": data.sentAt,
+		});
+}
+
+async function saveDirectMsg(data)
+{
+	db.collection(`chats/${data.chat}/messages`)
 		.add({
 			"message": data.msg,
 			"sender": data.sender,
@@ -101,5 +110,6 @@ module.exports = {
 	updateDoc,
 	getTeamMembers,
 	deleteCollection,
-	saveTeamMsg
+	saveTeamMsg,
+	saveDirectMsg
 };

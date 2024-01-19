@@ -27,16 +27,18 @@ function init(server)
 			console.log('user disconnected');
 		});
 
-		socket.on('teamMsg', (data) =>
+		socket.on('teamMsg', (data) => broadcastMessage(data));
+
+		socket.on('directMsg', (data) =>
 		{
-			broadcastTeamChat(data);
+			broadcastMessage(data, "direct");
 		});
 	});
 }
 
-async function broadcastTeamChat(data)
+async function broadcastMessage(data, type = "team")
 {
-	let members = await fb.getTeamMembers(data.team);
+	let members = await fb.getTeamMembers((type == "team") ? data.team : data.chat);
 	let membersList = Object.keys(members);
 
 	// Remove the sender
@@ -48,10 +50,10 @@ async function broadcastTeamChat(data)
 	membersList.forEach((member) =>
 	{
 		if (Object.keys(currLinks).includes(member))
-			io.to(currLinks[member]).emit('teamMsg', data);
+			io.to(currLinks[member]).emit((type == "team") ? "teamMsg" : "directMsg", data);
 	});
 
-	fb.saveTeamMsg(data);
+	(type == "team") ? fb.saveTeamMsg(data) : fb.saveDirectMsg(data);
 }
 
 module.exports = {
