@@ -162,10 +162,10 @@ router.put("/:user/:id", async (req, res) => {
 
     const auth = req.headers.authorization;
     let resourceUser = req.params.user;
-    const token = auth.split(' ')[1];
+    const token = auth?.split(' ')[1];
     const id = req.params.id;
 
-    const { name, data , share } = req.body;
+    const { name, data , share , access } = req.body;
 
     // Check if the token exists
     if (!token)
@@ -176,12 +176,6 @@ router.put("/:user/:id", async (req, res) => {
     if(!resourceUser)
     {
         return res.status(400).json({ code: 400, error: "Missing user" });
-    }
-
-    // Check if the request has the required data
-    if (!name )
-    {
-        return res.status(400).json({ code: 400, error: "Missing  name of the content map" });
     }
 
     if(share && (share!=="view" || share!=="edit")){
@@ -221,8 +215,6 @@ router.put("/:user/:id", async (req, res) => {
     }
 
     let userRole = contentMapData.Access[user.uid].role;
-
-    console.log("Triggered");
     
     let updatedContentMap = {
         ...contentMapData
@@ -234,6 +226,10 @@ router.put("/:user/:id", async (req, res) => {
 
     if(share && userRole==="owner"){
         updatedContentMap.share = share;
+    }
+
+    if(access && userRole==="owner"){
+        updatedContentMap.Access = access;
     }
 
     if(name && userRole==="owner"){
@@ -289,6 +285,67 @@ router.delete("/:id", async (req, res) => {
     await contentMapRef.delete();
 
     return res.status(200).json({ code:200, id: id });
+});
+
+
+/* A search API that returns similar matching users or teams */
+
+router.get("/search", async (req, res) => {
+
+    const auth = req.headers.authorization;
+    const token = auth?.split(' ')[1];
+    const query = req.query.query;
+
+    if(!query){
+        return res.status(400).json({ code: 400, error: "Missing query" });
+    }
+
+    if(query.length<3){
+        return res.status(400).json({ code: 400, error: "Query length should be greater than 3" });
+    }
+
+    // Check if the token exists
+    if (!token)
+    {
+        return res.status(400).json({ code: "AM101", error: "Missing token" });
+    }
+
+    //verify user
+    const user = await verifyUser(token);
+    if (!user)
+    {
+        return res.status(403).json({ code: "AM102", error: "Invalid token" });
+    }
+
+    const db = fb.admin.firestore();
+    const usersRef = db.collection("users");
+    const teamsRef = db.collection("teams");
+
+    let users = []
+
+    // get users based on email
+    const usersBasedOnEmail = await usersRef.where("email", ">=", query).where("email", "<=", query + "\uf8ff").get();
+
+    // get users based on userid
+    const usersBasedOnUserId = await usersRef.where("uid", ">=", query).where("uid", "<=", query + "\uf8ff").get();
+
+    //get teams based on name
+    const teamsBasedOnName = await teamsRef.where("name", ">=", query).where("name", "<=", query + "\uf8ff").get();
+    
+
+
+    // add them to users array, remove duplicates
+    users = [...usersBasedOnEmail.docs, ...usersBasedOnUserId.docs];
+    const usersData = users.map(doc => ({ id: doc.id, email: doc.data().email, name: doc.data().fname+" "+doc.data().lname, type: "user" }));
+    const teamsData = teamsBasedOnName.docs.map(doc => ({ id: doc.id, name: doc.data().name, type: "team" }));
+
+    response = {
+        users: usersData,
+        teams: teamsData
+    }
+
+    return res.status(200).json(response);
+
 });
 
 

@@ -10,6 +10,7 @@ import Link from "next/link";
 import { RefreshCcw } from 'lucide-react';
 import ShareComponent from "../../components/ui/share";
 const { isAuth, getToken } = require("_firebase/auth");
+import { ToastContainer } from "react-toastify";
 
 
 
@@ -28,6 +29,8 @@ function page() {
     const [ContentMapName, setContentMapName] = useState("New Content Map");
     const [Error, setError] = useState(null);
     const [isOwner, setisOwner] = useState(false);
+    const [user, setuser] = useState(null);
+    
     
 
 
@@ -39,6 +42,7 @@ function page() {
 
     const router = useRouter();
     const searchParms = useSearchParams();
+    
 
 
 
@@ -95,6 +99,8 @@ function page() {
         setid(id);
 
         let user = searchParms.get("user");
+        setuser(user);
+
 
         if (!user)  return null;
 
@@ -191,7 +197,7 @@ function page() {
         if (!token) return null;
 
         // make axois put rquest with token in header to update the content map, pass data (appState) in body
-        axios.put(`http://localhost:8080/api/contentmap/${id}`, { name: ContentMapName }, {
+        axios.put(`http://localhost:8080/api/contentmap/${user}/${id}`, { name: ContentMapName }, {
             headers: {
                 authorization: `Bearer ${token}`,
             },
@@ -202,21 +208,32 @@ function page() {
     };
 
     const updatecontent = async (data) => {
+        try {
+            let res = await  axios.put(`http://localhost:8080/api/contentmap/${user}/${id}`, data , {
+                headers: {
+                    authorization: `Bearer ${token}`,
+                },
+                timeout: 100000
+    
+            })
 
-        
+            return res;
 
+        } catch (err) {
+            
+            return null
+        }
+    }
+
+    const updatecontentmap = async (data) => {
         if(!(pointerState==="down" && data.button==="up")){
             setPointerState(data.button);
             return;
         }
 
         setPointerState(data.button);
+        setisSaved(false);
         
-        if (data.button !== "up") {
-            setisSaved(false);
-            return;
-        }
-        console.log(data);
 
         let appState = ExcalidrawAPI.getAppState();
         appState.collaborators=[];
@@ -227,29 +244,31 @@ function page() {
             files: ExcalidrawAPI.getFiles(),
         }
 
-        let user = searchParms.get("user");
-
-        // make axois put rquest with token in header to update the content map, pass data (appState) in body
-        let res = await  axios.put(`http://localhost:8080/api/contentmap/${user}/${id}`, { name: IntialData?.name, data: appdata }, {
-            headers: {
-                authorization: `Bearer ${token}`,
-            },
-            timeout: 100000
-
-        })
-
-        if(res.status===200){
-            setisSaved(true);
-        }
-
+        let res = await updatecontent({ name: IntialData?.name, data: appdata })
+       
+        if(res?.status===200) setisSaved(true);
         
+    }
 
+    const getdata = async (query) => {
+        try {
+            let res = await axios.get(`http://localhost:8080/api/contentmap/search?${query}`, {
+                headers: {
+                    authorization: `Bearer ${token}`,
+                },
+            })
+
+            return res;
+        } catch (err) {
+            return null;
+        }
     }
 
 
 
 
     return <div className="flex justify-center items-center flex-col h-screen w-screen">
+        <ToastContainer />
         <div className="flex justify-between items-center w-screen h-[12%]  bg-purple-600 px-3 pt-2 ">
             <div className="flex">
                 <Link href="/dashboard">
@@ -290,9 +309,9 @@ function page() {
                                 </div>
                             </div>
                         }
-                        <button onClick={()=>setShare(Share => !Share)} className="rounded-lg px-1">Share</button>
+                        <button disabled={!(id && IntialData && Excalidraw)} onClick={()=>setShare(Share => !Share)} className="rounded-lg px-1">Share</button>
                         {Share && <div className="absolute z-10 top-[13%] lg:left-[200px] left-[10px] md:left-[100px] bg-white rounded-md shadow-md p-2 flex flex-col gap-2 border border-purple-600">
-                                <ShareComponent contentMapName={IntialData?.name} setShare={setShare} sData={IntialData?.Access} isOwner={isOwner}  />
+                                <ShareComponent getdata={getdata} updatecontent={updatecontent} contentMapName={IntialData?.name} setShare={setShare} sData={IntialData?.Access} isOwner={isOwner}  />
                             </div>}
 
                         {(IntialData?.userAccess==="edit"||IntialData?.userAccess==="owner") && <div className="flex items-center bg-white text-purple-500 px-2 rounded-lg mb-1">
@@ -320,7 +339,7 @@ function page() {
                 isCollaborating={Collabaration}
                 excalidrawAPI={(api) => setExcalidrawAPI(api)}
                 initialData={IntialData?.data ? JSON.parse(IntialData?.data) : null}
-                onPointerUpdate={updatecontent}
+                onPointerUpdate={updatecontentmap}
             />}
             {!id && <h1 className="text-2xl font-bold text-purple-500 px-10"> Searching the cloud, Please wait ..</h1>}
             {id && !Excalidraw && <h1 className="text-2xl font-bold text-purple-500 px-10">Loading...</h1>}
