@@ -204,9 +204,11 @@ router.delete("/:id", async (req, res) => {
 
     await contentMapRef.delete();
 
-    // remove the content map from users content maps array
+    // remove the content map from users content maps array, by filtering out the content map id
+    let userContentMaps = doc.data().contentMaps;
+    userContentMaps = userContentMaps.filter(contentMapId => contentMapId !== id);
     await userRef.update({
-        contentMaps: fb.admin.firestore.FieldValue.arrayRemove(id)
+        contentMaps: userContentMaps
     });
 
     return res.status(200).json({ code:200, id: id });
