@@ -22,6 +22,7 @@
     "@mui/styles": "^5.15.3",
     "axios": "^1.6.5",
     "firebase": "^10.7.1",
+    "lucide-react": "^0.309.0",
     "next": "14.0.3",
     "react": "^18",
     "react-dom": "^18",
