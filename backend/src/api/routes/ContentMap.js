@@ -1,10 +1,10 @@
 const { Router } = require('express');
 const { verifyUser } = require("../helpers/firebase");
 const fb = require("../helpers/firebase");
-const WebSocket = require("ws");
+
 
 const router = Router();
-const wss = new WebSocket.Server({ port: 8080 });
+
 
 /* Create a Ne content map */
 router.post("/", async (req, res) =>
