@@ -15,16 +15,7 @@ router.post("/", async (req, res) =>
     const { name, data } = req.body;
 
     // Check if the token exists
-    if (!token)
-    {
-        return res.status(400).json({ code: "AM101", error: "Missing token" });
-    }
-
-    // Check if the request has the required data
-    if ( !name )
-    {
-        return res.status(400).json({ code: "AM104", error: "Missing name of the content map" });
-    }
+    if (!token||!name) return res.status(400).json({ code: "AM101", error: "Missing token or name" });
 
     //verify user
     const user = await verifyUser(token);
@@ -34,8 +25,6 @@ router.post("/", async (req, res) =>
     }
 
     // create a new content map as collection inside user's doc
-    console.log(user)
-
     const contentMap = {
         name: name,
         data: data ? JSON.stringify(data):"",
@@ -48,18 +37,20 @@ router.post("/", async (req, res) =>
     const userRef = db.collection("users").doc(user.uid);
 
     const doc = await userRef.get();
-    if (!doc.exists)
-    {
-        return res.status(404).json({ code: "AM107", error: "User not found" });
-    }
+    if (!doc.exists) return res.status(404).json({ code: "AM107", error: "User not found" });
 
-    const contentMapsRef = userRef.collection("contentMaps");
+
+    const contentMapsRef = db.collection("contentMaps")
 
     const contentMapRef = await contentMapsRef.add(contentMap);
     const contentMapId = contentMapRef.id;
 
-    return res.status(200).json({ id: contentMapId });
+    // add the content map to users content maps array
+    await userRef.update({
+        contentMaps: fb.admin.firestore.FieldValue.arrayUnion(contentMapId)
+    });
 
+    return res.status(200).json({ id: contentMapId });
 });
 
 
@@ -70,91 +61,51 @@ router.get("/", async (req, res) => {
     const token = auth.split(' ')[1];
 
     // Check if the token exists
-    if (!token)
-    {
-        return res.status(400).json({ code: "AM101", error: "Missing token" });
-    }
-
+    if (!token) return res.status(400).json({ code: "AM101", error: "Missing token" });
+    
     //verify user
     const user = await verifyUser(token);
-    if (!user)
-    {
-        return res.status(403).json({ code: "AM102", error: "Invalid token" });
-    }
+    if (!user) return res.status(403).json({ code: "AM102", error: "Invalid token" });
+    
 
     const db = fb.admin.firestore();
     const userRef = db.collection("users").doc(user.uid);
 
     const doc = await userRef.get();
-    if (!doc.exists)
-    {
-        return res.status(404).json({ code: "AM107", error: "User not found" });
-    }
+    if (!doc.exists) return res.status(404).json({ code: "AM107", error: "User not found" });
 
-    const contentMapsRef = userRef.collection("contentMaps");
-    const contentMaps = await contentMapsRef.get();
-
-    // Return an array of objects containing Id of content map and name of content map
-    const contentMapsData = contentMaps.docs.map(doc => ({ id: doc.id, name: doc.data().name }));
-
-    return res.status(200).json(contentMapsData);
-
+    //get the content maps array of the user
+    const contentMaps = doc.data().contentMaps;
+    
+    return res.status(200).json(contentMaps);
 });
 
 
-
+/* Get a content map of a user */
 router.get("/:user/:id", async (req, res) => {
 
-    const auth = req.headers.authorization;
-    const token = auth.split(' ')[1];
+    const token = req.headers?.authorization?.split(' ')[1];
     const id = req.params.id;
     const ResourceUser = req.params.user;
 
     // Check if the token exists
-    if (!token)
-    {
-        return res.status(400).json({ code: "AM101", error: "Missing token" });
-    }
-
-    if(!ResourceUser)
-    {
-        return res.status(400).json({ code: "AM101", error: "Missing user" });
-    }
-
+    if (!token || !ResourceUser) return res.status(400).json({ code: "AM101", error: "Missing token or user" });
+    
     //verify user
     const user = await verifyUser(token);
-    if (!user)
-    {
-        return res.status(403).json({ code: "AM102", error: "Invalid token" });
-    }
+    if (!user) return res.status(403).json({ code: "AM102", error: "Invalid token" });
 
     const db = fb.admin.firestore();
-    const userRef = db.collection("users").doc(ResourceUser);
+    const contentMap = await db.collection("contentMaps").doc(id).get();
+    
 
-    const doc = await userRef.get();
-    if (!doc.exists)
-    {
-        return res.status(404).json({ code: "AM107", error: "User not found" });
-    }
-
-    const contentMapsRef = userRef.collection("contentMaps");
-    const contentMapRef = contentMapsRef.doc(id);
-
-    const contentMap = await contentMapRef.get();
-
-    if (!contentMap.exists)
-    {
-        return res.status(404).json({ code: "AM108", error: "Content map not found" });
-    }
+    if (!contentMap.exists) return res.status(404).json({ code: "AM108", error: "Content map not found" });
 
     const contentMapData = contentMap.data();
 
     //check if user has access to the content map
-    if(!contentMapData.Access[user.uid]){
-        return res.status(403).json({ code: "AM109", error: "User does not have access to the content map" });
-    }
+    if(!contentMapData.Access[user.uid]) return res.status(403).json({ code: "AM109", error: "User does not have access to the content map" });
     
-
     return res.status(200).json({...contentMapData,userAccess:contentMapData.Access[user.uid]?.role});
 });
 
@@ -169,48 +120,22 @@ router.put("/:user/:id", async (req, res) => {
     const { name, data , share , access } = req.body;
 
     // Check if the token exists
-    if (!token)
+    if (!token || !id || !resourceUser || (share && (share!=="view" || share!=="edit")))
     {
-        return res.status(400).json({ code: 400, error: "Missing token" });
-    }
-
-    if(!resourceUser)
-    {
-        return res.status(400).json({ code: 400, error: "Missing user" });
-    }
-
-    if(share && (share!=="view" || share!=="edit")){
-        return res.status(400).json({ code: 400, error: "Wrong share value" });
+        return res.status(400).json({ code: 400, error: "Missing token or id or resource user or share" });
     }
 
     //verify user
     const user = await verifyUser(token);
-    if (!user)
-    {
-        return res.status(403).json({ code: 403, error: "Invalid token" });
-    }
+    if (!user) return res.status(403).json({ code: 403, error: "Invalid token" });
 
     const db = fb.admin.firestore();
-    const userRef = db.collection("users").doc(resourceUser);
-
-    const doc = await userRef.get();
-    if (!doc.exists)
-    {
-        return res.status(404).json({ code: 404, error: "User not found" });
-    }
-
-    const contentMapsRef = userRef.collection("contentMaps");
-    const contentMapRef = contentMapsRef.doc(id);
-
-    const contentMap = await contentMapRef.get();
-
-    if (!contentMap.exists)
-    {
-        return res.status(404).json({ code: 404, error: "Content map not found" });
-    }
+    
+    const contentMap =await db.collection("contentMaps").doc(id).get();
+    if (!contentMap.exists) return res.status(404).json({ code: 404, error: "Content map not found" });
+    
 
     let contentMapData = contentMap.data();
-
     if(!contentMapData.Access[user.uid]){
         return res.status(403).json({ code: 403, error: "User does not have access to the content map" });
     }
@@ -239,7 +164,7 @@ router.put("/:user/:id", async (req, res) => {
 
 
     //set updated content map
-    await contentMapRef.set(updatedContentMap);
+    await db.collection("contentMaps").doc(id).set(updatedContentMap);
 
     return res.status(200).json({ code:200, id: id });
 });
@@ -252,38 +177,37 @@ router.delete("/:id", async (req, res) => {
     const id = req.params.id;
 
     // Check if the token exists
-    if (!token)
-    {
-        return res.status(400).json({ code: 400, error: "Missing token" });
-    }
+    if (!token) return res.status(400).json({ code: 400, error: "Missing token" });
+    
 
     //verify user
     const user = await verifyUser(token);
-    if (!user)
-    {
-        return res.status(403).json({ code: 403, error: "Invalid token" });
-    }
-
+    if (!user) return res.status(403).json({ code: 403, error: "Invalid token" });
+    
     const db = fb.admin.firestore();
-    const userRef = db.collection("users").doc(user.uid);
-
+    const userRef =db.collection("users").doc(user.uid)
     const doc = await userRef.get();
-    if (!doc.exists)
-    {
-        return res.status(404).json({ code: 404, error: "User not found" });
-    }
 
-    const contentMapsRef = userRef.collection("contentMaps");
+    if (!doc.exists) return res.status(404).json({ code: 404, error: "User not found" });
+    
+    const contentMapsRef = db.collection("contentMaps");
     const contentMapRef = contentMapsRef.doc(id);
-
     const contentMap = await contentMapRef.get();
 
-    if (!contentMap.exists)
-    {
-        return res.status(404).json({ code: 404, error: "Content map not found" });
+    if (!contentMap.exists) return res.status(404).json({ code: 404, error: "Content map not found" });
+
+    // Ensure user is owner of the content map
+    let contentMapData = contentMap.data();
+    if(!contentMapData.Access[user.uid] || contentMapData.Access[user.uid].role!=="owner"){
+        return res.status(403).json({ code: 403, error: "User does not have access to the operation" });
     }
 
     await contentMapRef.delete();
+
+    // remove the content map from users content maps array
+    await userRef.update({
+        contentMaps: fb.admin.firestore.FieldValue.arrayRemove(id)
+    });
 
     return res.status(200).json({ code:200, id: id });
 });
@@ -297,26 +221,12 @@ router.get("/search", async (req, res) => {
     const token = auth?.split(' ')[1];
     const query = req.query.query;
 
-    if(!query){
-        return res.status(400).json({ code: 400, error: "Missing query" });
-    }
-
-    if(query.length<3){
-        return res.status(400).json({ code: 400, error: "Query length should be greater than 3" });
-    }
-
-    // Check if the token exists
-    if (!token)
-    {
-        return res.status(400).json({ code: "AM101", error: "Missing token" });
-    }
+    if(!query || query.length<3 || !token) return res.status(400).json({ code: 400, error: "Missing token or query or query length should be greater than 3" });
 
     //verify user
     const user = await verifyUser(token);
-    if (!user)
-    {
-        return res.status(403).json({ code: "AM102", error: "Invalid token" });
-    }
+    if (!user) return res.status(403).json({ code: "AM102", error: "Invalid token" });
+    
 
     const db = fb.admin.firestore();
     const usersRef = db.collection("users");
