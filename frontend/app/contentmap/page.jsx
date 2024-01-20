@@ -334,7 +334,7 @@ function page() {
                             <div className="flex items-center gap-2"><h1 className="text-white text-xl mt-2" onClick={handleEditClick}>
                                 {ContentMapName}
                             </h1>
-                            <button className="mt-2" onClick={()=>setIsEditing(isEditing=>!isEditing)}> 
+                            <button disabled={!isOwner} className="mt-2" onClick={()=>setIsEditing(isEditing=>!isEditing)}> 
                             <FilePenLine width={20} height={20} />
                             </button>
                             
