@@ -30,7 +30,7 @@ router.post("/", async (req, res) =>
         data: data ? JSON.stringify(data):"",
         createdAt: fb.admin.firestore.FieldValue.serverTimestamp(),
         updatedAt: fb.admin.firestore.FieldValue.serverTimestamp(),
-        Access: {[user.uid]: {role:"owner",email:user.email, name:user.name}}
+        Access: {[user.uid]: {role:"owner",email:user.email, name:user.name, type:"users"}}
     }
 
     const db = fb.admin.firestore();
