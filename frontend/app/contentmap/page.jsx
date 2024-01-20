@@ -170,7 +170,7 @@ function page() {
 
         try {
             const res = await axios.post(`http://localhost:8080/api/contentmap`, {
-                name: "New Content Map",
+                name: ContentMapName+" (copy)",
                 data: appdata
             }, {
                 headers: {
@@ -184,7 +184,8 @@ function page() {
             console.log(res.data);
 
             setid(res.data.id);
-            setIntialData({ name: "New Content Map", data: JSON.stringify(appdata) });
+            setIntialData({ name: ContentMapName+" (copy)", data: JSON.stringify(appdata) });
+            setContentMapName(ContentMapName+" (copy)");
 
             //TODO: change this user to the current user
             router.push(`/contentmap?user=${user}&id=${res.data.id}`);
@@ -316,7 +317,7 @@ function page() {
                     <Image src={LogoIcon} alt="Collabrain logo" width={75} height={50} />
                 </Link>
                 <div className="grid grid-rows-2 grid-cols-1 ml-8">
-                    <div>
+                    <div className="mb-1">
                         {isEditing ? (
                             <div className="flex items-center gap-2">
                             <input
