@@ -34,13 +34,14 @@ router.post("/", async (req, res) =>
     }
 
     // create a new content map as collection inside user's doc
+    console.log(user)
 
     const contentMap = {
         name: name,
-        data: data,
+        data: data ? JSON.stringify(data):"",
         createdAt: fb.admin.firestore.FieldValue.serverTimestamp(),
         updatedAt: fb.admin.firestore.FieldValue.serverTimestamp(),
-        Access: {[user.uid]: {role:"owner",email:user.email, name:user.displayName}}
+        Access: {[user.uid]: {role:"owner",email:user.email, name:user.name}}
     }
 
     const db = fb.admin.firestore();

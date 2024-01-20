@@ -147,7 +147,7 @@ function page() {
 
             setid(res.data.id);
             setIntialData({ name: "New Content Map", data: "" });
-            router.push(`/contentmap?id=${res.data.id}`);
+            router.push(`/contentmap?user=${user}&id=${res.data.id}`);
             router.reload();
         }
         catch (err) {
