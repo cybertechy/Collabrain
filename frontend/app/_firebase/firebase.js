@@ -1,8 +1,10 @@
 const { app: firebase } = require("_firebase/cli"); // Required for all pages
 const { getAuth, signInWithPopup, GoogleAuthProvider, OAuthProvider,
 	signInWithEmailAndPassword, createUserWithEmailAndPassword,
-	EmailAuthProvider, linkWithPopup } = require("firebase/auth");
-const { useAuthState } = require("react-firebase-hooks/auth"); // Required for all pages
+	EmailAuthProvider, getAdditionalUserInfo } = require("firebase/auth");
+const { Timestamp } = require("firebase/firestore");
+const authHook = require("react-firebase-hooks/auth"); // Required for all pages
+const axios = require("axios");
 
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({
@@ -13,20 +15,15 @@ const microsoftProvider = new OAuthProvider('microsoft.com');
 
 const auth = getAuth(firebase);
 const signOut = () => auth.signOut();
-
-/**
- * Check user auth state
- * @return {boolean} - true if signed in, false if not
-*/
-function isAuth()
-{
-	const [user, loading] = useAuthState(auth);
-	return (user) ? true : false;
-}
+const getToken = () => auth.currentUser.getIdToken(true);
+const getUserID = () => auth.currentUser.uid;
+const toFbTimestamp = (date) => Timestamp.fromDate(date);
+const fromFbTimestamp = (timestamp) => timestamp.toDate();
+const useAuthState = () => authHook.useAuthState(auth);
 
 async function emailSignIn(e)
 {
-	// This fucntion should be adjusted to seperate log in and sign up
+	// This function should be adjusted to seperate log in and sign up
 	e.preventDefault();
 	const { email, password } = e.target.elements;
 
@@ -47,6 +44,18 @@ async function emailSignIn(e)
 		{
 			alert("User doesnt exist, creating new user");
 			result = await createUserWithEmailAndPassword(auth, email.value, password.value);
+			axios.post("http://localhost:8080/api/user", {
+				email: email.value,
+				fname: fname.value,
+				lname: lname.value,
+				username: null,
+				photo: null,
+				uid: result.user.uid
+			})
+				.catch(err =>
+				{
+					alert(err.message);
+				});
 		}
 
 		else // Other errors
@@ -68,7 +77,7 @@ async function serviceSignIn(service)
 	const providers = {
 		"microsoft": microsoftProvider,
 		"google": googleProvider
-	}
+	};
 
 	const result = await signInWithPopup(auth, providers[service])
 		.catch(err =>
@@ -86,17 +95,32 @@ async function serviceSignIn(service)
 
 		});
 
-}
-
-async function getToken()
-{
-	return auth.currentUser.getIdToken(true)
+	const userInfo = getAdditionalUserInfo(result);
+	// Add user to database if new user
+	if (userInfo.isNewUser)
+	{
+		axios.post("http://localhost:8080/api/user", {
+			uid: result.user.uid,
+			email: result.user.email,
+			fname: userInfo.profile.given_name,
+			lname: userInfo.profile.family_name,
+			username: null,
+			photo: (result.user.photoURL) ? result.user.photoURL : null
+		})
+			.catch(err =>
+			{
+				alert(err.message);
+			});
+	}
 }
 
 module.exports = {
 	getToken,
+	getUserID,
 	signOut,
-	isAuth,
+	useAuthState,
 	emailSignIn,
-	serviceSignIn
-}
+	serviceSignIn,
+	toFbTimestamp,
+	fromFbTimestamp
+};

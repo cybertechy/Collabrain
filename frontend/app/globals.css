@@ -18,10 +18,47 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
+  background: white
     rgb(var(--background-start-rgb));
 }
+
+
+.custom-background {
+  position: relative;
+  overflow: hidden;
+}
+
+.custom-background::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-image: url('/assets/images/background.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  filter: blur(3px); /* blur level */
+  z-index: -1; /* so it stays behind the content */
+}
+.loader {
+  border: 5px solid #f3f3f3; /* Light grey */
+  border-top: 5px solid var(--primary-color); /* Primary color */
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+:root {
+  --primary-color: #972FFF; 
+  --secondary-color: #EBD7FF; 
+  --tertiary-color: #C58AFF; 
+}
+

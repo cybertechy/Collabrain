@@ -1,65 +1,32 @@
 "use client";
 
-const { signOut, isAuth, getToken } = require("_firebase/auth"); // Import the authentication functions
 const { useRouter } = require('next/navigation');
-const axios = require('axios');
+const { useEffect } = require("react");
+const fb = require("_firebase/firebase"); // Import the authentication functions
+const socket = require("_socket/socket");
 
 export default function Dashboard()
 {
 	const router = useRouter();
-	if (!isAuth())
+	const [user, loading] = fb.useAuthState();
+	let sock_cli;
+	useEffect(() =>
 	{
-		// router.push('/'); // Redirect to home page
-		return <h1 className="text-xl font-bold">Please sign in</h1>;
-	}
+		if (user)
+			sock_cli = socket.init('http://localhost:8080');
+	}, [user]);
 
-	// NOTE: Not finished
-	// Needs to be tested with backend
-
-	let currentDoc;
-
-	const createDoc = async () =>
-	{
-		// Create a new document
-		const title = document.querySelector("#doc-title").value;
-		const content = document.querySelector("#doc-text").value;
-		const token = await getToken();
-
-		let res = await axios.post('http://localhost:8080/api/doc/new', {
-			"token": token
-		}).catch(err => console.log(err));
-
-		if (res.status == 200)
-		{
-			currentDoc = res.data.id;
-			res = await axios.post(`http://localhost:8080/api/doc/${currentDoc}`, {
-				"token": token,
-				"title": title,
-				"content": content,
-			}).catch(err => console.log(err));
-		}
-	};
-
-	const deleteDoc = async () =>
-	{
-		console.log(currentDoc);
-		const token = await getToken();
-		let res = await axios.post(`http://localhost:8080/api/doc/delete/${currentDoc}`, {
-			"token": token
-		}).catch(err => console.log(err));
-	}
+	if (loading)
+		return <h1 className="text-xl font-bold  text-black">Please sign in</h1>;
 
 	return (
 		<div className="flex flex-col justify-center items-center">
-			<h1 className="text-xl font-bold">Dashboard</h1>
-			<p>This is your dashboard</p>
-			<p>There should be something here</p>
-			<button onClick={signOut}>Sign Out</button>
-			<input id="doc-title" style={{ color: "black", padding: 10, marginTop: 10 }} type="text" />
-			<textarea id="doc-text" style={{ color: "black", padding: 10, marginTop: 10 }} name="text" cols="30" rows="10"></textarea>
-			<div style={{display: "flex"}}>
-				<button onClick={createDoc} style={{ color: "black", backgroundColor: "white", padding: 10, borderRadius: 5, margin: 10 }}>Save doc</button>
-				<button onClick={deleteDoc} style={{ color: "black", backgroundColor: "white", padding: 10, borderRadius: 5, margin: 10 }}>Delete doc</button>
+			<h1 className="text-xl font-bold text-black">Dashboard</h1>
+			<p className='text-black'>This is your dashboard</p>
+			<p className='text-black'>There should be something here</p>
+			<div className="grid grid-cols-2 gap-5 my-5">
+				<button onClick={() => { router.push("/chat"); }} className="bg-sky-500 text-white font-semibold p-3 rounded-lg">Chat</button>
+				<button onClick={fb.signOut} className="bg-red-400 text-white font-semibold p-3 rounded-lg">Sign Out</button>
 			</div>
 		</div>
 	);
