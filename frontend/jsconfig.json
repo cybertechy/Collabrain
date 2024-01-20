@@ -2,7 +2,8 @@
   "compilerOptions": {
     "paths": {
       "@/*": ["./*"],
-	  "_firebase/*": ["./app/_firebase/*"]
+	  "_firebase/*": ["./app/_firebase/*"],
+	  "_socket/*": ["./app/_socket/*"]
     }
   }
 }

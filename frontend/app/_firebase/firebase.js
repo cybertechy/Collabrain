@@ -2,7 +2,8 @@ const { app: firebase } = require("_firebase/cli"); // Required for all pages
 const { getAuth, signInWithPopup, GoogleAuthProvider, OAuthProvider,
 	signInWithEmailAndPassword, createUserWithEmailAndPassword,
 	EmailAuthProvider, getAdditionalUserInfo } = require("firebase/auth");
-const { useAuthState } = require("react-firebase-hooks/auth"); // Required for all pages
+const { Timestamp } = require("firebase/firestore");
+const authHook = require("react-firebase-hooks/auth"); // Required for all pages
 const axios = require("axios");
 
 const googleProvider = new GoogleAuthProvider();
@@ -14,20 +15,15 @@ const microsoftProvider = new OAuthProvider('microsoft.com');
 
 const auth = getAuth(firebase);
 const signOut = () => auth.signOut();
-
-/**
- * Check user auth state
- * @return {boolean} - true if signed in, false if not
-*/
-function isAuth()
-{
-	const [user, loading] = useAuthState(auth);
-	return (user) ? true : false;
-}
+const getToken = () => auth.currentUser.getIdToken(true);
+const getUserID = () => auth.currentUser.uid;
+const toFbTimestamp = (date) => Timestamp.fromDate(date);
+const fromFbTimestamp = (timestamp) => timestamp.toDate();
+const useAuthState = () => authHook.useAuthState(auth);
 
 async function emailSignIn(e)
 {
-	// This fucntion should be adjusted to seperate log in and sign up
+	// This function should be adjusted to seperate log in and sign up
 	e.preventDefault();
 	const { email, password } = e.target.elements;
 
@@ -48,7 +44,7 @@ async function emailSignIn(e)
 		{
 			alert("User doesnt exist, creating new user");
 			result = await createUserWithEmailAndPassword(auth, email.value, password.value);
-			axios.post("/api/user", {
+			axios.post("http://localhost:8080/api/user", {
 				email: email.value,
 				fname: fname.value,
 				lname: lname.value,
@@ -118,15 +114,13 @@ async function serviceSignIn(service)
 	}
 }
 
-async function getToken()
-{
-	return auth.currentUser.getIdToken(true);
-}
-
 module.exports = {
 	getToken,
+	getUserID,
 	signOut,
-	isAuth,
+	useAuthState,
 	emailSignIn,
-	serviceSignIn
+	serviceSignIn,
+	toFbTimestamp,
+	fromFbTimestamp
 };
