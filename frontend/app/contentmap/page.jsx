@@ -147,6 +147,8 @@ function page() {
 
             setid(res.data.id);
             setIntialData({ name: "New Content Map", data: "" });
+
+            //TODO: change this user to the current user
             router.push(`/contentmap?user=${user}&id=${res.data.id}`);
             router.reload();
         }
@@ -154,6 +156,45 @@ function page() {
             console.log(err);
             return null;
         }
+    }
+
+    const duplicateContentMap = async () => {
+        let token = await getToken();
+        if (!token) return null;
+
+        let appdata = {
+            elements: ExcalidrawAPI.getSceneElements(),
+            appState: ExcalidrawAPI.getAppState(),
+            files: ExcalidrawAPI.getFiles(),
+        }
+
+        try {
+            const res = await axios.post(`http://localhost:8080/api/contentmap`, {
+                name: "New Content Map",
+                data: appdata
+            }, {
+                headers: {
+                    authorization: `Bearer ${token}`,
+                },
+            });
+
+            setNew(false);
+            if (res.status !== 200) return null;
+
+            console.log(res.data);
+
+            setid(res.data.id);
+            setIntialData({ name: "New Content Map", data: JSON.stringify(appdata) });
+
+            //TODO: change this user to the current user
+            router.push(`/contentmap?user=${user}&id=${res.data.id}`);
+            
+        }
+        catch (err) {
+            console.log(err);
+            return null;
+        }
+       
     }
 
     const DeleteContentMap = async () => {
@@ -269,7 +310,7 @@ function page() {
 
     return <div className="flex justify-center items-center flex-col h-screen w-screen">
         <ToastContainer />
-        <div className="flex justify-between items-center w-screen h-[12%]  bg-purple-600 px-3 pt-2 ">
+        <div className="flex justify-between items-center w-screen h-[12%]  bg-primary px-3 pt-2 ">
             <div className="flex">
                 <Link href="/dashboard">
                     <Image src={LogoIcon} alt="Collabrain logo" width={75} height={50} />
@@ -294,23 +335,23 @@ function page() {
                         <button onClick={() => setNew(New => !New)} className=" text-white rounded-md px-1 py-1 ">New</button>
                         { /* New button dropdown containing first new content map, second new doument, It should be right below the new button*/
                             New && <div className="absolute z-10 top-[12%] left-[80px] bg-white rounded-md shadow-md p-2 flex flex-col gap-2">
-                                <button onClick={NewContentMap} className="text-purple-600">New Content Map</button>
-                                <button className="text-purple-600">New Document</button>
+                                <button onClick={NewContentMap} className="text-primary">New Content Map</button>
+                                <button onClick={duplicateContentMap} className="text-primary">Create a copy</button>
                             </div>
                         }
                         <button disabled={!(id && IntialData && Excalidraw)||!isOwner} onClick={() => setDelete(Delete => !Delete)} className=" text-white rounded-md px-1 py-1 ">Delete</button>
                         { /* Ask for confirmation before deleting the content map in the center of screen as pop out*/
-                            id && IntialData && Excalidraw && Delete && <div className="absolute z-10 top-[50%] lg:left-[40%] md:left-[30%] left-[15%] w-72 bg-white rounded-md shadow-md py-2 px-4 flex flex-col gap-2 border border-purple-600">
-                                <h1 className="text-xl text-purple-600">Are you sure you want to delete this content map?</h1>
-                                <hr className="border-purple-600" />
+                            id && IntialData && Excalidraw && Delete && <div className="absolute z-10 top-[50%] lg:left-[40%] md:left-[30%] left-[15%] w-72 bg-white rounded-md shadow-md py-2 px-4 flex flex-col gap-2 border border-primary">
+                                <h1 className="text-xl text-primary">Are you sure you want to delete this content map?</h1>
+                                <hr className="border-primary" />
                                 <div className="flex gap-8">
-                                    <button onClick={DeleteContentMap} className="text-white text-xl bg-purple-600 rounded-lg px-3 py-1">Yes</button>
-                                    <button onClick={() => setDelete(Delete => !Delete)} className="text-purple-600 text-xl">No</button>
+                                    <button onClick={DeleteContentMap} className="text-white text-xl bg-primary rounded-lg px-3 py-1">Yes</button>
+                                    <button onClick={() => setDelete(Delete => !Delete)} className="text-primary text-xl">No</button>
                                 </div>
                             </div>
                         }
                         <button disabled={!(id && IntialData && Excalidraw)} onClick={()=>setShare(Share => !Share)} className="rounded-lg px-1">Share</button>
-                        {Share && <div className="absolute z-10 top-[13%] lg:left-[200px] left-[10px] md:left-[100px] bg-white rounded-md shadow-md p-2 flex flex-col gap-2 border border-purple-600">
+                        {Share && <div className="absolute z-10 top-[13%] lg:left-[200px] left-[10px] md:left-[100px] bg-white rounded-md shadow-md p-2 flex flex-col gap-2 border border-primary">
                                 <ShareComponent getdata={getdata} updatecontent={updatecontent} contentMapName={IntialData?.name} setShare={setShare} sData={IntialData?.Access} isOwner={isOwner}  />
                             </div>}
 
