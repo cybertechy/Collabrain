@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
 import Link from "next/link";
-import { RefreshCcw } from 'lucide-react';
+import { RefreshCcw, FilePenLine } from 'lucide-react';
 import ShareComponent from "../../components/ui/share";
 const { isAuth, getToken } = require("_firebase/auth");
 import { ToastContainer } from "react-toastify";
@@ -318,6 +318,7 @@ function page() {
                 <div className="grid grid-rows-2 grid-cols-1 ml-8">
                     <div>
                         {isEditing ? (
+                            <div className="flex items-center gap-2">
                             <input
                                 className="text-white bg-transparent border-b-2 border-white outline-none p-1"
                                 type="text"
@@ -325,10 +326,19 @@ function page() {
                                 onChange={handleInputChange}
                                 onBlur={handleSaveClick}
                             />
+                            <button className="mt-2" onClick={()=>setIsEditing(isEditing=>!isEditing)}> 
+                            <FilePenLine width={20} height={20} />
+                            </button>
+                            </div>
                         ) : (
-                            <h1 className="text-white text-xl mt-2" onClick={handleEditClick}>
+                            <div className="flex items-center gap-2"><h1 className="text-white text-xl mt-2" onClick={handleEditClick}>
                                 {ContentMapName}
                             </h1>
+                            <button className="mt-2" onClick={()=>setIsEditing(isEditing=>!isEditing)}> 
+                            <FilePenLine width={20} height={20} />
+                            </button>
+                            
+                            </div>
                         )}
                     </div>
                     <div className="flex gap-4 p-0">
