@@ -196,7 +196,7 @@ router.delete("/:team", async (req, res) =>
 
 /* Endpoint for adding a member to a team*/
 
-router.post("/:team/user", async (req, res) =>
+router.post("/:team/users", async (req, res) =>
 {
 	// Make sure all required fields are present
 	if (!req.headers.authorization)
@@ -233,7 +233,7 @@ router.post("/:team/user", async (req, res) =>
 
 /* Endpoint for deleting a member from a team */
 
-router.delete("/:team/user", async (req, res) =>
+router.delete("/:team/users", async (req, res) =>
 {
 	// Make sure all required fields are present
 	if (!req.headers.authorization)
@@ -300,7 +300,7 @@ router.get("/:team/users", async (req, res) =>
 /************************************************************/
 
 /* Endpoint for creating a new channel */
-router.post("/:team/channel", async (req, res) =>
+router.post("/:team/channels", async (req, res) =>
 {
 	// Make sure all required fields are present
 	if (!req.headers.authorization || !req.body.name)
@@ -323,7 +323,7 @@ router.post("/:team/channel", async (req, res) =>
 });
 
 /* Endpoint for updating a channel's data */
-router.patch("/:team/channel/:channel", async (req, res) =>
+router.patch("/:team/channels/:channel", async (req, res) =>
 {
 	// Make sure all required fields are present
 	if (!req.headers.authorization || !req.body.data)
@@ -348,7 +348,7 @@ router.patch("/:team/channel/:channel", async (req, res) =>
 });
 
 /* Endpoint for deleting a channel */
-router.delete("/:team/channel/:channel", async (req, res) =>
+router.delete("/:team/channels/:channel", async (req, res) =>
 {
 	// Make sure all required fields are present
 	if (!req.headers.authorization)
@@ -376,7 +376,7 @@ router.delete("/:team/channel/:channel", async (req, res) =>
 });
 
 /* Endpoint for getting a channel's messages */
-router.get("/:team/channel/:channel/messages", async (req, res) =>
+router.get("/:team/channels/:channel/messages", async (req, res) =>
 {
 	// Make sure all required fields are present
 	if (!req.headers.authorization)
@@ -403,7 +403,7 @@ router.get("/:team/channel/:channel/messages", async (req, res) =>
 });
 
 /* Endpoint for editing a message */
-router.patch("/:team/channel/:channel/message/:message", async (req, res) =>
+router.patch("/:team/channels/:channel/messages/:message", async (req, res) =>
 {
 	// Make sure all required fields are present
 	if (!req.headers.authorization || !req.body.message)

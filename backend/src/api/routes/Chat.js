@@ -64,7 +64,7 @@ router.get("/:chat/messages", async (req, res) =>
 });
 
 /* Endpoint for editing a message */
-router.patch("/:chat/message/:message", async (req, res) =>
+router.patch("/:chat/messages/:message", async (req, res) =>
 {
 	// Make sure all required fields are present
 	if (!req.headers.authorization || !req.body.message)

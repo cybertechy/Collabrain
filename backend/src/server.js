@@ -10,7 +10,6 @@ const http = require('http');
 const chatRoute = require("./api/routes/Chat");
 const teamsRoute = require("./api/routes/Teams");
 const userRoute = require("./api/routes/User");
-const profileRoute = require("./api/routes/Profile");
 
 // Helpers
 const sockServer = require("./api/helpers/socket");
@@ -25,10 +24,9 @@ app.use(bodyParser.json());
 app.use(cors());
 // app.use("/api/doc", docRoute);
 // app.use("/api/storage", strRoute);
-app.use("/api/chat", chatRoute);
-app.use("/api/team",teamsRoute);
-app.use("/api/user",userRoute);
-app.use("/api/profile",profileRoute);
+app.use("/api/chats", chatRoute);
+app.use("/api/teams",teamsRoute);
+app.use("/api/users",userRoute);
 
 app.get("/api/home", (req, res) =>
 {
