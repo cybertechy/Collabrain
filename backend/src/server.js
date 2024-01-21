@@ -9,10 +9,10 @@ const http = require('http');
 // const strRoute = require("./api/routes/Storage");
 const chatRoute = require("./api/routes/Chat");
 const teamsRoute = require("./api/routes/Teams");
+const userRoute = require("./api/routes/User");
 
 // Helpers
 const sockServer = require("./api/helpers/socket");
-const userRoute = require("./api/routes/User");
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -24,9 +24,9 @@ app.use(bodyParser.json());
 app.use(cors());
 // app.use("/api/doc", docRoute);
 // app.use("/api/storage", strRoute);
-app.use("/api/chat", chatRoute);
-app.use("/api/team",teamsRoute);
-app.use("/api/user",userRoute);
+app.use("/api/chats", chatRoute);
+app.use("/api/teams",teamsRoute);
+app.use("/api/users",userRoute);
 
 app.get("/api/home", (req, res) =>
 {
