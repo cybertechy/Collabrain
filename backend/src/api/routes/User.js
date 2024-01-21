@@ -141,11 +141,13 @@ router.post("/friends/request/:user", async (req, res) =>
 	if (!user)
 		return res.status(401).json({ error: "Unauthorized" });
 
+	// Get sender data
+	let senderDoc = (await fb.db.doc(`users/${user.uid}`).get()).data();
 	// Sender's user data
 	let senderData = {
 		uid: user.uid,
-		username: user.username,
-		photo: user.photo
+		username: senderDoc.username,
+		photo: senderDoc.photo
 	};
 
 	// Send friend request
@@ -154,11 +156,11 @@ router.post("/friends/request/:user", async (req, res) =>
 		.catch(err => { return res.status(500).json({ error: err }); });
 });
 
-// Cancel friend request
+// Cancel/decline friend request
 router.delete("/friends/request/:user", async (req, res) =>
 {
 	// Make sure all required fields are present
-	if (!req.headers.authorization)
+	if (!req.headers.authorization || !req.body.type)
 		return res.status(400).json({ error: "Missing required data" });
 
 	// verfiy token
@@ -166,9 +168,17 @@ router.delete("/friends/request/:user", async (req, res) =>
 	if (!user)
 		return res.status(401).json({ error: "Unauthorized" });
 
+	// Get sender data
+	let senderDoc = (await fb.db.doc(`users/${(req.body.type == "cancel") ? user.uid : req.params.user}`).get()).data();
+	// Sender's user data
+	let senderData = {
+		uid: (req.body.type == "cancel") ? user.uid : req.params.user,
+		username: senderDoc.username,
+		photo: senderDoc.photo
+	};
 	// Cancel friend request
-	fb.db.doc(`users/${req.params.user}`).update({ friendRequests: fb.admin.firestore.FieldValue.arrayRemove(user.uid) })
-		.then(() => { return res.json({ message: "Friend request cancelled" }); })
+	fb.db.doc(`users/${(req.body.type == "cancel") ? req.params.user : user.uid}`).update({ friendRequests: fb.admin.firestore.FieldValue.arrayRemove(senderData) })
+		.then(() => { return res.json({ message: "Removed friend request" }); })
 		.catch(err => { return res.status(500).json({ error: err }); });
 });
 
@@ -184,6 +194,21 @@ router.post("/friends/:user", async (req, res) =>
 	if (!user)
 		return res.status(401).json({ error: "Unauthorized" });
 
+	// Check if user has friend request
+	let error;
+	let doc = await fb.db.doc(`users/${user.uid}`).get()
+		.catch(err => { error = err; });
+
+	if (error) return res.status(500).json({ error: error });
+
+	let friendRequests = doc.data().friendRequests;
+	if (friendRequests == undefined)
+		return res.status(400).json({ error: "No friend requests" });
+
+	let friendRequest = friendRequests.find(request => request.uid == req.params.user);
+	if (friendRequest == undefined)
+		return res.status(400).json({ error: "No friend requests" });
+
 	try
 	{
 		// Add to friends lists
@@ -192,11 +217,27 @@ router.post("/friends/:user", async (req, res) =>
 		// Other user
 		fb.db.doc(`users/${req.params.user}`).update({ friends: fb.admin.firestore.FieldValue.arrayUnion(user.uid) });
 		// Remove from friend requests
-		fb.db.doc(`users/${user.uid}`).update({ friendRequests: fb.admin.firestore.FieldValue.arrayRemove(user.uid) });
+		fb.db.doc(`users/${user.uid}`).update({ friendRequests: fb.admin.firestore.FieldValue.arrayRemove(friendRequest) });
 
 		return res.status(200).json({ message: "Friend request accepted" });
 	}
 	catch (err) { return res.status(500).json({ error: err }); }
+});
+
+// Get friend requests
+router.get("/friends/requests", async (req, res) =>
+{
+	// Make sure all required fields are present
+	if (!req.headers.authorization) return res.status(400).json({ error: "Missing required data" });
+
+	// verfiy token
+	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
+
+	if (!user) return res.status(401).json({ error: "Unauthorized" });
+
+	fb.db.doc(`users/${user.uid}`).get()
+		.then(doc => { res.json(doc.data().friendRequests); })
+		.catch(err => { return res.status(500).json({ error: err }); });
 });
 
 // Remove friend
@@ -211,11 +252,17 @@ router.delete("/friends/:user", async (req, res) =>
 	if (!user)
 		return res.status(401).json({ error: "Unauthorized" });
 
-	// Remove from friends lists
-	// Current user
-	fb.db.doc(`users/${user.uid}`).update({ friends: fb.admin.firestore.FieldValue.arrayRemove(req.params.user) });
-	// Other user
-	fb.db.doc(`users/${req.params.user}`).update({ friends: fb.admin.firestore.FieldValue.arrayRemove(user.uid) });
+	try
+	{
+		// Remove from friends lists
+		// Current user
+		fb.db.doc(`users/${user.uid}`).update({ friends: fb.admin.firestore.FieldValue.arrayRemove(req.params.user) });
+		// Other user
+		fb.db.doc(`users/${req.params.user}`).update({ friends: fb.admin.firestore.FieldValue.arrayRemove(user.uid) });
+
+		return res.status(200).json({ message: "Friend removed" });
+	}
+	catch (err) { return res.status(500).json({ error: err }); }
 });
 
 /************************************************************/
@@ -233,7 +280,7 @@ router.post("/block/:user", async (req, res) =>
 	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
 	if (!user)
 		return res.status(401).json({ error: "Unauthorized" });
-	
+
 	// Block user
 	fb.db.doc(`users/${user.uid}`).update({ blocked: fb.admin.firestore.FieldValue.arrayUnion(req.params.user) })
 		.then(() => { return res.json({ message: "User blocked" }); })
@@ -246,12 +293,12 @@ router.delete("/block/:user", async (req, res) =>
 	// Make sure all required fields are present
 	if (!req.headers.authorization)
 		return res.status(400).json({ error: "Missing required data" });
-	
+
 	// verfiy token
 	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
 	if (!user)
 		return res.status(401).json({ error: "Unauthorized" });
-	
+
 	// Unblock user
 	fb.db.doc(`users/${user.uid}`).update({ blocked: fb.admin.firestore.FieldValue.arrayRemove(req.params.user) })
 		.then(() => { return res.json({ message: "User unblocked" }); })
