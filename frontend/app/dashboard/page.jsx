@@ -1,7 +1,9 @@
 "use client";
 
-const { signOut, isAuth, getToken } = require("_firebase/auth"); // Import the authentication functions
-const { useRouter } = require("next/navigation");
+const fb = require("_firebase/firebase"); // Import the authentication functions
+const socket = require("_socket/socket");
+const { useRouter } = require('next/navigation');
+const { useEffect } = require("react");
 const axios = require("axios");
 import Sidebar from "../../components/ui/sidebar/sidebar";
 import Navbar from "../../components/ui/navbar/navbar";
@@ -10,35 +12,45 @@ import DashboardFolder from "../../components/ui/dashboardComponents/dashboardFo
 import DropdownDashboard from '../../components/ui/dashboardComponents/dropdownDashboard'; // Adjust the import path as needed
 import DashboardNewFolder from '../../components/ui/dashboardComponents/dashboardNewFolder'
 import DashboardProjectButton from '../../components/ui/dashboardComponents/dashboardProjectButton'
+
 export default function Dashboard() {
     const router = useRouter();
+	const [user, loading] = fb.useAuthState();
     const typeItems = ['Type 1', 'Type 2', 'Type 3'];
     const peopleItems = ['Person 1', 'Person 2', 'Person 3'];
     const modifiedItems = ['Date 1', 'Date 2', 'Date 3'];
-    if (!isAuth()) {
-        //router.push('/'); // Redirect to home page
-        return <h1 className="text-xl font-bold">Please sign in</h1>;
-    }
+	let sock_cli;
+	useEffect(() =>
+	{
+		if (user)
+			sock_cli = socket.init('http://localhost:8080');
+	}, [user]);
+
+	if (loading)
+		return <div className = " flex  flex-col items-center justify-around min-h-screen">
+            <div className="flex flex-col items-center justify-center min-h-screen">
+            <h1 className="text-xl font-bold mb-5 text-primary">Trying to  sign in</h1> 
+            
+        <div className="loader"></div>
+    </div></div>;
+
+
     // NOTE: Not finished
     // Needs to be tested with backend
 
     let currentDoc;
-   
+
     const createDoc = async () => {
         // Create a new document
         const title = document.querySelector("#doc-title").value;
         const content = document.querySelector("#doc-text").value;
         const token = await getToken();
-        console.log(title);
-        console.log(content);
 
         let res = await axios
             .post("http://localhost:8080/api/doc/new", {
                 token: token,
             })
             .catch((err) => console.log(err));
-       
-
 
         if (res.status == 200) {
             currentDoc = res.data.id;
@@ -63,7 +75,7 @@ export default function Dashboard() {
 		}).catch(err => console.log(err));
 	};
 
-    return (
+	return (
         <div className="flex flex-col h-screen bg-gray-100 ">
         <div className="flex flex-grow overflow-hidden">
             <Sidebar />

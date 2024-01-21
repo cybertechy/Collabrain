@@ -23,7 +23,7 @@ const navigationItems1 = [
 ];
 
 const navigationItems2 = [
-    { name: "Teams", href: "/teams", icon: GroupsIcon },
+    { name: "Teams", href: "/chat", icon: GroupsIcon },
     { name: "Messages", href: "/messages", icon: ForumIcon },
     { name: "Calls", href: "/calls", icon: CallIcon },
 ];
