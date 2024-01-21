@@ -1,41 +1,55 @@
 "use client";
 
-const { isAuth } = require("_firebase/auth"); // Import the authentication functions
+
+const fb = require("_firebase/firebase");  // Import the authentication functions
 const { useRouter } = require("next/navigation");
 import Button from "../../components/ui/button/button";
 import InputField from "../../components/ui/input/input";
-import { useEffect, useState } from "react";
-export default function OTP() {
-    const router = useRouter();
-    const [backgroundLoaded, setBackgroundLoaded] = useState(false);
+import { useEffect, useState } from 'react';
+const socket = require("_socket/socket");
+export default function OTP()
+{
+	const router = useRouter();
+	const [backgroundLoaded, setBackgroundLoaded] = useState(false);
+	const [user, loading]  = fb.useAuthState();
+	useEffect(() =>
+	{
+		if (user)
+			sock_cli = socket.init('http://localhost:8080');
+	}, [user]);
+	useEffect(() =>
+	{
+		// Preload the background image
+		const img = new Image();
+		img.src = '/assets/images/background.jpg'; // Adjust the path to your background image
+		img.onload = () =>
+		{
+			setBackgroundLoaded(true);
+			document.body.classList.add('custom-background');
+		};
 
-    useEffect(() => {
-        // Preload the background image
-        const img = new Image();
-        img.src = "/assets/images/background.jpg"; // Adjust the path to your background image
-        img.onload = () => {
-            setBackgroundLoaded(true);
-            document.body.classList.add("custom-background");
-        };
+		// Remove the custom background class when the component unmounts
+		return () =>
+		{
+			document.body.classList.remove('custom-background');
+		};
+	}, []);
 
-        // Remove the custom background class when the component unmounts
-        return () => {
-            document.body.classList.remove("custom-background");
-        };
-    }, []);
-    if (isAuth()) {
-        router.push("/dashboard"); // Redirect to dashboard
-        return null; // Prevents rendering the rest of the component
-    }
-    if (!backgroundLoaded) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="loader"></div>
-            </div>
-        );
-    }
-    return (
-        <div>
+	if (user)
+	{
+		router.push("/dashboard"); // Redirect to dashboard
+		return null; // Prevents rendering the rest of the component
+	}
+	if (!backgroundLoaded)
+	{
+		return (
+			<div className="flex items-center justify-center min-h-screen">
+				<div className="loader"></div>
+			</div>
+		);
+	}
+	return (
+		<div>
             <div className="justify-center items-center flex flex-col min-h-screen">
                 <img
                     className="w-28 "

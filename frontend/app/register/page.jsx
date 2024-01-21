@@ -1,74 +1,58 @@
 "use client";
 
-const { isAuth,  emailSignUp } = require("_firebase/auth");
+const fb = require("_firebase/firebase");
 const { useRouter } = require("next/navigation");
 import Button from "../../components/ui/button/button";
 import InputField from "../../components/ui/input/input";
 import PasswordInput from "../../components/ui/input/passwordinput";
 import EmailInputField from "../../components/ui/input/emailinput";
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 export default function Register() {
     const router = useRouter();
     const [backgroundLoaded, setBackgroundLoaded] = useState(false);
-
-    const [email, setemail] = useState("");
+	const [user, loading]  = fb.useAuthState();
+	const [email, setemail] = useState("");
     const [password, setpassword] = useState("");
     const [confirmPassword, setconfirmPassword] = useState("");
     const [username, setusername] = useState("");
     const [firstname, setfirstname] = useState("");
     const [lastname, setlastname] = useState("");
-    
-    
-
-    
-
+	useEffect(() =>
+	{
+		if (user)
+			sock_cli = socket.init('http://localhost:8080');
+	}, [user]);
     useEffect(() => {
         // Preload the background image
         const img = new Image();
-        img.src = "/assets/images/background.jpg"; // Adjust the path to your background image
+        img.src = '/assets/images/background.jpg'; // Adjust the path to your background image
         img.onload = () => {
             setBackgroundLoaded(true);
-            document.body.classList.add("custom-background");
+            document.body.classList.add('custom-background');
         };
 
-        // Remove the custom background class when the component unmounts
-        return () => {
-            document.body.classList.remove("custom-background");
-        };
-    }, []);
-    if (isAuth()) {
-        router.push("/dashboard"); // Redirect to dashboard
-        return null; // Prevents rendering the rest of the component
-    }
+		// Remove the custom background class when the component unmounts
+		return () =>
+		{
+			document.body.classList.remove('custom-background');
+		};
+	}, []);
 
-    if (!backgroundLoaded) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="loader"></div>
-            </div>
-        );
-    }
+	if (fb.useIsAuth())
+	{
+		router.push("/dashboard"); // Redirect to dashboard
+		return null; // Prevents rendering the rest of the component
+	}
 
-    const formSignin =  async (event) => {
-
-        event.preventDefault();
-
-        let result = await emailSignUp(email, password, confirmPassword, username, firstname, lastname);
-        if(!result.success) {
-            toast.error(result.error,{
-                position: "top-center",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                theme: "colored",
-            });
-            if(result.route) router.push(result.route)
-        } else {
-            router.push("/dashboard");
-        }
-    }
+	if (!backgroundLoaded)
+	{
+		return (
+			<div className="flex items-center justify-center min-h-screen">
+				<div className="loader"></div>
+			</div>
+		);
+	}
 
     return (
         <div className="flex items-center justify-center min-h-screen">
@@ -84,7 +68,7 @@ export default function Register() {
                         Create Your Collabrain Account
                     </h1>
 
-                    <form className="flex flex-col gap-4 max-w-md">
+                    <form onSubmit={fb.emailSignIn} className="flex flex-col gap-4 max-w-md">
                         <div className="flex gap-4">
                             <InputField input={firstname} setinput={setfirstname} placeholder="First Name" color="tertiary"/>
                             <InputField input={lastname} setinput={setlastname} placeholder="Last Name"  color="tertiary"/>
