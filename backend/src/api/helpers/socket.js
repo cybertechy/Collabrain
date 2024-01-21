@@ -42,7 +42,7 @@ async function broadcastMessage(data, type = "team")
 	let membersList = Object.keys(members);
 
 	// Remove the sender
-	const index = membersList.indexOf(data.sender);
+	const index = membersList.indexOf(data.senderID);
 	if (index > -1) // only splice array when item is found
 		membersList.splice(index, 1); // 2nd parameter means remove one item only
 

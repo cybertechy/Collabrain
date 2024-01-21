@@ -79,12 +79,14 @@ export default function ChatRoom()
 			return;
 		}
 
+		let token = await fb.getToken();
 		let userData = axios.get(`http://localhost:8080/api/user/${user.uid}`,
 			{ headers: { "Authorization": "Bearer " + token } });
 
 		let sentAt = new Date();
 		let data = {
-			sender: userData.username,
+			senderID: fb.getUserID(),
+			sender: (userData.username) ? userData.username : user.email, // Change this to just username once implement username selection
 			team: "LoH1iHOGowBzcYDXEqnu",
 			channel: "General",
 			msg: msg,
@@ -94,7 +96,7 @@ export default function ChatRoom()
 		// Add the message to the real-time socket chat
 		setText((prevText) => [
 			...prevText,
-			<h1 key={prevText.length} className="text-white">{`${data.sender}@${sentAt.toLocaleTimeString}: ${data.msg}`}</h1>,
+			<h1 key={prevText.length} className="text-white">{`${data.sender}@${sentAt.toLocaleTimeString()}: ${data.msg}`}</h1>,
 		]);
 
 		sockCli.current.emit('teamMsg', data); // Send the message to the server
