@@ -23,7 +23,7 @@ export default function Home()
 	return (
 		<div className="flex flex-col justify-center items-center text-black">
 			<h1>You're signed in</h1>
-			<p className="">Your token is: {token}</p>
+			<p className="">{token}</p>
 		</div>
 	);
 }
