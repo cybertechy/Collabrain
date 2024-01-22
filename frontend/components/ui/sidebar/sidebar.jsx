@@ -13,13 +13,14 @@ import CallIcon from "@mui/icons-material/Call";
 import { useState } from "react";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
+
 // Define the sidebar navigation items
 import { usePathname } from "next/navigation";
 const navigationItems1 = [
     { name: "My Brain", href: "/dashboard", icon: FolderIcon },
     { name: "Shared With Me", href: "/shared-with-me", icon: PeopleIcon },
     { name: "Recent", href: "/recent", icon: HistoryIcon },
-    { name: "Starred", href: "/starred", icon: StarRateIcon },
+    { name: "Starred", href: "/starred", icon: StarRateIcon,  },
 ];
 
 const navigationItems2 = [

@@ -3,19 +3,21 @@
 const fb = require("_firebase/firebase"); // Import the authentication functions
 const socket = require("_socket/socket");
 const { useRouter } = require('next/navigation');
-const { useEffect } = require("react");
+const { useEffect , useState} = require("react");
 const axios = require("axios");
 import Sidebar from "../../components/ui/sidebar/sidebar";
 import Navbar from "../../components/ui/navbar/navbar";
 import DashboardInfoBar from "../../components/ui/dashboardComponents/dashboardInfoBar";
 import DashboardFolder from "../../components/ui/dashboardComponents/dashboardFolder";
 import DropdownDashboard from '../../components/ui/dashboardComponents/dropdownDashboard'; // Adjust the import path as needed
-import DashboardNewFolder from '../../components/ui/dashboardComponents/dashboardNewFolder'
-import DashboardProjectButton from '../../components/ui/dashboardComponents/dashboardProjectButton'
-
+import DashboardNewFolder from '../../components/ui/dashboardComponents/dashboardNewFolder';
+import DashboardProjectButton from '../../components/ui/dashboardComponents/dashboardProjectButton';
+import TeamOverlay from "../create_join_team/TeamOverlay";
 export default function Dashboard() {
     const router = useRouter();
 	const [user, loading] = fb.useAuthState();
+    const [showTeamOverlay, setShowTeamOverlay] = useState(false);
+
     const typeItems = ['Type 1', 'Type 2', 'Type 3'];
     const peopleItems = ['Person 1', 'Person 2', 'Person 3'];
     const modifiedItems = ['Date 1', 'Date 2', 'Date 3'];
@@ -83,7 +85,7 @@ export default function Dashboard() {
                 <div className="w-full">
                     <Navbar />
                     <DashboardInfoBar />
-                   
+                    {showTeamOverlay && <TeamOverlay /> }
                    
                 </div>
                 <div className="px-4 py-2 ">
@@ -97,9 +99,9 @@ export default function Dashboard() {
                 <div className="flex-grow p-4 flex flex-col">
                 <div> 
                 <p className="text-2xl text-left text-primary ml-4 mb-4" >Folders</p>
-                
+                <TeamOverlay></TeamOverlay>
                 <div className="flex flex-wrap content-start items-start w-full justify-start gap-8">
-                <DashboardFolder title="Folder 1" folder="folder1" onClick={()=>{}} />
+                <DashboardFolder title="Folder 1" folder="folder1" onClick={() => setShowTeamOverlay(true)} />
                 <DashboardFolder title="Folder 1" folder="folder1" onClick={()=>{}} />
                 <DashboardNewFolder onClick={()=>{}} />
                         </div>
