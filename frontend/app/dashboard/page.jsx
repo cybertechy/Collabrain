@@ -4,6 +4,10 @@ const fb = require("_firebase/firebase"); // Import the authentication functions
 const socket = require("_socket/socket");
 const { useRouter } = require('next/navigation');
 const { useEffect , useState} = require("react");
+const fb = require("_firebase/firebase"); // Import the authentication functions
+const socket = require("_socket/socket");
+const { useRouter } = require('next/navigation');
+const { useEffect , useState} = require("react");
 const axios = require("axios");
 import Sidebar from "../../components/ui/sidebar/sidebar";
 import Navbar from "../../components/ui/navbar/navbar";
@@ -66,6 +70,16 @@ export default function Dashboard() {
         }
     };
 
+	const deleteDoc = async () =>
+	{
+		console.log(currentDoc);
+		const token = await getToken();
+		let res = await axios.delete(`http://localhost:8080/api/doc/${currentDoc}`, {
+			data: {
+				"token": token
+			}
+		}).catch(err => console.log(err));
+	};
 	const deleteDoc = async () =>
 	{
 		console.log(currentDoc);
