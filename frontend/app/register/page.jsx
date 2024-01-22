@@ -57,7 +57,7 @@ export default function Register() {
 
         event.preventDefault();
 
-        let result = await emailSignUp(email, password, confirmPassword, username, firstname, lastname);
+        let result = await fb.emailSignIn(email, password, confirmPassword, username, firstname, lastname);
         if(!result.success) {
             toast.error(result.error,{
                 position: "top-center",

@@ -3,24 +3,24 @@ import PropTypes from 'prop-types';
 import { IconButton } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import DescriptionIcon from '@mui/icons-material/Description';
-import PsychologyIcon from '@mui/icons-material/Psychology';
 
+import MapIcon from '@mui/icons-material/Map';
 const DashboardProjectButton = ({ title, project, type, onClick, imageSrc }) => {
     // TODO: onClick(folder);
     return (
-        <div className = "bg-tertiary flex items-center justify-center flex-col rounded-xl hover:opacity-80 duration-300">
+        <div className = "bg-tertiary text-white flex items-center justify-center flex-col rounded-xl hover:opacity-80 duration-300">
             <div className="flex items-center justify-center w-min h-min p-2 ">
                 
-                    {type == 'Document' ? <DescriptionIcon fontSize="large"/> : <PsychologyIcon fontSize="large"/>}
+                    {type == 'Document' ? <DescriptionIcon fontSize="large"/> : <MapIcon fontSize="large"/>}
              
                 <span className='mx-5 w-24 text-lg text-semibold mr-10'>{title}</span>
                 <IconButton color="inherit">
                     <MoreVertIcon className = "pl-1"  fontSize="large"/>
                 </IconButton>
             </div>  
-            <div className = "items-center justify-center w-64 h-64 px-2">
+            {/* <div className = "items-center justify-center w-64 h-64 px-2">
                 <img src={imageSrc} alt={title} />
-            </div>
+            </div> */}
         </div>
     );
 };

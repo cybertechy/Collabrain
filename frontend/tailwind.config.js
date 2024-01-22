@@ -11,6 +11,7 @@ module.exports = {
             poppins: ["Poppins", "sans-serif"],
         },
         extend: {
+            scrollbar: ['rounded'],
             height: {
                 '13': '3.25rem', // 52px if 1rem = 16px
               },
@@ -26,6 +27,9 @@ module.exports = {
                 tertiary: "#C58AFF",
                 unselected: "#9DA5AF",
                 kindagrey: "#F5F5F5",
+                foldergrey: "#F0F4F9",
+                kindablack: "#1f1f1f",
+                littlelessblack: "#5e5e5e",
             },
             backgroundImage: {
                 "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
@@ -34,5 +38,9 @@ module.exports = {
             },
         },
     },
-    plugins: [],
+    plugins: [
+       
+    require('tailwind-scrollbar')
+  
+    ],
 };

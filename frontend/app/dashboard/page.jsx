@@ -4,10 +4,6 @@ const fb = require("_firebase/firebase"); // Import the authentication functions
 const socket = require("_socket/socket");
 const { useRouter } = require('next/navigation');
 const { useEffect , useState} = require("react");
-const fb = require("_firebase/firebase"); // Import the authentication functions
-const socket = require("_socket/socket");
-const { useRouter } = require('next/navigation');
-const { useEffect , useState} = require("react");
 const axios = require("axios");
 import Sidebar from "../../components/ui/sidebar/sidebar";
 import Navbar from "../../components/ui/navbar/navbar";
@@ -21,10 +17,6 @@ export default function Dashboard() {
     const router = useRouter();
 	const [user, loading] = fb.useAuthState();
 
-
-    const typeItems = ['Type 1', 'Type 2', 'Type 3'];
-    const peopleItems = ['Person 1', 'Person 2', 'Person 3'];
-    const modifiedItems = ['Date 1', 'Date 2', 'Date 3'];
 	let sock_cli;
 	useEffect(() =>
 	{
@@ -83,7 +75,7 @@ export default function Dashboard() {
 
 
 	return (
-        <div className="flex flex-col h-screen bg-gray-100 ">
+        <div className="flex flex-col h-screen bg-white ">
         <div className="flex flex-grow overflow-hidden">
             <Sidebar />
             <div className="flex-grow flex flex-col">
@@ -93,19 +85,13 @@ export default function Dashboard() {
                  
                    
                 </div>
-                <div className="px-4 py-2 ">
-                        <div className="flex content-start items-start w-full justify-start space-x-8">
-                            <DropdownDashboard title="Type" items={typeItems} hasBorders={true} />
-                            <DropdownDashboard title="People" items={peopleItems} hasBorders={true} />
-                            <DropdownDashboard title="Modified" items={modifiedItems} hasBorders={true} />
-                        </div>
-                    </div>
+                
                 {/* Content area */}
-                <div className="flex-grow p-4 flex flex-col">
+                <div classNa2e="flex-grow p-4 flex flex-col">
                 <div> 
                 <p className="text-2xl text-left text-primary ml-4 mb-4" >Folders</p>
                 
-                <div className="flex flex-wrap content-start items-start w-full justify-start gap-8">
+                <div className="flex flex-wrap content-start items-start w-full justify-start ml-4 gap-8 ">
                 <DashboardFolder title="Folder 1" folder="folder1" onClick={() => {}} />
                 <DashboardFolder title="Folder 1" folder="folder1" onClick={()=>{}} />
                 <DashboardNewFolder onClick={()=>{}} />
@@ -114,18 +100,46 @@ export default function Dashboard() {
                  <div> 
 
         <p className="text-2xl text-left text-primary ml-4 mb-4 mt-5">Projects</p>
-        
-        <div className="flex flex-wrap gap-4 justify-start">
-            <DashboardProjectButton title="Project 1" project="project1" type="Mind Map" onClick={()=>{}} imageSrc="/assets/images/imagenotFound.jpg" />
-            <DashboardProjectButton title="Project 2" project="project2" type="Document" onClick={()=>{}} imageSrc="/assets/images/imagenotFound.jpg" />
-            <DashboardProjectButton title="Project 3" project="project3" type="Mind Map" onClick={()=>{}} imageSrc="/assets/images/imagenotFound.jpg" />
-            <DashboardProjectButton title="Project 4" project="project4" type="Document" onClick={()=>{}} imageSrc="/assets/images/imagenotFound.jpg" />
-            <DashboardProjectButton title="Project 5" project="project5" type="Document" onClick={()=>{}} imageSrc="/assets/images/imagenotFound.jpg" />
-            {/* <DashboardProjectButton title="Project 6" project="project6" type="Document" onClick={()=>{}} imageSrc="/assets/images/imagenotFound.jpg" />
-            <DashboardProjectButton title="Project 7" project="project7" type="Document" onClick={()=>{}} imageSrc="/assets/images/imagenotFound.jpg" />
-            <DashboardProjectButton title="Project 8" project="project8" type="Mind Map" onClick={()=>{}} imageSrc="/assets/images/imagenotFound.jpg" />
-            <DashboardProjectButton title="Project 9" project="project9" type="Mind Map" onClick={()=>{}} imageSrc="/assets/images/imagenotFound.jpg" /> */}
-        </div>
+        <div className="scrollbar-thin scrollbar-thumb-primary  overflow-y-scroll pr-28" style={{ maxHeight: "400px" }}>
+  <div className="flex flex-wrap gap-4 ml-4 justify-start"> 
+  <DashboardProjectButton title="Project 1" project="project1" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 2" project="project2" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 3" project="project3" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 4" project="project4" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 5" project="project5" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 6" project="project6" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 7" project="project7" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 8" project="project8" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 9" project="project9" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 1" project="project1" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 2" project="project2" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 3" project="project3" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 4" project="project4" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 5" project="project5" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 6" project="project6" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 7" project="project7" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 8" project="project8" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 9" project="project9" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 1" project="project1" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 2" project="project2" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 3" project="project3" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 4" project="project4" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 5" project="project5" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 6" project="project6" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 7" project="project7" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 8" project="project8" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 9" project="project9" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 1" project="project1" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 2" project="project2" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 3" project="project3" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 4" project="project4" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 5" project="project5" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 6" project="project6" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 7" project="project7" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 8" project="project8" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 9" project="project9" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+</div>
+</div>
     </div>
 </div>
             </div>

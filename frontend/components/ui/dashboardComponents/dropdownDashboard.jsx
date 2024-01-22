@@ -18,15 +18,16 @@ const DropdownDashboard = ({ title, items, hasBorders = false }) => {
             </button>
             {/* Dropdown Content */}
             {isDropdownVisible && (
-                <div className={`absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50 ${animationClass}`}> {/* Adjusted z-index here */}
+                <div className={`absolute left-0 mt-2 w-auto bg-white rounded-md shadow-lg z-50 ${animationClass}`}> {/* Adjusted z-index here and set width to auto */}
                     {/* Dropdown Items */}
-                    <ul className="py-2 z-50">
+                    <ul className="py-1 z-50"> {/* Adjusted padding */}
                         {items.map((item, index) => (
                             <li 
                                 key={index} 
-                                className="px-4 py-2 text-primary hover:bg-primary hover:text-white rounded-sm"
+                                onClick = {item.onClick}
+                                className="px-1 py-1 text-primary hover:bg-primary hover:text-white rounded-sm" /* Adjusted padding */
                             >
-                                {item}
+                                {item.name}
                             </li>
                         ))}
                     </ul>

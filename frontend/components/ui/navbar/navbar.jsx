@@ -33,7 +33,7 @@ const Navbar = () => {
         <>
             <nav className="bg-purple-600 p-4 flex items-center justify-between">
                 <div className="flex-grow flex justify-center items-center mx-16">
-                    <SearchBar />
+                    {/* <SearchBar /> */}
                 </div>
                 <div className="flex items-center space-x-10">
                     <EmojiEventsIcon

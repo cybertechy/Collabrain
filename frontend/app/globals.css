@@ -90,3 +90,16 @@ body {
 .dropdown-enter {
   animation: slideDown 0.3s ease-out forwards;
 }
+
+/* .scrollbar-thin {
+  scrollbar-width: thin;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scrollbar-thumb-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #972FFF;
+  border-radius: 10px;
+} */
