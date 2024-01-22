@@ -1,17 +1,22 @@
+
 "use client";
 
-const { isAuth, emailSignIn, serviceSignIn } = require("_firebase/auth"); // Import the authentication functions
+const fb = require("_firebase/firebase"); // Import the authentication functions
 const { useRouter } = require("next/navigation");
-import Button from "../components/ui/button";
-import GoogleIcon from "../public/assets/svg/google.svg";
-import MicrosoftIcon from "../public/assets/svg/microsoft.svg";
-import AppleIcon from "../public/assets/svg/apple.svg";
+import Button from "../components/ui/button/button";
+import GoogleIcon from "../public/assets/svg/socials/google.svg";
+import MicrosoftIcon from "../public/assets/svg/socials/microsoft.svg";
+import AppleIcon from "../public/assets/svg/socials/apple.svg";
 import PasswordInput from "../components/ui/input/passwordinput";
 import EmailInputField from "../components/ui/input/emailinput";
+import { ToastContainer, toast } from 'react-toastify';
 import { useEffect, useState } from 'react';
 export default function Home() {
+    const [user, loading]  = fb.useAuthState();
     const router = useRouter();
     const [backgroundLoaded, setBackgroundLoaded] = useState(false);
+    const [email, setemail] = useState("");
+    const [password, setpassword] = useState("");
 
     useEffect(() => {
         // Preload the background image
@@ -27,7 +32,7 @@ export default function Home() {
             document.body.classList.remove('custom-background');
         };
     }, []);
-    if (isAuth()) {
+    if (user) {
         router.push("/dashboard"); // Redirect to dashboard
         return null; // Prevents rendering the rest of the component
     }
@@ -38,9 +43,27 @@ export default function Home() {
             </div>
         );
     }
+    const formSignin =  async (event) => {
+        event.preventDefault();
+        let result = await emailSignIn(email, password);
+        if(!result.success) {
+            toast.error(result.error,{
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                theme: "colored",
+            });
+        } else {
+            router.push("/dashboard");
+        }
+    };
+
     return (
-        <div>
-            <div className="justify-center items-center flex flex-col">
+        <div className="w-full md:w-3/4 lg:w-1/2 mx-auto">
+            <ToastContainer />
+            <div className="justify-center items-center flex flex-col min-h-screen">
                 <img
                     className="w-28 "
                     src=".//assets/images/logo_whitebackground.png"
@@ -55,33 +78,34 @@ export default function Home() {
 
                     <br />
                     <form
-                        onSubmit={emailSignIn}
+                        onSubmit={fb.emailSignIn}
                         style={{ textAlign: "center" }}
                     >
-                        <EmailInputField placeholder="Email Address" color = "tertiary" />
+                        <EmailInputField email={email} setEmail={setemail} placeholder="Email Address" color="tertiary" />
                         <br />
-                        <PasswordInput color = "tertiary"/>
+                        <PasswordInput password={password} setPassword={setpassword} color="tertiary" />
+                     
                         <br />
                         <p className="text-xs text-gray-600 font-poppins text-left ml-2">
-                            <a href = "">Forgot your password?</a>
+                            <a href="">Forgot your password?</a>
                         </p>
                         <Button
                             text="Log In"
                             color="primary"
-                            onClick={emailSignIn}
+                            onClick={fb.emailSignIn}
                         />
                         <hr className="border-t-1 border-solid border-gray-400"></hr>
                     </form>
 
                     <span className="">
                         <button
-                            onClick={() => serviceSignIn("google")}
+                            onClick={() => fb.serviceSignIn("google")}
                             className="bg-white py-1 px-1 rounded-full m-5"
                         >
                             <GoogleIcon className="h-8 w-8 text-gray-500"></GoogleIcon>
                         </button>
                         <button
-                            onClick={() => serviceSignIn("microsoft")}
+                            onClick={() => fb.serviceSignIn("microsoft")}
                             className="bg-white py-1 px-1 rounded-full m-5"
                         >
                             <MicrosoftIcon className="h-8 w-8 text-gray-500"></MicrosoftIcon>
@@ -90,12 +114,15 @@ export default function Home() {
                             <AppleIcon className="h-8 w-8 text-gray-500"></AppleIcon>
                         </button>
                     </span>
-                     <p className="text-xs text-gray-600 font-poppins text-left ml-2">
-                            Need an account?<a href = "/register" className="underline"> SIGN UP</a>
-                        </p>
+                    <p className="text-xs text-gray-600 font-poppins text-left ml-2">
+                        Need an account?
+                        <a href="/register" className="underline">
+                            {" "}
+                            SIGN UP
+                        </a>
+                    </p>
                 </div>
             </div>
-            
         </div>
     );
 }

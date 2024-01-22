@@ -10,7 +10,7 @@ const Button = ({ text, color, withShadow = false, Icon, onClick }) => (
     <button
         className={`${
             colorClasses[color]
-        } px-24 py-4 rounded-sm font-poppins text-md my-4 font-medium ${
+        } px-24 py-4 rounded-sm font-poppins text-md my-4 font-medium${
             withShadow ? "shadow-primary drop-shadow-md" : ""
         }`}
         onClick={onClick}

@@ -42,8 +42,7 @@ const theme = createTheme({
     },
 });
 
-const EmailInputField = ({ placeholder, color }) => {
-    const [email, setEmail] = useState("");
+const EmailInputField = ({ placeholder, color, email, setEmail }) => {
     const [error, setError] = useState(false);
     const backgroundColorClass = colorClasses[color] || colorClasses.primary;
 
@@ -86,6 +85,8 @@ const EmailInputField = ({ placeholder, color }) => {
 EmailInputField.propTypes = {
     placeholder: PropTypes.string.isRequired,
     color: PropTypes.oneOf(["primary", "secondary", "tertiary"]),
+    email: PropTypes.string.isRequired,
+    setEmail: PropTypes.func.isRequired,
 };
 
 export default EmailInputField;

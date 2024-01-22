@@ -67,9 +67,8 @@ const theme = createTheme({
     },
 });
 
-const PasswordInput = ({ isConfirm, color }) => {
+const PasswordInput = ({ isConfirm, color, password, setPassword }) => {
     const [showPassword, setShowPassword] = useState(false);
-    const [password, setPassword] = useState("");
     const [error, setError] = useState(false);
     const backgroundColorClass = colorClasses[color] || colorClasses.primary;
     const validatePassword = (value) => {
@@ -98,7 +97,11 @@ const PasswordInput = ({ isConfirm, color }) => {
 
     return (
         <ThemeProvider theme={theme}>
-            <FormControl sx={{ m: 1, width: "37ch" }} variant="outlined" className={backgroundColorClass}>
+            <FormControl
+                sx={{ m: 1, width: "37ch" }}
+                variant="outlined"
+                className={backgroundColorClass}
+            >
                 <InputLabel htmlFor="outlined-adornment-password">
                     {isConfirm ? "Confirm Password" : "Password"}
                 </InputLabel>
@@ -145,5 +148,7 @@ const PasswordInput = ({ isConfirm, color }) => {
 PasswordInput.propTypes = {
     isConfirm: PropTypes.bool,
     color: PropTypes.oneOf(["primary", "secondary", "tertiary"]),
+    password: PropTypes.string.isRequired,
+    setPassword: PropTypes.func.isRequired,
 };
 export default PasswordInput;
