@@ -79,7 +79,7 @@ const Sidebar = (teams = {}) => {
                 </div>
                 <hr className="border-t-1 mx-4 border-solid border-gray-400 opacity-30"></hr>
                 {/* Navigation items */}
-                <nav className="flex flex-col p-4">
+             <nav className="flex flex-col p-4">
                     <SidebarButtonIcon
                         key={"New Project"}
                         text={"New Project"}

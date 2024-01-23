@@ -50,10 +50,7 @@ const Navbar = () => {
                         className="cursor-pointer"
                         style={{ color: "white" }}
                     />
-                    <SettingsIcon
-                        className="cursor-pointer"
-                        style={{ color: "white" }}
-                    />
+                   
                 </div>
             </nav>
 
