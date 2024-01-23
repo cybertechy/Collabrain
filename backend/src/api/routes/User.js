@@ -48,8 +48,18 @@ router.get("/:user", async (req, res) =>
 router.post("/", (req, res) =>
 {
 	// Make sure all required fields are present
-	if (!req.body.email || !req.body.fname || !req.body.lname || !req.body.username || !req.body.photo)
+	if (!req.body.email || !req.body.fname || !req.body.lname || !req.body.photo || !req.body.uid)
 		return res.status(400).json({ error: "Missing required data" });
+
+	// Check if user already exists
+	let users = fb.db.collection("users").where("email", "==", req.body.email);
+	if (users.length > 0)
+		return res.status(400).json({ error: "User already exists" });
+
+	// Check if username is taken
+	users = fb.db.collection("users").where("username", "==", req.body.username);
+	if (users.length > 0)
+		return res.status(400).json({ error: "Username already taken" });
 
 	// Add user to database
 	fb.db.doc(`users/${req.body.uid}`).set(
@@ -57,7 +67,7 @@ router.post("/", (req, res) =>
 			email: req.body.email,
 			fname: req.body.fname,
 			lname: req.body.lname,
-			username: req.body.username,
+			username: null,
 			photo: req.body.photo,
 			bio: "",
 			teams: [],
@@ -106,6 +116,17 @@ router.delete("/:user", async (req, res) =>
 		.then(() => { return res.json({ message: "User deleted" }); })
 		.catch(err => { return res.status(500).json({ error: err }); });
 
+});
+
+// Check if username is taken
+router.get("/username/:username", async (req, res) =>
+{
+	// Check if username is taken
+	let users = fb.db.collection("users").where("username", "==", req.params.username);
+	if (users.length > 0)
+		return res.status(400).json({ error: "Username already taken" });
+
+	return res.json({ message: "Username available" });	
 });
 
 /************************************************************/
