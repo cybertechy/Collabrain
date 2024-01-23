@@ -10,7 +10,7 @@ const http = require('http');
 const chatRoute = require("./api/routes/Chat");
 const teamsRoute = require("./api/routes/Teams");
 const userRoute = require("./api/routes/User");
-
+const dashboardRoute = require("./api/routes/Dashboard");
 // Helpers
 const sockServer = require("./api/helpers/socket");
 
@@ -27,6 +27,7 @@ app.use(cors());
 app.use("/api/chats", chatRoute);
 app.use("/api/teams",teamsRoute);
 app.use("/api/users",userRoute);
+app.use("/api/dashboard", dashboardRoute);
 
 app.get("/api/home", (req, res) =>
 {
