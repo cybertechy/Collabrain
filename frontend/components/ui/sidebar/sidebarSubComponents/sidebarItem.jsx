@@ -2,8 +2,9 @@ import Link from "next/link";
 import PropTypes from "prop-types";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { useState, useEffect } from "react";
+import {Tooltip}  from '@mui/material';
 
-const SidebarItem = ({ href, icon: Icon, text, isSelected= false, isExpanded =true }) => {
+const SidebarItem = ({ href, icon: Icon, text = "", isSelected= false, isExpanded =true }) => {
     const itemClasses = isSelected ? "text-primary" : "text-unselected";
     const [showChevron, setShowChevron] = useState(false);
 
@@ -22,6 +23,12 @@ const SidebarItem = ({ href, icon: Icon, text, isSelected= false, isExpanded =tr
     }, [isExpanded]);
 
     return (
+        <Tooltip
+            title={text}
+            enterDelay={1000}
+            leaveDelay={200}
+          
+        >
         <Link href={href}>
             <div
                 className={`flex w-64 items-center p-2 my-2 transition-colors duration-200 justify-start cursor-pointer ${isExpanded &&"hover:bg-gray-200"}`}
@@ -51,6 +58,7 @@ const SidebarItem = ({ href, icon: Icon, text, isSelected= false, isExpanded =tr
                 )}
             </div>
         </Link>
+        </Tooltip>
     );
 };
 

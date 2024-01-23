@@ -1,9 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { IconButton } from '@mui/material';
+import { IconButton, Menu, MenuItem,  Tooltip } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import EditIcon from '@mui/icons-material/Edit'; // Icon for Rename
+import ShareIcon from '@mui/icons-material/Share'; // Icon for Share
+import SortIcon from '@mui/icons-material/Sort'; // Icon for Organize
+import DeleteIcon from '@mui/icons-material/Delete'; // Icon for Delete
 
-const DashboardProjectButton = ({ title, project, type, color="white", onClick }) => {
+const DashboardProjectButton = ({ title, project, type, color = "white", onClick }) => {
+    const [anchorEl, setAnchorEl] = useState(null);
+    const open = Boolean(anchorEl);
+
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
     const truncateTitle = (title, maxLength = 12) => {
         if (title.length > maxLength) {
             return title.substring(0, maxLength - 3) + '..';
@@ -24,17 +38,46 @@ const DashboardProjectButton = ({ title, project, type, color="white", onClick }
     );
 
     return (
+        <Tooltip
+            title={title}
+            enterDelay={1000}
+            leaveDelay={200}
+          
+        >
         <div className="flex flex-col items-center justify-center bg-tertiary rounded-xl hover:opacity-80 duration-300 w-32 h-28 pt-3 pl-1">
             <div className="flex flex-col items-center justify-center h-full">
                 {type === 'Document' ? doc() : map()}
                 <div className="flex flex-row justify-between items-center w-full mt-2">
                     <span className="text-lg font-semibold">{truncateTitle(title)}</span>
-                    <IconButton color="inherit" className="ml-2">
-                        <MoreVertIcon fontSize="small" />
-                    </IconButton>
-                </div>
+                    <IconButton color="inherit" onClick={handleClick} className="ml-2">
+                <MoreVertIcon fontSize="small" />
+            </IconButton>
+            <Menu
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleClose}
+            >
+                <MenuItem onClick={handleClose}>
+                    <EditIcon fontSize="small text-tertiary" className="mr-2 text-tertiary flex justify-between gap-5" />
+                    <span className='text-tertiary'>Rename</span>
+                </MenuItem>
+                <MenuItem onClick={handleClose}>
+                    <ShareIcon fontSize="small text-tertiary" className="mr-2  text-tertiary flex justify-between gap-5" />
+                    <span className='text-tertiary'>Share</span> 
+                </MenuItem>
+                <MenuItem onClick={handleClose}>
+                    <SortIcon fontSize="small text-tertiary" className="mr-2  text-tertiary flex justify-between gap-5" />
+                    <span className='text-tertiary'>Organize</span>
+                </MenuItem>
+                <MenuItem onClick={handleClose}>
+                    <DeleteIcon fontSize="small text-tertiary" className="mr-2  text-tertiary flex justify-between gap-5" />
+                    <span className='text-tertiary'>Delete</span>
+                </MenuItem>
+            </Menu>
+        </div>
             </div>
         </div>
+        </Tooltip>
     );
 };
 

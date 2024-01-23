@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-
+import {Tooltip}  from '@mui/material';
 const colorClasses = {
     primary: "bg-primary",
     secondary: "bg-secondary",
@@ -14,6 +14,12 @@ const SidebarButtonIcon = ({
     onClick,
     isExpanded,
 }) => (
+    <Tooltip
+            title={text}
+            enterDelay={1000}
+            leaveDelay={200}
+          
+        >
     <button
         className={`${
             colorClasses[color]
@@ -39,6 +45,7 @@ const SidebarButtonIcon = ({
         
         )}
     </button>
+    </Tooltip>
 );
 
 SidebarButtonIcon.propTypes = {
