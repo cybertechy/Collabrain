@@ -21,8 +21,10 @@ export default function Register() {
     const [lastname, setlastname] = useState("");
 	useEffect(() =>
 	{
-		if (user)
+		if (user){
 			sock_cli = socket.init('http://localhost:8080');
+        console.log(sock_cli)
+        }
 	}, [user]);
     useEffect(() => {
         // Preload the background image

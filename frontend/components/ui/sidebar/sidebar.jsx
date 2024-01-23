@@ -82,7 +82,7 @@ const Sidebar = (teams = {}) => {
                         withShadow={true}
                         onClick={() => router.push("/new-project")}
                         Icon={() => (
-                            <PlusIcon className="h-5 w-5 text-white"></PlusIcon>
+                            <PlusIcon fontSize = "medium"className="pt-3 pb-3 pl-5  text-white"></PlusIcon>
                         )}
                         isExpanded={isOpen}
                     />
