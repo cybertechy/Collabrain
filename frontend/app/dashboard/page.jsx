@@ -15,6 +15,7 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import FolderIcon from '@mui/icons-material/Folder';
 import MapIcon from '@mui/icons-material/Map';
 import ContextMenu from "../../components/ui/contextMenu/contextMenu";
+import UsernameOverlay from "../../components/ui/usernameOverlay/usernameOverlay";
 export default function Dashboard() {
    
     const contextMenuOptions = [
@@ -23,6 +24,15 @@ export default function Dashboard() {
         ,{text:"New Document", icon: <DescriptionIcon/>,onClick:()=>{} }
         
     ];
+    const [isUsernameOverlayOpen, setIsUsernameOverlayOpen] = useState(true);
+
+    const openUsernameOverlay = () => {
+      setIsUsernameOverlayOpen(true);
+    };
+  
+    const closeUsernameOverlay = () => {
+      setIsUsernameOverlayOpen(false);
+    };
     const [contextMenuVisible, setContextMenuVisible] = useState(false);
     const [teams, setTeams] = useState([]); 
     const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
@@ -94,8 +104,10 @@ export default function Dashboard() {
 	{ console.log(loading);
         console.log(user);
 		if (user){
+            
 			sock_cli = socket.init('http://localhost:8080');
             fetchTeams();
+
            
         }
 	}, [user]);
@@ -121,6 +133,7 @@ export default function Dashboard() {
 
     // NOTE: Not finished
     // Needs to be tested with backend
+
 
    
     let currentDoc;
@@ -164,7 +177,7 @@ export default function Dashboard() {
 	return (
     
         <div className="flex flex-col h-screen bg-white ">
-            
+         
         <div className="flex flex-grow overflow-hidden">
             <Sidebar />
             <div className="flex-grow flex flex-col">
@@ -184,8 +197,9 @@ export default function Dashboard() {
         onClose={handleCloseContextMenu}
         menuOptions = {contextMenuOptions}
       />
+      
                 <div> 
-                <p className="text-2xl text-left text-primary ml-4 mb-4" >Folders</p>
+                <p className="text-2xl text-left text-primary ml-4 mb-4"  >Folders</p>
                 
                 <div className="flex flex-wrap content-start items-start w-full justify-start ml-4 gap-8 ">
                 <DashboardFolder title="Folder 1" folder="folder1" onClick={() => {}} />
@@ -240,6 +254,7 @@ export default function Dashboard() {
 </div>
             </div>
         </div>
+        {/* { (user && !user.username)  && <UsernameOverlay isOpen = {isUsernameOverlayOpen} onClose={closeUsernameOverlay}/>} */}
         </div>
     );
     }
