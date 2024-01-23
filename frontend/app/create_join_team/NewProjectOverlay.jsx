@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import CloseIcon from '@mui/icons-material/Close';
  
 const NewProjectOverlay =() =>{
   const [modalVisible, setModalVisible] = useState(true);
@@ -39,7 +38,7 @@ return (
         <div className="w-2/4 h-3/5 shadow-lg bg-white rounded-md "> 
             <div className="bg-[url('./pics/bgDesign.png')] w-full h-full bg-contain bg-no-repeat bg-left">
                   <div className="flex justify-end">
-                  <button className=' bg-transparent border-none text-25 cursor-pointer pr-2 pt-2' onClick={setOpenModal}><CloseIcon fontsize="large"/></button>
+                  <button className=' bg-transparent border-none text-25 cursor-pointer pr-2 pt-2' onClick={setOpenModal}>X</button>
                   </div>
                   <div className=" text-center mt-24 flex justify-center">
                     <p className='text-2xl block text-center font-light'>Choose the type of project you would like to create</p>
