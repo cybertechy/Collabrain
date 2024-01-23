@@ -19,6 +19,7 @@ import { useEffect } from "react";
 import TeamOverlay from "../create_join_team/TeamOverlay"
 // Define the sidebar navigation items
 import { usePathname } from "next/navigation";
+import NewProjectOverlay from "../create_join_team/NewProjectOverlay";
 const navigationItems1 = [
     { name: "My Brain", href: "/dashboard", icon: FolderIcon },
     { name: "Shared With Me", href: "/shared-with-me", icon: PeopleIcon },
@@ -34,10 +35,13 @@ const Sidebar = (teams = {}) => {
     const router = useRouter();
     const [isOpen, setIsOpen] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false); 
+    const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
     const toggleModal = () => { // Define toggleModal function
         setIsModalOpen(!isModalOpen);
     };
-
+    const toggleProjectModal = () => { 
+        setIsProjectModalOpen(!isProjectModalOpen);
+    };
     const toggleSidebar = () => {
         setIsOpen(!isOpen);
     };
@@ -85,7 +89,7 @@ const Sidebar = (teams = {}) => {
                         text={"New Project"}
                         color="primary"
                         withShadow={true}
-                        onClick={() => router.push("/new-project")}
+                        onClick={toggleProjectModal}
                         Icon={() => (
                             <AddIcon fontSize = "medium" className="  text-white"></AddIcon>
                         )}
@@ -125,6 +129,7 @@ const Sidebar = (teams = {}) => {
             />
 
 {isModalOpen && <TeamOverlay toggleModal={ toggleModal} modalVisible= {isModalOpen} />}
+{isProjectModalOpen && <NewProjectOverlay toggleModal={ toggleProjectModal} modalVisible= {isProjectModalOpen} />}
                        {/* {teams.map(team => (
                     <SidebarItem
                         key={team.name}
