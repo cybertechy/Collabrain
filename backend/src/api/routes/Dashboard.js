@@ -23,7 +23,6 @@ router.post("/folder", async (req, res) =>
 	// Create new folder
 	fb.db.collection(`users/${user.uid}/folders/`).add({
 		name: req.body.name,
-		createdAt: fb.admin.firestore.FieldValue.serverTimestamp(),
 	})
 		.then(ref => res.status(200).json({ message: "Folder created", folderID: ref.id }))
 		.catch((err) => res.status(500).json({ error: err }));
@@ -220,8 +219,6 @@ router.get("/:folder/files", async (req, res) =>
 		files.push({
 			id: folder.contentMaps[i],
 			name: file.name,
-			updatedAt: file.updatedAt.toDate(),
-			createdAt: file.createdAt.toDate(),
 			type: "contentmap"
 		});
 	}
@@ -237,8 +234,6 @@ router.get("/:folder/files", async (req, res) =>
 		files.push({
 			id: folder.documents[i],
 			name: file.name,
-			updatedAt: file.updatedAt.toDate(),
-			createdAt: file.createdAt.toDate(),
 			type: "document"
 		});
 	}
@@ -284,8 +279,6 @@ router.get("/files", async (req, res) =>
 		files.push({
 			id: contentMapsIds[i],
 			name: file.name,
-			updatedAt: file.updatedAt.toDate(),
-			createdAt: file.createdAt.toDate(),
 			type: "contentmap"
 		});
 	}
