@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 const fb = require("../../../app/_firebase/firebase");
 import axios from 'axios';
-
+import { toast } from 'react-toastify';
+        import 'react-toastify/dist/ReactToastify.css';
     const UsernameOverlay = ({ isOpen, onClose }) => {
         const [username, setUsername] = useState('');
         const [error, setError] = useState('');
@@ -40,11 +41,12 @@ import axios from 'axios';
 
         const handleSave = async () => {
             if (error !== "Username is available" || !username) {
+                toast.error(error);
               return;
             }
         
             try {
-              // Make a PATCH request to update the user's username
+             
               const response = await axios.patch('http://localhost:8080/api/users', { username }, {
                 headers: {
                   Authorization: `Bearer ${await fb.getToken}`

@@ -104,7 +104,7 @@ export default function Dashboard() {
 	{ console.log(loading);
         console.log(user);
 		if (user){
-            
+            // fb.signOut(); //using this to sign out temporarily
 			sock_cli = socket.init('http://localhost:8080');
             fetchTeams();
 
@@ -215,7 +215,7 @@ export default function Dashboard() {
   <DashboardProjectButton title="Project 1" project="project1" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
     <DashboardProjectButton title="Project 2" project="project2" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
     <DashboardProjectButton title="Project 3" project="project3" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
-    <DashboardProjectButton title="Project 4" project="project4" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="A Very Long Project Title" project="project4" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
     <DashboardProjectButton title="Project 5" project="project5" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
     <DashboardProjectButton title="Project 6" project="project6" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
     <DashboardProjectButton title="Project 7" project="project7" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
@@ -247,14 +247,15 @@ export default function Dashboard() {
     <DashboardProjectButton title="Project 6" project="project6" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
     <DashboardProjectButton title="Project 7" project="project7" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
     <DashboardProjectButton title="Project 8" project="project8" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
-    <DashboardProjectButton title="Project 9" project="project9" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="dasd" project="project9" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
 </div>
 </div>
     </div>
 </div>
             </div>
         </div>
-        { (user && !user.username)  && <UsernameOverlay isOpen = {isUsernameOverlayOpen} onClose={closeUsernameOverlay}/>}
+        {/* uncomment the below for username popup when the server can be used */}
+        {/* { (user && !user.username)  && <UsernameOverlay isOpen = {isUsernameOverlayOpen} onClose={closeUsernameOverlay}/>} */}
         </div>
     );
     }
