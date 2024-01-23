@@ -12,16 +12,90 @@ import DashboardFolder from "../../components/ui/dashboardComponents/dashboardFo
 import DropdownDashboard from '../../components/ui/dashboardComponents/dropdownDashboard'; // Adjust the import path as needed
 import DashboardNewFolder from '../../components/ui/dashboardComponents/dashboardNewFolder';
 import DashboardProjectButton from '../../components/ui/dashboardComponents/dashboardProjectButton';
-
+import DescriptionIcon from '@mui/icons-material/Description';
+import FolderIcon from '@mui/icons-material/Folder';
+import MapIcon from '@mui/icons-material/Map';
+import ContextMenu from "../../components/ui/contextMenu/contextMenu";
 export default function Dashboard() {
+   
+    const contextMenuOptions = [
+        {text:"New Folder", icon: <FolderIcon/>,onClick:()=>{} },
+        {text:"New Map", icon: <MapIcon/>,onClick:()=>{console.log("new map to be made")}} 
+        ,{text:"New Document", icon: <DescriptionIcon/>,onClick:()=>{} }
+        
+    ];
+    const [contextMenuVisible, setContextMenuVisible] = useState(false);
+    const [teams, setTeams] = useState([]); 
+    const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
+    const handleClickOutside = (event) => {
+        if (contextMenuVisible) {
+            const menuElement = document.querySelector('.context-menu');
+            const clickedInsideMenu = menuElement && menuElement.contains(event.target);
+    
+            if (!clickedInsideMenu) {
+                setContextMenuVisible(false);
+            }
+        }
+    };
+    
+
+    // Add event listener on mount and remove on unmount
+    useEffect(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [contextMenuVisible]);
+    const handleContextMenu = (e) => {
+      e.preventDefault(); // Prevent the default right-click context menu
+      const xPos = e.clientX;
+      const yPos = e.clientY;
+      setContextMenuPosition({ x: xPos, y: yPos });
+      setContextMenuVisible(true);
+    };
+  
+    const handleCloseContextMenu = () => {
+      setContextMenuVisible(false);
+    };
     const router = useRouter();
 	const [user, loading] = fb.useAuthState();
+
+    const fetchTeams = async () => {
+        try {
+            const token = await fb.getToken();
+            // console.log("Token: ", token); 
+            const response = await axios.get('http://localhost:8080/api/profile/', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+    
+            console.log("Response: ", response);
+            if (response.status === 200) {
+                setTeams(response.data.teams); 
+            } else {
+                console.error('Failed to fetch team data', response.status);
+            }
+        } catch (error) {
+            console.error('Error fetching team data:', error);
+            
+        }
+    };
+    
+
+    // useEffect(() => {
+    //     if (user) {
+            
+    //     }
+    // }, [user]);
+
 
 	let sock_cli;
 	useEffect(() =>
 	{
 		if (user)
 			sock_cli = socket.init('http://localhost:8080');
+            fetchTeams();
 	}, [user]);
 
 	if (loading)
@@ -36,6 +110,7 @@ export default function Dashboard() {
     // NOTE: Not finished
     // Needs to be tested with backend
 
+   
     let currentDoc;
 
     const createDoc = async () => {
@@ -86,8 +161,15 @@ export default function Dashboard() {
                    
                 </div>
                 
-                {/* Content area */}
-                <div classNa2e="flex-grow p-4 flex flex-col">
+                {/* Main Content area */}
+                <div className="flex-grow p-4 flex flex-col" onContextMenu={handleContextMenu}>
+                <ContextMenu className="context-menu"
+        xPos={contextMenuPosition.x}
+        yPos={contextMenuPosition.y}
+        isVisible={contextMenuVisible}
+        onClose={handleCloseContextMenu}
+        menuOptions = {contextMenuOptions}
+      />
                 <div> 
                 <p className="text-2xl text-left text-primary ml-4 mb-4" >Folders</p>
                 

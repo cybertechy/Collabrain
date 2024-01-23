@@ -6,6 +6,7 @@ import Button from "../../components/ui/button/button";
 import InputField from "../../components/ui/input/input";
 import PasswordInput from "../../components/ui/input/passwordinput";
 import EmailInputField from "../../components/ui/input/emailinput";
+import UsernameInputField from "../../components/ui/input/usernameInput";
 import { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify'
 export default function Register() {
@@ -53,25 +54,7 @@ export default function Register() {
 			</div>
 		);
 	}
-	const formSignin =  async (event) => {
 
-        event.preventDefault();
-
-        let result = await fb.emailSignIn(email, password, confirmPassword, username, firstname, lastname);
-        if(!result.success) {
-            toast.error(result.error,{
-                position: "top-center",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                theme: "colored",
-            });
-            if(result.route) router.push(result.route)
-        } else {
-            router.push("/dashboard");
-        }
-    }
 
     return (
         <div className="flex items-center justify-center min-h-screen">
@@ -93,7 +76,7 @@ export default function Register() {
                         <InputField input={lastname} setinput={setlastname} placeholder="Last Name"  color="tertiary"/>
                         </div>
                         <div className="flex gap-4">
-							<InputField input={username} setinput={setusername} placeholder="Username"color="tertiary" />
+							<UsernameInputField username={username} setUsername={setusername} placeholder="Username"color="tertiary" />
                             <EmailInputField email={email} setEmail={setemail} placeholder="Email Address" color = "tertiary" />
                         </div>
                         <div className="flex gap-4">
@@ -110,7 +93,7 @@ export default function Register() {
 						<Button
                             text="Create Account"
                             color="primary"
-                            onClick={formSignin}
+                            onClick={fb.emailSignIn}
                             className="mt-4"
                         />
                     </form>

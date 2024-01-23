@@ -9,6 +9,7 @@ import MicrosoftIcon from "../public/assets/svg/socials/microsoft.svg";
 import AppleIcon from "../public/assets/svg/socials/apple.svg";
 import PasswordInput from "../components/ui/input/passwordinput";
 import EmailInputField from "../components/ui/input/emailinput";
+import GitHubIcon from '@mui/icons-material/GitHub';
 import { ToastContainer, toast } from 'react-toastify';
 import { useEffect, useState } from 'react';
 export default function Home() {
@@ -43,22 +44,7 @@ export default function Home() {
             </div>
         );
     }
-    const formSignin =  async (event) => {
-        event.preventDefault();
-        let result = await emailSignIn(email, password);
-        if(!result.success) {
-            toast.error(result.error,{
-                position: "top-center",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                theme: "colored",
-            });
-        } else {
-            router.push("/dashboard");
-        }
-    };
+    
 
     return (
         <div className="w-full md:w-3/4 lg:w-1/2 mx-auto">
@@ -97,7 +83,7 @@ export default function Home() {
                         <hr className="border-t-1 border-solid border-gray-400"></hr>
                     </form>
 
-                    <span className="">
+                    <span className="items-center justify-center flex flex-row">
                         <button
                             onClick={() => fb.serviceSignIn("google")}
                             className="bg-white py-1 px-1 rounded-full m-5"
@@ -111,7 +97,7 @@ export default function Home() {
                             <MicrosoftIcon className="h-8 w-8 text-gray-500"></MicrosoftIcon>
                         </button>
                         <button className="bg-white py-1 px-1 rounded-full m-5">
-                            <AppleIcon className="h-8 w-8 text-gray-500"></AppleIcon>
+                            <GitHubIcon fontSize = "large" className=" text-primary"/>
                         </button>
                     </span>
                     <p className="text-xs text-gray-600 font-poppins text-left ml-2">

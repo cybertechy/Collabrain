@@ -8,7 +8,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 const DashboardFolder = ({ title, folder, onClick }) => {
     // TODO: onClick(folder);
     return (
-        <div className="bg-tertiary2 text-white flex items-center justify-center rounded-xl w-min  pl-3 hover:opacity-80 duration-300">
+        <div className="bg-tertiary text-white flex items-center justify-center rounded-xl w-min  pl-3 hover:opacity-80 duration-300">
             
                 <FolderIcon  fontSize="large" className='' />
            

@@ -3,40 +3,41 @@ const { useRouter } = require("next/navigation");
 import SidebarButtonIcon from "./sidebarSubComponents/sidebarButton";
 import PlusIcon from "../../../public/assets/svg/sidebaricons/plusicon.svg";
 import FolderIcon from "@mui/icons-material/Folder";
+const fb = require("_firebase/firebase"); 
 import SidebarItem from "./sidebarSubComponents/sidebarItem";
 import PeopleIcon from "@mui/icons-material/People";
 import HistoryIcon from "@mui/icons-material/History";
 import StarRateIcon from "@mui/icons-material/StarRate";
+import ExploreIcon from '@mui/icons-material/Explore';
 import GroupsIcon from "@mui/icons-material/Groups";
 import ForumIcon from "@mui/icons-material/Forum";
-import CallIcon from "@mui/icons-material/Call";
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import { useState } from "react";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
-
+import { useEffect } from "react";
 // Define the sidebar navigation items
 import { usePathname } from "next/navigation";
 const navigationItems1 = [
     { name: "My Brain", href: "/dashboard", icon: FolderIcon },
     { name: "Shared With Me", href: "/shared-with-me", icon: PeopleIcon },
-    { name: "Recent", href: "/recent", icon: HistoryIcon },
-    { name: "Starred", href: "/starred", icon: StarRateIcon,  },
 ];
 
 const navigationItems2 = [
-    { name: "Teams", href: "/chat", icon: GroupsIcon },
-    { name: "Messages", href: "/messages", icon: ForumIcon },
-    { name: "Calls", href: "/calls", icon: CallIcon },
+    
+    { name: "Direct Messages", href: "/messages", icon: ForumIcon },
+   
 ];
 
-const Sidebar = () => {
+const Sidebar = (teams = {}) => {
     const router = useRouter();
     const [isOpen, setIsOpen] = useState(true);
-
+    
     const toggleSidebar = () => {
         setIsOpen(!isOpen);
     };
-    const pathname = usePathname(); // corrected from 'usePathname()'
+    const pathname = usePathname(); 
+    
     return (
         <aside
             className={`transition-all shadow-md h-screen pt-[height_of_navbar] z-10 duration-500 ease-in-out ${
@@ -81,7 +82,7 @@ const Sidebar = () => {
                         withShadow={true}
                         onClick={() => router.push("/new-project")}
                         Icon={() => (
-                            <PlusIcon className="h-4 w-4 text-gray-500"></PlusIcon>
+                            <PlusIcon className="h-5 w-5 text-white"></PlusIcon>
                         )}
                         isExpanded={isOpen}
                     />
@@ -106,6 +107,39 @@ const Sidebar = () => {
                             isExpanded={isOpen} // pass isOpen as isExpanded
                         />
                     ))}
+                                       <SidebarButtonIcon
+                        key={"New Team"}
+                        text={"New Team"}
+                        color="primary"
+                        withShadow={true}
+                        onClick={() => router.push("/new-project")}
+                        Icon={() => (
+                            <GroupAddIcon fontSize = "medium"className=" text-white"></GroupAddIcon>
+                        )}
+                        isExpanded={isOpen}
+                    />
+                       {/* {teams.map(team => (
+                    <SidebarItem
+                        key={team.name}
+                        href={`/team/${team.uid}`} // Assuming each team has a unique ID and a page
+                        icon={GroupsIcon} // You can use a default icon for teams
+                        text={team.name}
+                        isSelected={pathname === `/team/${team.uid}`}
+                        isExpanded={isOpen}
+                    />
+                ))} */}
+
+                                       <SidebarButtonIcon
+                        key={"Discover Teams"}
+                        text={"Discover Teams"}
+                        color="primary"
+                        withShadow={true}
+                        onClick={() => router.push("/new-project")}
+                        Icon={() => (
+                            <ExploreIcon fontSize = "medium"className=" text-white"></ExploreIcon>
+                        )}
+                        isExpanded={isOpen}
+                    />
                 </nav>
             </div>
         </aside>

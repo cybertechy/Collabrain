@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { useState, useEffect } from "react";
 
-const SidebarItem = ({ href, icon: Icon, text, isSelected, isExpanded }) => {
+const SidebarItem = ({ href, icon: Icon, text, isSelected= false, isExpanded =true }) => {
     const itemClasses = isSelected ? "text-primary" : "text-unselected";
     const [showChevron, setShowChevron] = useState(false);
 
@@ -62,9 +62,6 @@ SidebarItem.propTypes = {
     isExpanded: PropTypes.bool,
 };
 
-SidebarItem.defaultProps = {
-    isSelected: false,
-    isExpanded: true,
-};
+
 
 export default SidebarItem;
