@@ -113,4 +113,22 @@ const getFileBucket = async (fileName) =>
 	return bucket;
 }
 
-module.exports = { getBuckets, AddData, getData, getFileBucket, generateStreamFromString, generateStringFromStream };
+// delete data from a bucket using the mediaID (fileName)
+const deleteData = async (bucketName, mediaID) =>
+{
+	const request = {
+		namespaceName: "lrr6fvwwjb9p",
+		bucketName: bucketName,
+		objectName: mediaID
+	};
+	try
+	{
+		const response = await objectStorageClient.deleteObject(request);
+		return response;
+	} catch (error)
+	{
+		return { code: error.statusCode, error: error.message };
+	}
+}
+
+module.exports = { getBuckets, AddData, getData, getFileBucket, generateStreamFromString, generateStringFromStream, deleteData };
