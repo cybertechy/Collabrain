@@ -254,7 +254,7 @@ export default function Dashboard() {
 </div>
             </div>
         </div>
-        {/* { (user && !user.username)  && <UsernameOverlay isOpen = {isUsernameOverlayOpen} onClose={closeUsernameOverlay}/>} */}
+        { (user && !user.username)  && <UsernameOverlay isOpen = {isUsernameOverlayOpen} onClose={closeUsernameOverlay}/>}
         </div>
     );
     }

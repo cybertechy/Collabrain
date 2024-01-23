@@ -57,31 +57,28 @@ const UsernameInputField = ({ placeholder, color, username, setUsername }) => {
       setError(true);
       return;
     }
-  
 
     setLoading(true);
     setError(false);
-    // const token= await fb.getToken();
-    // try {
-    //   const response = await fetch(`http://localhost:8080/api/user/${enteredUsername}`, {
-    //   headers: {
-    //     'Authorization': `Bearer ${token}`, // Add token to request headers
-    //   },
-    // });
-    //   if (response.ok) {
-    //    toast.error("Username is taken");
-    //     setError(true);
-    //   } else if (response.status === 404) {
-    //     toast.success("Username is available");
-    //   } else {
-    //     throw new Error('Unable to check availability');
-    //   }
-    // } catch (error) {
-    //   toast.error("Error checking availability");
-    // } finally {
-    //   setLoading(false);
-    // }
+
+    try {
+      const response = await fetch(`http://localhost:8080/users/username/${enteredUsername}`, {
+      });
+      if (response.ok) {
+        toast.success("Username is available");
+      } else if (response.status === 400) {
+        toast.error("Username is taken");
+        setError(true);
+      } else {
+        throw new Error('Unable to check availability');
+      }
+    } catch (error) {
+      toast.error("Error checking availability");
+    } finally {
+      setLoading(false);
+    }
   };
+
 
   const debouncedCheck = useCallback(debounce(checkUsernameAvailability, 300), []);
 
