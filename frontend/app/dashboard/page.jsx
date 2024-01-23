@@ -1,5 +1,4 @@
 "use client";
-
 const fb = require("_firebase/firebase"); // Import the authentication functions
 const socket = require("_socket/socket");
 const { useRouter } = require('next/navigation');
@@ -92,19 +91,32 @@ export default function Dashboard() {
 
 	let sock_cli;
 	useEffect(() =>
-	{
-		if (user)
+	{ console.log(loading);
+        console.log(user);
+		if (user){
 			sock_cli = socket.init('http://localhost:8080');
             fetchTeams();
+           
+        }
 	}, [user]);
 
-	if (loading)
-		return <div className = " flex  flex-col items-center justify-around min-h-screen">
+	if (loading|| !user )
+    return (
+        <div className="flex flex-col items-center justify-around min-h-screen">
             <div className="flex flex-col items-center justify-center min-h-screen">
-            <h1 className="text-xl font-bold mb-5 text-primary">Trying to  sign in</h1> 
-            
-        <div className="loader"></div>
-    </div></div>;
+                <h1 className="text-xl font-bold mb-5 text-primary">Trying to sign in</h1>
+                <div className="loader mb-5"></div>
+
+                <p className="text-lg font-bold text-primary mb-5 ">
+                    If you're not signed in, sign in&nbsp;
+                    <span className="underline cursor-pointer" onClick={() => router.push("/")}>
+                        here
+                    </span>
+                </p>
+            </div>
+        </div>
+    );
+
 
 
     // NOTE: Not finished
@@ -150,7 +162,9 @@ export default function Dashboard() {
 
 
 	return (
+    
         <div className="flex flex-col h-screen bg-white ">
+            
         <div className="flex flex-grow overflow-hidden">
             <Sidebar />
             <div className="flex-grow flex flex-col">
@@ -228,4 +242,4 @@ export default function Dashboard() {
         </div>
         </div>
     );
-}
+    }

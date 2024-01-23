@@ -1,17 +1,18 @@
 import React, { useState } from "react";
 import CloseIcon from '@mui/icons-material/Close';
 
-const TeamOverlay = () => {
-  const [modalVisible, setModalVisible] = useState(true);
+const TeamOverlay = ({ toggleModal, modalVisible }) => {
+
+  // const [modalVisible, setModalVisible] = useState(true); // Set to false initially
   const [currentScreen, setCurrentScreen] = useState("home");
 
   const switchToHome = () => setCurrentScreen("home");
   const switchToCreateTeam = () => setCurrentScreen("create");
   const switchToJoinTeam = () => setCurrentScreen("join");
 
-  const toggleModal = () => {
-    setModalVisible(!modalVisible);
-  };
+  // const toggleModal = () => {
+  //   setModalVisible(!modalVisible);
+  // };
 
   return (
     modalVisible && (
