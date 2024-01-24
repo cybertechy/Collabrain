@@ -24,6 +24,7 @@ export default function Dashboard() {
         ,{text:"New Document", icon: <DescriptionIcon/>,onClick:()=>{} }
         
     ];
+ 
     const [isUsernameOverlayOpen, setIsUsernameOverlayOpen] = useState(true);
 
     const openUsernameOverlay = () => {
