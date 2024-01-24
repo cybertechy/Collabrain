@@ -24,9 +24,10 @@ import NewProjectOverlay from "../overlays/NewProjectOverlay";
 const navigationItems1 = [
     { name: "My Brain", href: "/dashboard", icon: FolderIcon },
     { name: "Shared With Me", href: "/shared-with-me", icon: PeopleIcon },
+    
 ];
 const groups = [
-    { name: 'Team Alpha', imageUrl: '/path/to/image1.jpg' },
+    { name: 'Team Alpha', imageUrl: '/path/to/image1.jpg', href: "/chat" },
     { name: 'Team Beta', imageUrl: '/path/to/image2.jpg'}
    , {name: 'Team Gamma', imageUrl: '/path/to/image3.jpg'} ,
     { name: 'Team Delta', imageUrl: '/path/to/image4.jpg'},
@@ -36,7 +37,6 @@ const groups = [
 ];
 
 const navigationItems2 = [
-    
     { name: "Direct Messages", href: "/messages", icon: ForumIcon },
    
 ];
@@ -56,12 +56,12 @@ const Sidebar = (teams = {}) => {
     const toggleSidebar = () => {
         setIsOpen(!isOpen);
     };
-    const handleSidebarClick = (e) => {
-        // Check if the click is not on an interactive element
-        if (!e.target.closest('.interactive-element')) {
-            toggleSidebar();
-        }
-    };
+    // const handleSidebarClick = (e) => {
+    //     // Check if the click is not on an interactive element
+    //     if (!e.target.closest('.interactive-element')) {
+    //         toggleSidebar();
+    //     }
+    // };
 
     const pathname = usePathname(); 
     
@@ -70,7 +70,7 @@ const Sidebar = (teams = {}) => {
             className={`transition-all shadow-md h-screen pt-[height_of_navbar] z-10 duration-500 ease-in-out ${
                 isOpen ? "w-72" : "w-24"
             } bg-white text-black`}
-            onClick={handleSidebarClick}
+            // onClick={handleSidebarClick}
         >
             <div className="flex flex-col">
                 <div className="flex items-center justify-center h-24">
@@ -179,7 +179,7 @@ const Sidebar = (teams = {}) => {
                     />
                       <div className={`max-h-48 scrollbar-thin scrollbar-thumb-primary ${isOpen ? "overflow-y-scroll overflow-x-hidden" : "overflow-hidden"}`}>
     {groups.map((team, index) => (
-        <TeamSidebarItem key={index} team={team} isExpanded={isOpen} />
+        <TeamSidebarItem key={index} team={team} isExpanded={isOpen}  isSelected={pathname === team.href} />
     ))}
 </div>
 

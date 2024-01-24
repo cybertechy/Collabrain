@@ -1,19 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Tooltip } from '@mui/material';
+import Link from 'next/link';
 
-const TeamSidebarItem = ({ team, isSelected = false, isExpanded = true }) => {
+const TeamSidebarItem = ({ team, isSelected , isExpanded = true }) => {
     const { name, imageUrl } = team;
     const itemClasses = isSelected ? "text-primary" : "text-unselected";
     const defaultImage = '/assets/images/imagenotFound.jpg';
 
     return (
         <Tooltip title={name} enterDelay={1000} leaveDelay={200}>
-            <div className={`group flex items-center  my-2 transition-colors duration-200 cursor-pointer ${isExpanded ? "hover:bg-gray-200" : ""}`}>
+            <Link href = "/chat">
+            <div className={`group flex items-center  my-2 transition-colors duration-200 cursor-pointer ${isExpanded ? "hover:bg-gray-200" : ""} ${isSelected ? "bg-gray-200" : ""}`}>
                 <img
                     src={defaultImage}
                     alt={name}
-                    className="w-14 h-14 rounded-lg mr-2 group-hover:border-primary group-hover:border-2 border-solid border-transparent transition-all duration-200 ease-in-out"
+                    className={`w-14 h-14 rounded-lg mr-2 border-transparent ${isSelected ? "border-tertiary border-2 border-solid" : "group-hover:border-primary group-hover:border-2"} transition-all duration-200 ease-in-out`}
                     />
               {isExpanded ?  <span
                     className={`text-md font-normal ${itemClasses} transition-all duration-500 ease-in-out`}
@@ -26,6 +28,7 @@ const TeamSidebarItem = ({ team, isSelected = false, isExpanded = true }) => {
                     {name}
                 </span>: ""}
             </div>
+            </Link>
         </Tooltip>
     );
 };
