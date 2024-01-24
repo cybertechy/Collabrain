@@ -3,11 +3,13 @@ const router = express.Router();
 const fb = require("../helpers/firebase");
 
 // Create new folder
-// @RequestBody: {name: string}
+// @RequestBody: {name: string, path: string}
+// For Path, supply the previous path 
+// For root, supply "/"
 router.post("/folder", async (req, res) =>
 {
 	// Make sure all required fields are present
-	if (!req.headers.authorization || !req.body.name)
+	if (!req.headers.authorization || !req.body.name || !req.body.path)
 		return res.status(400).json({ error: "Missing required data" });
 
 	// verify token
@@ -15,16 +17,13 @@ router.post("/folder", async (req, res) =>
 	if (!user)
 		return res.status(401).json({ error: "Unauthorized" });
 
-	// Check if folder already exists
-	let folder = await fb.db.collection(`users/${user.uid}/folders/`).where("name", "==", req.body.name).get();
-	if (folder.exists)
-		return res.status(400).json({ error: "Folder already exists" });
 
 	// Create new folder
 	fb.db.collection(`users/${user.uid}/folders/`).add({
 		name: req.body.name,
+		path: req.body.path+"/"+req.body.name,
 	})
-		.then(ref => res.status(200).json({ message: "Folder created", folderID: ref.id }))
+		.then(ref => res.status(200).json({ message: "Folder created", folderID: ref.id, path: req.body.path+"/"+req.body.name}))
 		.catch((err) => res.status(500).json({ error: err }));
 });
 
@@ -46,115 +45,92 @@ router.delete("/folder/:folder", async (req, res) =>
 		.catch((err) => res.status(500).json({ error: err }));
 });
 
-// Add file to folder
-router.put("/file/:fileid/:folder", async (req, res) =>
+
+//Move file from main to folder / folder to main / folder to folder
+// @RequestBody: {to: string, fileType: string}
+// For fileType, supply "contentMap" or "document"
+router.patch("/moveFile/:file", async (req, res) =>
 {
-	// Make sure all required fields are present
-	if (!req.headers.authorization || !req.params.fileid || !req.params.folder)
+	if(!req.headers.authorization || !req.body.to|| !req.body.fileType)
 		return res.status(400).json({ error: "Missing required data" });
 
+	if(req.body.fileType!=="contentMap" && req.body.fileType!=="document"){
+		return res.status(400).json({ error: "Invalid file type" });
+	}
+
 	// verify token
-	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
+	let user =await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
 	if (!user)
 		return res.status(401).json({ error: "Unauthorized" });
 
-	// Check if file exists in contentMaps array of user
-	let userref = await fb.db.doc(`users/${user.uid}`).get();
-	if (!userref.exists)
-		return res.status(400).json({ error: "User not found" });
-
-	let contentMaps = userref.data().contentMaps;
-	let documents = userref.data().documents;
-
-	let contentMapfound = contentMaps?.includes(req.params.fileid);
-	let documentfound = documents?.includes(req.params.fileid);
-	
-	if (!contentMapfound && !documentfound)
+	// get doc
+	let Doc = await fb.db.doc(`${req.body.fileType==="contentMap" ? "contentMaps" : "documents"}/${req.params.file}`).get();
+	if(!Doc)
 		return res.status(400).json({ error: "File not found" });
+	
 
-	// remove file from contentMaps array
-	if (contentMapfound)
-	{
-		fb.db.doc(`users/${user.uid}`).update({
-			contentMaps: fb.admin.firestore.FieldValue.arrayRemove(req.params.fileid)
-		});
-	}
-	else
-	{
-		fb.db.doc(`users/${user.uid}`).update({
-			documents: fb.admin.firestore.FieldValue.arrayRemove(req.params.fileid)
-		});
+	Doc = Doc.data();
+	
+	let currentPath= Doc.path;
+	let newPath = req.body.to;
+
+	if(currentPath===newPath){
+		return res.status(400).json({ error: "File already in folder" });
 	}
 
 	// get folder document
-	let folder = await fb.db.doc(`users/${user.uid}/folders/${req.params.folder}`).get();
-	if (!folder.exists)
+	let oldPathInfo = null;
+	if(currentPath==="/"){
+		oldPathInfo = await fb.db.doc(`users/${user.uid}`).get();
+	} else {
+		oldPathInfo = await fb.db.collection(`users/${user.uid}/folders`).where("path", "==", currentPath).get().then((querySnapshot) => {return querySnapshot.docs[0];});
+	}
+
+	if (!oldPathInfo.exists)
 		return res.status(400).json({ error: "Folder not found" });
 
-	folder = folder.data();
+	oldPathData = oldPathInfo.data();
 
-	let type = contentMapfound ? "contentMaps" : "documents";
-	// Add file to folder
-	fb.db.doc(`users/${user.uid}/folders/${req.params.folder}`).update({
-		[type]: fb.admin.firestore.FieldValue.arrayUnion(req.params.fileid)
-	})
-		.then(() => res.status(200).json({ message: "File added to folder" }))
-		.catch((err) => res.status(500).json({ error: err }));
-});
-
-// Remove file from a folder
-router.patch("/file/:fileid/:folder", async (req, res) => 
-{
-	// Make sure all required fields are present
-	if (!req.headers.authorization || !req.params.fileid || !req.params.folder)
-		return res.status(400).json({ error: "Missing required data" });
-
-	// verify token
-	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
-	if (!user)
-		return res.status(401).json({ error: "Unauthorized" });
-
-	// get folder document
-	let folder = await fb.db.doc(`users/${user.uid}/folders/${req.params.folder}`).get();
-	if (!folder.exists)
-		return res.status(400).json({ error: "Folder not found" });
-
-	folder = folder.data();
-
-	// search by id in filed array
-	let contentMapfound = folder.contentMaps?.includes(req.params.fileid);
-	let documentfound = null;
-	if (!contentMapfound)
-		documentfound = folder.documents?.includes(req.params.fileid);
-
-	// Check if file already exists in folder
-	if (!contentMapfound && !documentfound)
+	// search by id in filetpye array
+	let filefound = oldPathData[req.body.fileType+"s"]?.includes(req.params.file);
+	if (!filefound)
 		return res.status(400).json({ error: "File not found in folder" });
 
-	// Add file contentMaps array or documents array
-	if (contentMapfound)
-	{
-		fb.db.doc(`users/${user.uid}`).update({
-			contentMaps: fb.admin.firestore.FieldValue.arrayUnion(req.params.fileid)
-		});
-	}
-	else
-	{
-		fb.db.doc(`users/${user.uid}`).update({
-			documents: fb.admin.firestore.FieldValue.arrayUnion(req.params.fileid)
-		});
+	// get new path
+	if(newPath==="/"){
+		// add directly to user data content maps collection
+		await fb.db.doc(`users/${user.uid}`).update({
+			[req.body.fileType+"s"]: fb.admin.firestore.FieldValue.arrayUnion(req.params.file)
+		})
+
+	} else {
+		// search the folder in folders collection based on new path
+		
+		let newData = await fb.db.collection(`users/${user.uid}/folders`).where("path", "==", newPath).get().then((querySnapshot) => {return querySnapshot.docs[0];});
+		if (!newData.exists)
+			return res.status(400).json({ error: "to Folder not found" });
+
+		// Add file to folder
+		await fb.db.doc(`users/${user.uid}/folders/${newData.id}`).update({
+			[req.body.fileType+"s"]: fb.admin.firestore.FieldValue.arrayUnion(req.params.file)
+		})
 	}
 
-	// Remove file from folder
-	let type = contentMapfound ? "contentMaps" : "documents";
-
-	fb.db.doc(`users/${user.uid}/folders/${req.params.folder}`).update({
-		[type]: fb.admin.firestore.FieldValue.arrayRemove(req.params.fileid)
+	// Remove file 
+	await fb.db.doc(`${currentPath==="/" ? `users/${user.uid}` : `users/${user.uid}/folders/${oldPathInfo.id}`}`).update({
+		[req.body.fileType+"s"]: fb.admin.firestore.FieldValue.arrayRemove(req.params.file)
 	})
-		.then(() => res.status(200).json({ message: "File removed from folder" }))
-		.catch((err) => res.status(500).json({ error: err }));
 
-});
+	// change path in file
+	await fb.db.doc(`${req.body.fileType==="contentMap" ? "contentMaps" : "documents"}/${req.params.file}`).update({
+		path: newPath
+	})
+
+	return res.status(200).json({ message: "File moved" });
+		
+
+}
+)
 
 // Get all folders
 router.get("/folders", async (req, res) =>
@@ -243,7 +219,7 @@ router.get("/:folder/files", async (req, res) =>
 
 });
 
-// Get all files not in folder
+// Get all files in root directory
 router.get("/files", async (req, res) => 
 {
 	
