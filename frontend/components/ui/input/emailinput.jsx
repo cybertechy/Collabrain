@@ -76,7 +76,7 @@ const EmailInputField = ({ placeholder, color, email, setEmail }) => {
                     },
                 }}
                 placeholder={placeholder}
-                sx={{ m: 1, width: "37ch" }}
+                sx={{ m: 1}}
             />
         </ThemeProvider>
     );

@@ -1,5 +1,4 @@
 "use client";
-
 const fb = require("_firebase/firebase"); // Import the authentication functions
 const socket = require("_socket/socket");
 const { useRouter } = require('next/navigation');
@@ -16,6 +15,8 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import FolderIcon from '@mui/icons-material/Folder';
 import MapIcon from '@mui/icons-material/Map';
 import ContextMenu from "../../components/ui/contextMenu/contextMenu";
+import UsernameOverlay from "../../components/ui/overlays/usernameOverlay";
+
 export default function Dashboard() {
    
     const contextMenuOptions = [
@@ -24,6 +25,16 @@ export default function Dashboard() {
         ,{text:"New Document", icon: <DescriptionIcon/>,onClick:()=>{} }
         
     ];
+ 
+    const [isUsernameOverlayOpen, setIsUsernameOverlayOpen] = useState(true);
+
+    const openUsernameOverlay = () => {
+      setIsUsernameOverlayOpen(true);
+    };
+  
+    const closeUsernameOverlay = () => {
+      setIsUsernameOverlayOpen(false);
+    };
     const [contextMenuVisible, setContextMenuVisible] = useState(false);
     const [teams, setTeams] = useState([]); 
     const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
@@ -92,23 +103,39 @@ export default function Dashboard() {
 
 	let sock_cli;
 	useEffect(() =>
-	{
-		if (user)
+	{ console.log(loading);
+        console.log(user);
+		if (user){
+            // fb.signOut(); //using this to sign out temporarily
 			sock_cli = socket.init('http://localhost:8080');
             fetchTeams();
+
+           
+        }
 	}, [user]);
 
-	if (loading)
-		return <div className = " flex  flex-col items-center justify-around min-h-screen">
+	if (loading|| !user )
+    return (
+        <div className="flex flex-col items-center justify-around min-h-screen">
             <div className="flex flex-col items-center justify-center min-h-screen">
-            <h1 className="text-xl font-bold mb-5 text-primary">Trying to  sign in</h1> 
-            
-        <div className="loader"></div>
-    </div></div>;
+                <h1 className="text-xl font-bold mb-5 text-primary">Trying to sign in</h1>
+                <div className="loader mb-5"></div>
+
+                <p className="text-lg font-bold text-primary mb-5 ">
+                    If you're not signed in, sign in&nbsp;
+                    <span className="underline cursor-pointer" onClick={() => router.push("/")}>
+                        here
+                    </span>
+                </p>
+            </div>
+        </div>
+    );
+
 
 
     // NOTE: Not finished
     // Needs to be tested with backend
+
 
    
     let currentDoc;
@@ -150,7 +177,9 @@ export default function Dashboard() {
 
 
 	return (
+    
         <div className="flex flex-col h-screen bg-white ">
+         
         <div className="flex flex-grow overflow-hidden">
             <Sidebar />
             <div className="flex-grow flex flex-col">
@@ -170,8 +199,9 @@ export default function Dashboard() {
         onClose={handleCloseContextMenu}
         menuOptions = {contextMenuOptions}
       />
+      
                 <div> 
-                <p className="text-2xl text-left text-primary ml-4 mb-4" >Folders</p>
+                <p className="text-2xl text-left text-primary ml-4 mb-4"  >Folders</p>
                 
                 <div className="flex flex-wrap content-start items-start w-full justify-start ml-4 gap-8 ">
                 <DashboardFolder title="Folder 1" folder="folder1" onClick={() => {}} />
@@ -182,12 +212,12 @@ export default function Dashboard() {
                  <div> 
 
         <p className="text-2xl text-left text-primary ml-4 mb-4 mt-5">Projects</p>
-        <div className="scrollbar-thin scrollbar-thumb-primary  overflow-y-scroll pr-28" style={{ maxHeight: "400px" }}>
+        <div className="scrollbar-thin scrollbar-thumb-primary  overflow-y-scroll pr-28" style={{ maxHeight: "500px" }}>
   <div className="flex flex-wrap gap-4 ml-4 justify-start"> 
   <DashboardProjectButton title="Project 1" project="project1" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
     <DashboardProjectButton title="Project 2" project="project2" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
     <DashboardProjectButton title="Project 3" project="project3" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
-    <DashboardProjectButton title="Project 4" project="project4" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="A Very Long Project Title" project="project4" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
     <DashboardProjectButton title="Project 5" project="project5" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
     <DashboardProjectButton title="Project 6" project="project6" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
     <DashboardProjectButton title="Project 7" project="project7" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
@@ -219,13 +249,30 @@ export default function Dashboard() {
     <DashboardProjectButton title="Project 6" project="project6" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
     <DashboardProjectButton title="Project 7" project="project7" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
     <DashboardProjectButton title="Project 8" project="project8" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="dasd" project="project9" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 5" project="project5" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 6" project="project6" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 7" project="project7" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 8" project="project8" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
     <DashboardProjectButton title="Project 9" project="project9" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 1" project="project1" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 2" project="project2" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 3" project="project3" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 4" project="project4" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 5" project="project5" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 6" project="project6" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 7" project="project7" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 8" project="project8" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="dasd" project="project9" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+
 </div>
 </div>
     </div>
 </div>
             </div>
         </div>
+        {/* uncomment the below for username popup when the server can be used */}
+        {/* { (user && !user.username)  && <UsernameOverlay isOpen = {isUsernameOverlayOpen} onClose={closeUsernameOverlay}/>} */}
         </div>
     );
-}
+    }

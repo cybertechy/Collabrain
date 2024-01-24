@@ -1,7 +1,7 @@
 import Link from "next/link";
 const { useRouter } = require("next/navigation");
 import SidebarButtonIcon from "./sidebarSubComponents/sidebarButton";
-import PlusIcon from "../../../public/assets/svg/sidebaricons/plusicon.svg";
+import AddIcon from '@mui/icons-material/Add';
 import FolderIcon from "@mui/icons-material/Folder";
 const fb = require("_firebase/firebase"); 
 import SidebarItem from "./sidebarSubComponents/sidebarItem";
@@ -16,11 +16,23 @@ import { useState } from "react";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import { useEffect } from "react";
+import TeamOverlay from "../overlays/TeamOverlay"
+import TeamSidebarItem from "./sidebarSubComponents/sidebarTeamButton"
 // Define the sidebar navigation items
 import { usePathname } from "next/navigation";
+import NewProjectOverlay from "../overlays/NewProjectOverlay";
 const navigationItems1 = [
     { name: "My Brain", href: "/dashboard", icon: FolderIcon },
     { name: "Shared With Me", href: "/shared-with-me", icon: PeopleIcon },
+];
+const groups = [
+    { name: 'Team Alpha', imageUrl: '/path/to/image1.jpg' },
+    { name: 'Team Beta', imageUrl: '/path/to/image2.jpg'}
+   , {name: 'Team Gamma', imageUrl: '/path/to/image3.jpg'} ,
+    { name: 'Team Delta', imageUrl: '/path/to/image4.jpg'},
+    {name: 'Team Epsilon', imageUrl: '/path/to/image5.jpg'},  
+
+    // Add more teams or use real data from your state
 ];
 
 const navigationItems2 = [
@@ -32,17 +44,33 @@ const navigationItems2 = [
 const Sidebar = (teams = {}) => {
     const router = useRouter();
     const [isOpen, setIsOpen] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false); 
+    const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+    const toggleModal = () => { // Define toggleModal function
+        setIsModalOpen(!isModalOpen);
+    };
     
+    const toggleProjectModal = () => { 
+        setIsProjectModalOpen(!isProjectModalOpen);
+    };
     const toggleSidebar = () => {
         setIsOpen(!isOpen);
     };
+    const handleSidebarClick = (e) => {
+        // Check if the click is not on an interactive element
+        if (!e.target.closest('.interactive-element')) {
+            toggleSidebar();
+        }
+    };
+
     const pathname = usePathname(); 
     
     return (
         <aside
             className={`transition-all shadow-md h-screen pt-[height_of_navbar] z-10 duration-500 ease-in-out ${
-                isOpen ? "w-72" : "w-20"
+                isOpen ? "w-72" : "w-24"
             } bg-white text-black`}
+            onClick={handleSidebarClick}
         >
             <div className="flex flex-col">
                 <div className="flex items-center justify-center h-24">
@@ -76,15 +104,15 @@ const Sidebar = (teams = {}) => {
                 </div>
                 <hr className="border-t-1 mx-4 border-solid border-gray-400 opacity-30"></hr>
                 {/* Navigation items */}
-                <nav className="flex flex-col p-4">
+             <nav className="flex flex-col p-4">
                     <SidebarButtonIcon
                         key={"New Project"}
                         text={"New Project"}
                         color="primary"
                         withShadow={true}
-                        onClick={() => router.push("/new-project")}
+                        onClick={toggleProjectModal}
                         Icon={() => (
-                            <PlusIcon className="h-5 w-5 text-gray-500"></PlusIcon>
+                            <AddIcon fontSize = "medium" className="  text-white"></AddIcon>
                         )}
                         //     <PlusIcon fontSize = "medium"className="h-4 w-4 pt-3 pb-3 pl-5 text-white"></PlusIcon>
                         // )}
@@ -111,17 +139,22 @@ const Sidebar = (teams = {}) => {
                             isExpanded={isOpen} // pass isOpen as isExpanded
                         />
                     ))}
-                                       <SidebarButtonIcon
-                        key={"New Team"}
-                        text={"New Team"}
-                        color="primary"
-                        withShadow={true}
-                        onClick={() => router.push("/new-project")}
-                        Icon={() => (
-                            <GroupAddIcon fontSize = "medium"className=" text-white"></GroupAddIcon>
-                        )}
-                        isExpanded={isOpen}
-                    />
+                                      <SidebarButtonIcon
+                key={"New Team"}
+                text={"New Team"}
+                color="primary"
+                withShadow={true}
+                onClick={toggleModal} // Use toggleModal to open the overlay
+                Icon={() => (
+                    <GroupAddIcon fontSize="medium" className="text-white"></GroupAddIcon>
+                )}
+                isExpanded={isOpen}
+            />
+       
+
+
+{isModalOpen && <TeamOverlay toggleModal={ toggleModal} modalVisible= {isModalOpen} />}
+{isProjectModalOpen && <NewProjectOverlay toggleModal={ toggleProjectModal} modalVisible= {isProjectModalOpen} />}
                        {/* {teams.map(team => (
                     <SidebarItem
                         key={team.name}
@@ -144,6 +177,12 @@ const Sidebar = (teams = {}) => {
                         )}
                         isExpanded={isOpen}
                     />
+                      <div className={`max-h-48 scrollbar-thin scrollbar-thumb-primary ${isOpen ? "overflow-y-scroll overflow-x-hidden" : "overflow-hidden"}`}>
+    {groups.map((team, index) => (
+        <TeamSidebarItem key={index} team={team} isExpanded={isOpen} />
+    ))}
+</div>
+
                 </nav>
             </div>
         </aside>

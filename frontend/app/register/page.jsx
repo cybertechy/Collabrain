@@ -16,7 +16,7 @@ export default function Register() {
 	const [email, setemail] = useState("");
     const [password, setpassword] = useState("");
     const [confirmPassword, setconfirmPassword] = useState("");
-    const [username, setusername] = useState("");
+  
     const [firstname, setfirstname] = useState("");
     const [lastname, setlastname] = useState("");
 	useEffect(() =>
@@ -77,8 +77,8 @@ export default function Register() {
 						<InputField input={firstname} setinput={setfirstname} placeholder="First Name" color="tertiary"/>
                         <InputField input={lastname} setinput={setlastname} placeholder="Last Name"  color="tertiary"/>
                         </div>
-                        <div className="flex gap-4">
-							<UsernameInputField username={username} setUsername={setusername} placeholder="Username"color="tertiary" />
+                        <div className="flex w-full">
+							
                             <EmailInputField email={email} setEmail={setemail} placeholder="Email Address" color = "tertiary" />
                         </div>
                         <div className="flex gap-4">

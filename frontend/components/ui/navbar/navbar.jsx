@@ -5,7 +5,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import SettingsIcon from "@mui/icons-material/Settings";
 import SearchBar from "./navbarSubComponents/NavbarSearchbar";
 import LeaderboardNavbar from '../leaderboard/leaderboardNavbar';
-
+import {Tooltip}  from '@mui/material';
 const Navbar = () => {
     const [showLeaderboard, setShowLeaderboard] = useState(false);
     const leaderboardRef = useRef(null);
@@ -36,24 +36,44 @@ const Navbar = () => {
                     {/* <SearchBar /> */}
                 </div>
                 <div className="flex items-center space-x-10">
+                <Tooltip
+            title={"Leaderboard"}
+            enterDelay={1000}
+            leaveDelay={200}
+          
+        > 
                     <EmojiEventsIcon
                         ref={leaderboardToggleRef} // Attach the ref here
                         onClick={toggleLeaderboard}
                         className="cursor-pointer"
                         style={{ color: "white" }}
                     />
+                    </Tooltip>
+                    <Tooltip
+            title={
+                "Notifications"
+            }
+            enterDelay={1000}
+            leaveDelay={200}
+          
+        > 
                     <NotificationsNoneIcon
                         className="cursor-pointer"
                         style={{ color: "white" }}
                     />
+                     </Tooltip>
+                     <Tooltip
+            title={"Profile Settings"}
+            enterDelay={1000}
+            leaveDelay={200}
+          
+        > 
                     <AccountCircleIcon
                         className="cursor-pointer"
                         style={{ color: "white" }}
                     />
-                    <SettingsIcon
-                        className="cursor-pointer"
-                        style={{ color: "white" }}
-                    />
+                     </Tooltip>
+                   
                 </div>
             </nav>
 
