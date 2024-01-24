@@ -10,7 +10,6 @@ const uuid = require("uuid");
 /************************************************************/
 
 /* Endpoint for getting teams with filters */
-
 router.get("/search", async (req, res) =>
 {
 	// Make sure all required fields are present
@@ -43,7 +42,6 @@ router.get("/search", async (req, res) =>
 });
 
 /* Endpoint for creating a new team */
-
 router.post("/", async (req, res) =>
 {
 	// Make sure all required fields are present
@@ -110,7 +108,6 @@ router.post("/", async (req, res) =>
 });
 
 /* Endpoint for getting a team's data */
-
 router.get("/:team", async (req, res) =>
 {
 	// Make sure all required fields are present
@@ -132,7 +129,6 @@ router.get("/:team", async (req, res) =>
 
 
 /* Endpoint for updating a team's data */
-
 router.patch("/:team", async (req, res) =>
 {
 	// Make sure all required fields are present
@@ -162,7 +158,6 @@ router.patch("/:team", async (req, res) =>
 });
 
 /* Endpoint for deleting a team */
-
 router.delete("/:team", async (req, res) =>
 {
 	// Make sure all required fields are present
@@ -188,14 +183,120 @@ router.delete("/:team", async (req, res) =>
 		.catch(err => { return res.status(500).json({ error: err }); });
 });
 
+/************************************************************/
+/*                   Invites CRUD Operations                */
+/************************************************************/
+
+/* Endpoint for sending team invite */
+router.post("/:team/invite/:user", async (req, res) =>
+{
+	// Make sure all required fields are present
+	if (!req.headers.authorization)
+		return res.status(400).json({ error: "Missing required data" });
+
+	// verfiy token
+	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
+	if (!user)
+		return res.status(401).json({ error: "Unauthorized" });
+
+	// Check if user is a administator of the team
+	let doc = await fb.db.doc(`teams/${req.params.team}`).get();
+	if (doc.data().members[user.uid].role != "admin")
+		return res.status(401).json({ error: "Unauthorized" });
+
+	// Make sure user is not already part of the team
+	let userDoc = await fb.db.doc(`users/${req.params.user}`).get();
+	if (userDoc.data().teams.includes(req.params.team))
+		return res.status(400).json({ error: "User is already part of the team" });
+
+	// Send invite
+	fb.db.doc(`users/${req.params.user}`).update({
+		invites: fb.admin.firestore.FieldValue.arrayUnion({
+			teamID: req.params.team,
+			teamName: doc.data().name,
+			teamImg: doc.data().teamImageID
+		})
+			.catch(err => { return res.status(500).json({ error: err }); })
+	});
+});
+
+/* Endpoint for getting user's invites */
+router.get("/:team/invite", async (req, res) =>
+{
+	// Make sure all required fields are present
+	if (!req.headers.authorization)
+		return res.status(400).json({ error: "Missing required data" });
+
+	// verfiy token
+	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
+	if (!user)
+		return res.status(400).json({ code: 401, error: "Unauthorized" });
+
+	// Get user's invites
+	fb.db.doc(`users/${user.uid}`).get()
+		.then(doc =>
+		{
+			return res.status(200).json(doc.data().invites);
+		})
+		.catch(err => { return res.status(500).json({ error: err }); });
+});
+
+/* Endpoint for cancelling user's invite */
+router.delete("/:team/invite/:user", async (req, res) =>
+{
+	// Make sure all required fields are present
+	if (!req.headers.authorization)
+		return res.status(400).json({ error: "Missing required data" });
+
+	// verfiy token
+	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
+	if (!user)
+		return res.status(401).json({ error: "Unauthorized" });
+
+	// Check if user is a administator of the team
+	let doc = await fb.db.doc(`teams/${req.params.team}`).get();
+	if (doc.data().members[user.uid].role != "admin")
+		return res.status(401).json({ error: "Unauthorized" });
+
+	// Cancel invite
+	fb.db.doc(`users/${req.params.user}`).update({
+		invites: fb.admin.firestore.FieldValue.arrayRemove({
+			teamID: req.params.team
+		})
+	})
+		.catch(err => { return res.status(500).json({ error: err }); });
+
+	return res.status(200).json({ message: "Invite cancelled" });
+});
+
+/** Endpoint to decline invite */
+router.delete("/:team/invite", async (req, res) =>
+{
+	// Make sure all required fields are present
+	if (!req.headers.authorization)
+		return res.status(400).json({ error: "Missing required data" });
+
+	// verfiy token
+	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
+	if (!user)
+		return res.status(400).json({ error: "Unauthorized" });
+
+	// Decline invite
+	fb.db.doc(`users/${user.uid}`).update({
+		invites: fb.admin.firestore.FieldValue.arrayRemove({
+			teamID: req.params.team
+		})
+	})
+		.then(() => { return res.status(200).json({ message: "Invite declined" }); })
+		.catch(err => { return res.status(500).json({ error: err }); });
+});
 
 /************************************************************/
 /*                   Members CRUD Operations                */
 /************************************************************/
 
 
-/* Endpoint for adding a member to a team*/
-
+/* Endpoint for adding a member to a team */
 router.post("/:team/users", async (req, res) =>
 {
 	// Make sure all required fields are present
@@ -212,9 +313,9 @@ router.post("/:team/users", async (req, res) =>
 	if (doc.data().teams.includes(req.params.team))
 		return res.status(400).json({ error: "User is already part of the team" });
 
-	// Add user to team members list
 	try
 	{
+		// Add user to team members list
 		fb.db.doc(`teams/${req.params.team}`).update({
 			[`members.${user.uid}`]: {
 				role: "member"
@@ -225,6 +326,16 @@ router.post("/:team/users", async (req, res) =>
 		fb.db.collection("users").doc(user.uid).update({
 			teams: fb.admin.firestore.FieldValue.arrayUnion(req.params.team)
 		});
+
+		// If joined from invite, remove invite
+		if (req.query.invite == "true")
+		{
+			fb.db.doc(`users/${user.uid}`).update({
+				invites: fb.admin.firestore.FieldValue.arrayRemove({
+					teamID: req.params.team
+				})
+			});
+		}
 	}
 	catch (err) { return res.status(500).json({ error: err }); }
 
@@ -232,7 +343,6 @@ router.post("/:team/users", async (req, res) =>
 });
 
 /* Endpoint for deleting a member from a team */
-
 router.delete("/:team/users", async (req, res) =>
 {
 	// Make sure all required fields are present
@@ -272,7 +382,6 @@ router.delete("/:team/users", async (req, res) =>
 });
 
 /* Endpoint for getting a team's members */
-
 router.get("/:team/users", async (req, res) =>
 {
 	// Make sure all required fields are present
