@@ -49,14 +49,16 @@ const Sidebar = (teams = {}) => {
                     <div className="flex items-center justify-center">
                         {isOpen ? (
                             <div className="flex items-center justify-center transition-all duration-1000 ease-in-out">
+                                <div className="flex items-center justify-center ml-7 -mr-7">
                                 <img
-                                    className="transition-all duration-500 ease-in-out w-12 mb-2"
+                                    className="transition-all duration-500 ease-in-out w-12"
                                     src="/assets/images/logo_whitebackground.png"
                                     alt="Collabrain Logo"
                                 />
-                                <p className="text-xl font-poppins transition-all duration-1000 ease-in-out">
+                                <p className="text-xl font-semibold transition-all duration-1000 ease-in-out cursor-context-menu">
                                     Collabrain
                                 </p>
+                                </div>
                                 <CloseIcon
                                     className="text-lg ml-16 text-primary transition-all duration-1000 ease-in-out cursor-pointer"
                                     onClick={toggleSidebar}
@@ -65,7 +67,7 @@ const Sidebar = (teams = {}) => {
                             </div>
                         ) : (
                             <MenuIcon
-                                className="h-6 w-6 mb-2 text-lg text-primary transition-all duration-500 ease-in-out cursor-pointer"
+                                className="h-6 w-6 mb-2 text-lg text-primary transition-all duration-500 ease-in-out"
                                 onClick={toggleSidebar}
                                 fontSize="large"
                             />
@@ -82,8 +84,10 @@ const Sidebar = (teams = {}) => {
                         withShadow={true}
                         onClick={() => router.push("/new-project")}
                         Icon={() => (
-                            <PlusIcon fontSize = "medium"className="pt-3 pb-3 pl-5  text-white"></PlusIcon>
+                            <PlusIcon className="h-5 w-5 text-gray-500"></PlusIcon>
                         )}
+                        //     <PlusIcon fontSize = "medium"className="h-4 w-4 pt-3 pb-3 pl-5 text-white"></PlusIcon>
+                        // )}
                         isExpanded={isOpen}
                     />
                     {navigationItems1.map((item) => (

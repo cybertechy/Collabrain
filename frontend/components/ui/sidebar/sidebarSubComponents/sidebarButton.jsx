@@ -17,8 +17,8 @@ const SidebarButtonIcon = ({
     <button
         className={`${
             colorClasses[color]
-        } px-4 py-4 h-13  rounded-custom font-poppins text-md my-4 text-white font-medium flex items-center justify-center transition-all duration-500 ease-in-out ${
-            withShadow ? "shadow-primary shadow-custom" : ""
+        } px-4 py-4 h-13  rounded-custom font-poppins text-md my-4 text-white font-medium flex items-center justify-center transition-all duration-500 ease-in-out hover:bg-tertiary ${
+            withShadow ? "shadow-gray-500 shadow-custom" : ""
         }`}
         onClick={onClick}
     >
