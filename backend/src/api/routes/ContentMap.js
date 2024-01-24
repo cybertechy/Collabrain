@@ -92,7 +92,40 @@ router.get("/", async (req, res) => {
 });
 
 
-/* Get a content map of a user - Please check dashboard API */
+/* Get a content map of a user*/
+router.get("/:user/:id", async (req, res) => {
+
+    const token = req.headers?.authorization?.split(' ')[1];
+    const id = req.params.id;
+    const ResourceUser = req.params.user;
+
+    // Check if the token exists
+    if (!token || !ResourceUser) return res.status(400).json({ code: "AM101", error: "Missing token or user" });
+    
+    //verify user
+    const user = await verifyUser(token);
+    if (!user) return res.status(403).json({ code: "AM102", error: "Invalid token" });
+
+    const db = fb.admin.firestore();
+    const contentMap = await db.collection("contentMaps").doc(id).get();
+    
+
+    if (!contentMap.exists) return res.status(404).json({ code: "AM108", error: "Content map not found" });
+
+    const contentMapData = contentMap.data();
+
+    // get the data from oracle cloud
+    const getData = await oci.getData("B3", contentMapData.data);
+
+    if (!getData) return res.status(500).json({ code: 500, error: "Getting data failed" });
+
+    contentMapData.data = await oci.generateStringFromStream(getData.value);
+
+    //check if user has access to the content map
+    if(!contentMapData.Access[user.uid]) return res.status(403).json({ code: "AM109", error: "User does not have access to the content map" });
+    
+    return res.status(200).json({...contentMapData,userAccess:contentMapData.Access[user.uid]?.role});
+});
 
 /* Update a content map of a user */
 router.put("/:user/:id", async (req, res) => {
@@ -242,7 +275,7 @@ router.get("/search", async (req, res) => {
     const usersBasedOnEmail = await usersRef.where("email", ">=", query).where("email", "<=", query + "\uf8ff").get();
 
     // get users based on userid
-    const usersBasedOnUserId = await usersRef.where("uid", ">=", query).where("uid", "<=", query + "\uf8ff").get();
+    const usersBasedOnUserId = await usersRef.where("username", ">=", query).where("username", "<=", query + "\uf8ff").get();
 
     //get teams based on name
     const teamsBasedOnName = await teamsRef.where("name", ">=", query).where("name", "<=", query + "\uf8ff").get();
