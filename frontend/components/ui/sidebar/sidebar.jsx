@@ -16,11 +16,11 @@ import { useState } from "react";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import { useEffect } from "react";
-import TeamOverlay from "../create_join_team/TeamOverlay"
+import TeamOverlay from "../overlays/TeamOverlay"
 import TeamSidebarItem from "./sidebarSubComponents/sidebarTeamButton"
 // Define the sidebar navigation items
 import { usePathname } from "next/navigation";
-import NewProjectOverlay from "../create_join_team/NewProjectOverlay";
+import NewProjectOverlay from "../overlays/NewProjectOverlay";
 const navigationItems1 = [
     { name: "My Brain", href: "/dashboard", icon: FolderIcon },
     { name: "Shared With Me", href: "/shared-with-me", icon: PeopleIcon },
