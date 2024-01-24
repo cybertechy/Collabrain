@@ -15,7 +15,8 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import FolderIcon from '@mui/icons-material/Folder';
 import MapIcon from '@mui/icons-material/Map';
 import ContextMenu from "../../components/ui/contextMenu/contextMenu";
-import UsernameOverlay from "../../components/ui/usernameOverlay/usernameOverlay";
+import UsernameOverlay from "../../components/ui/overlays/usernameOverlay";
+
 export default function Dashboard() {
    
     const contextMenuOptions = [
