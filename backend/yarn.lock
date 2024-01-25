@@ -519,6 +519,20 @@
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-2.0.0.tgz#f544a148d3ab35801c1f633a7441fd87c2e484bf"
   integrity sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==
 
+"@treblle/express@^0.0.7":
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/@treblle/express/-/express-0.0.7.tgz#f6b295845560302e4a1a5fd50e484f68076a8fba"
+  integrity sha512-zl+rLyjCbvDVxCVxfdbAnAuTP1/bsfMHbCZ/tSNibW85OUhSuP5nCDq5S66oTkuMjgQOlMGE54VykmzsOxx9jw==
+  dependencies:
+    "@treblle/utils" "^0.1.13"
+
+"@treblle/utils@^0.1.13":
+  version "0.1.14"
+  resolved "https://registry.yarnpkg.com/@treblle/utils/-/utils-0.1.14.tgz#3cfa30d8c334303b17313a854f3f2f8e8c849610"
+  integrity sha512-uKVs0Q2lDuCymqYC9ZVqyuauChz3Y8mia50XMYg8svn8bTnQxg9WkaMTKYBIB70KG6JHz6rZePkAitc1QPbXgg==
+  dependencies:
+    node-fetch "^2.6.7"
+
 "@types/body-parser@*":
   version "1.19.5"
   resolved "https://registry.yarnpkg.com/@types/body-parser/-/body-parser-1.19.5.tgz#04ce9a3b677dc8bd681a17da1ab9835dc9d3ede4"
@@ -1792,7 +1806,7 @@ negotiator@0.6.3:
   resolved "https://registry.yarnpkg.com/negotiator/-/negotiator-0.6.3.tgz#58e323a72fedc0d6f9cd4d31fe49f51479590ccd"
   integrity sha512-+EUsqGPLsM+j/zdChZjsnX51g4XrHFOIXwfnCVPGlQk/k5giakcKsuxCObBRu6DSm9opw/O6slWbJdghQM4bBg==
 
-node-fetch@^2.6.1, node-fetch@^2.6.9:
+node-fetch@^2.6.1, node-fetch@^2.6.7, node-fetch@^2.6.9:
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.7.0.tgz#d0f0fa6e3e2dc1d27efcd8ad99d550bda94d187d"
   integrity sha512-c4FRfUm/dbcWZ7U+1Wq0AwCyFL+3nt2bEw05wfxSz+DWpWsitgmSgYmy2dQdWyKC1694ELPqMs/YzUSNozLt8A==

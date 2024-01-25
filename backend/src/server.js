@@ -3,6 +3,7 @@ const express = require("express");
 const bodyParser = require('body-parser');
 const cors = require("cors");
 const http = require('http');
+const treblle = require('@treblle/express')
 
 // Routes
 // const docRoute = require("./api/routes/Doc");
@@ -17,6 +18,14 @@ const sockServer = require("./api/helpers/socket");
 const app = express();
 const port = process.env.PORT || 8080;
 const server = http.createServer(app);
+
+app.use(
+	treblle({
+	  apiKey: "FWAsJIjJ9SUC48XJ52CmWPzrH5V5dDn7",
+	  projectId: "4n251kwdeS2Q4FUt",
+	  additionalFieldsToMask: [],
+	})
+  );
 
 sockServer.init(server);
 

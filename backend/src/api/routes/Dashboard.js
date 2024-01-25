@@ -17,13 +17,18 @@ router.post("/folder", async (req, res) =>
 	if (!user)
 		return res.status(401).json({ error: "Unauthorized" });
 
+	// check if folder already exists with same path
+	let folder = await fb.db.collection(`users/${user.uid}/folders`).where("path", "==", req.body.path+req.body.name).get().then((querySnapshot) => {return querySnapshot.docs[0];});
+	if (folder)
+		return res.status(400).json({ error: "Folder already exists" });
+
 
 	// Create new folder
 	fb.db.collection(`users/${user.uid}/folders/`).add({
 		name: req.body.name,
-		path: req.body.path+"/"+req.body.name,
+		path: req.body.path+req.body.name,
 	})
-		.then(ref => res.status(200).json({ message: "Folder created", folderID: ref.id, path: req.body.path+"/"+req.body.name}))
+		.then(ref => res.status(200).json({ message: "Folder created", folderID: ref.id, path: req.body.path+req.body.name}))
 		.catch((err) => res.status(500).json({ error: err }));
 });
 
