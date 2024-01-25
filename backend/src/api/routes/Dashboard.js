@@ -75,6 +75,8 @@ router.patch("/moveFile/:file", async (req, res) =>
 	
 
 	Doc = Doc.data();
+	if(!Doc.path)
+		return res.status(400).json({ error: "File Error" });
 	
 	let currentPath= Doc.path;
 	let newPath = req.body.to;
