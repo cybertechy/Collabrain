@@ -140,7 +140,7 @@ export default function ChatRoom()
 					{text}
 				</div>
 
-				<div className="absolute z-10 inset-x-0 bottom-5 mx-5 drop-shadow-lg bg-primary text-white">
+				<div className="absolute z-10 inset-x-0 bottom-5 mx-5  text-white">
 					<MessageBox callback={sendTeamMsg} />
 				</div>
 

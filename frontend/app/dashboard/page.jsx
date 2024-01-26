@@ -272,7 +272,7 @@ export default function Dashboard() {
             </div>
         </div>
         {/* uncomment the below for username popup when the server can be used */}
-        {/* { (user && !user.username)  && <UsernameOverlay isOpen = {isUsernameOverlayOpen} onClose={closeUsernameOverlay}/>} */}
+        { (user && !user.username)  && <UsernameOverlay isOpen = {isUsernameOverlayOpen} onClose={closeUsernameOverlay}/>}
         </div>
     );
     }

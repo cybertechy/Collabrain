@@ -8,7 +8,7 @@ import { toast } from 'react-toastify';
         const [error, setError] = useState('');
         const [user, loading] = fb.useAuthState();
         const [retrieve, setRetrieve] = useState(false);
-    
+        const [timeoutId, setTimeoutId] = useState(null);
 
 
         const checkUsernameAvailability = async (enteredUsername) => {
@@ -21,9 +21,10 @@ import { toast } from 'react-toastify';
         setError('');
     
         try {
-            const response = await axios.get(`http://localhost:8080/users/username/${enteredUsername}`);
+            const response = await axios.get(`http://localhost:8080/api/users/username/${enteredUsername}`);
             if (response.status === 200) {
             setError("Username is available");
+            setUsername(enteredUsername);
             console.log("Username is available")
             } else {
             setError("Username is taken");
@@ -38,7 +39,20 @@ import { toast } from 'react-toastify';
             setRetrieve(false);
         }
         };
-
+        const handleUsernameChange = (e) => {
+          const newUsername = e.target.value;
+          setUsername(newUsername);
+  
+          if (timeoutId) {
+              clearTimeout(timeoutId);
+          }
+  
+          const newTimeoutId = setTimeout(() => {
+              checkUsernameAvailability(newUsername);
+          }, 1000); //delay before checking username availability
+  
+          setTimeoutId(newTimeoutId);
+      };
         const handleSave = async () => {
             if (error !== "Username is available" || !username) {
                 toast.error(error);
@@ -46,10 +60,13 @@ import { toast } from 'react-toastify';
             }
         
             try {
-             
-              const response = await axios.patch('http://localhost:8080/api/users', { username }, {
+              token  = null;
+             if(user){
+              token  = await fb.getToken();
+             }
+              const response = await axios.patch('http://localhost:8080/api/users/', { username: username }, {
                 headers: {
-                  Authorization: `Bearer ${await fb.getToken}`
+                  authorization: `Bearer ${token}`
                 }
               });
         
@@ -74,10 +91,7 @@ import { toast } from 'react-toastify';
               className={`w-full text-black p-2 border ${error && error !== "Username is available" ? 'border-red-500' : 'border-gray-300'} rounded focus:outline-none focus:border-primary`}
               placeholder="Enter your username"
               value={username}
-              onChange={(e) => {
-                setUsername(e.target.value);
-                checkUsernameAvailability(e.target.value);
-              }}
+              onChange={handleUsernameChange}
             />
             <p className={`text-sm mt-1 ${error === "Username is available" ? 'text-green-500' : 'text-red-500'}`}>
               {retrieve ? "Checking availability..." : error}

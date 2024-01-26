@@ -98,7 +98,8 @@ const PasswordInput = ({ isConfirm, color, password, setPassword }) => {
     return (
         <ThemeProvider theme={theme}>
             <FormControl
-                sx={{ m: 1, width: "37ch" }}
+                sx={{ m: 1,  }}
+                fullWidth
                 variant="outlined"
                 className={backgroundColorClass}
             >
