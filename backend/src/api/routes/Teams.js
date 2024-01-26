@@ -167,7 +167,7 @@ router.delete("/:team", async (req, res) =>
 	// verfiy token
 	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
 	if (!user)
-		return res.status(400).json({ code: 401, error: "Unauthorized" });
+		return res.status(400).json({ error: "Unauthorized" });
 
 	// Check if user is a administator of the team
 	let doc = await fb.db.doc(`teams/${req.params.team}`).get();
@@ -230,7 +230,7 @@ router.get("/:team/invite", async (req, res) =>
 	// verfiy token
 	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
 	if (!user)
-		return res.status(400).json({ code: 401, error: "Unauthorized" });
+		return res.status(400).json({ error: "Unauthorized" });
 
 	// Get user's invites
 	fb.db.doc(`users/${user.uid}`).get()
@@ -402,6 +402,57 @@ router.get("/:team/users", async (req, res) =>
 	fb.getTeamMembers(req.params.team)
 		.then(members => { return res.status(200).json(members); })
 		.catch(err => { return res.status(500).json({ error: err }); });
+});
+
+/* Endpoint for banning a member from a team */
+router.post("/:team/ban/:user", async (req, res) =>
+{
+	// Make sure all required fields are present
+	if (!req.headers.authorization)
+		return res.status(400).json({ error: "Missing required data" });
+
+	// verify token and authority
+	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
+	if (!user)
+		return res.status(400).json({error: "Unauthorized" });
+
+	// Check if initiator is admin
+	let team = await fb.db.doc(`teams/${req.params.team}`).get();
+	if (team.data().members[user.uid].role != "admin")
+		return res.status(401).json({ error: "Unauthorized" });
+
+	// Add user to banned list
+	fb.db.doc(`teams/${req.params.team}`).update({
+		banned: fb.admin.firestore.FieldValue.arrayUnion(req.params.user)
+	})
+		.catch(err => { return res.status(500).json({ error: err }); });
+	
+});
+
+/* Endpoint for unbanning a member from a team */
+router.delete("/:team/ban/:user", async (req, res) =>
+{
+	// Make sure all required fields are present
+	if (!req.headers.authorization)
+		return res.status(400).json({ error: "Missing required data" });
+	
+	// verify token and authority
+	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
+	if (!user)
+		return res.status(400).json({ error: "Unauthorized" });
+
+	// Check if initiator is admin
+	let team = await fb.db.doc(`teams/${req.params.team}`).get();
+	if (team.data().members[user.uid].role != "admin")
+		return res.status(401).json({ error: "Unauthorized" });
+	
+	// Remove user from banned list
+	fb.db.doc(`teams/${req.params.team}`).update({
+		banned: fb.admin.firestore.FieldValue.arrayRemove(req.params.user)
+	})
+		.catch(err => { return res.status(500).json({ error: err }); });
+
+	return res.status(200).json({ message: "User unbanned" });
 });
 
 /************************************************************/
