@@ -7,25 +7,15 @@ const oci = require("../helpers/oracle");
 const router = Router();
 
 
-/* Create a Ne content map */
+/* Create a New content map */
 router.post("/", async (req, res) => {
-    const auth = req.headers.authorization;
-    const token = auth.split(' ')[1];
-
-    const { name, data } = req.body;
-
-    // Check if the token exists
-    if (!token || !name) return res.status(400).json({ code: "AM101", error: "Missing token or name" });
+   
+    if(!req.headers.authorization || !req.body.name || !req.body.data) return res.status(400).json({ code: 400, error: "Missing token or name or data" });
 
     //verify user
     const user = await verifyUser(token);
-    if (!user) {
-        return res.status(403).json({ code: "AM102", error: "Invalid token" });
-    }
-
-
-
-
+    if (!user) return res.status(403).json({ code: "AM102", error: "Invalid token" });
+    
 
     const db = fb.admin.firestore();
     const userRef = db.collection("users").doc(user.uid);
@@ -34,19 +24,16 @@ router.post("/", async (req, res) => {
     if (!doc.exists) return res.status(404).json({ code: "AM107", error: "User not found" });
 
     const contentMapsRef = db.collection("contentMaps")
-
     let DataId = uuid.v4();
 
     // upload data to oracle cloud
-    const uploadData = await oci.AddData("B3", DataId, "application/json", JSON.stringify(data));
-
-    if (!uploadData.eTag) {
-        return res.status(500).json({ code: 500, error: "Uploading data failed" });
-    }
+    const uploadData = await oci.AddData("B3", DataId, "application/json", JSON.stringify(req.body.data));
+    if (!uploadData.eTag) return res.status(500).json({ code: 500, error: "Uploading data failed" });
+    
 
     // create a new content map as collection inside user's doc
     const contentMap = {
-        name: name,
+        name: req.body.name,
         data: DataId,
         createdAt: fb.admin.firestore.FieldValue.serverTimestamp(),
         updatedAt: fb.admin.firestore.FieldValue.serverTimestamp(),
