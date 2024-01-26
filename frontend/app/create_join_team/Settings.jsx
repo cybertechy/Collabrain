@@ -233,6 +233,7 @@ const GeneralOverlay = ({setOpenModal, switchToProfile, switchToSound, switchToP
     <>
       <div className="w-screen h-screen flex items-center justify-center ">
         <div className="w-2/4 h-screen shadow-lg bg-white rounded-md flex">
+         <button className='absolute top-4 pr-4 right-1/4 text-xl cursor-pointer' onClick={setOpenModal}><CloseIcon fontSize="large" /></button>
           <div className="flex flex-col justify-start px-16 py-8">
             <p className="py-10 text-4xl font-bold">Settings</p>
             <button className={`w-72 p-4 text-xl font-medium text-black text-start mb-2 `} onClick={switchToProfile}>Profile</button>
@@ -244,8 +245,7 @@ const GeneralOverlay = ({setOpenModal, switchToProfile, switchToSound, switchToP
           </div>
           {/* RIGHT SIDE */}
           <div className="pt-36 px-8 w-full">
-          <button className=' bg-transparent border-none text-25 cursor-pointer pr-4 pt-2 flex justify-end w-full ' onClick={setOpenModal}><CloseIcon fontSize="large" /></button>
-          <p className="mb-2 text-2xl ">Change Apperaence</p>
+          <p className="mb-2 text-2xl ">Change Appearence</p>
             <div className="flex space-x-5 mb-4">
               <buttons className=" h-44 w-44"><img src={require("./blackBG.png")} alt="image1"></img></buttons>
               <buttons className=' h-44 w-44 '><img src={require("./purpleBG.png")} alt="image2"></img></buttons></div>
@@ -296,6 +296,7 @@ const SoundOverlay = ({ setOpenModal, switchToProfile, switchToGeneral, switchTo
     <>
       <div className="w-screen h-screen flex items-center justify-center ">
         <div className="w-2/4 h-screen shadow-lg bg-white rounded-md flex">
+         <button className='absolute top-4 pr-4 right-1/4 text-xl cursor-pointer' onClick={setOpenModal}><CloseIcon fontSize="large" /></button>
           <div className="flex flex-col justify-start px-16 py-8">
             <p className="py-10 text-4xl font-bold">Settings</p>
             <button className={`w-72 p-4 text-xl font-medium text-black text-start mb-2 `} onClick={switchToProfile}>Profile</button>
@@ -307,7 +308,6 @@ const SoundOverlay = ({ setOpenModal, switchToProfile, switchToGeneral, switchTo
           </div>
           {/* RIGHT SIDE */}
           <div className="pt-36 px-8 w-full ">
-          <button className=' bg-transparent border-none text-25 cursor-pointer pr-4 pt-2 flex justify-end w-full ' onClick={setOpenModal}><CloseIcon fontSize="large" /></button>
             <div className="mb-4">
               <p className="mb-2 text-2xl ">Speaker Device</p>
               <Dropdown buttonLabel={selectedSpeakerLabel} dropdownItems={dropdownItems} onSelect={handleSpeakerSelect} />
@@ -333,6 +333,7 @@ const PrivacyOverlay = ({ setOpenModal, switchToProfile, switchToSound, switchTo
     <>
       <div className="w-screen h-screen flex items-center justify-center ">
         <div className="w-2/4 h-screen shadow-lg bg-white rounded-md flex">
+         <button className='absolute top-4 pr-4 right-1/4 text-xl cursor-pointer' onClick={setOpenModal}><CloseIcon fontSize="large" /></button>
           <div className="flex flex-col justify-start px-16 py-8">
             <p className="py-10 text-4xl font-bold">Settings</p>
             <button className={`w-72 p-4 text-xl font-medium text-black text-start mb-2 `} onClick={switchToProfile}>Profile</button>
@@ -343,8 +344,7 @@ const PrivacyOverlay = ({ setOpenModal, switchToProfile, switchToSound, switchTo
             <button className={`w-72 p-4 text-xl font-medium text-black text-start mb-2 `} onClick={switchToAccessibility}>Accessibility</button>
           </div>
           {/* RIGHT SIDE */}
-          <div className="pt-36 px-8 w-full ">
-          <button className=' bg-transparent border-none text-25 cursor-pointer pr-4 pt-2 flex justify-end w-full ' onClick={setOpenModal}><CloseIcon fontSize="large" /></button>            
+          <div className="pt-36 px-8 w-full ">           
           <div className="mb-4 flex justify-between">
               <p className="p-2.5 text-2xl   ">Do not disturb</p>
               <ToggleButtonExample isToggled={isToggled} handleToggle={handleToggle} />
@@ -354,7 +354,7 @@ const PrivacyOverlay = ({ setOpenModal, switchToProfile, switchToSound, switchTo
               <button className="text-center text-xl inline-flex items-center border border-purple-500 text-purple-500 hover:bg-purple-500 hover:text-white px-7 py-3 ">Request</button>
             </div>
             <div className="mb-4 flex justify-between ">
-              <p className="p-2.5 text-2xl   ">Relete my data</p>
+              <p className="p-2.5 text-2xl   ">Delete my data</p>
               <button className="text-center text-xl inline-flex items-center border border-purple-500 text-purple-500 hover:bg-purple-500 hover:text-white px-7 py-3 ">Delete</button>
             </div>          
           </div>
@@ -382,6 +382,7 @@ const NotificationsOverlay = ({ setOpenModal, switchToProfile, switchToSound, sw
    
       <div className="w-screen h-screen flex items-center justify-center ">
         <div className="w-2/4 h-screen shadow-lg bg-white rounded-md flex">
+         <button className='absolute top-4 pr-4 right-1/4 text-xl cursor-pointer' onClick={setOpenModal}><CloseIcon fontSize="large" /></button>
           <div className="flex flex-col justify-start px-16 py-8">
             <p className="py-10 text-4xl font-bold">Settings</p>
             <button className={`w-72 p-4 text-xl font-medium text-black text-start mb-2 `} onClick={switchToProfile}>Profile</button>
@@ -393,9 +394,8 @@ const NotificationsOverlay = ({ setOpenModal, switchToProfile, switchToSound, sw
           </div>
           {/* RIGHT SIDE */}
           <div className="pt-36 px-8 w-full ">
-          <button className=' bg-transparent border-none text-25 cursor-pointer pr-4 pt-2 flex justify-end w-full ' onClick={setOpenModal}><CloseIcon fontSize="large" /></button>
             <div className="mb-4">
-              <p className="mb-2 text-2xl ">Recive Notifications from:</p>
+              <p className="mb-2 text-2xl ">Recive Notifications from</p>
               <Dropdown buttonLabel={selectedNotiLabel} dropdownItems={dropdownItems3} onSelect={handleNotiSelect} />
             </div>
             <div className="mb-4 flex justify-between">
@@ -419,6 +419,7 @@ const AccessibilityOverlay = ({ setOpenModal, switchToProfile, switchToSound, sw
     <>
       <div className="w-screen h-screen flex items-center justify-center ">
         <div className="w-2/4 h-screen shadow-lg bg-white rounded-md flex">
+         <button className='absolute top-4 pr-4 right-1/4 text-xl cursor-pointer' onClick={setOpenModal}><CloseIcon fontSize="large" /></button>
           <div className="flex flex-col justify-start px-16 py-8">
             <p className="py-10 text-4xl font-bold">Settings</p>
             <button className={`w-72 p-4 text-xl font-medium text-black text-start mb-2 `} onClick={switchToProfile}>Profile</button>
@@ -430,7 +431,6 @@ const AccessibilityOverlay = ({ setOpenModal, switchToProfile, switchToSound, sw
           </div>
           {/* RIGHT SIDE */}
           <div className="pt-36 px-8 w-full ">
-          <button className=' bg-transparent border-none text-25 cursor-pointer pr-4 pt-2 flex justify-end w-full ' onClick={setOpenModal}><CloseIcon fontSize="large" /></button>
             <div className="mb-4 flex justify-between">
               <p className="p-2.5 text-2xl   ">Text-to-speech(TTS)</p>
               <button className="text-center text-xl inline-flex items-center border border-purple-500 text-purple-500 hover:bg-purple-500 hover:text-white px-7 py-3 ">Configure</button>
