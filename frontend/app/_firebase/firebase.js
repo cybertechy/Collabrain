@@ -28,22 +28,18 @@ async function emailSignIn(e)
 	const { email, password } = e.target.elements;
 
 	let result;
-	try
-	{
-		result = await signInWithEmailAndPassword(auth, email.value, password.value);
-	}
-	catch (err)
-	{
-		if (err.code === "auth/wrong-password" || err.code === "auth/invalid-email")
-		{
-			alert("Inccorect email or password");
-			return;
-		}
+	try { result = await signInWithEmailAndPassword(auth, email.value, password.value); }
+	catch (err) { alert(err.code.slice(5)); } // Firebase error without "auth/" prefix
+}
 
-		else if (err.code === "auth/user-not-found")
+async function emailSignUp(e)
+{
+	e.preventDefault();
+	const { email, password, fname, lname } = e.target.elements;
+
+	createUserWithEmailAndPassword(auth, email.value, password.value)
+		.then(result =>
 		{
-			alert("User doesnt exist, creating new user");
-			result = await createUserWithEmailAndPassword(auth, email.value, password.value);
 			axios.post("http://localhost:8080/api/user", {
 				email: email.value,
 				fname: fname.value,
@@ -52,19 +48,9 @@ async function emailSignIn(e)
 				photo: null,
 				uid: result.user.uid
 			})
-				.catch(err =>
-				{
-					alert(err.message);
-				});
-		}
-
-		else // Other errors
-		{
-			alert(err.message);
-		}
-
-	}
-
+				.catch(err => { alert(err.message); });
+		})
+		.catch(err => { alert(err.message.slice(5)); });
 }
 
 async function serviceSignIn(service)
@@ -120,6 +106,7 @@ module.exports = {
 	signOut,
 	useAuthState,
 	emailSignIn,
+	emailSignUp,
 	serviceSignIn,
 	toFbTimestamp,
 	fromFbTimestamp

@@ -79,8 +79,7 @@ export default function Register() {
             }
         };
     
-        // Call fb.emailSignIn with the custom event
-        await fb.emailSignIn(customEvent);
+		fb.emailSignUp(customEvent);
     };
 
     return (
