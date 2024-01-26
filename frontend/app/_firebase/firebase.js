@@ -29,28 +29,30 @@ async function emailSignIn(e)
 
 	let result;
 	try { result = await signInWithEmailAndPassword(auth, email.value, password.value); }
-	catch (err) { alert(err.code.slice(5)); } // Firebase error without "auth/" prefix
+	catch (err)
+	{
+		if (error.code == "auth/cancelled-popup-request") return;
+		return (err.code).slice(5);
+	}
 }
 
 async function emailSignUp(e)
 {
 	e.preventDefault();
-	const { email, password, fname, lname } = e.target.elements;
-
+	const { email, password, firstname, lastname } = e.target.elements;
 	createUserWithEmailAndPassword(auth, email.value, password.value)
 		.then(result =>
 		{
-			axios.post("http://localhost:8080/api/user", {
+			axios.post("http://localhost:8080/api/users", {
 				email: email.value,
-				fname: fname.value,
-				lname: lname.value,
+				fname: firstname.value,
+				lname: lastname.value,
 				username: null,
 				photo: null,
 				uid: result.user.uid
-			})
-				.catch(err => { alert(err.message); });
+			});
 		})
-		.catch(err => { alert(err.message.slice(5)); });
+		.catch(err => { return (err.code).slice(5); });
 }
 
 async function serviceSignIn(service)
@@ -85,7 +87,7 @@ async function serviceSignIn(service)
 	// Add user to database if new user
 	if (userInfo.isNewUser)
 	{
-		axios.post("http://localhost:8080/api/user", {
+		axios.post("http://localhost:8080/api/users", {
 			uid: result.user.uid,
 			email: result.user.email,
 			fname: userInfo.profile.given_name,

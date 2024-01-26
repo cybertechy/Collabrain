@@ -84,7 +84,7 @@ export default function ChatRoom()
 		}
 
 		let token = await fb.getToken();
-		let userData = axios.get(`http://localhost:8080/api/user/${user.uid}`,
+		let userData = axios.get(`http://localhost:8080/api/users/${user.uid}`,
 			{ headers: { "Authorization": "Bearer " + token } });
 
 			let sentAt = new Date();

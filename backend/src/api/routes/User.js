@@ -48,18 +48,13 @@ router.get("/:user", async (req, res) =>
 router.post("/", (req, res) =>
 {
 	// Make sure all required fields are present
-	if (!req.body.email || !req.body.fname || !req.body.lname || !req.body.photo || !req.body.uid)
+	if (!req.body.email || !req.body.fname || !req.body.lname || !req.body.uid)
 		return res.status(400).json({ error: "Missing required data" });
 
 	// Check if user already exists
 	let users = fb.db.collection("users").where("email", "==", req.body.email);
 	if (users.length > 0)
 		return res.status(400).json({ error: "User already exists" });
-
-	// Check if username is taken
-	users = fb.db.collection("users").where("username", "==", req.body.username);
-	if (users.length > 0)
-		return res.status(400).json({ error: "Username already taken" });
 
 	// Add user to database
 	fb.db.doc(`users/${req.body.uid}`).set(
@@ -68,7 +63,7 @@ router.post("/", (req, res) =>
 			fname: req.body.fname,
 			lname: req.body.lname,
 			username: null,
-			photo: req.body.photo,
+			photo: null,
 			bio: "",
 			teams: [],
 			friends: [],
