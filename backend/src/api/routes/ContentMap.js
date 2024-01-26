@@ -75,7 +75,15 @@ router.get("/", async (req, res) => {
     //get the content maps array of the user
     const contentMaps = doc.data().contentMaps;
 
-    return res.status(200).json(contentMaps);
+    // get the content maps data
+    const contentMapsData = await Promise.all(contentMaps.map(async contentMapId => {
+        const contentMapRef = db.collection("contentMaps").doc(contentMapId);
+        const contentMap = await contentMapRef.get();
+        const contentMapData = contentMap.data();
+        return { id: contentMapId, name: contentMapData.name, path: contentMapData.path, createdAt: contentMapData.createdAt.toDate(), updatedAt: contentMapData.updatedAt.toDate()};
+    }));
+
+    return res.status(200).json(contentMapsData);
 });
 
 
