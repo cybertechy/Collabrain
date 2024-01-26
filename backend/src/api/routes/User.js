@@ -117,8 +117,8 @@ router.delete("/:user", async (req, res) =>
 router.get("/username/:username", async (req, res) =>
 {
 	// Check if username is taken
-	let users = fb.db.collection("users").where("username", "==", req.params.username);
-	if (users.length > 0)
+	let users = await fb.db.collection("users").where("username", "==", req.params.username).get();
+	if (users.docs.length > 0)
 		return res.status(400).json({ error: "Username already taken" });
 
 	return res.json({ message: "Username available" });	
