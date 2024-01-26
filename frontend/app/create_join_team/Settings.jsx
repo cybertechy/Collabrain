@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import './index.css';
+import CloseIcon from '@mui/icons-material/Close';
  
 const Dropdown = ({ buttonLabel, dropdownItems, onSelect }) => {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
@@ -108,11 +108,11 @@ const SettingsOverlay = () => {
           <div>
             <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center z-50 bg-white bg-opacity-20 backdrop-blur-sm">
               {currentScreen === "profile" && (<ProfileOverlay setOpenModal={toggleModal} switchToGeneral={switchToGeneral} switchToSound={switchToSound} switchToPrivacy={switchToPrivacy} switchToNotifications={switchToNotifications} switchToAccessibility={switchToAccessibility} />)}
-              {currentScreen === "general" && (<GeneralOverlay switchToProfile={switchToProfile} switchToSound={switchToSound} switchToPrivacy={switchToPrivacy} switchToNotifications={switchToNotifications} switchToAccessibility={switchToAccessibility} />)}
-              {currentScreen === "sound" && <SoundOverlay switchToProfile={switchToProfile} switchToGeneral={switchToGeneral} switchToPrivacy={switchToPrivacy} switchToNotifications={switchToNotifications} switchToAccessibility={switchToAccessibility} />}
-              {currentScreen === "privacy" && <PrivacyOverlay switchToProfile={switchToProfile} switchToSound={switchToSound} switchToGeneral={switchToGeneral} switchToNotifications={switchToNotifications} switchToAccessibility={switchToAccessibility} />}
-              {currentScreen === "notifications" && <NotificationsOverlay switchToProfile={switchToProfile} switchToSound={switchToSound} switchToPrivacy={switchToPrivacy} switchToGeneral={switchToGeneral} switchToAccessibility={switchToAccessibility} />}
-              {currentScreen === "accessibility" && <AccessibilityOverlay switchToProfile={switchToProfile} switchToSound={switchToSound} switchToPrivacy={switchToPrivacy} switchToNotifications={switchToNotifications} switchToGeneral={switchToGeneral} />}
+              {currentScreen === "general" && (<GeneralOverlay setOpenModal={toggleModal} switchToProfile={switchToProfile} switchToSound={switchToSound} switchToPrivacy={switchToPrivacy} switchToNotifications={switchToNotifications} switchToAccessibility={switchToAccessibility} />)}
+              {currentScreen === "sound" && <SoundOverlay  setOpenModal={toggleModal} switchToProfile={switchToProfile} switchToGeneral={switchToGeneral} switchToPrivacy={switchToPrivacy} switchToNotifications={switchToNotifications} switchToAccessibility={switchToAccessibility} />}
+              {currentScreen === "privacy" && <PrivacyOverlay setOpenModal={toggleModal} switchToProfile={switchToProfile} switchToSound={switchToSound} switchToGeneral={switchToGeneral} switchToNotifications={switchToNotifications} switchToAccessibility={switchToAccessibility} />}
+              {currentScreen === "notifications" && <NotificationsOverlay setOpenModal={toggleModal}  switchToProfile={switchToProfile} switchToSound={switchToSound} switchToPrivacy={switchToPrivacy} switchToGeneral={switchToGeneral} switchToAccessibility={switchToAccessibility} />}
+              {currentScreen === "accessibility" && <AccessibilityOverlay setOpenModal={toggleModal} switchToProfile={switchToProfile} switchToSound={switchToSound} switchToPrivacy={switchToPrivacy} switchToNotifications={switchToNotifications} switchToGeneral={switchToGeneral} />}
             </div>
           </div>
         )}
@@ -122,7 +122,7 @@ const SettingsOverlay = () => {
 }
  
  
-const ProfileOverlay = ({ switchToGeneral, switchToSound, switchToPrivacy, switchToNotifications, switchToAccessibility }) => {
+const ProfileOverlay = ({ setOpenModal, switchToGeneral, switchToSound, switchToPrivacy, switchToNotifications, switchToAccessibility }) => {
   const [inputValue, setInputValue] = useState('Enter your name');
   const [inputValue1, setInputValue1] = useState('Enter your Username');
   const [inputValue2, setInputValue2] = useState('Enter your Email');
@@ -142,6 +142,7 @@ const ProfileOverlay = ({ switchToGeneral, switchToSound, switchToPrivacy, switc
   return (
     <>
       <div className="w-screen h-max flex items-center justify-center overflow-auto  ">
+      
         <div className="w-2/4 h-screen shadow-lg bg-white rounded-md flex">
             <div className="flex flex-col justify-start px-16 py-8">
               {/* LEFT SIDE */}
@@ -154,7 +155,9 @@ const ProfileOverlay = ({ switchToGeneral, switchToSound, switchToPrivacy, switc
               <button className={`w-72 p-4 text-xl font-medium text-black text-start mb-2 `} onClick={switchToAccessibility}>Accessibility</button>
             </div>
               {/* RIGHT SIDE */}
+              
             <div className='pt-5 w-full h-screen  '>
+            <button className=' bg-transparent border-none text-25 cursor-pointer pr-4 pt-2 flex justify-end w-full ' onClick={setOpenModal}><CloseIcon fontSize="large" /></button>
             <p className="text-2xl pl-10 font-medium">My Account</p>
             <div className=" w-11/12 h-96  ml-5 bg-white rounded-md">
               <div className="flex flex-col justify-start p-5 h-full">
@@ -216,7 +219,7 @@ const ProfileOverlay = ({ switchToGeneral, switchToSound, switchToPrivacy, switc
   );
 }
  
-const GeneralOverlay = ({ switchToProfile, switchToSound, switchToPrivacy, switchToNotifications, switchToAccessibility }) => {
+const GeneralOverlay = ({setOpenModal, switchToProfile, switchToSound, switchToPrivacy, switchToNotifications, switchToAccessibility }) => {
   const [selectedLangLabel, setSelectedLangLabel] = useState('Select an option');
   const handleLangSelect = (label) => {
     setSelectedLangLabel(label);
@@ -241,6 +244,7 @@ const GeneralOverlay = ({ switchToProfile, switchToSound, switchToPrivacy, switc
           </div>
           {/* RIGHT SIDE */}
           <div className="pt-36 px-8 w-full">
+          <button className=' bg-transparent border-none text-25 cursor-pointer pr-4 pt-2 flex justify-end w-full ' onClick={setOpenModal}><CloseIcon fontSize="large" /></button>
           <p className="mb-2 text-2xl ">Change Apperaence</p>
             <div className="flex space-x-5 mb-4">
               <buttons className=" h-44 w-44"><img src={require("./blackBG.png")} alt="image1"></img></buttons>
@@ -266,7 +270,7 @@ const GeneralOverlay = ({ switchToProfile, switchToSound, switchToPrivacy, switc
   );
 }
  
-const SoundOverlay = ({ switchToProfile, switchToGeneral, switchToPrivacy, switchToNotifications, switchToAccessibility}) => {
+const SoundOverlay = ({ setOpenModal, switchToProfile, switchToGeneral, switchToPrivacy, switchToNotifications, switchToAccessibility}) => {
  
   const [selectedSpeakerLabel, setSelectedSpeakerLabel] = useState('Select an option');
   const [selectedMicrophoneLabel, setSelectedMicrophoneLabel] = useState('Select an option');
@@ -303,6 +307,7 @@ const SoundOverlay = ({ switchToProfile, switchToGeneral, switchToPrivacy, switc
           </div>
           {/* RIGHT SIDE */}
           <div className="pt-36 px-8 w-full ">
+          <button className=' bg-transparent border-none text-25 cursor-pointer pr-4 pt-2 flex justify-end w-full ' onClick={setOpenModal}><CloseIcon fontSize="large" /></button>
             <div className="mb-4">
               <p className="mb-2 text-2xl ">Speaker Device</p>
               <Dropdown buttonLabel={selectedSpeakerLabel} dropdownItems={dropdownItems} onSelect={handleSpeakerSelect} />
@@ -322,7 +327,7 @@ const SoundOverlay = ({ switchToProfile, switchToGeneral, switchToPrivacy, switc
  
  
  
-const PrivacyOverlay = ({switchToProfile, switchToSound, switchToGeneral, switchToNotifications, switchToAccessibility,isToggled,handleToggle}) => {
+const PrivacyOverlay = ({ setOpenModal, switchToProfile, switchToSound, switchToGeneral, switchToNotifications, switchToAccessibility,isToggled,handleToggle}) => {
  
   return (
     <>
@@ -339,7 +344,8 @@ const PrivacyOverlay = ({switchToProfile, switchToSound, switchToGeneral, switch
           </div>
           {/* RIGHT SIDE */}
           <div className="pt-36 px-8 w-full ">
-            <div className="mb-4 flex justify-between">
+          <button className=' bg-transparent border-none text-25 cursor-pointer pr-4 pt-2 flex justify-end w-full ' onClick={setOpenModal}><CloseIcon fontSize="large" /></button>            
+          <div className="mb-4 flex justify-between">
               <p className="p-2.5 text-2xl   ">Do not disturb</p>
               <ToggleButtonExample isToggled={isToggled} handleToggle={handleToggle} />
             </div>
@@ -360,7 +366,7 @@ const PrivacyOverlay = ({switchToProfile, switchToSound, switchToGeneral, switch
  
  
  
-const NotificationsOverlay = ({ switchToProfile, switchToSound, switchToPrivacy, switchToGeneral, switchToAccessibility, isToggled, handleToggle }) => {
+const NotificationsOverlay = ({ setOpenModal, switchToProfile, switchToSound, switchToPrivacy, switchToGeneral, switchToAccessibility, isToggled, handleToggle }) => {
   const [selectedNotiLabel, setSelectedNotiLabel] = useState('Select an option');
   const handleNotiSelect = (label) => {
     setSelectedNotiLabel(label);
@@ -387,6 +393,7 @@ const NotificationsOverlay = ({ switchToProfile, switchToSound, switchToPrivacy,
           </div>
           {/* RIGHT SIDE */}
           <div className="pt-36 px-8 w-full ">
+          <button className=' bg-transparent border-none text-25 cursor-pointer pr-4 pt-2 flex justify-end w-full ' onClick={setOpenModal}><CloseIcon fontSize="large" /></button>
             <div className="mb-4">
               <p className="mb-2 text-2xl ">Recive Notifications from:</p>
               <Dropdown buttonLabel={selectedNotiLabel} dropdownItems={dropdownItems3} onSelect={handleNotiSelect} />
@@ -407,7 +414,7 @@ const NotificationsOverlay = ({ switchToProfile, switchToSound, switchToPrivacy,
   );
 }
  
-const AccessibilityOverlay = ({ switchToProfile, switchToSound, switchToPrivacy, switchToNotifications, switchToGeneral }) => {
+const AccessibilityOverlay = ({ setOpenModal, switchToProfile, switchToSound, switchToPrivacy, switchToNotifications, switchToGeneral }) => {
   return (
     <>
       <div className="w-screen h-screen flex items-center justify-center ">
@@ -423,6 +430,7 @@ const AccessibilityOverlay = ({ switchToProfile, switchToSound, switchToPrivacy,
           </div>
           {/* RIGHT SIDE */}
           <div className="pt-36 px-8 w-full ">
+          <button className=' bg-transparent border-none text-25 cursor-pointer pr-4 pt-2 flex justify-end w-full ' onClick={setOpenModal}><CloseIcon fontSize="large" /></button>
             <div className="mb-4 flex justify-between">
               <p className="p-2.5 text-2xl   ">Text-to-speech(TTS)</p>
               <button className="text-center text-xl inline-flex items-center border border-purple-500 text-purple-500 hover:bg-purple-500 hover:text-white px-7 py-3 ">Configure</button>
