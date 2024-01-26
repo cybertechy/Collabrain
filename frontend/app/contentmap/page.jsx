@@ -61,51 +61,15 @@ function page() {
         });
     }, [isAuth()]);
 
-    // useEffect(() => {
-
-    //     if (pointerState?.button !== "up") {
-    //         setisSaved(false);
-    //         return;
-    //     }
-
-    //     let appState = ExcalidrawAPI.getAppState();
-    //     appState.collaborators=[];
-
-    //     let appdata = {
-    //         elements: ExcalidrawAPI.getSceneElements(),
-    //         appState: appState,
-    //         files: ExcalidrawAPI.getFiles(),
-    //     }
-
-    //     let user = searchParms.get("user");
-
-    //     // make axois put rquest with token in header to update the content map, pass data (appState) in body
-    //     axios.put(`http://localhost:8080/api/contentmap/${user}/${id}`, { name: IntialData?.name, data: appdata }, {
-    //         headers: {
-    //             authorization: `Bearer ${token}`,
-    //         },
-    //     }).then((res) => {
-    //         setisSaved(true);
-    //     })
-
-
-
-    // }, [pointerState]);
-
+   
     const getInitialData = async (token) => {
         let id = searchParms.get("id");
         if (!token || !id) return null;
 
         setid(id);
 
-        let user = searchParms.get("user");
-        setuser(user);
-
-
-        if (!user)  return null;
-
         try {
-            const res = await axios.get(`http://localhost:8080/api/contentmap/${user}/${id}`, {
+            const res = await axios.get(`http://localhost:8080/api/contentmap/${id}`, {
                 headers: {
                     authorization: `Bearer ${token}`,
                 },
@@ -148,8 +112,7 @@ function page() {
             setid(res.data.id);
             setIntialData({ name: "New Content Map", data: "" });
 
-            //TODO: change this user to the current user
-            router.push(`/contentmap?user=${user}&id=${res.data.id}`);
+            router.push(`/contentmap?id=${res.data.id}`);
             router.reload();
         }
         catch (err) {
@@ -187,8 +150,8 @@ function page() {
             setIntialData({ name: ContentMapName+" (copy)", data: JSON.stringify(appdata) });
             setContentMapName(ContentMapName+" (copy)");
 
-            //TODO: change this user to the current user
-            router.push(`/contentmap?user=${user}&id=${res.data.id}`);
+            
+            router.push(`/contentmap?&id=${res.data.id}`);
             
         }
         catch (err) {
@@ -239,7 +202,7 @@ function page() {
         if (!token) return null;
 
         // make axois put rquest with token in header to update the content map, pass data (appState) in body
-        axios.put(`http://localhost:8080/api/contentmap/${user}/${id}`, { name: ContentMapName }, {
+        axios.put(`http://localhost:8080/api/contentmap/${id}`, { name: ContentMapName }, {
             headers: {
                 authorization: `Bearer ${token}`,
             },
@@ -251,7 +214,7 @@ function page() {
 
     const updatecontent = async (data) => {
         try {
-            let res = await  axios.put(`http://localhost:8080/api/contentmap/${user}/${id}`, data , {
+            let res = await  axios.put(`http://localhost:8080/api/contentmap/${id}`, data , {
                 headers: {
                     authorization: `Bearer ${token}`,
                 },
@@ -294,7 +257,7 @@ function page() {
 
     const getdata = async (query) => {
         try {
-            let res = await axios.get(`http://localhost:8080/api/contentmap/search?${query}`, {
+            let res = await axios.get(`http://localhost:8080/api/contentmap/ut/search?${query}`, {
                 headers: {
                     authorization: `Bearer ${token}`,
                 },
