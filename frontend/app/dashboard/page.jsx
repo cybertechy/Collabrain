@@ -18,7 +18,8 @@ import ContextMenu from "../../components/ui/contextMenu/contextMenu";
 import UsernameOverlay from "../../components/ui/overlays/usernameOverlay";
 
 export default function Dashboard() {
-   
+    const [isUsernameOverlayOpen, setIsUsernameOverlayOpen] = useState(true);
+    const [user, loading] = fb.useAuthState();
     const contextMenuOptions = [
         {text:"New Folder", icon: <FolderIcon/>,onClick:()=>{} },
         {text:"New Map", icon: <MapIcon/>,onClick:()=>{console.log("new map to be made")}} 
@@ -26,7 +27,17 @@ export default function Dashboard() {
         
     ];
  
-    const [isUsernameOverlayOpen, setIsUsernameOverlayOpen] = useState(true);
+    useEffect(() => {
+        // Function definitions can be inside useEffect
+        const checkUsername = async () => {
+            if (user) {
+                const result = await hasUsername();
+                setHasUserUsername(result);
+            }
+        };
+
+        checkUsername();
+    }, [user]);
 
     const openUsernameOverlay = () => {
       setIsUsernameOverlayOpen(true);
@@ -37,26 +48,28 @@ export default function Dashboard() {
     };
     const [contextMenuVisible, setContextMenuVisible] = useState(false);
     const [teams, setTeams] = useState([]); 
+    const [hasUserUsername, setHasUserUsername] = useState(null);
     const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
-    const handleClickOutside = (event) => {
-        if (contextMenuVisible) {
-            const menuElement = document.querySelector('.context-menu');
-            const clickedInsideMenu = menuElement && menuElement.contains(event.target);
-    
-            if (!clickedInsideMenu) {
-                setContextMenuVisible(false);
-            }
-        }
-    };
-    
-
-    // Add event listener on mount and remove on unmount
     useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (contextMenuVisible) {
+                const menuElement = document.querySelector('.context-menu');
+                const clickedInsideMenu = menuElement && menuElement.contains(event.target);
+        
+                if (!clickedInsideMenu) {
+                    setContextMenuVisible(false);
+                }
+            }
+        };
+        
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, [contextMenuVisible]);
+
+    // Define useEffect for user state changes
+   
     const handleContextMenu = (e) => {
       e.preventDefault(); // Prevent the default right-click context menu
       const xPos = e.clientX;
@@ -69,7 +82,7 @@ export default function Dashboard() {
       setContextMenuVisible(false);
     };
     const router = useRouter();
-	const [user, loading] = fb.useAuthState();
+	
 
     const fetchTeams = async () => {
         try {
@@ -93,7 +106,7 @@ export default function Dashboard() {
         }
     };
     
-
+   
     // useEffect(() => {
     //     if (user) {
             
@@ -175,6 +188,27 @@ export default function Dashboard() {
 		}).catch(err => console.log(err));
 	};
 
+    const hasUsername = async () => {
+        const token = await fb.getToken();
+        const uid = fb.getUserID();
+
+        try {
+            const res = await axios.get(`http://localhost:8080/api/users/${uid}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            const user = res.data;
+           
+            return user.username ? true : false;
+        } catch (err) {
+            console.log(err);
+            return false;
+        }
+    };
+
+   
 
 	return (
     
@@ -271,8 +305,11 @@ export default function Dashboard() {
 </div>
             </div>
         </div>
+      
         {/* uncomment the below for username popup when the server can be used */}
-        { (user && !user.username)  && <UsernameOverlay isOpen = {isUsernameOverlayOpen} onClose={closeUsernameOverlay}/>}
+        {user && hasUserUsername === false && (
+        <UsernameOverlay isOpen={isUsernameOverlayOpen} onClose={closeUsernameOverlay} />
+    )}
         </div>
     );
     }

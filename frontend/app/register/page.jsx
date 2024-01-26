@@ -7,6 +7,7 @@ import InputField from "../../components/ui/input/input";
 import PasswordInput from "../../components/ui/input/passwordinput";
 import EmailInputField from "../../components/ui/input/emailinput";
 import UsernameInputField from "../../components/ui/input/usernameInput";
+const socket = require("_socket/socket");
 import { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify'
 
@@ -21,7 +22,7 @@ export default function Register() {
     const [firstname, setfirstname] = useState("");
     const [lastname, setlastname] = useState("");
 
-    
+    let sock_cli;
 	useEffect(() =>
 	{
 		if (user){

@@ -87,7 +87,7 @@ const UsernameOverlay = ({ isOpen, onClose }) =>
 				}
 			});
 
-			console.log(response);
+			// console.log(response);
 
 			if (response.status === 200)
 			{
@@ -118,9 +118,16 @@ const UsernameOverlay = ({ isOpen, onClose }) =>
 					<p className={`text-sm mt-1 ${error === "Username is available" ? 'text-green-500' : 'text-red-500'}`}>
 						{retrieve ? "Checking availability..." : error}
 					</p>
-					<div className="mt-4 flex justify-end">
+					<div className="mt-4 flex justify-between">
+          <button
+							className="px-4 py-2 bg-primary text-white rounded hover:bg-teritary"
+							onClick={fb.signOut}
+							
+						>
+							Sign out
+						</button>
 						<button
-							className="px-4 py-2 bg-primary text-white rounded hover:bg-secondary"
+							className="px-4 py-2 bg-primary text-white rounded hover:bg-teritary"
 							onClick={handleSave}
 							disabled={retrieve || error !== "Username is available"}
 						>
