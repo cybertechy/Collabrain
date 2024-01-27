@@ -2,19 +2,28 @@ import React, { useState, useEffect, useRef } from 'react';
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import SettingsIcon from "@mui/icons-material/Settings";
+// import SettingsIcon from "../overlays/settingsOverlay";
 import SearchBar from "./navbarSubComponents/NavbarSearchbar";
 import LeaderboardNavbar from '../leaderboard/leaderboardNavbar';
 import {Tooltip}  from '@mui/material';
+// import SettingsOverlay from '../overlays/settingsOverlay';
 const Navbar = () => {
     const [showLeaderboard, setShowLeaderboard] = useState(false);
     const leaderboardRef = useRef(null);
     const leaderboardToggleRef = useRef(null); // Ref for the leaderboard toggle icon
-
+    const [showSettings, setShowSettings] = useState(false); 
+  
     const toggleLeaderboard = () => {
         setShowLeaderboard(!showLeaderboard);
     };
+   
 
+    // Function to toggle the SettingsOverlay
+    const toggleSettings = () => {
+        console.log("toggleSettings called");
+        setShowSettings(!showSettings);
+        console.log("showSettings:", showSettings);
+    };
     useEffect(() => {
         function handleClickOutside(event) {
             if (leaderboardRef.current && !leaderboardRef.current.contains(event.target) &&
@@ -67,11 +76,11 @@ const Navbar = () => {
             enterDelay={1000}
             leaveDelay={200}
           
-        > 
-                    <AccountCircleIcon
-                        className="cursor-pointer"
-                        style={{ color: "white" }}
-                    />
+        > <AccountCircleIcon
+        className="cursor-pointer"
+        style={{ color: "white" }}
+        onClick={toggleSettings} // Attach onClick handler here
+    />
                      </Tooltip>
                    
                 </div>
@@ -82,6 +91,8 @@ const Navbar = () => {
                     <LeaderboardNavbar />
                 </div>
             )}
+               {/* {showSettings && <SettingsOverlay setOpenModal={setShowSettings} modalVisible={showSettings} />}  */}
+
         </>
     );
 };
