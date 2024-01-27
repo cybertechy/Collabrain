@@ -212,9 +212,7 @@ router.post("/:team/invite/:user", async (req, res) =>
 	// Send invite
 	fb.db.doc(`users/${req.params.user}`).update({
 		invites: fb.admin.firestore.FieldValue.arrayUnion({
-			teamID: req.params.team,
-			teamName: doc.data().name,
-			teamImg: doc.data().teamImageID
+			team: req.params.team
 		})
 			.catch(err => { return res.status(500).json({ error: err }); })
 	});
@@ -261,7 +259,7 @@ router.delete("/:team/invite/:user", async (req, res) =>
 	// Cancel invite
 	fb.db.doc(`users/${req.params.user}`).update({
 		invites: fb.admin.firestore.FieldValue.arrayRemove({
-			teamID: req.params.team
+			team: req.params.team
 		})
 	})
 		.catch(err => { return res.status(500).json({ error: err }); });
@@ -284,7 +282,7 @@ router.delete("/:team/invite", async (req, res) =>
 	// Decline invite
 	fb.db.doc(`users/${user.uid}`).update({
 		invites: fb.admin.firestore.FieldValue.arrayRemove({
-			teamID: req.params.team
+			team: req.params.team
 		})
 	})
 		.then(() => { return res.status(200).json({ message: "Invite declined" }); })
