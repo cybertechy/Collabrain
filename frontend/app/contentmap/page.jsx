@@ -407,7 +407,7 @@ function page() {
             {!id && <h1 className="text-2xl font-bold text-purple-500 px-10 text-center"> Searching the cloud, Please wait ..</h1>}
             {id && !Excalidraw && <h1 className="text-2xl font-bold text-purple-500 px-10">Loading...</h1>}
             {id && Excalidraw && !IntialData && !Error && !OverrideMessage && <h1 className="text-2xl font-bold text-purple-500 px-10 text-center"> Working to load the Map ... </h1>}
-            {id && Excalidraw && !IntialData && Error && !OverrideMessage &&  <h1 className="text-2xl font-bold text-purple-500 px-10 text-center"> Error: {Error.error} </h1>}
+            {id && Excalidraw && !IntialData && Error && !OverrideMessage &&  <h1 className="text-2xl font-bold text-purple-500 px-10 text-center"> {Error.error} </h1>}
             {id && Excalidraw && !IntialData && !Error && OverrideMessage && <h1 className="text-2xl font-bold text-purple-500 px-10 text-center"> {OverrideMessage} </h1>}
         </div>
     </div>
