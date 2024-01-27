@@ -37,7 +37,7 @@ const theme = createTheme({
     },
 });
 
-const InputField = ({ placeholder, color }) => {
+const InputField = ({ placeholder, color, input, setinput }) => {
     const backgroundColorClass = colorClasses[color] || colorClasses.primary;
 
     return (
@@ -46,6 +46,8 @@ const InputField = ({ placeholder, color }) => {
                 variant="outlined"
                 size="small"
                 fullWidth
+                value={input}
+                onChange={(e) => setinput(e.target.value)}
                 InputLabelProps={{ style: { color: "white" } }}
                 InputProps={{
                     className: backgroundColorClass,
@@ -67,6 +69,8 @@ const InputField = ({ placeholder, color }) => {
 InputField.propTypes = {
     placeholder: PropTypes.string.isRequired,
     color: PropTypes.oneOf(["primary", "secondary", "tertiary"]),
+    input: PropTypes.string.isRequired,
+    setinput: PropTypes.func.isRequired,
 };
 
 export default InputField;

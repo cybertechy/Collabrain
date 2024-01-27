@@ -8,6 +8,7 @@ import MicrosoftIcon from "../public/assets/svg/microsoft.svg";
 import AppleIcon from "../public/assets/svg/apple.svg";
 import PasswordInput from "../components/ui/input/passwordinput";
 import EmailInputField from "../components/ui/input/emailinput";
+import { ToastContainer, toast } from 'react-toastify';
 import { useEffect, useState } from 'react';
 
 export default function Home()

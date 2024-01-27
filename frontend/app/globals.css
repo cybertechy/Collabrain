@@ -62,3 +62,7 @@ body {
   --tertiary-color: #C58AFF; 
 }
 
+.excalidraw {
+  --color-primary: #972FFF;
+}
+
