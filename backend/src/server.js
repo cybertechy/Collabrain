@@ -1,6 +1,5 @@
 // Libs
 const express = require("express");
-const app = express();
 const cors = require("cors");
 const db = require("./api/helpers/firebase");
 const docRoute = require("./api/routes/Doc");
@@ -8,7 +7,6 @@ const strRoute = require("./api/routes/Storage");
 const contentMapRoute = require("./api/routes/ContentMap");
 
 const bodyParser = require('body-parser');
-const cors = require("cors");
 const http = require('http');
 
 // Routes

@@ -9,7 +9,7 @@ import axios from "axios";
 import Link from "next/link";
 import { RefreshCcw, FilePenLine } from 'lucide-react';
 import ShareComponent from "../../components/ui/share";
-const { isAuth, getToken } = require("_firebase/auth");
+const { useAuthState, getToken } = require("_firebase/firebase");
 import { ToastContainer, toast } from "react-toastify";
 
 
@@ -29,21 +29,19 @@ function page() {
     const [ContentMapName, setContentMapName] = useState("New Content Map");
     const [Error, setError] = useState(null);
     const [isOwner, setisOwner] = useState(false);
-    const [user, setuser] = useState(null);
+    const [user, loading] = useAuthState();
     const [OverrideMessage, setOverrideMessage] = useState("");
-    
-    
-
-
 
     /* UI states */
     const [New, setNew] = useState(false);
     const [Delete, setDelete] = useState(false);
     const [Share, setShare] = useState(false);
 
+    
     const router = useRouter();
     const searchParms = useSearchParams();
 
+    
     useEffect(() => {
         import("@excalidraw/excalidraw").then((comp) =>
             setExcalidraw(comp.Excalidraw),
@@ -51,13 +49,13 @@ function page() {
     }, []);
 
     useEffect(() => {
-        getToken().then((token) => {
+        getToken()?.then((token) => {
             setToken(token);
             getInitialData(token).then((res) => {
                 setIntialData(res);
             });
-        });
-    }, [isAuth()]);
+        })
+    }, [user]);
 
    
     const getInitialData = async (token) => {
@@ -196,6 +194,7 @@ function page() {
         let backup = IntialData;
         setIntialData(null);
         setOverrideMessage("Deleting content map, Please wait ...");
+        setDelete(false);
 
         try {
             const res = await axios.delete(`http://localhost:8080/api/contentmap/${id}`, {
@@ -317,7 +316,13 @@ function page() {
         }
     }
 
+    if(!user) return <div className="flex flex-col justify-center items-center text-black">
+        <h1>You're not signed in</h1>
+    </div>
 
+    if(loading) return <div className="flex flex-col justify-center items-center text-black">
+        <h1>Loading...</h1>
+    </div>
 
 
     return <div className="flex justify-center items-center flex-col h-screen w-screen">

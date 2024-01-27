@@ -28,7 +28,7 @@ router.post("/", async (req, res) => {
     let DataId = uuid.v4();
 
     // upload data to oracle cloud
-    const uploadData = await oci.AddData("B3", DataId, "application/json", JSON.stringify(req.body.data));
+    const uploadData = await oci.addData("B3", DataId, "application/json", JSON.stringify(req.body.data));
     if (!uploadData.eTag) return res.status(500).json({ code: 500, error: "Uploading data failed" });
 
     // get the user's name from the database
@@ -166,7 +166,7 @@ router.put("/:id", async (req, res) => {
         else updatedContentMap.data = uuid.v4();
         
         // upload data to oracle cloud
-        const uploadData = await oci.AddData("B3", contentMapData.data, "application/json", JSON.stringify(req.body.data));
+        const uploadData = await oci.addData("B3", contentMapData.data, "application/json", JSON.stringify(req.body.data));
         
 
         if (!uploadData.eTag) {
@@ -217,7 +217,7 @@ router.delete("/:id", async (req, res) => {
     }
 
     // delete the data from oracle cloud
-    const deleteData = await oci.deleteData("B3", contentMapData.data);
+    const deleteData = await oci.deleteFile("B3", contentMapData.data);
     if (!deleteData.lastModified) return res.status(500).json({ code: 500, error: "Deleting data failed" });
 
     await contentMapRef.delete();
