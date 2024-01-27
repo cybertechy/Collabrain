@@ -17,7 +17,7 @@ const CircleComponent = () => {
   const renderSadFace = () => {
     return (
       <div>
-        <img className='h-5 w-5'src={"/assets/images/sadface.png"} alt="icon"></img>
+        <img className='h-7 w-7'src={"/assets/images/sadface.png"} alt="icon"></img>
       </div>
     );
   };
@@ -125,7 +125,7 @@ const ToggleButtonExample = () => {
   );
 }
  
-  
+ 
 const SettingsOverlay = () => {
   const [modalVisible, setModalVisible] = useState(true);
   const [currentScreen, setCurrentScreen] = useState("profile");
@@ -303,7 +303,7 @@ const GeneralOverlay = ({setOpenModal, switchToProfile, switchToSound, switchToP
               </div>
               <div className="mb-4">
                 <p className="text-2xl pb-2 text-black md:text-lg sm:text-sm lg:text-2xl">Bad behavior strikes</p>
-                <div>
+                <div className="flex flex-row justify-start items-center">
                 <CircleComponent/>
                 </div>
  
