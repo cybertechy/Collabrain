@@ -54,7 +54,7 @@ const ProfileBox = ({ userData, onMute, onDeafen, onSettings }) => {
     return (
         <div className="absolute bottom-0 w-full bg-primary text-white p-2 flex flex-col justify-between items-center shadow-lg">
             <div className="flex items-center flex-row mt-2">
-            <Avatar {...stringAvatar(userData.fname + " " +  userData.lname || "User")} />
+            <Avatar {...stringAvatar(userData.fname? (userData.fname + " " +  userData.lname):"User")} />
 <span className="ml-2">{userData.username || "User"}</span>
             </div>
             <div>
