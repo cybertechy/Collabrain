@@ -30,10 +30,10 @@ function stringToColor(string = "User") {
   return color;
 }
 
-const MessageItem = ({ sender, timestamp, message, reactions, username }) => {
+const MessageItem = ({ sender, timestamp, message, reactions, userData }) => {
   return (
     <div className="flex items-start space-x-2 p-2 border-b border-gray-300">
-      <Avatar {...stringAvatar(username)} /> {/* Replace with actual path */}
+      <Avatar {...stringAvatar(userData.fname? (userData.fname + " " +  userData.lname):"User")} /> {/* Replace with actual path */}
       <div className="flex flex-col">
         <div className="text-sm font-medium">{sender}</div>
         <div className="text-xs text-gray-500">{timestamp}</div>

@@ -67,7 +67,7 @@ export default function ChatRoom() {
                         timestamp={fb.fromFbTimestamp(new Timestamp(messageData.sentAt.seconds, messageData.sentAt.nanoseconds)).toLocaleTimeString()}
                         message={messageData.message}
                         reactions={{}}
-						username = {userInfo.username}
+						userData = {userInfo.data}
                     />
                 ));
                 setText(msgs);
@@ -128,7 +128,7 @@ export default function ChatRoom() {
 			  timestamp={sentAt.toLocaleTimeString()} 
 			  message={messageData.msg} 
 			  reactions={{}} // Add reactions if you have them
-			  username = {userInfo.username}
+			  userData = {userInfo.data}
 			/>,
 		  ]);
 
