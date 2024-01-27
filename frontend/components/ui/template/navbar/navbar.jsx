@@ -4,12 +4,18 @@ import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import SettingsIcon from "@mui/icons-material/Settings";
 import SearchBar from "./navbarSubComponents/NavbarSearchbar";
-import LeaderboardNavbar from '../leaderboard/leaderboardNavbar';
+import LeaderboardNavbar from '../../leaderboard/leaderboardNavbar';
 import {Tooltip}  from '@mui/material';
-const Navbar = () => {
+import MenuIcon from "@mui/icons-material/Menu";
+import { isSidebarOpen } from "../sidebar/sidebar";
+import Template from '../template';
+
+
+const Navbar = ({ isOpen }) => {
     const [showLeaderboard, setShowLeaderboard] = useState(false);
     const leaderboardRef = useRef(null);
     const leaderboardToggleRef = useRef(null); // Ref for the leaderboard toggle icon
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
     const toggleLeaderboard = () => {
         setShowLeaderboard(!showLeaderboard);
@@ -29,11 +35,35 @@ const Navbar = () => {
         };
     }, []);
 
+    useEffect(() => {
+      const handleResize = () => {
+        setWindowWidth(window.innerWidth);
+      };
+
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    const navbarStyle = () => {
+    if (isOpen) {
+        if (windowWidth > 500) {
+            return (
+            <div className="flex flex-row items-center mr-auto">
+                <MenuIcon
+                className="h-6 w-6 text-lg transition-all duration-500 ease-in-out cursor-pointer"
+                onClick={toggleSidebar}/>
+            <div className='relative'>
+      </div>  
+        </div>);
+        }
+    }
+}
+
     return (
         <>
             <nav className="bg-purple-600 p-4 flex items-center justify-between">
                 <div className="flex-grow flex justify-center items-center mx-16">
-                    {/* <SearchBar /> */}
+                    {navbarStyle()}
                 </div>
                 <div className="flex items-center space-x-10">
                 <Tooltip

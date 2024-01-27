@@ -4,9 +4,19 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { useState, useEffect } from "react";
 import {Tooltip}  from '@mui/material';
 
-const SidebarItem = ({ href, icon: Icon, text = "", isSelected= false, isExpanded =true }) => {
+const SidebarItem = ({ href, icon: Icon, text = "", isSelected= false, isExpanded =true, is }) => {
     const itemClasses = isSelected ? "text-primary" : "text-unselected hover:text-primary";
     const [showChevron, setShowChevron] = useState(false);
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+    
+    useEffect(() => {
+        const handleResize = () => {
+            setWindowWidth(window.innerWidth);
+        };
+        
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     useEffect(() => {
         // If the sidebar is expanding, wait for the animation to finish
@@ -22,6 +32,8 @@ const SidebarItem = ({ href, icon: Icon, text = "", isSelected= false, isExpande
         }
     }, [isExpanded]);
 
+    const widthClass = windowWidth < 500 ? "w-full" : "w-64";
+
     return (
         <Tooltip
             title={text}
@@ -29,11 +41,12 @@ const SidebarItem = ({ href, icon: Icon, text = "", isSelected= false, isExpande
             leaveDelay={200}
           
         >
-        <Link href={href}>
-            <div
-                className={`
-                flex w-64 items-center p-2 my-2 transition-colors duration-200 justify-start cursor-pointer ${isExpanded && "hover:bg-gray-200"}  ${itemClasses}`}
-                // flex w-64 items-center p-2 my-2 transition-colors duration-200 justify-start cursor-pointer ${isExpanded &&"hover:bg-gray-200"} ${isSelected ? "text-primary" : "text-unselected"} hover:text-primary`}
+        <Link href={href}
+        // >
+        //     <div
+                className={`flex ${widthClass} items-center p-2 my-2 transition-colors duration-200 justify-start cursor-pointer ${isExpanded &&"hover:bg-gray-200"} ${isSelected ? "text-primary" : "text-unselected"} hover:text-primary`}
+                // flex items-center p-2 my-2 transition-colors duration-200 justify-start cursor-pointer ${isExpanded && "hover:bg-gray-200"}  ${itemClasses}`}
+                // }
                 style={{ 
                     maxWidth: isExpanded ? "100%" : "0",
                 }}
@@ -57,7 +70,7 @@ const SidebarItem = ({ href, icon: Icon, text = "", isSelected= false, isExpande
                         className={`ml-auto`}
                     />
                 )}
-            </div>
+            {/* </div> */}
         </Link>
         </Tooltip>
     );

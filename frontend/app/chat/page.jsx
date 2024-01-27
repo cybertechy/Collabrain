@@ -7,7 +7,7 @@ import MessageBox from "./messageBox";
 // import Sidebar from "./sidebar";
 import Toolbar from '@mui/material/Toolbar';
 import { Timestamp } from "firebase/firestore";
-import Sidebar from "../../components/ui/sidebar/sidebar";
+import Sidebar from "../../components/ui/template/sidebar/sidebar";
 const { useRouter } = require('next/navigation');
 const axios = require("axios");
 const fb = require("_firebase/firebase"); // Import the authentication functions

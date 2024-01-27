@@ -4,8 +4,8 @@ const socket = require("_socket/socket");
 const { useRouter } = require('next/navigation');
 const { useEffect , useState} = require("react");
 const axios = require("axios");
-import Sidebar from "../../components/ui/sidebar/sidebar";
-import Navbar from "../../components/ui/navbar/navbar";
+import Sidebar from "../../components/ui/template/sidebar/sidebar";
+import Navbar from "../../components/ui/template/navbar/navbar";
 import DashboardInfoBar from "../../components/ui/dashboardComponents/dashboardInfoBar";
 import DashboardFolder from "../../components/ui/dashboardComponents/dashboardFolder";
 import DropdownDashboard from '../../components/ui/dashboardComponents/dropdownDashboard'; // Adjust the import path as needed
@@ -16,6 +16,7 @@ import FolderIcon from '@mui/icons-material/Folder';
 import MapIcon from '@mui/icons-material/Map';
 import ContextMenu from "../../components/ui/contextMenu/contextMenu";
 import UsernameOverlay from "../../components/ui/overlays/usernameOverlay";
+import Template from "@/components/ui/template/template";
 
 export default function Dashboard() {
    
@@ -178,17 +179,18 @@ export default function Dashboard() {
 
 	return (
     
-        <div className="flex flex-col h-screen bg-white ">
+        <Template>
+            {/* <div className="flex flex-col h-screen bg-white ">
          
         <div className="flex flex-grow overflow-hidden">
             <Sidebar />
             <div className="flex-grow flex flex-col">
                 <div className="w-full">
-                    <Navbar />
-                    <DashboardInfoBar />
+                    <Navbar /> */}
+                    
                  
-                   
-                </div>
+                
+            <DashboardInfoBar />
                 
                 {/* Main Content area */}
                 <div className="flex-grow p-4 flex flex-col" onContextMenu={handleContextMenu}>
@@ -214,7 +216,7 @@ export default function Dashboard() {
         <p className="text-2xl text-left text-primary ml-4 mb-4 mt-5">Projects</p>
         <div className="scrollbar-thin scrollbar-thumb-primary  overflow-y-scroll pr-28" style={{ maxHeight: "500px" }}>
   <div className="flex flex-wrap gap-4 ml-4 justify-start"> 
-  <DashboardProjectButton title="Project 1" project="project1" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
+    <DashboardProjectButton title="Project 1" project="project1" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
     <DashboardProjectButton title="Project 2" project="project2" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
     <DashboardProjectButton title="Project 3" project="project3" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
     <DashboardProjectButton title="A Very Long Project Title" project="project4" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
@@ -269,10 +271,16 @@ export default function Dashboard() {
 </div>
     </div>
 </div>
-            </div>
+{/* </div>
+                   
+
         </div>
-        {/* uncomment the below for username popup when the server can be used */}
-        {/* { (user && !user.username)  && <UsernameOverlay isOpen = {isUsernameOverlayOpen} onClose={closeUsernameOverlay}/>} */}
+         uncomment the below for username popup when the server can be used 
+         (user && !user.username)  && <UsernameOverlay isOpen = {isUsernameOverlayOpen} onClose={closeUsernameOverlay}/>
         </div>
+        </div>  `*/}
+</Template>
+            
     );
+    
     }
