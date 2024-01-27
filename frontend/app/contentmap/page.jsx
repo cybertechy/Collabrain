@@ -10,7 +10,7 @@ import Link from "next/link";
 import { RefreshCcw, FilePenLine } from 'lucide-react';
 import ShareComponent from "../../components/ui/share";
 const { isAuth, getToken } = require("_firebase/auth");
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 
 
 
@@ -117,6 +117,14 @@ function page() {
         }
         catch (err) {
             console.log(err);
+            toast.error("Error creating new content map",{
+                position: "bottom-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                theme: "colored"
+            });
             return null;
         }
     }
@@ -156,6 +164,14 @@ function page() {
         }
         catch (err) {
             console.log(err);
+            toast.error("Error creating new content map",{
+                position: "bottom-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                theme: "colored"
+            });
             return null;
         }
        

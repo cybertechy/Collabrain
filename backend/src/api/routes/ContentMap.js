@@ -30,8 +30,17 @@ router.post("/", async (req, res) => {
     // upload data to oracle cloud
     const uploadData = await oci.AddData("B3", DataId, "application/json", JSON.stringify(req.body.data));
     if (!uploadData.eTag) return res.status(500).json({ code: 500, error: "Uploading data failed" });
-    
 
+    // get the user's name from the database
+    if(!user.name) {
+        await db.doc(`users/${user.uid}`).get().then(doc => {
+            if(doc.exists) {
+                user.name = doc.data().fname + " " + doc.data().lname;
+            }
+        })
+
+        console.log(user.name);
+    }
     // create a new content map as collection inside user's doc
     const contentMap = {
         name: req.body.name,
