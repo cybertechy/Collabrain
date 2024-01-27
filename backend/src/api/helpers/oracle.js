@@ -65,7 +65,7 @@ const getBuckets = async () =>
 };
 
 // Add data to a bucket
-const AddData = async (bucketName, fileName, MIMEtype, data, meta) =>
+const addData = async (bucketName, fileName, MIMEtype, data, meta) =>
 {
 	const request = {
 		namespaceName: "lrr6fvwwjb9p",
@@ -105,7 +105,7 @@ const getData = async (bucketName, mediaID) =>
 }
 
 
-//check which bucket is the file in
+// Check which bucket is the file in
 const getFileBucket = async (fileName) =>
 {
 	const buckets = await getBuckets();
@@ -113,13 +113,13 @@ const getFileBucket = async (fileName) =>
 	return bucket;
 }
 
-// delete data from a bucket using the mediaID (fileName)
-const deleteData = async (bucketName, mediaID) =>
+// Delete file from bucket
+const deleteFile = async (bucketName, fileName) =>
 {
 	const request = {
 		namespaceName: "lrr6fvwwjb9p",
 		bucketName: bucketName,
-		objectName: mediaID
+		objectName: fileName
 	};
 	try
 	{
@@ -131,4 +131,6 @@ const deleteData = async (bucketName, mediaID) =>
 	}
 }
 
-module.exports = { getBuckets, AddData, getData, getFileBucket, generateStreamFromString, generateStringFromStream, deleteData };
+module.exports = {
+	getBuckets, addData, getData, getFileBucket, generateStreamFromString, generateStringFromStream, deleteFile
+};

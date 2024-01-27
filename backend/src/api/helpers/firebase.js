@@ -12,8 +12,9 @@ function verifyUser(token)
 	return admin.auth().verifyIdToken(token).catch((error) => { return null; });
 }
 
-// Functions to manipulate docs in Firestore
 const db = admin.firestore();
+
+// Functions to manipulate docs in Firestore
 async function createDoc(user)
 {
 	// Create new doc with generated ID
@@ -33,10 +34,82 @@ async function updateDoc(user, docID, title, content)
 	db.collection(`users/${user}/docs`).doc(docID).update({ "title": title, "content": content });
 }
 
+async function getTeamMembers(teamID)
+{
+	let doc = await db.doc(`teams/${teamID}`).get();
+	return doc.data().members;
+}
+
+async function deleteCollection(collectionPath, batchSize = 5)
+{
+	const collectionRef = db.collection(collectionPath);
+	const query = collectionRef.orderBy('__name__').limit(batchSize);
+
+	return new Promise((resolve, reject) =>
+	{
+		deleteQueryBatch(query, resolve).catch(reject);
+	});
+}
+
+async function deleteQueryBatch(query, resolve)
+{
+	const snapshot = await query.get();
+
+	const batchSize = snapshot.size;
+	if (batchSize === 0)
+	{
+		// When there are no documents left, we are done
+		resolve();
+		return;
+	}
+
+	// Delete documents in a batch
+	const batch = db.batch();
+	snapshot.docs.forEach((doc) =>
+	{
+		batch.delete(doc.ref);
+	});
+	await batch.commit();
+
+	// Recurse on the next process tick, to avoid
+	// exploding the stack.
+	process.nextTick(() =>
+	{
+		deleteQueryBatch(db, query, resolve);
+	});
+}
+
+async function saveTeamMsg(data)
+{
+	let channels = (await db.collection(`teams/${data.team}/channels/`).where("name", "==", data.channel).get());
+	let channelID = channels.docs[0].id;
+	db.collection(`teams/${data.team}/channels/${channelID}/messages`)
+		.add({
+			"message": data.msg,
+			"sender": data.sender,
+			"sentAt": data.sentAt,
+		});
+}
+
+async function saveDirectMsg(data)
+{
+	db.collection(`chats/${data.chat}/messages`)
+		.add({
+			"message": data.msg,
+			"sender": data.sender,
+			"sentAt": data.sentAt,
+		});
+}
+
 module.exports = {
+	db,
 	admin,
 	verifyUser,
 	createDoc,
 	removeDoc,
 	updateDoc,
+	getTeamMembers,
+	deleteCollection,
+	saveTeamMsg,
+	saveDirectMsg
 };
