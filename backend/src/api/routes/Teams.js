@@ -127,7 +127,6 @@ router.get("/:team", async (req, res) =>
 		.catch(err => { return res.status(500).json({ error: err }); });
 });
 
-
 /* Endpoint for updating a team's data */
 router.patch("/:team", async (req, res) =>
 {
@@ -180,6 +179,24 @@ router.delete("/:team", async (req, res) =>
 	// Delete team
 	fb.db.doc(`teams/${req.params.team}`).delete()
 		.then(() => { return res.status(200).json({ message: "Team deleted" }); })
+		.catch(err => { return res.status(500).json({ error: err }); });
+});
+
+/* Endpoint for user's teams */
+router.get("/", async (req, res) =>
+{
+	// Make sure all required fields are present
+	if (!req.headers.authorization)
+		return res.status(401).json({ error: "Missing required data" });
+
+	// verfiy token
+	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
+	if (!user)
+		return res.status(401).json({ error: "Unauthorized" });
+
+	// Get user's teams
+	fb.db.doc(`users/${user.uid}`).get()
+		.then(doc => { return res.status(200).json(doc.data().teams); })
 		.catch(err => { return res.status(500).json({ error: err }); });
 });
 
@@ -451,6 +468,54 @@ router.delete("/:team/ban/:user", async (req, res) =>
 		.catch(err => { return res.status(500).json({ error: err }); });
 
 	return res.status(200).json({ message: "User unbanned" });
+});
+
+/* Endpoint for getting a team's banned members */
+router.get("/:team/ban", async (req, res) =>
+{
+	// Make sure all required fields are present
+	if (!req.headers.authorization)
+		return res.status(400).json({error: "Missing required data" });
+
+	// verify token and authority
+	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
+	if (!user)
+		return res.status(400).json({error: "Unauthorized" });
+
+	// Check if initiator is admin
+	let team = await fb.db.doc(`teams/${req.params.team}`).get();
+	if (team.data().members[user.uid].role != "admin")
+		return res.status(401).json({ error: "Unauthorized" });
+
+	// Get team's banned members
+	fb.db.doc(`teams/${req.params.team}`).get()
+		.then(doc => { return res.status(200).json(doc.data().banned); })
+		.catch(err => { return res.status(500).json({ error: err }); });
+});
+
+/* Endpoint for updating a member's role */
+router.patch("/:team/users/:user", async (req, res) =>
+{
+	// Make sure all required fields are present
+	if (!req.headers.authorization || !req.body.role)
+		return res.status(400).json({ error: "Missing required data" });
+
+	// verify token and authority
+	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
+	if (!user)
+		return res.status(400).json({error: "Unauthorized" });
+
+	// Check if initiator is owner
+	let team = await fb.db.doc(`teams/${req.params.team}`).get();
+	if (team.data().owner != user.uid)
+		return res.status(401).json({ error: "Unauthorized" });
+
+	// Update member's role
+	fb.db.doc(`teams/${req.params.team}`).update({
+		[`members.${req.params.user}.role`]: req.body.role
+	})
+		.then(() => { return res.status(200).json({ message: "Member role updated" }); })
+		.catch(err => { return res.status(500).json({ error: err }); });
 });
 
 /************************************************************/
