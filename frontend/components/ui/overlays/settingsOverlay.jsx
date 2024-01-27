@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-//import CloseIcon from '@mui/icons-material/Close';
-import './index.css';
+import CloseIcon from '@mui/icons-material/Close';
  
 const CircleComponent = () => {
   const [clickedCircles, setClickedCircles] = useState(0);
@@ -199,8 +198,8 @@ const ProfileOverlay = ({ setOpenModal, switchToGeneral, switchToSound, switchTo
               {/* RIGHT SIDE */}
              
             <div className='pt-5 w-full h-screen overflow-auto '>
-            <button className=' bg-transparent border-none text-25 cursor-pointer pr-4 pt-2 flex justify-end w-full ' onClick={setOpenModal}>X
-              {/* <CloseIcon fontSize="large" /> */}
+            <button className=' bg-transparent border-none text-25 cursor-pointer pr-4 pt-2 flex justify-end w-full ' onClick={setOpenModal}>
+              <CloseIcon fontSize="large" />
               </button>
             <p className="text-2xl pl-10  text-black font-medium">My Account</p>
             <div className=" w-11/12 h-96  ml-5 bg-white rounded-md">
@@ -277,8 +276,8 @@ const GeneralOverlay = ({setOpenModal, switchToProfile, switchToSound, switchToP
     <>
       <div className="w-screen h-screen flex items-center justify-center  ">
         <div className="w-2/4  h-screen shadow-lg bg-white rounded-md flex ">
-         <button className='absolute top-4 pr-4 right-1/4 text-xl cursor-pointer' onClick={setOpenModal}>X
-          {/* <CloseIcon fontSize="large" /> */}
+         <button className='absolute top-4 pr-4 right-1/4 text-xl cursor-pointer' onClick={setOpenModal}>
+          <CloseIcon fontSize="large" />
           </button>
           {/* LEFT SIDE */}
           <div className="flex flex-col justify-start px-4 py-2 sm:px-8 sm:py-4 md:px-12 md:py-6 lg:px-16 lg:py-8 w-2/6 overflow-hidden ">
@@ -346,8 +345,8 @@ const SoundOverlay = ({ setOpenModal, switchToProfile, switchToGeneral, switchTo
     <>
       <div className="w-screen h-screen flex items-center justify-center ">
         <div className="w-2/4 h-screen shadow-lg bg-white rounded-md flex">
-        <button className='absolute top-4 pr-4 right-1/4 text-xl cursor-pointer' onClick={setOpenModal}>X
-          {/* <CloseIcon fontSize="large" /> */}
+        <button className='absolute top-4 pr-4 right-1/4 text-xl cursor-pointer' onClick={setOpenModal}>
+          <CloseIcon fontSize="large" />
           </button>
           <div className="flex flex-col justify-start px-4 py-2 sm:px-8 sm:py-4 md:px-12 md:py-6 lg:px-16 lg:py-8 w-2/6 overflow-hidden ">
           <p className="py-4 sm:py-10 text-4xl md:text-base sm:text-sm lg:text-4xl text-black font-bold">Settings</p>
@@ -385,8 +384,8 @@ const PrivacyOverlay = ({ setOpenModal, switchToProfile, switchToSound, switchTo
     <>
       <div className="w-screen h-screen flex items-center justify-center ">
         <div className="w-2/4 h-screen shadow-lg bg-white rounded-md flex">
-        <button className='absolute top-4 pr-4 right-1/4 text-xl cursor-pointer' onClick={setOpenModal}>X
-          {/* <CloseIcon fontSize="large" /> */}
+        <button className='absolute top-4 pr-4 right-1/4 text-xl cursor-pointer' onClick={setOpenModal}>
+          <CloseIcon fontSize="large" />
           </button>
           <div className="flex flex-col justify-start px-4 py-2 sm:px-8 sm:py-4 md:px-12 md:py-6 lg:px-16 lg:py-8 w-2/6 overflow-hidden ">
             <p className="py-4 sm:py-10 text-4xl md:text-base sm:text-sm lg:text-4xl text-black font-bold">Settings</p>
@@ -436,8 +435,8 @@ const NotificationsOverlay = ({ setOpenModal, switchToProfile, switchToSound, sw
    
       <div className="w-screen h-screen flex items-center justify-center ">
         <div className="w-2/4 h-screen shadow-lg bg-white rounded-md flex">
-        <button className='absolute top-4 pr-4 right-1/4 text-xl cursor-pointer' onClick={setOpenModal}>X
-          {/* <CloseIcon fontSize="large" /> */}
+        <button className='absolute top-4 pr-4 right-1/4 text-xl cursor-pointer' onClick={setOpenModal}>
+          <CloseIcon fontSize="large" />
           </button>
           <div className="flex flex-col justify-start px-4 py-2 sm:px-8 sm:py-4 md:px-12 md:py-6 lg:px-16 lg:py-8 w-2/6 overflow-hidden ">
             <p className="py-4 sm:py-10 text-4xl md:text-base sm:text-sm lg:text-4xl text-black font-bold">Settings</p>
@@ -477,8 +476,8 @@ const AccessibilityOverlay = ({ setOpenModal, switchToProfile, switchToSound, sw
     <>
       <div className="w-screen h-screen flex items-center justify-center ">
         <div className="w-2/4 h-screen shadow-lg bg-white rounded-md flex">
-        <button className='absolute top-4 pr-4 right-1/4 text-xl cursor-pointer' onClick={setOpenModal}>X
-          {/* <CloseIcon fontSize="large" /> */}
+        <button className='absolute top-4 pr-4 right-1/4 text-xl cursor-pointer' onClick={setOpenModal}>
+          <CloseIcon fontSize="large" />
           </button>
           <div className="flex flex-col justify-start px-4 py-2 sm:px-8 sm:py-4 md:px-12 md:py-6 lg:px-16 lg:py-8 w-2/6 overflow-hidden ">
             <p className="py-4 sm:py-10 text-4xl md:text-base sm:text-sm lg:text-4xl text-black font-bold">Settings</p>
