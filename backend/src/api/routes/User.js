@@ -121,7 +121,7 @@ router.get("/username/:username", async (req, res) =>
 	if (users.docs.length > 0)
 		return res.status(400).json({ error: "Username already taken" });
 
-	return res.json({ message: "Username available" });	
+	return res.json({ message: "Username available" });
 });
 
 /************************************************************/
@@ -157,17 +157,10 @@ router.post("/friends/request/:user", async (req, res) =>
 	if (!user)
 		return res.status(401).json({ error: "Unauthorized" });
 
-	// Get sender data
-	let senderDoc = (await fb.db.doc(`users/${user.uid}`).get()).data();
-	// Sender's user data
-	let senderData = {
-		uid: user.uid,
-		username: senderDoc.username,
-		photo: senderDoc.photo
-	};
-
 	// Send friend request
-	fb.db.doc(`users/${req.params.user}`).update({ friendRequests: fb.admin.firestore.FieldValue.arrayUnion(senderData) })
+	fb.db.doc(`users/${req.params.user}`).update({
+		friendRequests: fb.admin.firestore.FieldValue.arrayUnion({ user: user.uid })
+	})
 		.then(() => { return res.json({ message: "Friend request sent" }); })
 		.catch(err => { return res.status(500).json({ error: err }); });
 });
@@ -175,6 +168,8 @@ router.post("/friends/request/:user", async (req, res) =>
 // Cancel/decline friend request
 router.delete("/friends/request/:user", async (req, res) =>
 {
+	// req.body.type = "cancel" or "decline"
+
 	// Make sure all required fields are present
 	if (!req.headers.authorization || !req.body.type)
 		return res.status(400).json({ error: "Missing required data" });
@@ -184,16 +179,12 @@ router.delete("/friends/request/:user", async (req, res) =>
 	if (!user)
 		return res.status(401).json({ error: "Unauthorized" });
 
-	// Get sender data
-	let senderDoc = (await fb.db.doc(`users/${(req.body.type == "cancel") ? user.uid : req.params.user}`).get()).data();
-	// Sender's user data
-	let senderData = {
-		uid: (req.body.type == "cancel") ? user.uid : req.params.user,
-		username: senderDoc.username,
-		photo: senderDoc.photo
-	};
+	let uid = (req.body.type == "cancel") ? req.params.user : user.uid;
+
 	// Cancel friend request
-	fb.db.doc(`users/${(req.body.type == "cancel") ? req.params.user : user.uid}`).update({ friendRequests: fb.admin.firestore.FieldValue.arrayRemove(senderData) })
+	fb.db.doc(`users/${uid}`).update({
+		friendRequests: fb.admin.firestore.FieldValue.arrayRemove({ user: uid })
+	})
 		.then(() => { return res.json({ message: "Removed friend request" }); })
 		.catch(err => { return res.status(500).json({ error: err }); });
 });

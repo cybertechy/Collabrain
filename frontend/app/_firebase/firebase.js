@@ -15,11 +15,12 @@ const microsoftProvider = new OAuthProvider('microsoft.com');
 
 const auth = getAuth(firebase);
 const signOut = () => auth.signOut();
-const getToken = () => auth.currentUser.getIdToken(true);
-const getUserID = () => auth.currentUser.uid;
+const getToken = () => auth.currentUser?.getIdToken(true);
+const getUserID = () => auth.currentUser?.uid;
 const toFbTimestamp = (date) => Timestamp.fromDate(date);
 const fromFbTimestamp = (timestamp) => timestamp.toDate();
 const useAuthState = () => authHook.useAuthState(auth);
+
 
 async function emailSignIn(e)
 {
