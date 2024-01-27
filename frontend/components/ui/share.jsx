@@ -114,8 +114,8 @@ const share = ({ contentMapName = "Content Map", sData, setShare , isOwner, upda
                         searchResults?.users?.map((result, index) => <button key={index} onClick={()=>select(result.id,"users")} id={result.id} name={result.id}  className="flex items-center gap-2 hover:bg-purple-100 rounded-lg py-2 px-2">
                             <User width={25} height={25} />
                             <div className="flex flex-col ml-5">
-                                <p className="text-sm">{result.name}</p>
-                                <p className="text-xs">{result.email}</p>
+                                <p className="text-sm text-left">{result.name}</p>
+                                <p className="text-xs text-left">{result.email}</p>
                             </div>
                         </button>)
                     }
@@ -126,7 +126,7 @@ const share = ({ contentMapName = "Content Map", sData, setShare , isOwner, upda
                         searchResults?.teams?.map((result, index) => <button key={index} onClick={()=>select(result.id,"teams")} id={result.id} name={result.id}  className="flex items-center gap-2 hover:bg-purple-100 rounded-lg py-2 px-2">
                             <Users width={25} height={25} />
                             <div className="flex flex-col ml-5">
-                                <p className="text-sm">{result.name}</p>
+                                <p className="text-sm text-left">{result.name}</p>
                             </div>
                         </button>)
                     }
@@ -145,7 +145,7 @@ const share = ({ contentMapName = "Content Map", sData, setShare , isOwner, upda
                     <div className="flex items-center">
                         {shareData[key]?.type==="users"?<User width={25} height={25} />:<Users width={25} height={25} />}
                         <div className="flex flex-col ml-5">
-                            <p className="text-sm">{shareData[key].name}</p>
+                            <p className="text-sm text-left">{shareData[key].name}</p>
                             {shareData[key]?.type==="users" && <p className="text-xs">{shareData[key].email}</p>}
                         </div>
                     </div>
