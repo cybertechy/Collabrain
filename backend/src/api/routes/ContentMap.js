@@ -254,19 +254,14 @@ router.get("/ut/search", async (req, res) => {
 
     let users = []
 
-    // get users based on email
-    const usersBasedOnEmail = await usersRef.where("email", ">=", query).where("email", "<=", query + "\uf8ff").get();
-
-    // get users based on userid
-    const usersBasedOnUserId = await usersRef.where("username", ">=", query).where("username", "<=", query + "\uf8ff").get();
-
-    //get teams based on name
-    const teamsBasedOnName = await teamsRef.where("name", ">=", query).where("name", "<=", query + "\uf8ff").get();
-
-
-
+    const [usersBasedOnEmail, usersBasedOnUsername, teamsBasedOnName] = await Promise.all([
+        usersRef.where("email", ">=", query).where("email", "<=", query + "\uf8ff").get(),
+        usersRef.where("username", ">=", query).where("username", "<=", query + "\uf8ff").get(),
+        teamsRef.where("name", ">=", query).where("name", "<=", query + "\uf8ff").get()
+    ]);
+    
     // add them to users array, remove duplicates
-    users = [...usersBasedOnEmail.docs, ...usersBasedOnUserId.docs];
+    users = [...usersBasedOnEmail.docs, ...usersBasedOnUsername.docs];
 
     users = users.filter((user, index, self) =>
         index === self.findIndex((t) => (
