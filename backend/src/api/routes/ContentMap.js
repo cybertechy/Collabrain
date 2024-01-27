@@ -10,7 +10,7 @@ const router = Router();
 /* Create a New content map */
 router.post("/", async (req, res) => {
    
-    if(!req.headers.authorization || !req.body.name || !req.body.data) return res.status(400).json({ code: 400, error: "Missing token or name or data" });
+    if(!req.headers.authorization || !req.body.name) return res.status(400).json({ code: 400, error: "Missing token or name" });
 
     //verify user
     const token = req.headers.authorization.split(' ')[1];

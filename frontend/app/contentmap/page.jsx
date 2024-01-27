@@ -30,6 +30,7 @@ function page() {
     const [Error, setError] = useState(null);
     const [isOwner, setisOwner] = useState(false);
     const [user, setuser] = useState(null);
+    const [OverrideMessage, setOverrideMessage] = useState("");
     
     
 
@@ -42,9 +43,6 @@ function page() {
 
     const router = useRouter();
     const searchParms = useSearchParams();
-    
-
-
 
     useEffect(() => {
         import("@excalidraw/excalidraw").then((comp) =>
@@ -94,6 +92,11 @@ function page() {
         let token = await getToken();
         if (!token) return null;
 
+        let backup = IntialData;
+        setIntialData(null);
+        setOverrideMessage("Creating new content map, Please wait ...");
+        setNew(false);
+    
         try {
             const res = await axios.post(`http://localhost:8080/api/contentmap`, {
                 name: "New Content Map",
@@ -110,10 +113,12 @@ function page() {
             console.log(res.data);
 
             setid(res.data.id);
-            setIntialData({ name: "New Content Map", data: "" });
+            setIntialData({ name: "New Content Map", data: "", userAccess: "owner"});
+            setContentMapName("New Content Map");
+            setisOwner(true);
+            setOverrideMessage("");
 
             router.push(`/contentmap?id=${res.data.id}`);
-            router.reload();
         }
         catch (err) {
             console.log(err);
@@ -125,6 +130,7 @@ function page() {
                 pauseOnHover: true,
                 theme: "colored"
             });
+            setIntialData(backup);
             return null;
         }
     }
@@ -138,6 +144,10 @@ function page() {
             appState: ExcalidrawAPI.getAppState(),
             files: ExcalidrawAPI.getFiles(),
         }
+
+        setIntialData(null);
+        setOverrideMessage("Creating new content map, Please wait ...");
+        setNew(false);
 
         try {
             const res = await axios.post(`http://localhost:8080/api/contentmap`, {
@@ -155,9 +165,10 @@ function page() {
             console.log(res.data);
 
             setid(res.data.id);
-            setIntialData({ name: ContentMapName+" (copy)", data: JSON.stringify(appdata) });
+            setIntialData({ name: ContentMapName+" (copy)", data: JSON.stringify(appdata), userAccess: "owner" });
             setContentMapName(ContentMapName+" (copy)");
-
+            setisOwner(true);
+            setOverrideMessage("");
             
             router.push(`/contentmap?&id=${res.data.id}`);
             
@@ -172,6 +183,7 @@ function page() {
                 pauseOnHover: true,
                 theme: "colored"
             });
+            setIntialData(backup);
             return null;
         }
        
@@ -180,6 +192,10 @@ function page() {
     const DeleteContentMap = async () => {
         let token = await getToken();
         if (!token) return null;
+
+        let backup = IntialData;
+        setIntialData(null);
+        setOverrideMessage("Deleting content map, Please wait ...");
 
         try {
             const res = await axios.delete(`http://localhost:8080/api/contentmap/${id}`, {
@@ -193,11 +209,24 @@ function page() {
 
             setid(null);
             setIntialData(null);
+            setContentMapName("New Content Map");
+            setisOwner(false);
+            setOverrideMessage("");
             router.push(`/dashboard`);
             router.reload();
         }
         catch (err) {
             console.log(err);
+            toast.error("Error deleting content map",{
+                position: "bottom-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                theme: "colored"
+            });
+
+            setIntialData(backup);
             return null;
         }
     }
@@ -255,6 +284,10 @@ function page() {
         setPointerState(data.button);
         setisSaved(false);
         
+        if(!ExcalidrawAPI) {
+            updatecontentmap(data);
+            return;
+        }
 
         let appState = ExcalidrawAPI.getAppState();
         appState.collaborators=[];
@@ -268,7 +301,6 @@ function page() {
         let res = await updatecontent({ name: IntialData?.name, data: appdata })
        
         if(res?.status===200) setisSaved(true);
-        
     }
 
     const getdata = async (query) => {
@@ -372,10 +404,11 @@ function page() {
                 initialData={IntialData?.data ? JSON.parse(IntialData?.data) : null}
                 onPointerUpdate={updatecontentmap}
             />}
-            {!id && <h1 className="text-2xl font-bold text-purple-500 px-10"> Searching the cloud, Please wait ..</h1>}
+            {!id && <h1 className="text-2xl font-bold text-purple-500 px-10 text-center"> Searching the cloud, Please wait ..</h1>}
             {id && !Excalidraw && <h1 className="text-2xl font-bold text-purple-500 px-10">Loading...</h1>}
-            {id && Excalidraw && !IntialData && !Error && <h1 className="text-2xl font-bold text-purple-500 px-10"> Working to load the Map ... </h1>}
-            {id && Excalidraw && !IntialData && Error && <h1 className="text-2xl font-bold text-purple-500 px-10"> Error: {Error.error} </h1>}
+            {id && Excalidraw && !IntialData && !Error && !OverrideMessage && <h1 className="text-2xl font-bold text-purple-500 px-10 text-center"> Working to load the Map ... </h1>}
+            {id && Excalidraw && !IntialData && Error && !OverrideMessage &&  <h1 className="text-2xl font-bold text-purple-500 px-10 text-center"> Error: {Error.error} </h1>}
+            {id && Excalidraw && !IntialData && !Error && OverrideMessage && <h1 className="text-2xl font-bold text-purple-500 px-10 text-center"> {OverrideMessage} </h1>}
         </div>
     </div>
 }
