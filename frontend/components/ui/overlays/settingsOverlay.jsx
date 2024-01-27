@@ -125,7 +125,7 @@ const ToggleButtonExample = () => {
   );
 }
  
- 
+  
 const SettingsOverlay = () => {
   const [modalVisible, setModalVisible] = useState(true);
   const [currentScreen, setCurrentScreen] = useState("profile");
