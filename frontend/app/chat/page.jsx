@@ -1,80 +1,101 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import ChannelBar from "./channelBar";
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import MessageBox from "./messageBox";
-// import Sidebar from "./sidebar";
 import Toolbar from '@mui/material/Toolbar';
 import { Timestamp } from "firebase/firestore";
 import Sidebar from "../../components/ui/sidebar/sidebar";
+import ChannelBar from "../../components/ui/chatsComponents/channelBar";
+import MessageItem from "./messageItem";
 const { useRouter } = require('next/navigation');
 const axios = require("axios");
-const fb = require("_firebase/firebase"); // Import the authentication functions
+const fb = require("_firebase/firebase");
 const socket = require("_socket/socket");
-import MessageItem from "./messageItem";
-export default function ChatRoom()
-{
-	const router = useRouter();
-	const [user, loading] = fb.useAuthState();
+import ShortTextIcon from '@mui/icons-material/ShortText'; // This can act as a hash
 
-	// Setup listener for new messages
-	// Only listen when on chat page
-	let sockCli = useRef(null);
-	useEffect(() =>
-	{
-		if (!user)
-			return;
 
-		sockCli.current = socket.init('http://localhost:8080');
-		sockCli.current.on('teamMsg', (data) =>
-		{
-			console.log("Received message from server");
-			setText((prevText) => [
-				...prevText,
-				<h1 key={prevText.length} className="text-black">{`${data.sender}: ${data.msg}`}</h1>,
-			]);
-		});
+export default function ChatRoom() {
+    const router = useRouter();
+    const [user, loading] = fb.useAuthState();
+	const [channelsData, setChannelsData] = useState([]);
+	const [userInfo, setUserInfo] = useState({data:{username: "User"}});
+    let sockCli = useRef(null);
+    useEffect(() => {
+        if (!user) return;
 
-		return () => sockCli.current.off('teamMsg');
-	}, [user]);
+        sockCli.current = socket.init('http://localhost:8080');
+        sockCli.current.on('teamMsg', (data) => {
+            console.log("Received message from server");
+            setText((prevText) => [
+                ...prevText,
+                <h1 key={prevText.length} className="text-black">{`${data.sender}: ${data.msg}`}</h1>,
+            ]);
+        });
 
-	// Get previous messages
-	useEffect(() =>
-	{
-		if (!user)
-			return;
+        return () => sockCli.current.off('teamMsg');
+    }, [user]);
 
-		fb.getToken().then((token) =>
-		{
-			// Get the messages from the server
-			axios.get(`http://localhost:8080/api/team/LoH1iHOGowBzcYDXEqnu/channel/General/messages`,
-				{ headers: { "Authorization": "Bearer " + token } })
-				.then((res) =>
-				{
-					console.log(res.data);
-					let data = res.data;
-					let msgs = [];
-  for (let i = 0; i < data.length; i++) {
-    let msgDate = fb.fromFbTimestamp(new Timestamp(data[i].sentAt.seconds, data[i].sentAt.nanoseconds));
-    msgs.push(
-      <MessageItem 
-        key={i} 
-        sender={data[i].sender} 
-        timestamp={msgDate.toLocaleTimeString()} 
-        message={data[i].message} 
-        reactions={{}} // Add reactions if you have them
-      />
-    );
-  }
-  setText(msgs);
-				})
-				.catch((err) => console.log(err));
-		});
-	}, [user]);
+	useEffect(() => {
+        const fetchChannels =  () => {
+            // Placeholder function to fetch channels data
+            // Replace this with actual API call and set the state
+            setChannelsData([
+                { name: 'Category 1', channels: ['General', 'Random'] },
+                { name: 'Category 2', channels: ['Updates', 'Launch'] },
+            ]);
+        };
 
-	const [text, setText] = useState([]);
+        if (user) {
+            fetchChannels();
+        }
+    }, [user]);
 
+    useEffect(() => {
+        if (!user) return;
+
+        fb.getToken().then((token) => {
+            axios.get(`http://localhost:8080/api/team/LoH1iHOGowBzcYDXEqnu/channel/General/messages`, {
+                headers: { "Authorization": "Bearer " + token }
+            }).then((res) => {
+                console.log(res.data);
+                let data = res.data;
+                let msgs = data.map((messageData, i) => (
+                    <MessageItem
+                        key={i}
+                        sender={messageData.sender}
+                        timestamp={fb.fromFbTimestamp(new Timestamp(messageData.sentAt.seconds, messageData.sentAt.nanoseconds)).toLocaleTimeString()}
+                        message={messageData.message}
+                        reactions={{}}
+						username = {userInfo.username}
+                    />
+                ));
+                setText(msgs);
+            }).catch((err) => console.log(err));
+        });
+    }, [user]);
+	useEffect(() => {
+		if (!user) return;
+	  
+		const fetchUser = async () => {
+		  try {
+			const token = await fb.getToken();
+			const response = await axios.get(`http://localhost:8080/api/users/${user.uid}`, {
+			  headers: { "Authorization": "Bearer " + token }
+			});
+			// Set user info with the data obtained from the response
+			setUserInfo({ data: response.data });
+		  } catch (error) {
+			console.error('Error fetching user data:', error);
+			// Handle error, for example by setting a default user info
+			setUserInfo({ data: { username: "User" } });
+		  }
+		};
+	  
+		fetchUser();
+	  }, [user]);
+	  
+    const [text, setText] = useState([]);
 	const sendTeamMsg = async (msg) =>
 	{
 		if (!sockCli.current)
@@ -84,13 +105,14 @@ export default function ChatRoom()
 		}
 
 		let token = await fb.getToken();
-		let userData = axios.get(`http://localhost:8080/api/users/${user.uid}`,
+		let userData = await axios.get(`http://localhost:8080/api/users/${user.uid}`,
 			{ headers: { "Authorization": "Bearer " + token } });
-
+			
+		
 			let sentAt = new Date();
-			let messageData = {
-			  senderID: fb.getUserID(),
-			  sender: (userData.username) ? userData.username : user.email,
+			const messageData = {
+				senderID: fb.getUserID(),
+				sender: userInfo.data.username,
 			  team: "LoH1iHOGowBzcYDXEqnu",
 			  channel: "General",
 			  msg: msg,
@@ -106,6 +128,7 @@ export default function ChatRoom()
 			  timestamp={sentAt.toLocaleTimeString()} 
 			  message={messageData.msg} 
 			  reactions={{}} // Add reactions if you have them
+			  username = {userInfo.username}
 			/>,
 		  ]);
 
@@ -128,12 +151,19 @@ export default function ChatRoom()
         </div>
     );
 
+
+
 	return (
-		<div className="flex h-full w-full">
+		<div className="flex h-full w-full drop-shadow-lg">
+			
 			<Sidebar />
+			<ChannelBar
+                user={userInfo}
+                channelsData={channelsData} // Pass the state variable directly
+            />
 			<div className="relative h-full w-full bg-white overflow-y-auto"> {/* Chat room */}
 				<Toolbar sx={{ backgroundColor: 'whitesmoke', boxShadow: '0px 2px 1px rgba(0, 0, 0, 0.1)' }}>
-					<h1 className='text-xl font-semibold text-primary items-center justify-center flex-row'>Team Alpha {<ChevronRightIcon className = "mb-1" fontSize = "large"/>} General</h1>
+					<h1 className='text-xl font-semibold text-primary items-center justify-center flex-row'>{<ShortTextIcon style={{ color: '#972FFF', opacity: '0.7'  }} fontSize="large" /> } General</h1>
 				</Toolbar>
 
 				<div className="p-5 h-5/6 scrollbar-thin scrollbar-thumb-primary  text-black overflow-y-scroll">
