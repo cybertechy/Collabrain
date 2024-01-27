@@ -2,11 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-// import SettingsIcon from "../overlays/settingsOverlay";
+import SettingsIcon from "../overlays/settingsOverlay";
 import SearchBar from "./navbarSubComponents/NavbarSearchbar";
 import LeaderboardNavbar from '../leaderboard/leaderboardNavbar';
 import {Tooltip}  from '@mui/material';
-// import SettingsOverlay from '../overlays/settingsOverlay';
+import SettingsOverlay from '../overlays/settingsOverlay';
 const Navbar = () => {
     const [showLeaderboard, setShowLeaderboard] = useState(false);
     const leaderboardRef = useRef(null);
@@ -91,7 +91,7 @@ const Navbar = () => {
                     <LeaderboardNavbar />
                 </div>
             )}
-               {/* {showSettings && <SettingsOverlay setOpenModal={setShowSettings} modalVisible={showSettings} />}  */}
+               {showSettings && <SettingsOverlay setOpenModal={setShowSettings} modalVisible={showSettings} />} 
 
         </>
     );
