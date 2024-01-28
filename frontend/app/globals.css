@@ -66,9 +66,6 @@ body {
   --color-primary: #972FFF;
 }
 
-.excalidraw {
-  --color-primary: #972FFF;
-}
 
 @keyframes slideInFromLeft {
   from {

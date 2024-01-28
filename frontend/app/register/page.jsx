@@ -60,28 +60,25 @@ export default function Register() {
 			</div>
 		);
 	}
- 
+	const formSignin =  async (event) => {
 
+        event.preventDefault();
 
-    const handleFormSubmit = async (e) => {
-        e.preventDefault();
-    
-        // Create a custom event object that mimics the structure of a real event
-        const customEvent = {
-            preventDefault: () => {}, //dummy function for preventDefault
-            target: {
-                elements: {
-                    email: { value: email },
-                    password: { value: password },
-                    firstname: { value: firstname },
-                    lastname: { value: lastname },   
-                    
-                }
-            }
-        };
-    
-		fb.emailSignUp(customEvent);
-    };
+        let result = await emailSignUp(email, password, confirmPassword, username, firstname, lastname);
+        if(!result.success) {
+            toast.error(result.error,{
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                theme: "colored",
+            });
+            if(result.route) router.push(result.route)
+        } else {
+            router.push("/dashboard");
+        }
+    }
 
     return (
         <div className="flex items-center justify-center min-h-screen">
