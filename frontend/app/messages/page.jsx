@@ -13,6 +13,7 @@ const axios = require("axios");
 const fb = require("_firebase/firebase");
 const socket = require("_socket/socket");
 import ChatWindow from "./chatWindow";
+import FriendsWindow from "./friendWindow";
 import ShortTextIcon from '@mui/icons-material/ShortText'; // This can act as a hash
 
 
@@ -20,6 +21,7 @@ export default function Messages() {
     const router = useRouter();
     const [user, loading] = fb.useAuthState();
     const [channelsData, setChannelsData] = useState([]);
+    const [showChat, setShowChat] = useState(false);
     const [userInfo, setUserInfo] = useState(null);
     const [text, setText] = useState([]);
     const sockCli = useRef(null);
@@ -157,19 +159,23 @@ export default function Messages() {
     
       // Handler for the friends button
       const handleFriendsClick = () => {
-        console.log('Friends button clicked');
-      };
-    
-	return (
-		<div className="flex h-full w-full drop-shadow-lg">
-			
-			<Sidebar />
+        // Toggles the display between ChatWindow and FriendsWindow
+        setShowChat((prevShowChat) => !prevShowChat);
+    };
+	  return (
+        <div className="flex h-full w-full drop-shadow-lg">
+            <Sidebar />
             <DMSideBar userData={userInfo} friendsHandler={handleFriendsClick} directMessages={directMessages} />
 
-			<div className="relative h-full w-full bg-white overflow-y-auto"> {/* Chat room */}
-            <ChatWindow messages={text} sendPersonalMsg={sendPersonalMsg} userInfo={userInfo} />
-				</div>
-		{/* <ChannelBar /> */}
-		</div>
-	);
+            <div className="relative h-full w-full bg-white overflow-y-auto">
+                {/* Toggle between ChatWindow and FriendsWindow */}
+                {showChat ? (
+                    <ChatWindow messages={text} sendPersonalMsg={sendPersonalMsg} userInfo={userInfo} title="General" />
+                ) : (
+                    <FriendsWindow />
+                )}
+            </div>
+            {/* <ChannelBar /> */}
+        </div>
+    );
 }
