@@ -6,7 +6,7 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import {Tooltip}  from '@mui/material';
 import { useState } from 'react';
 import CreateFolderOverlay from  '../overlays/CreateFolderOverlay';
-const DashboardNewFolder = ({}) => {
+const DashboardNewFolder = ({ onNewFolderCreated }) => {
     const [isCreateFolderOverlayOpen, setIsCreateFolderOverlayOpen] = useState(false);
 
     const toggleCreateFolderOverlay = () => {
@@ -21,10 +21,13 @@ const DashboardNewFolder = ({}) => {
           
         >
              {isCreateFolderOverlayOpen && (
-                <CreateFolderOverlay 
-                    isOpen={isCreateFolderOverlayOpen} 
-                    onClose={toggleCreateFolderOverlay} 
-                />
+             <CreateFolderOverlay 
+            isOpen={isCreateFolderOverlayOpen} 
+            onClose={toggleCreateFolderOverlay} 
+            onFolderCreated={(newFolder) => {
+                onNewFolderCreated(newFolder); // Invoke the callback passed from Dashboard
+            }}
+        />
             )}
         <div className="bg-tertiary flex items-center justify-center rounded-xl w-min  hover:opacity-80 duration-300">
             <IconButton onClick={toggleCreateFolderOverlay} color="inherit">

@@ -1,5 +1,9 @@
 import React, { useState } from "react";
 import CloseIcon from '@mui/icons-material/Close';
+const { useRouter } = require("next/navigation");
+import fb from '../../../app/_firebase/firebase';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const NewProjectOverlay = ({ toggleModal, modalVisible }) => {
   const [currentScreen, setCurrentScreen] = useState("contentMap");
@@ -22,9 +26,49 @@ const NewProjectOverlay = ({ toggleModal, modalVisible }) => {
     )
   );
 }
- 
+
+const NewContentMap = async () => {
+  const router = useRouter();
+  let token = await fb.getToken();
+  if (!token) return null;
+
+
+
+  try {
+      const res = await axios.post(`http://localhost:8080/api/maps`, {
+          name: "New Content Map",
+          data: ""
+      }, {
+          headers: {
+              authorization: `Bearer ${token}`,
+          },
+      });
+
+     
+      if (res.status !== 200) return null;
+
+      
+
+      router.push(`/contentmap?id=${res.data.id}`);
+  }
+  catch (err) {
+      console.log(err);
+      toast.error("Error creating new content map",{
+          position: "bottom-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          theme: "colored"
+      });
+    
+      return null;
+  }
+}
+
 
 const ContentMapOverlay = ({ setOpenModal, switchToDocument }) => {
+
 return (
     <>
     <div className="w-screen h-screen flex items-center justify-center">
@@ -47,7 +91,7 @@ return (
                     <p className="mt-4 ml-16">Document</p></button>
                   </div>
                   <div className="mt-36 flex justify-end">
-                    <button className="mr-10 w-44 h-12  text-white bg-purple-600 hover:bg-purple-700  font-normal rounded text-lg shadow-xl ">Create Project</button>
+                    <button onClick = {NewContentMap}className="mr-10 w-44 h-12  text-white bg-purple-600 hover:bg-purple-700  font-normal rounded text-lg shadow-xl ">Create Project</button>
                   </div>
           </div>
       </div>
@@ -58,6 +102,7 @@ return (
 }
 
 const DocumentOverlay=({ setOpenModal, switchToContent }) => {
+ 
     return (
         <>
          <div className="w-screen h-screen flex items-center justify-center">
@@ -81,7 +126,7 @@ const DocumentOverlay=({ setOpenModal, switchToContent }) => {
                     <p className="mt-4 ml-10">Document</p></button>
                   </div>
                   <div className="mt-36 flex justify-end">
-                    <button className="mr-10 w-44 h-12  text-white bg-purple-600 hover:bg-purple-700  font-normal rounded text-lg shadow-xl ">Create Project</button>
+                    <button  className="mr-10 w-44 h-12  text-white bg-purple-600 hover:bg-purple-700  font-normal rounded text-lg shadow-xl ">Create Project</button>
                   </div>
           </div>
                 

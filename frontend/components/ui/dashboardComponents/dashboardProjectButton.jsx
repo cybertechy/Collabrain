@@ -1,24 +1,32 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
+const { useRouter } = require("next/navigation");
 import { IconButton, Menu, MenuItem,  Tooltip } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from '@mui/material';
+import axios from 'axios';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import EditIcon from '@mui/icons-material/Edit'; // Icon for Rename
 import ShareIcon from '@mui/icons-material/Share'; // Icon for Share
 import SortIcon from '@mui/icons-material/Sort'; // Icon for Organize
 import DeleteIcon from '@mui/icons-material/Delete'; // Icon for Delete
-
-const DashboardProjectButton = ({ title, project, type, color = "white", onClick }) => {
+import fb from '../../../app/_firebase/firebase';
+const DashboardProjectButton = ({ title, project, type, color = "white", onClick , key, createdAt, updatedAt,  renamedProject , handleProjectDeleted}) => {
     const [anchorEl, setAnchorEl] = useState(null);
-    const open = Boolean(anchorEl);
+    const [renameOverlayOpen, setRenameOverlayOpen] = useState(false);
+    const [deleteOverlayOpen, setDeleteOverlayOpen] = useState(false);
+    const [newProjectName, setNewProjectName] = useState('');
 
+    const open = Boolean(anchorEl);
+    const router = useRouter();
     const handleClick = (event) => {
+        event.stopPropagation();
         setAnchorEl(event.currentTarget);
     };
 
     const handleClose = () => {
         setAnchorEl(null);
     };
-    const truncateTitle = (title, maxLength = 12) => {
+    const truncateTitle = (title, maxLength = 11) => {
         if (title.length > maxLength) {
             return title.substring(0, maxLength - 3) + '..';
         }
@@ -36,7 +44,69 @@ const DashboardProjectButton = ({ title, project, type, color = "white", onClick
             <path d="M12.971 1.816A5.23 5.23 0 0 1 14.25 5.25v1.875c0 .207.168.375.375.375H16.5a5.23 5.23 0 0 1 3.434 1.279 9.768 9.768 0 0 0-6.963-6.963Z" />
         </svg>
     );
-
+    const handleContentMapClick = (event) => {
+        // Check if the type is "Content Map"
+        event.stopPropagation();
+        if (type === 'Content Map' && project.id) {
+            // Navigate to the content map page with the id parameter
+            router.push(`/contentmap?id=${project.id}`);
+        }
+    
+    };
+    async function renameContentMap(contentMapId, newName) {
+        let token = await fb.getToken();
+        await axios.put("http://localhost:8080/api/maps/" + contentMapId, {
+            name: newName
+        }, {
+            headers: {
+                "Authorization": `Bearer ${token}`, // Replace <UserToken> with actual token
+                "Content-Type": "application/json"
+            }
+        })
+        .then(function (response) {
+            console.log('Content Map renamed successfully:', response.data);    
+            renamedProject(response.data);
+        })
+        .catch(function (error) {
+            console.error('Error renaming content map:', error);
+        });
+    }
+    async function deleteContentMap(contentMapId) {
+        let token = await fb.getToken();
+       await axios.delete("http://localhost:8080/api/maps/" + contentMapId, {
+            headers: {
+                "Authorization": `Bearer ${token}` // Replace <UserToken> with actual token
+            }
+        })
+        .then(function (response) {
+            console.log('Content Map deleted successfully');
+            deleteContentMap(response.data);
+        })
+        .catch(function (error) {
+            console.error('Error deleting content map:', error);
+        });
+    }
+    const dialogStyles = {
+        color: "#972FFF",  // Text color
+        borderColor: "#972FFF",  // Border color
+    };
+    
+    const buttonStyles = {
+        color: "#FFFFFF",  // Text color
+        backgroundColor: "#972FFF",  // Button background color
+    };
+    const handleRename = () => {
+        renameContentMap(project.id, newProjectName);
+        setRenameOverlayOpen(false);
+        // Update other UI elements or state if necessary
+    };
+    
+    
+    const handleDelete = () => {
+        deleteContentMap(project.id);
+        setDeleteOverlayOpen(false);
+        // Update other UI elements or state if necessary
+    };
     return (
         <Tooltip
             title={title}
@@ -46,8 +116,9 @@ const DashboardProjectButton = ({ title, project, type, color = "white", onClick
         >
         <div className="flex flex-col items-center justify-center bg-tertiary rounded-md hover:opacity-80 duration-300 w-32 h-28 pt-3 pl-1">
             <div className="flex flex-col items-center justify-center h-full">
-                {type === 'Document' ? doc() : map()}
+               <div  onClick = {handleContentMapClick} >{type === 'Document' ? doc() : map()}</div> 
                 <div className="flex flex-row justify-between items-center w-full mt-2">
+                    
                     <span className="text-lg font-semibold">{truncateTitle(title)}</span>
                     <IconButton color="inherit" onClick={handleClick} className="ml-2">
                 <MoreVertIcon fontSize="small" />
@@ -57,7 +128,7 @@ const DashboardProjectButton = ({ title, project, type, color = "white", onClick
                 open={open}
                 onClose={handleClose}
             >
-                <MenuItem onClick={handleClose}>
+                <MenuItem onClick={() => { handleClose(); setRenameOverlayOpen(true); }}>
                     <EditIcon fontSize="small text-tertiary" className="mr-2 text-tertiary flex justify-between gap-5" />
                     <span className='text-tertiary'>Rename</span>
                 </MenuItem>
@@ -69,23 +140,69 @@ const DashboardProjectButton = ({ title, project, type, color = "white", onClick
                     <SortIcon fontSize="small text-tertiary" className="mr-2  text-tertiary flex justify-between gap-5" />
                     <span className='text-tertiary'>Organize</span>
                 </MenuItem>
-                <MenuItem onClick={handleClose}>
+                <MenuItem onClick={() => { handleClose(); setDeleteOverlayOpen(true); }}>
                     <DeleteIcon fontSize="small text-tertiary" className="mr-2  text-tertiary flex justify-between gap-5" />
                     <span className='text-tertiary'>Delete</span>
                 </MenuItem>
             </Menu>
         </div>
             </div>
+
         </div>
+        {/* Rename Overlay */}
+        <Dialog open={renameOverlayOpen} onClose={() => setRenameOverlayOpen(false)} className={dialogStyles}>
+    <DialogTitle>Rename Project</DialogTitle>
+    <DialogContent>
+        <TextField
+            label="New Project Name"
+            variant="outlined"
+            fullWidth
+            value={newProjectName}
+            onChange={(e) => setNewProjectName(e.target.value)}
+        />
+    </DialogContent>
+    <DialogActions>
+        <Button onClick={() => setRenameOverlayOpen(false)} style={buttonStyles}>
+            Cancel
+        </Button>
+        <Button onClick={handleRename} style={buttonStyles}>
+            Rename
+        </Button>
+    </DialogActions>
+</Dialog>
+
+{/* Delete Confirmation Overlay */}
+<Dialog open={deleteOverlayOpen} onClose={() => setDeleteOverlayOpen(false)} className={dialogStyles}>
+    <DialogTitle>Confirm Delete</DialogTitle>
+    <DialogContent>
+        Are you sure you want to delete this Project and its contents?
+    </DialogContent>
+    <DialogActions>
+        <Button onClick={() => setDeleteOverlayOpen(false)} style={buttonStyles}>
+            Cancel
+        </Button>
+        <Button onClick={handleDelete} style={buttonStyles}>
+            Delete
+        </Button>
+    </DialogActions>
+</Dialog>
+);
         </Tooltip>
     );
 };
 
 DashboardProjectButton.propTypes = {
     title: PropTypes.string,
-    project: PropTypes.string.isRequired,
+    project: PropTypes.object.isRequired,
     type: PropTypes.string.isRequired,
     color: PropTypes.string,
+    onClick: PropTypes.func.isRequired,
+    key: PropTypes.string,
+   
+    createdAt : PropTypes.string,
+    updatedAt : PropTypes.string,
+    
+   
     onClick: PropTypes.func.isRequired,
 };
 
