@@ -24,8 +24,7 @@ const FriendsWindow = () => {
   };
 
   const handleSearch = (query) => {
-    setSearchQuery(query);
-    // Implement the search/filter logic
+    setSearchQuery(query.toLowerCase());
   };
 
   const handleMoreOptions = (friend) => {
@@ -33,17 +32,22 @@ const FriendsWindow = () => {
     console.log('More options clicked for:', friend.name);
   };
 
-  return (
-    <Box sx={{ width: '100%' }}>
-      <TopBar activeTab={activeTab} onTabChange={handleTabChange} />
-      <SearchBar onSearch={handleSearch} />
-      <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
-        {friendsList.map((friend) => (
-          <FriendTile key={friend.id} friendData={friend} onMoreOptions={handleMoreOptions} />
-        ))}
-      </List>
-    </Box>
-  );
-};
+  const filteredFriends = searchQuery
+  ? friendsList.filter((friend) =>
+      friend.name.toLowerCase().includes(searchQuery)
+    )
+  : friendsList;
+    return (
+        <Box sx={{ width: '100%' }}>
+          <TopBar activeTab={activeTab} onTabChange={handleTabChange} />
+          <SearchBar onSearch={handleSearch} />
+          <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
+            {filteredFriends.map((friend) => (
+              <FriendTile key={friend.id} friendData={friend} onMoreOptions={handleMoreOptions} />
+            ))}
+          </List>
+        </Box>
+      );
+    };
 
 export default FriendsWindow;
