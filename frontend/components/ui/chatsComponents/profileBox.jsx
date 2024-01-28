@@ -51,7 +51,7 @@ const ProfileBox = ({ userData, onMute, onDeafen, onSettings }) => {
       
         return color;
       }
-      
+      console.log(userData)
     return (
         <div className=" bg-primary w-full text-white p-2 flex flex-col justify-between items-center shadow-lg">
             <div className="flex items-center flex-row mt-2">

@@ -12,6 +12,7 @@ const { useRouter } = require('next/navigation');
 const axios = require("axios");
 const fb = require("_firebase/firebase");
 const socket = require("_socket/socket");
+import ChatWindow from "./chatWindow";
 import ShortTextIcon from '@mui/icons-material/ShortText'; // This can act as a hash
 import Template from "@/components/ui/template/template";
 
@@ -20,7 +21,7 @@ export default function Messages() {
     const router = useRouter();
     const [user, loading] = fb.useAuthState();
     const [channelsData, setChannelsData] = useState([]);
-    const [userInfo, setUserInfo] = useState({ data: { username: "User" } });
+    const [userInfo, setUserInfo] = useState(null);
     const [text, setText] = useState([]);
     const sockCli = useRef(null);
     useEffect(() => {
@@ -159,52 +160,13 @@ export default function Messages() {
       const handleFriendsClick = () => {
         console.log('Friends button clicked');
       };
+    
 	return (
         <Template>
-		{/* <div className="flex h-full w-full drop-shadow-lg"> */}
-			
-			{/* <Sidebar /> */}
-            
             <div className="flex flex-row flex-grow">
-                {/* <div className="flex flex-col"> */}
-                    <DMSideBar
-                    userData = {userInfo}
-                    friendsHandler={handleFriendsClick}
-                    directMessages={directMessages}
-                    />
-                    {/* </div> */}
-                    <div className="flex flex-col flex-grow relative">
-            <div className="flex items-center justify-between bg-gray-100 w-full drop-shadow-md mb-3 h-min">
-                <Toolbar sx={{ backgroundColor: 'whitesmoke', 
-                // boxShadow: '0px 2px 1px rgba(0, 0, 0, 0.1)' 
-                }}>
-					<h1 className='text-xl font-semibold text-primary items-center justify-center'>{<ShortTextIcon style={{ color: '#972FFF', opacity: '0.7'  }} fontSize="large" /> } General</h1>
-			    </Toolbar>
-                
+                <DMSideBar userData={userInfo} friendsHandler={handleFriendsClick} directMessages={directMessages} />
+                <ChatWindow messages={text} sendPersonalMsg={sendPersonalMsg} userInfo={userInfo} />
             </div>
-
-            <div className="flex">
-            <div className="p-5 h-5/6 scrollbar-thin scrollbar-thumb-primary  text-black overflow-y-scroll">
-					{text}
-				</div>
-
-				<div className="absolute z-10 inset-x-0 bottom-5 mx-5  text-white">
-					<MessageBox callback={sendPersonalMsg} />
-				</div>
-            </div>
-            </div>
-            </div>
-            {/* <nav className="bg-white p-4 flex items-center justify-between"> */}
-			{/* <div className="relative h-full w-full bg-white"> Chat room */}
-            
-            {/* </nav> */}
-				
-
-				
-
-				{/* </div> */}
-		{/* <ChannelBar /> */}
-		{/* </div> */}
         </Template>
 	);
 }
