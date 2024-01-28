@@ -7,15 +7,16 @@ const TeamSidebarItem = ({ team, isSelected , isExpanded = true }) => {
     const { name, imageUrl } = team;
     const itemClasses = isSelected ? "text-primary" : "text-unselected";
     const defaultImage = '/assets/images/imagenotFound.jpg';
+    const selectedBorder = isSelected ? "border-primary border-2 border-solid" : "group-hover:border-primary group-hover:border-2";
 
     return (
         <Tooltip title={name} enterDelay={1000} leaveDelay={200}>
             <Link href = "/chat">
-            <div className={`group flex items-center  my-2 transition-colors duration-200 cursor-pointer ${isExpanded ? "hover:bg-gray-200" : ""} ${isSelected ? "bg-gray-200" : ""}`}>
+            <div className={`group flex items-center  my-2 transition-colors duration-200 cursor-pointer ${isExpanded ? "hover:bg-gray-200" : ""} ${isSelected ? "bg-gray-200 rounded-lg" : ""}`}>
                 <img
                     src={defaultImage}
                     alt={name}
-                    className={`w-14 h-14 rounded-lg mr-2 border-transparent ${isSelected ? "border-tertiary border-2 border-solid" : "group-hover:border-primary group-hover:border-2"} transition-all duration-200 ease-in-out`}
+                    className={`w-14 h-14 rounded-lg mr-2  ${selectedBorder} transition-all duration-200 ease-in-out`}
                     />
               {isExpanded ?  <span
                     className={`text-md font-normal ${itemClasses} transition-all duration-500 ease-in-out`}

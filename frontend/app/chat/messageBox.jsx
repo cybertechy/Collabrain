@@ -5,21 +5,22 @@ import { styled } from '@mui/material/styles';
 const CustomTextField = styled(TextField)({
   '& .MuiOutlinedInput-root': {
     borderRadius: '20px', // Rounded border
+    backgroundColor: 'transparent', // Background color similar to Discord
     '& fieldset': {
-      border: 'none', // Remove border
+      border: '1px solid #972FFF', // Light border
     },
     '&:hover fieldset': {
-      borderColor: 'red', // Border color on hover
+      borderColor: '#972FFF', // Slightly darker border on hover
     },
     '&.Mui-focused fieldset': {
-      borderColor: 'green', // Border color when focused
+      borderColor: '#972FFF', // Discord's brand color on focus
     },
     '& .MuiInputBase-input::placeholder': {
-      color: 'white',
+      color: '#972FFF', // Placeholder text color
       opacity: 1,
     },
     '& .MuiInputBase-input': {
-      color: 'white', // Text color
+      color: 'black', // Text color
     },
   },
 });
@@ -28,15 +29,15 @@ export default function MessageBox(props) {
   let inputMsg = useRef();
 
   return (
-    <div className='bg-transparent p-3 rounded-md'>
+    <div className='bg-transparent p-3 rounded-md'> {/* Updated container style */}
       <CustomTextField
-        size='small'
+        size='large'
         fullWidth={true}
         minRows={1}
         maxRows={3}
         inputProps={{ maxLength: 2000 }}
         id="outlined-textarea"
-        placeholder="Message"
+        placeholder="Enter a Message"
         inputRef={inputMsg}
         onKeyDown={(e) => {
           if (e.key === 'Enter' && !e.shiftKey) {

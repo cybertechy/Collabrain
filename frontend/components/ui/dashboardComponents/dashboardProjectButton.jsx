@@ -44,7 +44,7 @@ const DashboardProjectButton = ({ title, project, type, color = "white", onClick
             leaveDelay={200}
           
         >
-        <div className="flex flex-col items-center justify-center bg-tertiary rounded-xl hover:opacity-80 duration-300 w-32 h-28 pt-3 pl-1">
+        <div className="flex flex-col items-center justify-center bg-tertiary rounded-md hover:opacity-80 duration-300 w-32 h-28 pt-3 pl-1">
             <div className="flex flex-col items-center justify-center h-full">
                 {type === 'Document' ? doc() : map()}
                 <div className="flex flex-row justify-between items-center w-full mt-2">

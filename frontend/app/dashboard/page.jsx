@@ -19,7 +19,8 @@ import UsernameOverlay from "../../components/ui/overlays/usernameOverlay";
 import Template from "@/components/ui/template/template";
 
 export default function Dashboard() {
-   
+    const [isUsernameOverlayOpen, setIsUsernameOverlayOpen] = useState(true);
+    const [user, loading] = fb.useAuthState();
     const contextMenuOptions = [
         {text:"New Folder", icon: <FolderIcon/>,onClick:()=>{} },
         {text:"New Map", icon: <MapIcon/>,onClick:()=>{console.log("new map to be made")}} 
@@ -27,7 +28,7 @@ export default function Dashboard() {
         
     ];
  
-    const [isUsernameOverlayOpen, setIsUsernameOverlayOpen] = useState(true);
+   
 
     const openUsernameOverlay = () => {
       setIsUsernameOverlayOpen(true);
@@ -38,26 +39,28 @@ export default function Dashboard() {
     };
     const [contextMenuVisible, setContextMenuVisible] = useState(false);
     const [teams, setTeams] = useState([]); 
+   
     const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
-    const handleClickOutside = (event) => {
-        if (contextMenuVisible) {
-            const menuElement = document.querySelector('.context-menu');
-            const clickedInsideMenu = menuElement && menuElement.contains(event.target);
-    
-            if (!clickedInsideMenu) {
-                setContextMenuVisible(false);
-            }
-        }
-    };
-    
-
-    // Add event listener on mount and remove on unmount
     useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (contextMenuVisible) {
+                const menuElement = document.querySelector('.context-menu');
+                const clickedInsideMenu = menuElement && menuElement.contains(event.target);
+        
+                if (!clickedInsideMenu) {
+                    setContextMenuVisible(false);
+                }
+            }
+        };
+        
         document.addEventListener('mousedown', handleClickOutside);
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, [contextMenuVisible]);
+
+    // Define useEffect for user state changes
+   
     const handleContextMenu = (e) => {
       e.preventDefault(); // Prevent the default right-click context menu
       const xPos = e.clientX;
@@ -70,7 +73,7 @@ export default function Dashboard() {
       setContextMenuVisible(false);
     };
     const router = useRouter();
-	const [user, loading] = fb.useAuthState();
+	
 
     const fetchTeams = async () => {
         try {
@@ -94,7 +97,7 @@ export default function Dashboard() {
         }
     };
     
-
+   
     // useEffect(() => {
     //     if (user) {
             
@@ -176,6 +179,9 @@ export default function Dashboard() {
 		}).catch(err => console.log(err));
 	};
 
+   
+
+   
 
 	return (
     
@@ -271,14 +277,11 @@ export default function Dashboard() {
 </div>
     </div>
 </div>
-{/* </div>
-                   
-
-        </div>
-         uncomment the below for username popup when the server can be used 
-         (user && !user.username)  && <UsernameOverlay isOpen = {isUsernameOverlayOpen} onClose={closeUsernameOverlay}/>
-        </div>
-        </div>  `*/}
+      
+        {/* uncomment the below for username popup when the server can be used */}
+       {
+        // <UsernameOverlay isOpen={isUsernameOverlayOpen} onClose={closeUsernameOverlay} />
+    }
 </Template>
             
     );

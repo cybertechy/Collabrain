@@ -7,8 +7,10 @@ import InputField from "../../components/ui/input/input";
 import PasswordInput from "../../components/ui/input/passwordinput";
 import EmailInputField from "../../components/ui/input/emailinput";
 import UsernameInputField from "../../components/ui/input/usernameInput";
+const socket = require("_socket/socket");
 import { useEffect, useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify'
+
 export default function Register() {
     const router = useRouter();
     const [backgroundLoaded, setBackgroundLoaded] = useState(false);
@@ -19,6 +21,8 @@ export default function Register() {
   
     const [firstname, setfirstname] = useState("");
     const [lastname, setlastname] = useState("");
+
+    let sock_cli;
 	useEffect(() =>
 	{
 		if (user){
@@ -56,7 +60,25 @@ export default function Register() {
 			</div>
 		);
 	}
+	const formSignin =  async (event) => {
 
+        event.preventDefault();
+
+        let result = await emailSignUp(email, password, confirmPassword, username, firstname, lastname);
+        if(!result.success) {
+            toast.error(result.error,{
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                theme: "colored",
+            });
+            if(result.route) router.push(result.route)
+        } else {
+            router.push("/dashboard");
+        }
+    }
 
     return (
         <div className="flex items-center justify-center min-h-screen">
@@ -72,17 +94,17 @@ export default function Register() {
                         Create Your Collabrain Account
                     </h1>
 
-                    <form onSubmit={fb.emailSignIn} className="flex flex-col gap-4 max-w-md">
+                    <form onSubmit={handleFormSubmit} className="flex flex-col gap-4 max-w-md">
                         <div className="flex gap-4">
-						<InputField input={firstname} setinput={setfirstname} placeholder="First Name" color="tertiary"/>
-                        <InputField input={lastname} setinput={setlastname} placeholder="Last Name"  color="tertiary"/>
+						<InputField name = "firstname" value = {firstname} input={firstname} setinput={setfirstname} placeholder="First Name" color="tertiary"/>
+                        <InputField name="lastname" value = {firstname} input={lastname} setinput={setlastname} placeholder="Last Name"  color="tertiary"/>
                         </div>
                         <div className="flex w-full">
 							
-                            <EmailInputField email={email} setEmail={setemail} placeholder="Email Address" color = "tertiary" />
+                            <EmailInputField name="email" value = {email}email={email} setEmail={setemail} placeholder="Email Address" color = "tertiary" />
                         </div>
                         <div className="flex gap-4">
-						<PasswordInput password={password} setPassword={setpassword} placeholder="Password" color = "tertiary" />
+						<PasswordInput name="password" value = {password} password={password} setPassword={setpassword} placeholder="Password" color = "tertiary" />
                         <PasswordInput password={confirmPassword} setPassword={setconfirmPassword} isConfirm={true} placeholder="Confirm Password" color = "tertiary" />
                         </div>
                         <p className="text-xs text-gray-600 text-left font-poppins ml-2">
@@ -95,7 +117,7 @@ export default function Register() {
 						<Button
                             text="Create Account"
                             color="primary"
-                            onClick={fb.emailSignIn}
+                            type = "submit"
                             className="mt-4"
                         />
                     </form>
