@@ -199,29 +199,29 @@ export default function Dashboard() {
             <DashboardInfoBar />
                 
                 {/* Main Content area */}
-                <div className="flex-grow p-4 flex flex-col" onContextMenu={handleContextMenu}>
-                <ContextMenu className="context-menu"
+        <div className="flex-grow p-4 flex flex-col" onContextMenu={handleContextMenu}>
+        <ContextMenu className="context-menu"
         xPos={contextMenuPosition.x}
         yPos={contextMenuPosition.y}
         isVisible={contextMenuVisible}
         onClose={handleCloseContextMenu}
         menuOptions = {contextMenuOptions}
-      />
+        />
       
-                <div> 
+            <div> 
                 <p className="text-2xl text-left text-primary ml-4 mb-4"  >Folders</p>
                 
-                <div className="flex flex-wrap content-start items-start w-full justify-start ml-4 gap-8 ">
-                <DashboardFolder title="Folder 1" folder="folder1" onClick={() => {}} />
-                <DashboardFolder title="Folder 1" folder="folder1" onClick={()=>{}} />
-                <DashboardNewFolder onClick={()=>{}} />
-                        </div>
+                <div className="flex flex-wrap content-start items-start w-full justify-start ml-6 gap-4">
+                    <DashboardFolder title="Folder 1" folder="folder1" onClick={() => {}} />
+                    <DashboardFolder title="Folder 1" folder="folder1" onClick={()=>{}} />
+                    <DashboardNewFolder onClick={()=>{}} />
                 </div>
-                 <div> 
+            </div>
+        <div> 
 
         <p className="text-2xl text-left text-primary ml-4 mb-4 mt-5">Projects</p>
         <div className="scrollbar-thin scrollbar-thumb-primary  overflow-y-scroll pr-2" style={{ maxHeight: "500px" }}>
-  <div className="flex flex-wrap gap-4 ml-4 justify-start"> 
+  <div className="flex flex-wrap gap-4 ml-6 justify-start"> 
     <DashboardProjectButton title="Project 1" project="project1" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
     <DashboardProjectButton title="Project 2" project="project2" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
     <DashboardProjectButton title="Project 3" project="project3" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
