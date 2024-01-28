@@ -1,7 +1,12 @@
 // Libs
 const express = require("express");
-const bodyParser = require('body-parser');
 const cors = require("cors");
+const db = require("./api/helpers/firebase");
+const docRoute = require("./api/routes/Doc");
+const strRoute = require("./api/routes/Storage");
+const contentMapRoute = require("./api/routes/ContentMap");
+
+const bodyParser = require('body-parser');
 const http = require('http');
 const treblle = require('@treblle/express')
 
@@ -28,12 +33,13 @@ app.use(
 
 sockServer.init(server);
 
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit: '50mb'}));
 app.use(cors());
 app.use("/api/chats", chatRoute);
 app.use("/api/teams",teamsRoute);
 app.use("/api/users",userRoute);
 app.use("/api/dashboard", dashboardRoute);
+app.use("/api/contentmap",contentMapRoute);
 
 app.get("/api/home", (req, res) =>
 {
