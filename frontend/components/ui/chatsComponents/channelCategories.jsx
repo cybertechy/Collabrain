@@ -15,7 +15,7 @@ const ChannelCategories = ({ categoryName, channels, onChannelSelect }) => {
     };
 
     return (
-        <div className='text-primary font-medium font-poppins'>
+        <div className='text-primary font-extrabold font-poppins'>
             <ListItem button onClick={handleClick}>
                 <div className='flex flex-row items-center justify-center'>
                 {open ? <ExpandLess className='mr-2' /> : <ExpandMore  className='mr-2'/>}
@@ -25,7 +25,7 @@ const ChannelCategories = ({ categoryName, channels, onChannelSelect }) => {
                
             </ListItem>
             <Collapse in={open} timeout="auto" unmountOnExit>
-                <List component="div" disablePadding className='text-primary font-medium font-poppins' style={{ paddingLeft: '20px' }}> {/* Add padding here */}
+                <List component="div" disablePadding className='text-primary font-medium italic font-poppins' style={{ paddingLeft: '20px' }}> {/* Add padding here */}
                     {channels.map((channelName, index) => (
                         <Channel
                             key={index}
