@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 const fb = require("../../../app/_firebase/firebase");
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -10,8 +10,38 @@ const UsernameOverlay = ({ isOpen, onClose }) =>
 	const [user, loading] = fb.useAuthState();
 	const [retrieve, setRetrieve] = useState(false);
 	const [timeoutId, setTimeoutId] = useState(null);
+	const [hasUserUsername, setHasUserUsername] = useState(null);
+ 
+	const hasUsername = async () => {
+        const token = await fb.getToken();
+        const uid = fb.getUserID();
 
+        try {
+            const res = await axios.get(`http://localhost:8080/api/users/${uid}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
 
+            const user = res.data;
+           
+            return user.username ? true : false;
+        } catch (err) {
+            console.log(err);
+            return false;
+        }
+    };
+    useEffect(() => {
+        // Function definitions can be inside useEffect
+        const checkUsername = async () => {
+            if (user) {
+                const result = await hasUsername();
+                setHasUserUsername(result);
+            }
+        };
+
+        checkUsername();
+    }, [user]);
 	const checkUsernameAvailability = async (enteredUsername) =>
 	{
 		if (!/^[a-zA-Z0-9_]{4,}$/.test(enteredUsername))
@@ -103,7 +133,7 @@ const UsernameOverlay = ({ isOpen, onClose }) =>
 	};
 
 	return (
-		<div className={`fixed top-0 left-0 w-full h-full flex items-center justify-center ${isOpen ? 'block' : 'hidden'} z-50 bg-white bg-opacity-20 backdrop-blur-sm`}>
+		<div className={`fixed top-0 left-0 w-full h-full flex items-center justify-center ${isOpen && !hasUserUsername ? 'block' : 'hidden'} z-50 bg-white bg-opacity-20 backdrop-blur-sm`}>
 			<div className="w-1/4 bg-white rounded-md shadow-lg">
 				<div className="p-8">
 					<h2 className="text-2xl font-bold mb-4 text-black">Welcome! Let's Pick a Username</h2>

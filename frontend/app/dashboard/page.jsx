@@ -27,17 +27,7 @@ export default function Dashboard() {
         
     ];
  
-    useEffect(() => {
-        // Function definitions can be inside useEffect
-        const checkUsername = async () => {
-            if (user) {
-                const result = await hasUsername();
-                setHasUserUsername(result);
-            }
-        };
-
-        checkUsername();
-    }, [user]);
+   
 
     const openUsernameOverlay = () => {
       setIsUsernameOverlayOpen(true);
@@ -48,7 +38,7 @@ export default function Dashboard() {
     };
     const [contextMenuVisible, setContextMenuVisible] = useState(false);
     const [teams, setTeams] = useState([]); 
-    const [hasUserUsername, setHasUserUsername] = useState(null);
+   
     const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -188,25 +178,7 @@ export default function Dashboard() {
 		}).catch(err => console.log(err));
 	};
 
-    const hasUsername = async () => {
-        const token = await fb.getToken();
-        const uid = fb.getUserID();
-
-        try {
-            const res = await axios.get(`http://localhost:8080/api/users/${uid}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-
-            const user = res.data;
-           
-            return user.username ? true : false;
-        } catch (err) {
-            console.log(err);
-            return false;
-        }
-    };
+   
 
    
 
@@ -307,9 +279,9 @@ export default function Dashboard() {
         </div>
       
         {/* uncomment the below for username popup when the server can be used */}
-        {user && hasUserUsername === false && (
+       {
         <UsernameOverlay isOpen={isUsernameOverlayOpen} onClose={closeUsernameOverlay} />
-    )}
+    }
         </div>
     );
     }
