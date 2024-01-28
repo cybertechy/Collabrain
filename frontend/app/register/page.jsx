@@ -85,21 +85,21 @@
         };
     
         return (
-            <div className="flex items-center justify-center min-h-screen">
+            <div className="max-sm:bg-secondary max-sm:min-h-screen flex items-center justify-center min-h-screen">
                 <ToastContainer />
-                <div className="flex flex-col items-center justify-center h-full">
+                <div className="flex flex-col items-center justify-center">
                     <img
-                        className="w-28 "
+                        className="w-28"
                         src="./assets/images/logo_whitebackground.png"
                         alt="Logo"
                     />
-                    <div className="bg-secondary drop-shadow-lg p-10 rounded-2xl mt-4">
+                    <div className="bg-secondary sm:drop-shadow-lg sm:p-10 rounded-2xl sm:mt-4">
                         <h1 className="text-2xl text-black font-poppins mb-6 text-center">
                             Create Your Collabrain Account
                         </h1>
     
                         <form onSubmit={handleFormSubmit} className="flex flex-col gap-4 max-w-md">
-                            <div className="flex gap-4">
+                            <div className="flex max-sm:flex-col sm:gap-4">
                             <InputField name = "firstname" value = {firstname} input={firstname} setinput={setfirstname} placeholder="First Name" color="tertiary"/>
                             <InputField name="lastname" value = {firstname} input={lastname} setinput={setlastname} placeholder="Last Name"  color="tertiary"/>
                             </div>
@@ -107,7 +107,7 @@
                                 
                                 <EmailInputField name="email" value = {email}email={email} setEmail={setemail} placeholder="Email Address" color = "tertiary" />
                             </div>
-                            <div className="flex gap-4">
+                            <div className="flex max-sm:pr-4 max-sm:flex-col sm:gap-4">
                             <PasswordInput name="password" value = {password} password={password} setPassword={setpassword} placeholder="Password" color = "tertiary" />
                             <PasswordInput password={confirmPassword} setPassword={setconfirmPassword} isConfirm={true} placeholder="Confirm Password" color = "tertiary" />
                             </div>

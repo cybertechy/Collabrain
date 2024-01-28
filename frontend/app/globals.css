@@ -18,7 +18,7 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: white
+  background: var(--secondary-color)
     rgb(var(--background-start-rgb));
 }
 
