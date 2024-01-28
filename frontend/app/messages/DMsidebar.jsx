@@ -3,11 +3,12 @@ import { Add as AddIcon, Message as MessageIcon } from '@mui/icons-material';
 import React from 'react';
 import ProfileBox from '../../components/ui/chatsComponents/profileBox';
 import { useState } from 'react';
+import { Button } from '@mui/material';
 // Reusable Direct Message Item Component
-const DirectMessageItem = ({ name, message, avatar, onClick, userInfo }) => {
+const DirectMessageItem = ({ name, message, avatar, onClick }) => {
     const [isMuted, setIsMuted] = useState(false);
     const [isDeafened, setIsDeafened] = useState(false);
-
+  
    
 
     function stringAvatar(name = "User") {
@@ -44,7 +45,7 @@ const DirectMessageItem = ({ name, message, avatar, onClick, userInfo }) => {
       <ListItemAvatar>
         <Avatar {...stringAvatar(name[0])} />
       </ListItemAvatar>
-      <ListItemText primary={name} secondary={message} />
+      <ListItemText primary={name} secondary={message}   />
     </ListItem>
   );
 };
@@ -69,21 +70,32 @@ const DMSideBar = ({ friendsHandler, directMessages , userData}) => {
     console.log('Add Direct Message');
   };
 
-  return (
+  console.log(userData)
+  const buttonStyle = {
+    textTransform: 'none',
+    justifyContent: 'start', // Aligns content to the left inside the button
+    width: '100%', // Ensures button takes full available width
+    borderBottom: '2px solid rgb(229, 231, 235)', // Changes border color to rgb(229, 231, 235)
+    borderRadius: '0' // Removes roundedness
+  };
+return (
     <div className="flex flex-col h-full w-1/5 bg-neutral shadow-md">
         <div className="flex-grow flex flex-col justify-between">
             <div>
-                <IconButton onClick={friendsHandler} className="text-black w-full" style={{ borderRadius: 0 }}>
-                    <MessageIcon className='text-black'/>
-                    <span className='ml-2 text-black'>Friends</span>
-                </IconButton>
+                <Button style={buttonStyle} onClick={friendsHandler}>
+                    <div className='flex justify-around items-center p-2 w-full  text-primary border-gray-200'>
+                        <h2 className="text-lg font-normal font-poppins">Friends</h2>
+                        <MessageIcon className='text-primary'/>
+                    </div>
+                </Button>
+                
+                <Button style={buttonStyle} onClick={handleAddDM}>
+                    <div className="flex justify-around items-center p-2 w-full text-primary border-gray-200">
+                        <h2 className="text-lg font-normal font-poppins">Direct Messages</h2>
+                        <AddIcon className='text-primary'/>
+                    </div>
+                </Button>
 
-                <div className="flex justify-around items-center p-2 border-b text-black border-gray-200">
-                    <h2 className="text-lg font-normal font-poppins">Direct Messages</h2>
-                    <IconButton onClick={handleAddDM}>
-                        <AddIcon className='text-black'/>
-                    </IconButton>
-                </div>
 
                 <List className="overflow-auto text-black">
                     {directMessages.map((dm, index) => (
@@ -100,7 +112,7 @@ const DMSideBar = ({ friendsHandler, directMessages , userData}) => {
 
             <div>
                 <ProfileBox
-                    userInfo={userData.data}
+                    userData={userData?.data}
                     onMute={handleMute}
                     onDeafen={handleDeafen}
                     onSettings={handleSettings}
@@ -109,5 +121,6 @@ const DMSideBar = ({ friendsHandler, directMessages , userData}) => {
         </div>
     </div>
 );
+
 };
 export default DMSideBar;

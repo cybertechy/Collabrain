@@ -12,6 +12,7 @@ const { useRouter } = require('next/navigation');
 const axios = require("axios");
 const fb = require("_firebase/firebase");
 const socket = require("_socket/socket");
+import ChatWindow from "./chatWindow";
 import ShortTextIcon from '@mui/icons-material/ShortText'; // This can act as a hash
 
 
@@ -19,7 +20,7 @@ export default function Messages() {
     const router = useRouter();
     const [user, loading] = fb.useAuthState();
     const [channelsData, setChannelsData] = useState([]);
-    const [userInfo, setUserInfo] = useState({ data: { username: "User" } });
+    const [userInfo, setUserInfo] = useState(null);
     const [text, setText] = useState([]);
     const sockCli = useRef(null);
     useEffect(() => {
@@ -158,28 +159,15 @@ export default function Messages() {
       const handleFriendsClick = () => {
         console.log('Friends button clicked');
       };
+    
 	return (
 		<div className="flex h-full w-full drop-shadow-lg">
 			
 			<Sidebar />
-            <DMSideBar
-        userData = {userInfo}
-      friendsHandler={handleFriendsClick}
-      directMessages={directMessages}
-    />
+            <DMSideBar userData={userInfo} friendsHandler={handleFriendsClick} directMessages={directMessages} />
+
 			<div className="relative h-full w-full bg-white overflow-y-auto"> {/* Chat room */}
-				<Toolbar sx={{ backgroundColor: 'whitesmoke', boxShadow: '0px 2px 1px rgba(0, 0, 0, 0.1)' }}>
-					<h1 className='text-xl font-semibold text-primary items-center justify-center flex-row'>{<ShortTextIcon style={{ color: '#972FFF', opacity: '0.7'  }} fontSize="large" /> } General</h1>
-				</Toolbar>
-
-				<div className="p-5 h-5/6 scrollbar-thin scrollbar-thumb-primary  text-black overflow-y-scroll">
-					{text}
-				</div>
-
-				<div className="absolute z-10 inset-x-0 bottom-5 mx-5  text-white">
-					<MessageBox callback={sendPersonalMsg} />
-				</div>
-
+            <ChatWindow messages={text} sendPersonalMsg={sendPersonalMsg} userInfo={userInfo} />
 				</div>
 		{/* <ChannelBar /> */}
 		</div>
