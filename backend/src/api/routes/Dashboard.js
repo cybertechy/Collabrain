@@ -227,10 +227,72 @@ router.get("/:folder/files", async (req, res) =>
 });
 
 // Get all files in root directory
-router.get("/files", async (req, res) => 
-{
+// router.get("/files", async (req, res) => 
+// {
 	
-	if(!req.headers.authorization)
+// 	if(!req.headers.authorization)
+// 		return res.status(400).json({ error: "Missing required data" });
+
+// 	// verify token
+// 	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
+// 	if (!user)
+// 		return res.status(401).json({ error: "Unauthorized" });
+
+// 	let files = [];
+
+	
+// 	let userRef = await fb.db.collection(`users`).doc(user.uid).get();
+// 	if(!userRef.exists)
+// 		return res.status(400).json({ error: "User not found" });
+
+// 	let contentMapsIds = userRef.data().contentMaps;
+
+// 	// Get all documents in user's documents array
+// 	let documentsIds = userRef.data().documents;
+
+// 	// get name, id , updatedAt and type of each file
+// 	for(let i = 0; i < contentMapsIds?.length; i++)
+// 	{
+// 		let file = await fb.db.doc(`contentMaps/${contentMapsIds[i]}`).get();
+// 		if(!file)
+// 			return res.status(400).json({ error: "File not found" });
+
+// 		file = file.data();
+
+// 		files.push({
+// 			id: contentMapsIds[i],
+// 			name: file.name,
+// 			type: "contentmap"
+// 		});
+// 	}
+
+// 	for(let i = 0; i < documentsIds?.length; i++)
+// 	{
+// 		let file = await fb.db.doc(`documents/${documentsIds[i]}`).get();
+// 		if(!file)
+// 			return res.status(400).json({ error: "File not found" });
+
+// 		file = file.data();
+
+// 		files.push({
+// 			id: documentsIds[i],
+// 			name: file.name,
+// 			updatedAt: file.updatedAt.toDate(),
+// 			createdAt: file.createdAt.toDate(),
+// 			type: "document"
+// 		});
+// 	}
+
+// 	return res.status(200).json({ files: files });
+
+// });
+
+//Get all files by giving a path 
+// @requestQuery: {path: string}
+router.get("/files", async (req, res) =>
+{
+	// Make sure all required fields are present
+	if (!req.headers.authorization || !req.query.path)
 		return res.status(400).json({ error: "Missing required data" });
 
 	// verify token
@@ -239,53 +301,105 @@ router.get("/files", async (req, res) =>
 		return res.status(401).json({ error: "Unauthorized" });
 
 	let files = [];
+	// Get folder
+	if(req.query.path==="/"){
+		let root = await fb.db.doc(`users/${user.uid}`).get();
+		if (!root)
+			return res.status(400).json({ error: "Folder not found" });
 
+		// add contentMaps and documents with type
+		let contentMapsIds = root.data().contentMaps;
+		let documentsIds = root.data().documents;
+
+		// get name, id , updatedAt and type of each file
+
+		// get the data of each file, using promise all
+		for(let i = 0; i < contentMapsIds?.length; i++)
+		{
+			let file = await fb.db.doc(`contentMaps/${contentMapsIds[i]}`).get();
+			if(!file)
+				return res.status(400).json({ error: "File not found" });
+
+			file = file.data();
+
+			files.push({
+				id: contentMapsIds[i],
+				name: file.name,
+				type: "contentmap",
+				path: "/"
+			});
+		}
+		
+
+		
+		
+
+		for(let i = 0; i < documentsIds?.length; i++)
+		{
+			let file = await fb.db.doc(`documents/${documentsIds[i]}`).get();
+			if(!file)
+				return res.status(400).json({ error: "File not found" });
+
+			file = file.data();
+
+			files.push({
+				id: documentsIds[i],
+				name: file.name,
+				updatedAt: file.updatedAt.toDate(),
+				createdAt: file.createdAt.toDate(),
+				type: "document",
+				path: "/"
+			});
+		}
+	} else {
+		let folder = await fb.db.collection(`users/${user.uid}/folders`).where("path", "==", req.query.path).get().then((querySnapshot) => {return querySnapshot.docs[0];});
+		if (!folder)
+			return res.status(400).json({ error: "Folder not found" });
+
+		folder = folder.data();
+
+		// For each file id, fetch the corresponding type data, such name and updateAt
+
+		for(let i = 0; i < folder.contentMaps?.length; i++)
+		{
+			let file = await fb.db.doc(`contentMaps/${folder.contentMaps[i]}`).get();
+			if(!file)
+				return res.status(400).json({ error: "File not found" });
+
+			file = file.data();
+
+			files.push({
+				id: folder.contentMaps[i],
+				name: file.name,
+				type: "contentmap",
+				path: folder.path
+			});
+		}
+
+		for(let i = 0; i < folder.documents?.length; i++)
+		{
+			let file = await fb.db.doc(`documents/${folder.documents[i]}`).get();
+			if(!file)
+				return res.status(400).json({ error: "File not found" });
+
+			file = file.data();
+
+			files.push({
+				id: folder.documents[i],
+				name: file.name,
+				updatedAt: file.updatedAt.toDate(),
+				createdAt: file.createdAt.toDate(),
+				type: "document",
+				path: folder.path
+			});
+		}
+
+		
+	}
 	
-	let userRef = await fb.db.collection(`users`).doc(user.uid).get();
-	if(!userRef.exists)
-		return res.status(400).json({ error: "User not found" });
-
-	let contentMapsIds = userRef.data().contentMaps;
-
-	// Get all documents in user's documents array
-	let documentsIds = userRef.data().documents;
-
-	// get name, id , updatedAt and type of each file
-	for(let i = 0; i < contentMapsIds?.length; i++)
-	{
-		let file = await fb.db.doc(`contentMaps/${contentMapsIds[i]}`).get();
-		if(!file)
-			return res.status(400).json({ error: "File not found" });
-
-		file = file.data();
-
-		files.push({
-			id: contentMapsIds[i],
-			name: file.name,
-			type: "contentmap"
-		});
-	}
-
-	for(let i = 0; i < documentsIds?.length; i++)
-	{
-		let file = await fb.db.doc(`documents/${documentsIds[i]}`).get();
-		if(!file)
-			return res.status(400).json({ error: "File not found" });
-
-		file = file.data();
-
-		files.push({
-			id: documentsIds[i],
-			name: file.name,
-			updatedAt: file.updatedAt.toDate(),
-			createdAt: file.createdAt.toDate(),
-			type: "document"
-		});
-	}
-
 	return res.status(200).json({ files: files });
 
-});
+})
 
 // Delete file from Anywhere
 // Can be in or out of a folder
