@@ -6,7 +6,7 @@ import MessageBox from "../chat/messageBox";
 import Toolbar from '@mui/material/Toolbar';
 import { Timestamp } from "firebase/firestore";
 import Sidebar from "../../components/ui/sidebar/sidebar";
-import ChannelBar from "../../components/ui/chatsComponents/channelBar";
+import DMSideBar from "./DMsidebar";
 import MessageItem from "../chat/messageItem";
 const { useRouter } = require('next/navigation');
 const axios = require("axios");
@@ -15,12 +15,13 @@ const socket = require("_socket/socket");
 import ShortTextIcon from '@mui/icons-material/ShortText'; // This can act as a hash
 
 
-export default function ChatRoom() {
+export default function Messages() {
     const router = useRouter();
     const [user, loading] = fb.useAuthState();
-	const [channelsData, setChannelsData] = useState([]);
-	const [userInfo, setUserInfo] = useState({data:{username: "User"}});
-    let sockCli = useRef(null);
+    const [channelsData, setChannelsData] = useState([]);
+    const [userInfo, setUserInfo] = useState({ data: { username: "User" } });
+    const [text, setText] = useState([]);
+    const sockCli = useRef(null);
     useEffect(() => {
         if (!user) return;
 
@@ -36,21 +37,24 @@ export default function ChatRoom() {
         return () => sockCli.current.off('teamMsg');
     }, [user]);
 
-	useEffect(() => {
-        const fetchChannels =  () => {
-            // Placeholder function to fetch channels data
-            // Replace this with actual API call and set the state
-            setChannelsData([
-                { name: 'Category 1', channels: ['General', 'Random'] },
-                { name: 'Category 2', channels: ['Updates', 'Launch'] },
-            ]);
+    useEffect(() => {
+        if (!user) return;
+
+        const fetchUser = async () => {
+            try {
+                const token = await fb.getToken();
+                const response = await axios.get(`http://localhost:8080/api/users/${user.uid}`, {
+                    headers: { "Authorization": "Bearer " + token }
+                });
+                setUserInfo({ data: response.data });
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+                setUserInfo({ data: { username: "User" } });
+            }
         };
 
-        if (user) {
-            fetchChannels();
-        }
+        fetchUser();
     }, [user]);
-
     useEffect(() => {
         if (!user) return;
 
@@ -74,29 +78,9 @@ export default function ChatRoom() {
             }).catch((err) => console.log(err));
         });
     }, [user]);
-	useEffect(() => {
-		if (!user) return;
-	  
-		const fetchUser = async () => {
-		  try {
-			const token = await fb.getToken();
-			const response = await axios.get(`http://localhost:8080/api/users/${user.uid}`, {
-			  headers: { "Authorization": "Bearer " + token }
-			});
-			// Set user info with the data obtained from the response
-			setUserInfo({ data: response.data });
-		  } catch (error) {
-			console.error('Error fetching user data:', error);
-			// Handle error, for example by setting a default user info
-			setUserInfo({ data: { username: "User" } });
-		  }
-		};
-	  
-		fetchUser();
-	  }, [user]);
-	  
-    const [text, setText] = useState([]);
-	const sendTeamMsg = async (msg) =>
+	
+
+	const sendPersonalMsg = async (msg) =>
 	{
 		if (!sockCli.current)
 		{
@@ -152,15 +136,37 @@ export default function ChatRoom() {
     );
 
 
-
+    const directMessages = [
+        {
+          name: 'Jane Doe',
+          message: 'Hey, how are you?',
+          avatar: 'https://i.pravatar.cc/300?img=1', // This is a placeholder avatar URL
+        },
+        {
+          name: 'John Smith',
+          message: 'Sent a photo',
+          avatar: 'https://i.pravatar.cc/300?img=2',
+        },
+        {
+          name: 'Alice Johnson',
+          message: 'Can we meet tomorrow?',
+          avatar: 'https://i.pravatar.cc/300?img=3',
+        },
+      ];
+    
+      // Handler for the friends button
+      const handleFriendsClick = () => {
+        console.log('Friends button clicked');
+      };
 	return (
 		<div className="flex h-full w-full drop-shadow-lg">
 			
 			<Sidebar />
-			<ChannelBar
-                user={userInfo}
-                channelsData={channelsData} // Pass the state variable directly
-            />
+            <DMSideBar
+        userData = {userInfo}
+      friendsHandler={handleFriendsClick}
+      directMessages={directMessages}
+    />
 			<div className="relative h-full w-full bg-white overflow-y-auto"> {/* Chat room */}
 				<Toolbar sx={{ backgroundColor: 'whitesmoke', boxShadow: '0px 2px 1px rgba(0, 0, 0, 0.1)' }}>
 					<h1 className='text-xl font-semibold text-primary items-center justify-center flex-row'>{<ShortTextIcon style={{ color: '#972FFF', opacity: '0.7'  }} fontSize="large" /> } General</h1>
@@ -171,7 +177,7 @@ export default function ChatRoom() {
 				</div>
 
 				<div className="absolute z-10 inset-x-0 bottom-5 mx-5  text-white">
-					<MessageBox callback={sendTeamMsg} />
+					<MessageBox callback={sendPersonalMsg} />
 				</div>
 
 				</div>

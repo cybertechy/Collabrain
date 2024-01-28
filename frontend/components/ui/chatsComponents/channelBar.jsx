@@ -37,7 +37,7 @@ const ChannelBar = ({ user, channelsData }) => {
   };
 
   return (
-    <div className="flex flex-col h-full w-1/6 relative bg-neutral-50 shadow-2xl">
+    <div className="flex flex-col h-full w-1/6  bg-neutral-50 shadow-2xl">
       <div className="flex flex-col">
         <TeamChannelOptionsMenu teamName = {"Team Alpha"} onOptionSelect={handleTeamOptionSelect} />
       </div>

@@ -11,7 +11,8 @@ import { grey } from '@mui/material/colors';
 const ProfileBox = ({ userData, onMute, onDeafen, onSettings }) => {
     const [isMuted, setIsMuted] = useState(false);
     const [isDeafened, setIsDeafened] = useState(false);
-
+    const avatarName = userData?.fname ? `${userData.fname} ${userData.lname}` : "User";
+    const displayName = userData?.username || "User";
     const handleMute = () => {
         setIsMuted(!isMuted);
         onMute();
@@ -52,10 +53,10 @@ const ProfileBox = ({ userData, onMute, onDeafen, onSettings }) => {
       }
       
     return (
-        <div className="absolute bottom-0 w-full bg-primary text-white p-2 flex flex-col justify-between items-center shadow-lg">
+        <div className=" bg-primary w-full text-white p-2 flex flex-col justify-between items-center shadow-lg">
             <div className="flex items-center flex-row mt-2">
-            <Avatar {...stringAvatar(userData.fname? (userData.fname + " " +  userData.lname):"User")} />
-<span className="ml-2">{userData.username || "User"}</span>
+            <Avatar {...stringAvatar(avatarName)} />
+<span className="ml-2">{displayName}</span>
             </div>
             <div>
                 <IconButton onClick={handleMute}>
