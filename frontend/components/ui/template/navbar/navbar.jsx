@@ -11,7 +11,7 @@ import { isSidebarOpen } from "../sidebar/sidebar";
 import Template from '../template';
 
 
-const Navbar = ({ isOpen }) => {
+const Navbar = ({ isOpen, toggleSidebar }) => {
     const [showLeaderboard, setShowLeaderboard] = useState(false);
     const leaderboardRef = useRef(null);
     const leaderboardToggleRef = useRef(null); // Ref for the leaderboard toggle icon
@@ -45,28 +45,25 @@ const Navbar = ({ isOpen }) => {
     }, []);
 
     const navbarStyle = () => {
-    if (isOpen) {
-        if (windowWidth > 500) {
+    if (!isOpen) {
+        if (windowWidth < 400) {
             return (
-            <div className="flex flex-row items-center mr-auto">
                 <MenuIcon
-                className="h-6 w-6 text-lg transition-all duration-500 ease-in-out cursor-pointer"
-                onClick={toggleSidebar}/>
-            <div className='relative'>
-      </div>  
-        </div>);
+                                className="h-6 w-6 mb-2 text-lg text-white transition-all duration-500 ease-in-out"
+                                onClick={toggleSidebar}
+                                fontSize="large"
+                            />
+            
+              
+            )
         }
     }
 }
 
-    return (
-        <>
-            <nav className="bg-purple-600 p-4 flex items-center justify-between">
-                <div className="flex-grow flex justify-center items-center mx-16">
-                    {navbarStyle()}
-                </div>
-                <div className="flex items-center space-x-10">
-                <Tooltip
+    const tooltips = () => {
+        return (
+            <>
+            <Tooltip
             title={"Leaderboard"}
             enterDelay={1000}
             leaveDelay={200}
@@ -103,8 +100,26 @@ const Navbar = ({ isOpen }) => {
                         style={{ color: "white" }}
                     />
                      </Tooltip>
-                   
+                     </>
+
+        )
+    }
+
+    return (
+        <>
+            <nav className="bg-purple-600 p-4 flex items-center justify-between">
+                <div className="flex-grow flex">
+                    {navbarStyle()}
                 </div>
+                {(windowWidth > 500) ? 
+                (<div className="flex items-center space-x-10">
+                    {tooltips()}
+                </div>) 
+                : 
+                (<div className="flex items-center space-x-7">
+                   {tooltips()}
+                </div>)}
+                
             </nav>
 
             {showLeaderboard && (

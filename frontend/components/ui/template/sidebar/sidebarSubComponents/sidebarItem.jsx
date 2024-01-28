@@ -32,7 +32,7 @@ const SidebarItem = ({ href, icon: Icon, text = "", isSelected= false, isExpande
         }
     }, [isExpanded]);
 
-    const widthClass = windowWidth < 500 ? "w-full" : "w-64";
+    const widthClass = windowWidth < 550 ? "w-full" : "w-64";
 
     return (
         <Tooltip

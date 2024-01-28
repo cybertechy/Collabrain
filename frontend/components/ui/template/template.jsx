@@ -27,7 +27,7 @@ const Template = ({ children }) => {
     {/* <div className="flex h-screen bg-gray-100 overflow-hidden"> */}
       <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} className="overflow-hidden"/>
       <>{
-      ((isSidebarOpen) && (windowWidth < 500)) ? 
+      ((isSidebarOpen) && (windowWidth < 550)) ? 
         (<div className="flex flex-col flex-grow overflow-hidden">
           <div className=" bg-purple-600 h-screen">
 

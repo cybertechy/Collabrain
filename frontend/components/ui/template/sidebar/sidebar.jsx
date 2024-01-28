@@ -81,7 +81,7 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
                 width: '18rem'
             }
         }
-        if (windowWidth >= 500 && windowWidth < 800) {
+        if (windowWidth > 550 && windowWidth < 800) {
             return {
                 width: '18rem'
             }
