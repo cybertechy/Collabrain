@@ -199,10 +199,12 @@ router.get("/:folder/files", async (req, res) =>
 
 		file = file.data();
 
+		console.log(file);
 		files.push({
 			id: folder.contentMaps[i],
 			name: file.name,
-			type: "contentmap"
+			type: "contentmap",
+			path: file.path
 		});
 	}
 
@@ -217,7 +219,8 @@ router.get("/:folder/files", async (req, res) =>
 		files.push({
 			id: folder.documents[i],
 			name: file.name,
-			type: "document"
+			type: "document",
+			path: file.path,
 		});
 	}
 
