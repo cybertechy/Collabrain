@@ -5,7 +5,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import MessageBox from "../chat/messageBox";
 import Toolbar from '@mui/material/Toolbar';
 import { Timestamp } from "firebase/firestore";
-import Sidebar from "../../components/ui/sidebar/sidebar";
+import Sidebar from "../../components/ui/template/sidebar/sidebar";
 import DMSideBar from "./DMsidebar";
 import MessageItem from "../chat/messageItem";
 const { useRouter } = require('next/navigation');
@@ -15,6 +15,7 @@ const socket = require("_socket/socket");
 import ChatWindow from "./chatWindow";
 import FriendsWindow from "./friendWindow";
 import ShortTextIcon from '@mui/icons-material/ShortText'; // This can act as a hash
+import Template from "@/components/ui/template/template";
 
 
 export default function Messages() {
@@ -161,21 +162,19 @@ export default function Messages() {
       const handleFriendsClick = () => {
         // Toggles the display between ChatWindow and FriendsWindow
         setShowChat((prevShowChat) => !prevShowChat);
-    };
-	  return (
-        <div className="flex h-full w-full drop-shadow-lg">
-            <Sidebar />
-            <DMSideBar userData={userInfo} friendsHandler={handleFriendsClick} directMessages={directMessages} />
-
-            <div className="relative h-full w-full bg-white overflow-y-auto">
-                {/* Toggle between ChatWindow and FriendsWindow */}
+      };
+    
+	return (
+        <Template>
+            <div className="flex flex-row flex-grow">
+                <DMSideBar userData={userInfo} friendsHandler={handleFriendsClick} directMessages={directMessages} />
                 {showChat ? (
                     <ChatWindow messages={text} sendPersonalMsg={sendPersonalMsg} userInfo={userInfo} title="General" />
                 ) : (
                     <FriendsWindow />
                 )}
+                {/* <ChatWindow messages={text} sendPersonalMsg={sendPersonalMsg} userInfo={userInfo} /> */}
             </div>
-            {/* <ChannelBar /> */}
-        </div>
-    );
+        </Template>
+	);
 }

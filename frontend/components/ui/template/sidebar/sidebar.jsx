@@ -16,22 +16,22 @@ import { useState } from "react";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import { useEffect } from "react";
-import TeamOverlay from "../overlays/TeamOverlay"
+import TeamOverlay from "../../overlays/TeamOverlay"
 import TeamSidebarItem from "./sidebarSubComponents/sidebarTeamButton"
 // Define the sidebar navigation items
 import { usePathname } from "next/navigation";
-import NewProjectOverlay from "../overlays/NewProjectOverlay";
+import NewProjectOverlay from "../../overlays/NewProjectOverlay";
 const navigationItems1 = [
     { name: "My Brain", href: "/dashboard", icon: FolderIcon },
     { name: "Shared With Me", href: "/shared-with-me", icon: PeopleIcon },
     
 ];
 const groups = [
-    { name: 'Team Alpha', imageUrl: '/path/to/image1.jpg', href: "/chat" },
-    { name: 'Team Beta', imageUrl: '/path/to/image2.jpg'}
-   , {name: 'Team Gamma', imageUrl: '/path/to/image3.jpg'} ,
-    { name: 'Team Delta', imageUrl: '/path/to/image4.jpg'},
-    {name: 'Team Epsilon', imageUrl: '/path/to/image5.jpg'},  
+    { name: 'Team Alpha',   imageUrl: '/path/to/image1.jpg', href: "/chat" },
+    { name: 'Team Beta',    imageUrl: '/path/to/image2.jpg'}, 
+    { name: 'Team Gamma',   imageUrl: '/path/to/image3.jpg'} ,
+    { name: 'Team Delta',   imageUrl: '/path/to/image4.jpg'},
+    { name: 'Team Epsilon', imageUrl: '/path/to/image5.jpg'},  
 
     // Add more teams or use real data from your state
 ];
@@ -41,9 +41,9 @@ const navigationItems2 = [
    
 ];
 
-const Sidebar = (teams = {}) => {
+const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
     const router = useRouter();
-    const [isOpen, setIsOpen] = useState(true);
+    // const [isOpen, setIsOpen] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false); 
     const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
     const toggleModal = () => { // Define toggleModal function
@@ -53,9 +53,9 @@ const Sidebar = (teams = {}) => {
     const toggleProjectModal = () => { 
         setIsProjectModalOpen(!isProjectModalOpen);
     };
-    const toggleSidebar = () => {
-        setIsOpen(!isOpen);
-    };
+    // const toggleSidebar = () => {
+    //     setIsOpen(!isOpen);
+    // };
     // const handleSidebarClick = (e) => {
     //     // Check if the click is not on an interactive element
     //     if (!e.target.closest('.interactive-element')) {
@@ -64,12 +64,63 @@ const Sidebar = (teams = {}) => {
     // };
 
     const pathname = usePathname(); 
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     
+    useEffect(() => {
+        const handleResize = () => {
+            setWindowWidth(window.innerWidth);
+        };
+        
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    const sidebarStyle = () => {
+        if (windowWidth >= 800) {
+            return {
+                width: '18rem'
+            }
+        }
+        if (windowWidth > 550 && windowWidth < 800) {
+            return {
+                width: '18rem'
+            }
+        }
+        else {
+            return {
+                width: '100%',  // Use '100vw' for full width
+                // maxWidth: '100%'
+    
+            }
+        }
+    }
+    
+    const sidebarStyle1 = () => {
+        if (windowWidth >= 800) {
+            return {
+                width: '5rem'
+            }
+        }
+        if (windowWidth >= 400 && windowWidth < 800) {
+            return {
+                width: '5rem'
+            }
+        }
+        else {
+            return {
+                // overflow: 'hidden',
+                display: 'none',
+                // width: '0px'
+            }
+        }
+    }
+
     return (
         <aside
             className={`transition-all shadow-md h-screen pt-[height_of_navbar] z-10 duration-500 ease-in-out ${
                 isOpen ? "w-72" : "w-24"
             } bg-white text-black`}
+            style={isOpen ? sidebarStyle() : sidebarStyle1()}
             // onClick={handleSidebarClick}
         >
             <div className="flex flex-col">
@@ -77,14 +128,16 @@ const Sidebar = (teams = {}) => {
                     <div className="flex items-center justify-center">
                         {isOpen ? (
                             <div className="flex items-center justify-center transition-all duration-1000 ease-in-out">
+                                <div className="flex items-center justify-center ml-7 -mr-7">
                                 <img
-                                    className="transition-all duration-500 ease-in-out w-12 mb-2"
+                                    className="transition-all duration-500 ease-in-out w-12"
                                     src="/assets/images/logo_whitebackground.png"
                                     alt="Collabrain Logo"
                                 />
-                                <p className="text-xl font-poppins transition-all duration-1000 ease-in-out">
+                                <p className="text-xl font-semibold transition-all duration-1000 ease-in-out cursor-context-menu">
                                     Collabrain
                                 </p>
+                                </div>
                                 <CloseIcon
                                     className="text-lg ml-16 text-primary transition-all duration-1000 ease-in-out cursor-pointer"
                                     onClick={toggleSidebar}
@@ -93,7 +146,7 @@ const Sidebar = (teams = {}) => {
                             </div>
                         ) : (
                             <MenuIcon
-                                className="h-6 w-6 mb-2 text-lg text-primary transition-all duration-500 ease-in-out cursor-pointer"
+                                className="h-6 w-6 mb-2 text-lg text-primary transition-all duration-500 ease-in-out"
                                 onClick={toggleSidebar}
                                 fontSize="large"
                             />
@@ -112,6 +165,8 @@ const Sidebar = (teams = {}) => {
                         Icon={() => (
                             <AddIcon fontSize = "medium" className="  text-white"></AddIcon>
                         )}
+                        //     <PlusIcon fontSize = "medium"className="h-4 w-4 pt-3 pb-3 pl-5 text-white"></PlusIcon>
+                        // )}
                         isExpanded={isOpen}
                     />
                     {navigationItems1.map((item) => (
@@ -146,12 +201,10 @@ const Sidebar = (teams = {}) => {
                 )}
                 isExpanded={isOpen}
             />
-       
-
-
-{isModalOpen && <TeamOverlay toggleModal={ toggleModal} modalVisible= {isModalOpen} />}
-{isProjectModalOpen && <NewProjectOverlay toggleModal={ toggleProjectModal} modalVisible= {isProjectModalOpen} />}
-                       {/* {teams.map(team => (
+            
+            {isModalOpen && <TeamOverlay toggleModal={ toggleModal} modalVisible= {isModalOpen} />}
+            {isProjectModalOpen && <NewProjectOverlay toggleModal={ toggleProjectModal} modalVisible= {isProjectModalOpen} />}
+                {/* {teams.map(team => (
                     <SidebarItem
                         key={team.name}
                         href={`/team/${team.uid}`} // Assuming each team has a unique ID and a page
