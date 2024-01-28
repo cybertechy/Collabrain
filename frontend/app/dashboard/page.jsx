@@ -220,7 +220,7 @@ export default function Dashboard() {
                  <div> 
 
         <p className="text-2xl text-left text-primary ml-4 mb-4 mt-5">Projects</p>
-        <div className="scrollbar-thin scrollbar-thumb-primary  overflow-y-scroll pr-28" style={{ maxHeight: "500px" }}>
+        <div className="scrollbar-thin scrollbar-thumb-primary  overflow-y-scroll pr-2" style={{ maxHeight: "500px" }}>
   <div className="flex flex-wrap gap-4 ml-4 justify-start"> 
     <DashboardProjectButton title="Project 1" project="project1" type="Mind Map" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
     <DashboardProjectButton title="Project 2" project="project2" type="Document" onClick={() => {}} imageSrc="/assets/images/imagenotFound.jpg" />
