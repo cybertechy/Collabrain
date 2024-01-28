@@ -3,7 +3,7 @@ import Toolbar from '@mui/material/Toolbar';
 import MessageItem from "../chat/messageItem";
 import ShortTextIcon from '@mui/icons-material/ShortText';
 
-export default function ChatWindow({ messages, sendPersonalMsg, userInfo }) {
+export default function ChatWindow({ messages, sendPersonalMsg, userInfo, title }) {
     return (
         <div className="flex flex-col flex-grow relative">
                     <div className="flex items-center justify-between bg-gray-100 w-full mb-3 h-min">

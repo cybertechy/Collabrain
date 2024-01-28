@@ -13,6 +13,7 @@ const axios = require("axios");
 const fb = require("_firebase/firebase");
 const socket = require("_socket/socket");
 import ChatWindow from "./chatWindow";
+import FriendsWindow from "./friendWindow";
 import ShortTextIcon from '@mui/icons-material/ShortText'; // This can act as a hash
 import Template from "@/components/ui/template/template";
 
@@ -21,6 +22,7 @@ export default function Messages() {
     const router = useRouter();
     const [user, loading] = fb.useAuthState();
     const [channelsData, setChannelsData] = useState([]);
+    const [showChat, setShowChat] = useState(false);
     const [userInfo, setUserInfo] = useState(null);
     const [text, setText] = useState([]);
     const sockCli = useRef(null);
@@ -158,14 +160,20 @@ export default function Messages() {
     
       // Handler for the friends button
       const handleFriendsClick = () => {
-        console.log('Friends button clicked');
+        // Toggles the display between ChatWindow and FriendsWindow
+        setShowChat((prevShowChat) => !prevShowChat);
       };
     
 	return (
         <Template>
             <div className="flex flex-row flex-grow">
                 <DMSideBar userData={userInfo} friendsHandler={handleFriendsClick} directMessages={directMessages} />
-                <ChatWindow messages={text} sendPersonalMsg={sendPersonalMsg} userInfo={userInfo} />
+                {showChat ? (
+                    <ChatWindow messages={text} sendPersonalMsg={sendPersonalMsg} userInfo={userInfo} title="General" />
+                ) : (
+                    <FriendsWindow />
+                )}
+                {/* <ChatWindow messages={text} sendPersonalMsg={sendPersonalMsg} userInfo={userInfo} /> */}
             </div>
         </Template>
 	);

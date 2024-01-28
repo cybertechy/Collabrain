@@ -103,19 +103,15 @@ const UsernameOverlay = ({ isOpen, onClose }) =>
 
 		setTimeoutId(newTimeoutId);
 	};
-	const handleSave = async () =>
-	{
-		if (error !== "Username is available" || !username)
-		{
+	const handleSave = async () => {
+		if (error !== "Username is available" || !username) {
 			toast.error(error);
 			return;
 		}
-
-		try
-		{
+	
+		try {
 			let token = null;
-			if (user)
-			{
+			if (user) {
 				token = await fb.getToken();
 			}
 			const response = await axios.patch('http://localhost:8080/api/users/', { username: username }, {
@@ -123,18 +119,14 @@ const UsernameOverlay = ({ isOpen, onClose }) =>
 					authorization: `Bearer ${token}`
 				}
 			});
-
-			// console.log(response);
-
-			if (response.status === 200)
-			{
-				onClose();
-			} else
-			{
+	
+			if (response.status === 200) {
+				setHasUserUsername(true); // Update this state to indicate the user now has a username
+				onClose(); // Close the overlay
+			} else {
 				setError("Failed to update username");
 			}
-		} catch (error)
-		{
+		} catch (error) {
 			setError("Error updating username");
 		}
 	};
@@ -156,7 +148,7 @@ const UsernameOverlay = ({ isOpen, onClose }) =>
     );
 	return (
 		<div className={`fixed top-0 left-0 w-full h-full flex items-center justify-center ${user && !hasUserUsername ? 'block' : 'hidden'} z-50 bg-white bg-opacity-20 backdrop-blur-sm`}>
-			<div className="w-1/4 bg-white rounded-md shadow-lg">
+		<div className="w-1/4 bg-white rounded-md shadow-lg">
 				<div className="p-8">
 					<h2 className="text-2xl font-bold mb-4 text-black">Welcome! Let's Pick a Username</h2>
 					<p className="mb-4 text-gray-600">Choose a unique username to represent you on our platform. It's the first step in creating your personal profile!</p>
