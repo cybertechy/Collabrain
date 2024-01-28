@@ -2,9 +2,6 @@
 const express = require("express");
 const cors = require("cors");
 const db = require("./api/helpers/firebase");
-const docRoute = require("./api/routes/Doc");
-const strRoute = require("./api/routes/Storage");
-const contentMapRoute = require("./api/routes/ContentMap");
 
 const bodyParser = require('body-parser');
 const http = require('http');
@@ -15,6 +12,7 @@ const chatRoute = require("./api/routes/Chat");
 const teamsRoute = require("./api/routes/Teams");
 const userRoute = require("./api/routes/User");
 const dashboardRoute = require("./api/routes/Dashboard");
+const mapRoute = require("./api/routes/ContentMap");
 
 // Helpers
 const sockServer = require("./api/helpers/socket");
@@ -39,7 +37,7 @@ app.use("/api/chats", chatRoute);
 app.use("/api/teams",teamsRoute);
 app.use("/api/users",userRoute);
 app.use("/api/dashboard", dashboardRoute);
-app.use("/api/contentmap",contentMapRoute);
+app.use("/api/maps",mapRoute);
 
 app.get("/api/home", (req, res) =>
 {

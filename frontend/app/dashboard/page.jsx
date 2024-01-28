@@ -34,47 +34,6 @@ export default function Dashboard() {
         <div className="loader"></div>
     </div></div>;
 
-
-    // NOTE: Not finished
-    // Needs to be tested with backend
-
-    let currentDoc;
-
-    const createDoc = async () => {
-        // Create a new document
-        const title = document.querySelector("#doc-title").value;
-        const content = document.querySelector("#doc-text").value;
-        const token = await getToken();
-
-        let res = await axios
-            .post("http://localhost:8080/api/doc/new", {
-                token: token,
-            })
-            .catch((err) => console.log(err));
-
-        if (res.status == 200) {
-            currentDoc = res.data.id;
-            res = await axios
-                .post(`http://localhost:8080/api/doc/${currentDoc}`, {
-                    token: token,
-                    title: title,
-                    content: content,
-                })
-                .catch((err) => console.log(err));
-        }
-    };
-
-	const deleteDoc = async () =>
-	{
-		console.log(currentDoc);
-		const token = await getToken();
-		let res = await axios.delete(`http://localhost:8080/api/doc/${currentDoc}`, {
-			data: {
-				"token": token
-			}
-		}).catch(err => console.log(err));
-	};
-
 	return (
         <div className="flex flex-col h-screen bg-gray-100 ">
         <div className="flex flex-grow overflow-hidden">

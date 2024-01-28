@@ -65,7 +65,7 @@ function page() {
         setid(id);
 
         try {
-            const res = await axios.get(`http://localhost:8080/api/contentmap/${id}`, {
+            const res = await axios.get(`http://localhost:8080/api/maps/${id}`, {
                 headers: {
                     authorization: `Bearer ${token}`,
                 },
@@ -96,7 +96,7 @@ function page() {
         setNew(false);
     
         try {
-            const res = await axios.post(`http://localhost:8080/api/contentmap`, {
+            const res = await axios.post(`http://localhost:8080/api/maps`, {
                 name: "New Content Map",
                 data: ""
             }, {
@@ -148,7 +148,7 @@ function page() {
         setNew(false);
 
         try {
-            const res = await axios.post(`http://localhost:8080/api/contentmap`, {
+            const res = await axios.post(`http://localhost:8080/api/maps`, {
                 name: ContentMapName+" (copy)",
                 data: appdata
             }, {
@@ -197,7 +197,7 @@ function page() {
         setDelete(false);
 
         try {
-            const res = await axios.delete(`http://localhost:8080/api/contentmap/${id}`, {
+            const res = await axios.delete(`http://localhost:8080/api/maps/${id}`, {
                 headers: {
                     authorization: `Bearer ${token}`,
                 },
@@ -246,7 +246,7 @@ function page() {
         if (!token) return null;
 
         // make axois put rquest with token in header to update the content map, pass data (appState) in body
-        axios.put(`http://localhost:8080/api/contentmap/${id}`, { name: ContentMapName }, {
+        axios.put(`http://localhost:8080/api/maps/${id}`, { name: ContentMapName }, {
             headers: {
                 authorization: `Bearer ${token}`,
             },
@@ -258,7 +258,7 @@ function page() {
 
     const updatecontent = async (data) => {
         try {
-            let res = await  axios.put(`http://localhost:8080/api/contentmap/${id}`, data , {
+            let res = await  axios.put(`http://localhost:8080/api/maps/${id}`, data , {
                 headers: {
                     authorization: `Bearer ${token}`,
                 },
@@ -304,7 +304,7 @@ function page() {
 
     const getdata = async (query) => {
         try {
-            let res = await axios.get(`http://localhost:8080/api/contentmap/ut/search?${query}`, {
+            let res = await axios.get(`http://localhost:8080/api/maps/ut/search?${query}`, {
                 headers: {
                     authorization: `Bearer ${token}`,
                 },
