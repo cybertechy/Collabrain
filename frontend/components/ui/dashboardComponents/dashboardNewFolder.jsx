@@ -26,11 +26,16 @@ const DashboardNewFolder = ({}) => {
                     onClose={toggleCreateFolderOverlay} 
                 />
             )}
-        <div className="bg-tertiary flex items-center justify-center rounded-xl w-min  hover:opacity-80 duration-300">
-            <IconButton onClick={toggleCreateFolderOverlay} color="inherit">
-                <AddCircleIcon  fontSize="large" style={{ color: 'white' }} />
+        <div className="bg-tertiary bottom-2 flex flex-col items-center justify-center rounded-xl w-8 h-8 hover:opacity-80 duration-300 mb-3">
+            <IconButton onClick={toggleCreateFolderOverlay} >
+                <AddCircleIcon  fontSize="medium" className='text-white' />
             </IconButton>
         </div>
+        {/* <div className="bottom-2 flex flex-col items-center justify-center rounded-xl w-8 h-8 hover:opacity-80 duration-300 mb-3">
+            <IconButton onClick={toggleCreateFolderOverlay} >
+                <AddCircleIcon  fontSize="large" className='text-tertiary' />
+            </IconButton>
+        </div> */}
         </Tooltip>
     );
 };

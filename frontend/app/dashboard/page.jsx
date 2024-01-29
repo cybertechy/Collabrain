@@ -208,13 +208,15 @@ export default function Dashboard() {
         menuOptions = {contextMenuOptions}
         />
       
-            <div> 
-                <p className="text-2xl text-left text-primary ml-4 mb-4"  >Folders</p>
-                
-                <div className="flex flex-wrap content-start items-start w-full justify-start ml-6 gap-4">
-                    <DashboardFolder title="Folder 1" folder="folder1" onClick={() => {}} />
-                    <DashboardFolder title="Folder 1" folder="folder1" onClick={()=>{}} />
+            <div>
+                <div className="flex items-center space-x-5">
+                    <p className="text-2xl text-left text-primary ml-4 mb-4"  >Folders</p>
                     <DashboardNewFolder onClick={()=>{}} />
+                </div> 
+                <div className="flex flex-wrap content-start items-start w-full justify-start ml-6 gap-4">
+                    <DashboardFolder title="Folder 1" folder="folder1" onClick={()=>{}} />
+                    <DashboardFolder title="Folder 1" folder="folder1" onClick={()=>{}} />
+                    {/* <DashboardNewFolder onClick={()=>{}} /> */}
                 </div>
             </div>
         <div> 
