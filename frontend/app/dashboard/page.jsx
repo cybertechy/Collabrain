@@ -222,6 +222,11 @@ export default function Dashboard() {
         const fetchContentMaps = async () => {
             try {
                 const token = await fb.getToken();
+                if (!token) {
+                    console.error('User is not authorized or token is not available');
+                    // Handle the unauthorized case, e.g., show an error message or log out the user
+                    return;
+                }
                 const response = await axios.get(
                     "http://localhost:8080/api/maps",
                     {
@@ -266,6 +271,11 @@ export default function Dashboard() {
         const fetchFolders = async () => {
             try {
                 const token = await fb.getToken();
+                 if (!token) {
+        console.error('User is not authorized or token is not available');
+        // Handle the unauthorized case, e.g., show an error message or log out the user
+        return;
+    }
                 const response = await axios.get(
                     "http://localhost:8080/api/dashboard/folders",
                     {
@@ -297,9 +307,14 @@ export default function Dashboard() {
     
    
            
-    if ( !user){
+    if ( loading ||!user){
+        if(user){
+            return null;
+            
+                        }
         return (
-            <div className="flex flex-col items-center justify-around min-h-screen">
+           
+            <div className="loader-container">
                 <div className="flex flex-col items-center justify-center min-h-screen">
                     <h1 className="text-xl font-bold mb-5 text-primary">
                         Trying to sign in
@@ -401,7 +416,8 @@ export default function Dashboard() {
                     <div className="flex flex-wrap content-start items-start w-full justify-start ml-4 gap-8 ">
                         {folders.map((folder) => (
                             <DashboardFolder
-                                key={folder?.id}
+                            key={folder?.id}
+                                id={folder?.id}
                                 title={folder?.name}
                                 folder={folder}
                                 onClick={() => {}}
@@ -423,7 +439,8 @@ export default function Dashboard() {
                             {console.log("Content Maps:", contentMaps)}
                             {sortedContentMaps.map((contentMap) => (
     <DashboardProjectButton
-        key={contentMap?.id}
+    id={contentMap?.id}
+    key={contentMap?.id}
         title={contentMap?.name}
         createdAt={contentMap?.createdAt}
         updatedAt={contentMap?.updatedAt}
@@ -441,7 +458,7 @@ export default function Dashboard() {
 
             {/* uncomment the below for username popup when the server can be used */}
             {
-               isUsernameOverlayOpen && <UsernameOverlay isOpen={isUsernameOverlayOpen} onClose={closeUsernameOverlay} />
+              user && isUsernameOverlayOpen && <UsernameOverlay isOpen={isUsernameOverlayOpen} onClose={closeUsernameOverlay} />
             }
           {isCreateFolderOverlayOpen && (
              <CreateFolderOverlay 

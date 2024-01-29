@@ -10,7 +10,7 @@ import ShareIcon from '@mui/icons-material/Share'; // Icon for Share
 import SortIcon from '@mui/icons-material/Sort'; // Icon for Organize
 import DeleteIcon from '@mui/icons-material/Delete'; // Icon for Delete
 import fb from '../../../app/_firebase/firebase';
-const DashboardProjectButton = ({ title, project, type, color = "white", onClick , key, createdAt, updatedAt,  renamedProject , handleProjectDeleted}) => {
+const DashboardProjectButton = ({ title, project, type, color = "white", onClick , id, createdAt, updatedAt,  renamedProject , handleProjectDeleted}) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [renameOverlayOpen, setRenameOverlayOpen] = useState(false);
     const [deleteOverlayOpen, setDeleteOverlayOpen] = useState(false);
@@ -114,7 +114,7 @@ const DashboardProjectButton = ({ title, project, type, color = "white", onClick
             leaveDelay={200}
           
         >
-        <div className="flex flex-col items-center justify-center bg-tertiary rounded-md hover:opacity-80 duration-300 w-32 h-28 pt-3 pl-1">
+            <>   <div className="flex flex-col items-center justify-center bg-tertiary rounded-md hover:opacity-80 duration-300 w-32 h-28 pt-3 pl-1">
             <div className="flex flex-col items-center justify-center h-full">
                <div  onClick = {handleContentMapClick} >{type === 'Document' ? doc() : map()}</div> 
                 <div className="flex flex-row justify-between items-center w-full mt-2">
@@ -150,7 +150,7 @@ const DashboardProjectButton = ({ title, project, type, color = "white", onClick
 
         </div>
         {/* Rename Overlay */}
-        <Dialog open={renameOverlayOpen} onClose={() => setRenameOverlayOpen(false)} className={dialogStyles}>
+        <Dialog open={renameOverlayOpen} onClose={() => setRenameOverlayOpen(false)} sx={dialogStyles}>
     <DialogTitle>Rename Project</DialogTitle>
     <DialogContent>
         <TextField
@@ -162,31 +162,32 @@ const DashboardProjectButton = ({ title, project, type, color = "white", onClick
         />
     </DialogContent>
     <DialogActions>
-        <Button onClick={() => setRenameOverlayOpen(false)} style={buttonStyles}>
+        <Button onClick={() => setRenameOverlayOpen(false)} sx={buttonStyles}>
             Cancel
         </Button>
-        <Button onClick={handleRename} style={buttonStyles}>
+        <Button onClick={handleRename} sx={buttonStyles}>
             Rename
         </Button>
     </DialogActions>
 </Dialog>
 
 {/* Delete Confirmation Overlay */}
-<Dialog open={deleteOverlayOpen} onClose={() => setDeleteOverlayOpen(false)} className={dialogStyles}>
+<Dialog open={deleteOverlayOpen} onClose={() => setDeleteOverlayOpen(false)} sx={dialogStyles}>
     <DialogTitle>Confirm Delete</DialogTitle>
     <DialogContent>
         Are you sure you want to delete this Project and its contents?
     </DialogContent>
     <DialogActions>
-        <Button onClick={() => setDeleteOverlayOpen(false)} style={buttonStyles}>
+        <Button onClick={() => setDeleteOverlayOpen(false)} sx={buttonStyles}>
             Cancel
         </Button>
-        <Button onClick={handleDelete} style={buttonStyles}>
+        <Button onClick={handleDelete} sx={buttonStyles}>
             Delete
         </Button>
     </DialogActions>
 </Dialog>
-);
+);</>
+     
         </Tooltip>
     );
 };
@@ -197,7 +198,7 @@ DashboardProjectButton.propTypes = {
     type: PropTypes.string.isRequired,
     color: PropTypes.string,
     onClick: PropTypes.func.isRequired,
-    key: PropTypes.string,
+    id: PropTypes.string,
    
     createdAt : PropTypes.string,
     updatedAt : PropTypes.string,

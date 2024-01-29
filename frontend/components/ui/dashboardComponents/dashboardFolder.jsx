@@ -119,6 +119,7 @@ const DashboardFolder = ({ title, folder, onClick  ,onFolderDeleted}) => {
     };
     return (
         <Tooltip title={title} enterDelay={1000} leaveDelay={200}>
+            <>
             <div className="bg-tertiary text-white flex items-center justify-center rounded-md w-min pl-3 hover:opacity-80 duration-300">
                 <FolderIcon fontSize="large" />
                 <span className='mx-5 w-24 text-lg font-semibold mr-10'>{truncateTitle(title)}</span>
@@ -149,8 +150,8 @@ const DashboardFolder = ({ title, folder, onClick  ,onFolderDeleted}) => {
             </Menu>
             </div>
               {/* Rename Overlay */}
-              <Dialog open={renameOverlayOpen} onClose={() => setRenameOverlayOpen(false)} className={dialogStyles}>
-    <DialogTitle>Rename Folder</DialogTitle>
+              <Dialog open={renameOverlayOpen} onClose={() => setRenameOverlayOpen(false)} sx={dialogStyles}>
+  <DialogTitle>Rename Folder</DialogTitle>
     <DialogContent>
         <TextField
             label="New Folder Name"
@@ -161,30 +162,33 @@ const DashboardFolder = ({ title, folder, onClick  ,onFolderDeleted}) => {
         />
     </DialogContent>
     <DialogActions>
-        <Button onClick={() => setRenameOverlayOpen(false)} style={buttonStyles}>
-            Cancel
+    <Button onClick={() => setRenameOverlayOpen(false)} sx={buttonStyles}>
+    Cancel
         </Button>
-        <Button onClick={handleRename} style={buttonStyles}>
+        <Button onClick={handleRename} sx={buttonStyles}>
+
             Rename
         </Button>
     </DialogActions>
 </Dialog>
 
 {/* Delete Confirmation Overlay */}
-<Dialog open={deleteOverlayOpen} onClose={() => setDeleteOverlayOpen(false)} className={dialogStyles}>
+<Dialog open={deleteOverlayOpen} onClose={() => setDeleteOverlayOpen(false)} sx={dialogStyles}>
     <DialogTitle>Confirm Delete</DialogTitle>
     <DialogContent>
         Are you sure you want to delete this folder and its contents?
     </DialogContent>
     <DialogActions>
-        <Button onClick={() => setDeleteOverlayOpen(false)} style={buttonStyles}>
+        <Button onClick={() => setDeleteOverlayOpen(false)} sx={buttonStyles}>
             Cancel
         </Button>
-        <Button onClick={handleDelete} style={buttonStyles}>
+        <Button onClick={handleDelete} sx={buttonStyles}>
             Delete
         </Button>
     </DialogActions>
 </Dialog>
+            </>
+           
         </Tooltip>
     );
 };
