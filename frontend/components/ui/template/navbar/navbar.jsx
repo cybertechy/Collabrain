@@ -9,6 +9,7 @@ import {Tooltip}  from '@mui/material';
 import MenuIcon from "@mui/icons-material/Menu";
 import { isSidebarOpen } from "../sidebar/sidebar";
 import NotificationsIcon from '@mui/icons-material/Notifications';
+import SettingsOverlay from '../../overlays/settingsOverlay';
 import Template from '../template';
 
 
@@ -16,8 +17,8 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
     const [showLeaderboard, setShowLeaderboard] = useState(false);
     const leaderboardRef = useRef(null);
     const leaderboardToggleRef = useRef(null); // Ref for the leaderboard toggle icon
-    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth); 
+    const [showSettings, setShowSettings] = useState(false);
     const toggleLeaderboard = () => {
         setShowLeaderboard(!showLeaderboard);
     };
@@ -126,6 +127,11 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
             {showLeaderboard && (
                 <div ref={leaderboardRef}>
                     <LeaderboardNavbar />
+                </div>
+            )}
+            {(
+                <div >
+                    <SettingsOverlay />
                 </div>
             )}
         </>
