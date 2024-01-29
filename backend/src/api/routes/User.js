@@ -7,8 +7,7 @@ const fb = require("../helpers/firebase");
 /************************************************************/
 
 // Get users
-router.get("/", async (req, res) => 
-{
+router.get("/", async (req, res) => {
 	// Make sure all required fields are present
 	if (!req.headers.authorization)
 		return res.status(400).json({ error: "Missing required data" });
@@ -19,17 +18,34 @@ router.get("/", async (req, res) =>
 		return res.status(401).json({ error: "Unauthorized" });
 
 	// Get up to 1000 users
-	fb.db.collection("users").limit(1000).get().then(records =>
-	{
+	fb.db.collection("users").limit(1000).get().then(records => {
 		let users = [];
 		records.forEach(doc => { users.push(doc.data()); });
 		res.json(users);
 	});
 });
 
+// search users
+router.get("/search", async (req, res) => {
+	if (!req.headers.authorization || !req.query.username)
+		return res.status(400).json({ error: "Missing required data" });
+
+	// Verify token
+	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
+	if (!user)
+		return res.status(401).json({ error: "Unauthorized" });
+
+	// Get up to 1000 users
+	fb.db.collection("users").orderBy("lowUsername", "asc").where("lowUsername", ">=", req.query.username).where("lowUsername", "<=", req.query.username + "\uf8ff").limit(1000).get().then(records => {
+		let users = [];
+		records.forEach(doc => { users.push(doc.data()); });
+		return res.status(200).json(users);
+	}).catch(err => { return res.status(500).json({ error: err }); });
+})
+
+
 // Get user from ID
-router.get("/:user", async (req, res) =>
-{
+router.get("/:user", async (req, res) => {
 	// Make sure all required fields are present
 	if (!req.headers.authorization)
 		return res.status(400).json({ error: "Missing required data" });
@@ -45,8 +61,7 @@ router.get("/:user", async (req, res) =>
 });
 
 // Create user
-router.post("/", (req, res) =>
-{
+router.post("/", (req, res) => {
 	// Make sure all required fields are present
 	if (!req.body.email || !req.body.fname || !req.body.lname || !req.body.photo || !req.body.uid)
 		return res.status(400).json({ error: "Missing required data" });
@@ -79,8 +94,7 @@ router.post("/", (req, res) =>
 });
 
 // Update user info
-router.patch("/", async (req, res) =>
-{
+router.patch("/", async (req, res) => {
 	// Make sure all required fields are present
 	if (!req.headers.authorization)
 		return res.status(400).json({ error: "Missing required data" });
@@ -90,6 +104,16 @@ router.patch("/", async (req, res) =>
 	if (!user)
 		return res.status(401).json({ error: "Unauthorized" });
 
+	if(req.body.username){
+		// Check if username is taken
+		let users = fb.db.collection("users").where("username", "==", req.body.username);
+		if (users.length > 0)
+			return res.status(400).json({ error: "Username already taken" });
+
+		// Update lowUsername
+		req.body.lowUsername = req.body.username.toLowerCase();
+	}
+
 	// Update user info
 	fb.db.doc(`users/${user.uid}`).update(req.body)
 		.then(() => { return res.json({ message: "User updated" }); })
@@ -97,8 +121,7 @@ router.patch("/", async (req, res) =>
 });
 
 // Delete user
-router.delete("/:user", async (req, res) =>
-{
+router.delete("/:user", async (req, res) => {
 	// Make sure all required fields are present
 	if (!req.headers.authorization)
 		return res.status(400).json({ error: "Missing required data" });
@@ -119,8 +142,7 @@ router.delete("/:user", async (req, res) =>
 });
 
 // Check if username is taken
-router.get("/username/:username", async (req, res) =>
-{
+router.get("/username/:username", async (req, res) => {
 	// Check if username is taken
 	let users = fb.db.collection("users").where("username", "==", req.params.username);
 	if (users.length > 0)
@@ -134,8 +156,7 @@ router.get("/username/:username", async (req, res) =>
 /************************************************************/
 
 // Get friends
-router.get("/friends", async (req, res) =>
-{
+router.get("/f/friends", async (req, res) => {
 	// Make sure all required fields are present
 	if (!req.headers.authorization)
 		return res.status(400).json({ error: "Missing required data" });
@@ -144,15 +165,20 @@ router.get("/friends", async (req, res) =>
 	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
 	if (!user)
 		return res.status(401).json({ error: "Unauthorized" });
+	
 
 	fb.db.doc(`users/${user.uid}`).get()
-		.then(doc => { res.json(doc.data().friends); })
+		.then(doc => {
+			res.json({
+				friends: doc.data().friends,
+				alias: doc.data().alias
+			});
+		})
 		.catch(err => { return res.status(500).json({ error: err }); });
 });
 
 // Send friend request
-router.post("/friends/request/:user", async (req, res) =>
-{
+router.post("/friends/request/:user", async (req, res) => {
 	// Make sure all required fields are present
 	if (!req.headers.authorization)
 		return res.status(400).json({ error: "Missing required data" });
@@ -171,8 +197,7 @@ router.post("/friends/request/:user", async (req, res) =>
 });
 
 // Cancel/decline friend request
-router.delete("/friends/request/:user", async (req, res) =>
-{
+router.delete("/friends/request/:user", async (req, res) => {
 	// req.body.type = "cancel" or "decline"
 
 	// Make sure all required fields are present
@@ -195,8 +220,7 @@ router.delete("/friends/request/:user", async (req, res) =>
 });
 
 // Accept friend request
-router.post("/friends/:user", async (req, res) =>
-{
+router.post("/friends/:user", async (req, res) => {
 	// Make sure all required fields are present
 	if (!req.headers.authorization)
 		return res.status(400).json({ error: "Missing required data" });
@@ -221,8 +245,7 @@ router.post("/friends/:user", async (req, res) =>
 	if (friendRequest == undefined)
 		return res.status(400).json({ error: "No friend requests" });
 
-	try
-	{
+	try {
 		// Add to friends lists
 		// Current user
 		fb.db.doc(`users/${user.uid}`).update({ friends: fb.admin.firestore.FieldValue.arrayUnion(req.params.user) });
@@ -237,8 +260,7 @@ router.post("/friends/:user", async (req, res) =>
 });
 
 // Get friend requests
-router.get("/friends/requests", async (req, res) =>
-{
+router.get("/friends/requests", async (req, res) => {
 	// Make sure all required fields are present
 	if (!req.headers.authorization) return res.status(400).json({ error: "Missing required data" });
 
@@ -253,8 +275,7 @@ router.get("/friends/requests", async (req, res) =>
 });
 
 // Remove friend
-router.delete("/friends/:user", async (req, res) =>
-{
+router.delete("/friends/:user", async (req, res) => {
 	// Make sure all required fields are present
 	if (!req.headers.authorization)
 		return res.status(400).json({ error: "Missing required data" });
@@ -264,8 +285,7 @@ router.delete("/friends/:user", async (req, res) =>
 	if (!user)
 		return res.status(401).json({ error: "Unauthorized" });
 
-	try
-	{
+	try {
 		// Remove from friends lists
 		// Current user
 		fb.db.doc(`users/${user.uid}`).update({ friends: fb.admin.firestore.FieldValue.arrayRemove(req.params.user) });
@@ -277,13 +297,49 @@ router.delete("/friends/:user", async (req, res) =>
 	catch (err) { return res.status(500).json({ error: err }); }
 });
 
+// update alias for friend
+// @requestParams: user id of friend
+// @requestBody: alias
+// Initially a friend has no alias, so only username is displayed
+// If user sets alias, frontend will show alias and underneath "@username"
+router.patch("/friends/:user", async (req, res) => {
+	// Make sure all required fields are present
+	if (!req.headers.authorization || !req.body.alias)
+		return res.status(400).json({ error: "Missing required data" });
+
+	// verify token
+	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]);
+	if (!user)
+		return res.status(401).json({ error: "Unauthorized" });
+
+	// get user friends
+	let userRef = await fb.db.doc(`users/${user.uid}`).get();
+	if (!userRef.exists)
+		return res.status(404).json({ error: "User not found" });
+
+	let userdata = userRef.data();
+
+	let friends = userRef.data().friends;
+	if (!friends.includes(req.params.user))
+		return res.status(400).json({ error: "firend not found" });
+
+	if(!userdata.alias) userdata.alias = {};
+
+	userdata.alias[req.params.user] = req.body.alias;
+
+	fb.db.doc(`users/${user.uid}`).update({ alias: userdata.alias })
+		.then(() => { return res.json({ message: "Alias updated" }); })
+		.catch(err => { return res.status(500).json({ error: err }); });
+});
+
+
+
 /************************************************************/
 /*                   Block CRUD Operations                  */
 /************************************************************/
 
 // Block user
-router.post("/block/:user", async (req, res) =>
-{
+router.post("/block/:user", async (req, res) => {
 	// Make sure all required fields are present
 	if (!req.headers.authorization)
 		return res.status(400).json({ error: "Missing required data" });
@@ -300,8 +356,7 @@ router.post("/block/:user", async (req, res) =>
 });
 
 // Unblock user
-router.delete("/block/:user", async (req, res) =>
-{
+router.delete("/block/:user", async (req, res) => {
 	// Make sure all required fields are present
 	if (!req.headers.authorization)
 		return res.status(400).json({ error: "Missing required data" });

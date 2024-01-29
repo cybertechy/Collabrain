@@ -79,6 +79,7 @@ async function deleteQueryBatch(query, resolve)
 	});
 }
 
+// Untested after modification
 async function saveTeamMsg(data)
 {
 	let channels = (await db.collection(`teams/${data.team}/channels/`).where("name", "==", data.channel).get());
@@ -89,8 +90,23 @@ async function saveTeamMsg(data)
 			"sender": data.sender,
 			"sentAt": data.sentAt,
 		});
+
+	let teamData = (await db.doc(`teams/${data.team}`).get()).data();
+
+	// Increase member score
+	let members = teamData.members;
+	members[data.sender].score++;
+
+	//Increase team score
+	let score = teamData.score++;
+
+	db.doc(`team/${data.team}`).update({
+		members,
+		score
+	}).catch(err => console.log(err));
 }
 
+// Untested after modification
 async function saveDirectMsg(data)
 {
 	db.collection(`chats/${data.chat}/messages`)
@@ -99,6 +115,15 @@ async function saveDirectMsg(data)
 			"sender": data.sender,
 			"sentAt": data.sentAt,
 		});
+	
+	let userData = (await db.doc(`users/${data.sender}`).get()).data();
+
+	// Increase member score
+	let score = userData.score++;
+
+	db.doc(`users/${data.sender}`).update({
+		score
+	}).catch(err => console.log(err));
 }
 
 module.exports = {
