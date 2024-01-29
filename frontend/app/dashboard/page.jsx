@@ -437,8 +437,8 @@ export default function Dashboard() {
                             <DashboardFolder
                             key={folder?.id}
                                 id={folder?.id}
-                            key={folder?.id}
-                                id={folder?.id}
+                           
+                              
                                 title={folder?.name}
                                 folder={folder}
                                 onClick={() => {}}
@@ -462,8 +462,7 @@ export default function Dashboard() {
     <DashboardProjectButton
     id={contentMap?.id}
     key={contentMap?.id}
-    id={contentMap?.id}
-    key={contentMap?.id}
+  
         title={contentMap?.name}
         createdAt={contentMap?.createdAt}
         updatedAt={contentMap?.updatedAt}
