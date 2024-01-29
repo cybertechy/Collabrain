@@ -184,6 +184,7 @@ export default function Dashboard() {
         if (user) {
             sock_cli = socket.init("http://localhost:8080");
         //    fetchTeams();
+        //    fetchTeams();
            
         }
     }, [user]);
@@ -201,7 +202,29 @@ export default function Dashboard() {
     //                 },
     //             }
     //         );
+    // const fetchTeams = async () => {
+    //     try {
+    //         const token = await fb.getToken();
+    //         // console.log("Token: ", token);
+    //         const response = await axios.get(
+    //             "http://localhost:8080/api/profile/",
+    //             {
+    //                 headers: {
+    //                     Authorization: `Bearer ${token}`,
+    //                 },
+    //             }
+    //         );
 
+    //         console.log("Response: ", response);
+    //         if (response.status === 200) {
+    //             setTeams(response.data.teams);
+    //         } else {
+    //             console.error("Failed to fetch team data", response.status);
+    //         }
+    //     } catch (error) {
+    //         console.error("Error fetching team data:", error);
+    //     }
+    // };
     //         console.log("Response: ", response);
     //         if (response.status === 200) {
     //             setTeams(response.data.teams);
@@ -268,6 +291,7 @@ export default function Dashboard() {
         const fetchFolders = async () => {
             try {
                 const token = await fb.getToken();
+              
               
                 const response = await axios.get(
                     "http://localhost:8080/api/dashboard/folders",
@@ -413,6 +437,8 @@ export default function Dashboard() {
                             <DashboardFolder
                             key={folder?.id}
                                 id={folder?.id}
+                            key={folder?.id}
+                                id={folder?.id}
                                 title={folder?.name}
                                 folder={folder}
                                 onClick={() => {}}
@@ -434,6 +460,8 @@ export default function Dashboard() {
                             {console.log("Content Maps:", contentMaps)}
                             {sortedContentMaps.map((contentMap) => (
     <DashboardProjectButton
+    id={contentMap?.id}
+    key={contentMap?.id}
     id={contentMap?.id}
     key={contentMap?.id}
         title={contentMap?.name}
