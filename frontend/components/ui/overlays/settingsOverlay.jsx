@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import CloseIcon from '@mui/icons-material/Close';
+import './index.css';
 import PersonIcon from '@mui/icons-material/Person';
 import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied';
  
@@ -51,26 +52,16 @@ const Dropdown = ({ buttonLabel, dropdownItems, onSelect }) => {
           />
 </svg>
 </button>
-      {/* Dropdown menu */}
-      {isDropdownOpen && (
-<div
-          id="dropdown"
-          className="z-10 absolute bg-white divide-y divide-white-100 rounded-lg shadow dark:bg-white-700 "
->
-<ul className="py-2 " aria-labelledby="dropdownDefaultButton">
-            {dropdownItems.map((item, index) => (
-<li key={index}>
-<button href={item.link} onClick={() => handleItemClick(item.label)} className="block text-center px-20 py-3 text-xl hover:bg-purple-500 hover:text-white dark:hover:bg-purple-600 dark:hover:text-white text-purple-500 w-full ">
-                  {item.label}
-</button>
-</li>
-            ))}
+{/* Dropdown menu */}
+{isDropdownOpen && (
+<div id="dropdown" className="z-10 absolute bg-white divide-y divide-white-100 rounded-lg shadow dark:bg-white-700 ">
+<ul className="py-2 " aria-labelledby="dropdownDefaultButton">{dropdownItems.map((item, index) => (
+<li key={index}><button href={item.link} onClick={() => handleItemClick(item.label)} className="block text-center px-20 py-3 text-xl hover:bg-purple-500 hover:text-white dark:hover:bg-purple-600 dark:hover:text-white text-purple-500 w-full ">{item.label}</button></li>))}
 </ul>
 </div>
-      )}
+)}
 </div>
-  );
-};
+);};
  
 const ToggleButtonExample = () => {
   const [isToggled, setToggled] = useState(false);
@@ -79,22 +70,13 @@ const ToggleButtonExample = () => {
   };
   return (
 <div>
-<button
-        className={`relative w-12 h-6 rounded-full focus:outline-none transition-colors duration-300 ease-in-out ${
-          isToggled ? 'bg-purple-500' : 'bg-gray-400'
-        }`}
-        onClick={handleToggle}
->
-<span
-          className={`absolute left-0 top-0 w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-300 ease-in-out ${
-            isToggled ? 'translate-x-full' : 'translate-x-0'
-          }`}
+<button className={`relative w-12 h-6 rounded-full focus:outline-none transition-colors duration-300 ease-in-out ${isToggled ? 'bg-purple-500' : 'bg-gray-400'}`}onClick={handleToggle}>
+<span className={`absolute left-0 top-0 w-6 h-6 rounded-full bg-white shadow-md transform transition-transform duration-300 ease-in-out ${isToggled ? 'translate-x-full' : 'translate-x-0'}`}
         />
 </button>
 </div>
   );
 }
- 
 const SettingsOverlay = () => {
   const [modalVisible, setModalVisible] = useState(true);
   const [currentScreen, setCurrentScreen] = useState("profile");
@@ -110,38 +92,56 @@ const SettingsOverlay = () => {
   };
   return (
 <>
-<div>
+<div> 
         {modalVisible && (
 <div>
 <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center z-50 bg-white bg-opacity-20 backdrop-blur-sm">
-    {currentScreen === "profile" && (<ProfileOverlay setOpenModal={toggleModal} switchToGeneral={switchToGeneral} switchToSound={switchToSound} switchToPrivacy={switchToPrivacy} switchToNotifications={switchToNotifications} switchToAccessibility={switchToAccessibility} />)}
-    {currentScreen === "general" && (<GeneralOverlay setOpenModal={toggleModal} switchToProfile={switchToProfile} switchToSound={switchToSound} switchToPrivacy={switchToPrivacy} switchToNotifications={switchToNotifications} switchToAccessibility={switchToAccessibility} />)}
+    {currentScreen === "profile" && (<ProfileOverlay setOpenModal={toggleModal}switchToProfile={switchToProfile} switchToGeneral={switchToGeneral} switchToSound={switchToSound} switchToPrivacy={switchToPrivacy} switchToNotifications={switchToNotifications} switchToAccessibility={switchToAccessibility} />)}
+    {currentScreen === "general" && (<GeneralOverlay setOpenModal={toggleModal} switchToProfile={switchToProfile} switchToSound={switchToSound} switchToPrivacy={switchToPrivacy} switchToNotifications={switchToNotifications} switchToAccessibility={switchToAccessibility} />) }
     {currentScreen === "sound" && <SoundOverlay  setOpenModal={toggleModal} switchToProfile={switchToProfile} switchToGeneral={switchToGeneral} switchToPrivacy={switchToPrivacy} switchToNotifications={switchToNotifications} switchToAccessibility={switchToAccessibility} />}
     {currentScreen === "privacy" && <PrivacyOverlay setOpenModal={toggleModal} switchToProfile={switchToProfile} switchToSound={switchToSound} switchToGeneral={switchToGeneral} switchToNotifications={switchToNotifications} switchToAccessibility={switchToAccessibility} />}
     {currentScreen === "notifications" && <NotificationsOverlay setOpenModal={toggleModal}  switchToProfile={switchToProfile} switchToSound={switchToSound} switchToPrivacy={switchToPrivacy} switchToGeneral={switchToGeneral} switchToAccessibility={switchToAccessibility} />}
     {currentScreen === "accessibility" && <AccessibilityOverlay setOpenModal={toggleModal} switchToProfile={switchToProfile} switchToSound={switchToSound} switchToPrivacy={switchToPrivacy} switchToNotifications={switchToNotifications} switchToGeneral={switchToGeneral} />}
+
 </div>
 </div>
-        )}
+        )}     
 </div>
 </>
   );
- 
 }
-const OverlaySidebar = ({currentScreen ,switchToProfile, switchToGeneral, switchToSound, switchToPrivacy, switchToNotifications, switchToAccessibility}) => {
- 
+const OverlaySidebar = ({ currentScreen, switchToProfile, switchToGeneral, switchToSound, switchToPrivacy, switchToNotifications, switchToAccessibility }) => {
+  const [selectedButton, setSelectedButton] = useState(currentScreen);
+  const screenHandlers = {
+    profile: switchToProfile,
+    general: switchToGeneral,
+    sound: switchToSound,
+    privacy: switchToPrivacy,
+    notifications: switchToNotifications,
+    accessibility: switchToAccessibility,
+  };
+  const handleButtonClick = (screen) => {
+    setSelectedButton(screen);
+    const handler = screenHandlers[screen];
+    if (handler) {
+      handler();
+    }
+  };
   return (
     <div className="flex flex-col justify-start px-4 py-2 sm:px-8 sm:py-4 md:px-12 md:py-6 lg:px-16 lg:py-8 w-2/6 overflow-hidden">
       <p className="py-4 sm:py-10 text-4xl md:text-base sm:text-sm lg:text-4xl text-black font-bold">Settings</p>
-      <button className={`w-screen sm:w-72 p-2 sm:p-4 text-sm md:text-xl font-medium text-black text-start mb-2 ${currentScreen === 'profile' ? 'bg-gray-200' : 'bg-white'}`}onClick={switchToProfile}>Profile</button>
-      <button className={`w-screen sm:w-72 p-2 sm:p-4 text-sm md:text-xl font-medium text-black text-start mb-2 ${currentScreen === 'general' ? 'bg-gray-200' : 'bg-white'}`}onClick={switchToGeneral}>General</button>
-      <button className={`w-screen sm:w-72 p-2 sm:p-4 text-sm md:text-xl font-medium text-black text-start mb-2 ${currentScreen === 'sound' ? 'bg-gray-200' : 'bg-white'}`}onClick={switchToSound}>Sound</button>
-      <button className={`w-screen sm:w-72 p-2 sm:p-4 text-sm md:text-xl font-medium text-black text-start mb-2 ${currentScreen === 'privacy' ? 'bg-gray-200' : 'bg-white'}`}onClick={switchToPrivacy}>Privacy</button>
-      <button className={`w-screen sm:w-72 p-2 sm:p-4 text-sm md:text-xl font-medium text-black text-start mb-2 ${currentScreen === 'notifications' ? 'bg-gray-200' : 'bg-white'}`}onClick={switchToNotifications}>Notifications</button>
-      <button className={`w-screen sm:w-72 p-2 sm:p-4 text-sm md:text-xl font-medium text-black text-start mb-2 ${currentScreen === 'accessibility' ? 'bg-gray-200' : 'bg-white'}`}onClick={switchToAccessibility}>Accessibility</button>
+      {['profile', 'general', 'sound', 'privacy', 'notifications', 'accessibility'].map((screen) => (
+        <button
+          key={screen}
+          className={`w-screen sm:w-72 p-2 sm:p-4 text-sm md:text-xl font-medium text-black text-start mb-2 ${selectedButton === screen ? 'bg-gray-200' : 'bg-white'}`}
+          onClick={() => handleButtonClick(screen)}>
+          {screen.charAt(0).toUpperCase() + screen.slice(1)}
+        </button>
+      ))}
     </div>
   );
 };
+
 //  PROFILE SETTINGS PAGE
 const ProfileOverlay = ({ currentScreen, setOpenModal, switchToProfile, switchToGeneral, switchToSound, switchToPrivacy, switchToNotifications, switchToAccessibility }) => {
   const [inputValue, setInputValue] = useState('Enter your name');
@@ -164,7 +164,7 @@ const ProfileOverlay = ({ currentScreen, setOpenModal, switchToProfile, switchTo
 <div className="w-screen h-screen flex items-center justify-center overflow-hidden">
 <div className="w-2/4 h-5/6 shadow-lg bg-white border rounded-md flex overflow-auto">
 {/* LEFT SIDE */}        
-<OverlaySidebar currentScreen={currentScreen}  switchToProfile={switchToProfile}  switchToGeneral={switchToGeneral}  switchToSound={switchToSound}  switchToPrivacy={switchToPrivacy} switchToNotifications={switchToNotifications}switchToAccessibility={switchToAccessibility}/>
+<OverlaySidebar currentScreen={currentScreen}  switchToProfile={switchToProfile}  switchToGeneral={switchToGeneral }  switchToSound={switchToSound}  switchToPrivacy={switchToPrivacy} switchToNotifications={switchToNotifications}switchToAccessibility={switchToAccessibility}/>
 {/* RIGHT SIDE */}
 <div className='pt-5 w-full h-screen overflow-auto pb-5'>
 <button className=' bg-transparent border-none text-25 cursor-pointer pr-4 pt-2 flex justify-end w-full ' onClick={setOpenModal}>
@@ -245,7 +245,7 @@ const GeneralOverlay = ({setOpenModal, currentScreen, switchToGeneral, switchToP
 <CloseIcon className = "text-black" fontSize="large" />
 </button>
 {/* LEFT SIDE */}
-<OverlaySidebar currentScreen={currentScreen}  switchToProfile={switchToProfile}  switchToGeneral={switchToGeneral}  switchToSound={switchToSound}  switchToPrivacy={switchToPrivacy} switchToNotifications={switchToNotifications}switchToAccessibility={switchToAccessibility}/>
+<OverlaySidebar currentScreen={currentScreen} switchToProfile={switchToProfile}  switchToGeneral={switchToGeneral} switchToSound={switchToSound}  switchToPrivacy={switchToPrivacy} switchToNotifications={switchToNotifications}switchToAccessibility={switchToAccessibility}/>
 {/* RIGHT SIDE */}
 <div className="flex flex-col pt-8 sm:pt-16 md:pt-24 px-4 sm:px-8 md:px-12 lg:px-16 w-11/12 overflow-auto">
 <p className="mb-2 text-2xl text-black md:text-lg sm:text-sm lg:text-2xl">Change Appearance</p>
@@ -263,13 +263,11 @@ const GeneralOverlay = ({setOpenModal, currentScreen, switchToGeneral, switchToP
 {/* <CircleComponent/> */}
 <BadBehaviorStrikes strikes={3}/>
 </div>
- 
 </div>
 </div>
 </div>
 </div>
 </>
- 
   );
 }
 //  SOUND SETTINGS PAGE
