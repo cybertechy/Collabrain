@@ -8,6 +8,7 @@ import LeaderboardNavbar from '../../leaderboard/leaderboardNavbar';
 import {Tooltip}  from '@mui/material';
 import MenuIcon from "@mui/icons-material/Menu";
 import { isSidebarOpen } from "../sidebar/sidebar";
+import NotificationsIcon from '@mui/icons-material/Notifications';
 import Template from '../template';
 
 
@@ -84,7 +85,7 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
             leaveDelay={200}
           
         > 
-                    <NotificationsNoneIcon
+                    <NotificationsIcon
                         className="cursor-pointer"
                         style={{ color: "white" }}
                     />

@@ -120,6 +120,7 @@ export default function Dashboard() {
     const NewContentMap = async () => {
         
         let token = await fb.getToken();
+
         if (!token) return null;
       
       
@@ -182,35 +183,35 @@ export default function Dashboard() {
         console.log(user);
         if (user) {
             sock_cli = socket.init("http://localhost:8080");
-            fetchTeams();
+        //    fetchTeams();
            
         }
     }, [user]);
 
   
-    const fetchTeams = async () => {
-        try {
-            const token = await fb.getToken();
-            // console.log("Token: ", token);
-            const response = await axios.get(
-                "http://localhost:8080/api/profile/",
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
+    // const fetchTeams = async () => {
+    //     try {
+    //         const token = await fb.getToken();
+    //         // console.log("Token: ", token);
+    //         const response = await axios.get(
+    //             "http://localhost:8080/api/profile/",
+    //             {
+    //                 headers: {
+    //                     Authorization: `Bearer ${token}`,
+    //                 },
+    //             }
+    //         );
 
-            console.log("Response: ", response);
-            if (response.status === 200) {
-                setTeams(response.data.teams);
-            } else {
-                console.error("Failed to fetch team data", response.status);
-            }
-        } catch (error) {
-            console.error("Error fetching team data:", error);
-        }
-    };
+    //         console.log("Response: ", response);
+    //         if (response.status === 200) {
+    //             setTeams(response.data.teams);
+    //         } else {
+    //             console.error("Failed to fetch team data", response.status);
+    //         }
+    //     } catch (error) {
+    //         console.error("Error fetching team data:", error);
+    //     }
+    // };
 
     // useEffect(() => {
     //     if (user) {
@@ -222,6 +223,7 @@ export default function Dashboard() {
         const fetchContentMaps = async () => {
             try {
                 const token = await fb.getToken();
+                console.log(token);
                 const response = await axios.get(
                     "http://localhost:8080/api/maps",
                     {
@@ -266,6 +268,7 @@ export default function Dashboard() {
         const fetchFolders = async () => {
             try {
                 const token = await fb.getToken();
+              
                 const response = await axios.get(
                     "http://localhost:8080/api/dashboard/folders",
                     {
@@ -294,26 +297,33 @@ export default function Dashboard() {
         fetchFolders();
     }, [user, folderChanges]);
 
-    
+    const showToken = async () => {
+        const token = await fb.getToken();
+        return token;
+    };
    
            
     if ( !user){
+        const tokenExists = showToken();;
+    const itemClasses = "hidden";
         return (
-            <div className="flex flex-col items-center justify-around min-h-screen">
+           
+            <div className={`loader-container ${tokenExists? "":itemClasses + "mt-96"}`}>
                 <div className="flex flex-col items-center justify-center min-h-screen">
                     <h1 className="text-xl font-bold mb-5 text-primary">
-                        Trying to sign in
+                        {isContentMapsLoading? "Loading Projects":"Trying to sign in"}
                     </h1>
                     <div className="loader mb-5"></div>
 
                     <p className="text-lg font-bold text-primary mb-5 ">
-                        If you're not signed in, sign in&nbsp;
-                        <span
+                        {isContentMapsLoading? "" : "If you're not signed in, sign in "}
+                        {isContentMapsLoading? "" :<span
                             className="underline cursor-pointer"
                             onClick={() => router.push("/")}
                         >
                             here
-                        </span>
+                        </span>}
+                        
                     </p>
                 </div>
             </div>
@@ -359,7 +369,7 @@ export default function Dashboard() {
             })
             .catch((err) => console.log(err));
     };
-
+   
     return (
         <Template>
             {/* <div className="flex flex-col h-screen bg-white ">
@@ -401,7 +411,8 @@ export default function Dashboard() {
                     <div className="flex flex-wrap content-start items-start w-full justify-start ml-4 gap-8 ">
                         {folders.map((folder) => (
                             <DashboardFolder
-                                key={folder?.id}
+                            key={folder?.id}
+                                id={folder?.id}
                                 title={folder?.name}
                                 folder={folder}
                                 onClick={() => {}}
@@ -423,7 +434,8 @@ export default function Dashboard() {
                             {console.log("Content Maps:", contentMaps)}
                             {sortedContentMaps.map((contentMap) => (
     <DashboardProjectButton
-        key={contentMap?.id}
+    id={contentMap?.id}
+    key={contentMap?.id}
         title={contentMap?.name}
         createdAt={contentMap?.createdAt}
         updatedAt={contentMap?.updatedAt}
@@ -441,7 +453,7 @@ export default function Dashboard() {
 
             {/* uncomment the below for username popup when the server can be used */}
             {
-               isUsernameOverlayOpen && <UsernameOverlay isOpen={isUsernameOverlayOpen} onClose={closeUsernameOverlay} />
+              isUsernameOverlayOpen && <UsernameOverlay isOpen={isUsernameOverlayOpen} onClose={closeUsernameOverlay} />
             }
           {isCreateFolderOverlayOpen && (
              <CreateFolderOverlay 

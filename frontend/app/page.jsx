@@ -45,7 +45,25 @@ export default function Home() {
         );
     }
     
-
+    const handleFormSubmit = async (e) => {
+        e.preventDefault();
+    
+        // Create a custom event object that mimics the structure of a real event
+        const customEvent = {
+            preventDefault: () => {}, //dummy function for preventDefault
+            target: {
+                elements: {
+                    email: { value: email },
+                    password: { value: password },
+                    
+                    
+                }
+            }
+        };
+       await fb.emailSignIn(customEvent);
+       
+        
+    };
     return (
         <div className="w-full md:w-3/4 lg:w-1/2 mx-auto">
             <ToastContainer />
@@ -64,7 +82,7 @@ export default function Home() {
 
                     <br />
                     <form
-                        onSubmit={fb.emailSignIn}
+                       onSubmit={handleFormSubmit}
                         style={{ textAlign: "center" }}
                     >
                         <EmailInputField email={email} setEmail={setemail} placeholder="Email Address" color="tertiary" />
@@ -78,7 +96,7 @@ export default function Home() {
                         <Button
                             text="Log In"
                             color="primary"
-                            onClick={fb.emailSignIn}
+                            type = "submit"
                         />
                         <hr className="border-t-1 border-solid border-gray-400"></hr>
                     </form>
