@@ -129,11 +129,11 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
                     <LeaderboardNavbar />
                 </div>
             )}
-            {(
+            {/* {(
                 <div >
                     <SettingsOverlay />
                 </div>
-            )}
+            )} */}
         </>
     );
 };

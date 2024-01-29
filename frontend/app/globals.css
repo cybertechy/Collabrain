@@ -110,13 +110,14 @@ body {
 }
 
 .loader-container {
-  position: fixed; /* Fixed position to the viewport */
+  position: absolute; /* or 'absolute' if you prefer */
   top: 0;
   left: 0;
-  height: 100vh;
-  width: 100vw;
-  display: block;
-  align-items: center;
+  width: 100%;
+  height: 100%;
+  z-index: 1000; /* high z-index to overlay on top of other content */
+  display: flex;
   justify-content: center;
-  z-index: 1000; /* High z-index to be on top of other elements */
+  align-items: center;
+ 
 }

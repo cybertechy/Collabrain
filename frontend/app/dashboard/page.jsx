@@ -328,14 +328,13 @@ export default function Dashboard() {
    
            
     if ( !user){
-        const tokenExists = showToken();;
-    const itemClasses = "hidden";
+  
         return (
            
-            <div className={`loader-container ${tokenExists? "":itemClasses + "mt-96"}`}>
+            <div className={`hidden`}>
                 <div className="flex flex-col items-center justify-center min-h-screen">
                     <h1 className="text-xl font-bold mb-5 text-primary">
-                        {isContentMapsLoading? "Loading Projects":"Trying to sign in"}
+                        {isContentMapsLoading? "Loading Projects":" Trying to sign in"}
                     </h1>
                     <div className="loader mb-5"></div>
 
@@ -453,7 +452,7 @@ export default function Dashboard() {
                         Projects
                     </p>
                     <div
-                        className="scrollbar-thin scrollbar-thumb-primary  overflow-y-scroll pr-28"
+                        className="scrollbar-thin scrollbar-thumb-primary h-full  overflow-y-scroll pr-28"
                         style={{ maxHeight: "500px" }}
                     >
                         <div className="flex flex-wrap gap-4 ml-4 justify-start">
