@@ -67,7 +67,22 @@ router.post("/", (req, res) =>
 			bio: "",
 			teams: [],
 			friends: [],
-			blocked: []
+			aliases: [],
+			blocked: [],
+			contentMaps: [],
+			documents: [],
+			friendRequests: [],
+			teamInvites: [],
+			education: [],
+			courses: [],
+			achievements: [],
+			learningMaterials: [],
+			twoFA: false,
+			colorBlindFilter: false,
+			fontSize: 16,
+			theme: "light",
+			language: "en",
+			
 		})
 		.then(() => { return res.json({ message: "User added" }); })
 		.catch(err => { return res.status(500).json({ error: err }); });
