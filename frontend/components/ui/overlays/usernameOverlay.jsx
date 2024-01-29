@@ -3,7 +3,7 @@ const fb = require("../../../app/_firebase/firebase");
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-const UsernameOverlay = ({ isOpen, onClose , setIsUsernameOverlayOpen}) =>
+const UsernameOverlay = ({ isOpen, onClose }) =>
 {
 	const [username, setUsername] = useState('');
 	const [error, setError] = useState('');
@@ -25,7 +25,7 @@ const UsernameOverlay = ({ isOpen, onClose , setIsUsernameOverlayOpen}) =>
             });
 
             const user = res.data;
-			user.username? setIsUsernameOverlayOpen(false): setIsUsernameOverlayOpen(true);
+			
 			console.log("Overlay open: " + isOpen);
             return user.username ? true : false;
         } catch (err) {

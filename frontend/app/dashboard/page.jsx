@@ -182,35 +182,35 @@ export default function Dashboard() {
         console.log(user);
         if (user) {
             sock_cli = socket.init("http://localhost:8080");
-            fetchTeams();
+        //    fetchTeams();
            
         }
     }, [user]);
 
   
-    const fetchTeams = async () => {
-        try {
-            const token = await fb.getToken();
-            // console.log("Token: ", token);
-            const response = await axios.get(
-                "http://localhost:8080/api/profile/",
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
+    // const fetchTeams = async () => {
+    //     try {
+    //         const token = await fb.getToken();
+    //         // console.log("Token: ", token);
+    //         const response = await axios.get(
+    //             "http://localhost:8080/api/profile/",
+    //             {
+    //                 headers: {
+    //                     Authorization: `Bearer ${token}`,
+    //                 },
+    //             }
+    //         );
 
-            console.log("Response: ", response);
-            if (response.status === 200) {
-                setTeams(response.data.teams);
-            } else {
-                console.error("Failed to fetch team data", response.status);
-            }
-        } catch (error) {
-            console.error("Error fetching team data:", error);
-        }
-    };
+    //         console.log("Response: ", response);
+    //         if (response.status === 200) {
+    //             setTeams(response.data.teams);
+    //         } else {
+    //             console.error("Failed to fetch team data", response.status);
+    //         }
+    //     } catch (error) {
+    //         console.error("Error fetching team data:", error);
+    //     }
+    // };
 
     // useEffect(() => {
     //     if (user) {
@@ -222,11 +222,7 @@ export default function Dashboard() {
         const fetchContentMaps = async () => {
             try {
                 const token = await fb.getToken();
-                if (!token) {
-                    console.error('User is not authorized or token is not available');
-                    // Handle the unauthorized case, e.g., show an error message or log out the user
-                    return;
-                }
+        
                 const response = await axios.get(
                     "http://localhost:8080/api/maps",
                     {
@@ -271,11 +267,7 @@ export default function Dashboard() {
         const fetchFolders = async () => {
             try {
                 const token = await fb.getToken();
-                 if (!token) {
-        console.error('User is not authorized or token is not available');
-        // Handle the unauthorized case, e.g., show an error message or log out the user
-        return;
-    }
+              
                 const response = await axios.get(
                     "http://localhost:8080/api/dashboard/folders",
                     {
@@ -457,9 +449,9 @@ export default function Dashboard() {
             </div>
 
             {/* uncomment the below for username popup when the server can be used */}
-            {
-              user && isUsernameOverlayOpen && <UsernameOverlay isOpen={isUsernameOverlayOpen} onClose={closeUsernameOverlay} />
-            }
+            {/* {
+              isUsernameOverlayOpen && <UsernameOverlay isOpen={isUsernameOverlayOpen} onClose={closeUsernameOverlay} />
+            } */}
           {isCreateFolderOverlayOpen && (
              <CreateFolderOverlay 
             isOpen={isCreateFolderOverlayOpen} 
