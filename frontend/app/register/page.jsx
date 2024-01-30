@@ -23,6 +23,13 @@
         const [lastname, setlastname] = useState("");
     
         let sock_cli;
+        const confirmPasswordSame= ()=>{
+            if(password !=confirmPassword){
+                toast.error("Password and Confirm Password are not the same")
+                return false;
+            }
+
+        }
         useEffect(() =>
         {
             if (user){
@@ -60,12 +67,15 @@
                 </div>
             );
         }
+
+        
      
     
     
         const handleFormSubmit = async (e) => {
             e.preventDefault();
         
+            if(!confirmPasswordSame()){
             // Create a custom event object that mimics the structure of a real event
             const customEvent = {
                 preventDefault: () => {}, //dummy function for preventDefault
@@ -82,8 +92,8 @@
            await fb.emailSignUp(customEvent);
            
             
+        }
         };
-    
         return (
             <div className="flex items-center justify-center min-h-screen">
                 <ToastContainer />
@@ -109,7 +119,7 @@
                             </div>
                             <div className="flex gap-4">
                             <PasswordInput name="password" value = {password} password={password} setPassword={setpassword} placeholder="Password" color = "tertiary" />
-                            <PasswordInput password={confirmPassword} setPassword={setconfirmPassword} isConfirm={true} placeholder="Confirm Password" color = "tertiary" />
+                            <PasswordInput  password={confirmPassword} setPassword={setconfirmPassword} isConfirm={true} placeholder="Confirm Password" color = "tertiary" />
                             </div>
                             <p className="text-xs text-gray-600 text-left font-poppins ml-2">
                                 Already have an account?

@@ -19,10 +19,27 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
     const leaderboardToggleRef = useRef(null); // Ref for the leaderboard toggle icon
     const [windowWidth, setWindowWidth] = useState(window.innerWidth); 
     const [showSettings, setShowSettings] = useState(false);
+    const [currentScreen, setCurrentScreen] = useState("profile");
+    const settingsOverlayRef = useRef(null); 
     const toggleLeaderboard = () => {
         setShowLeaderboard(!showLeaderboard);
     };
+    const [showSettingsOverlay, setShowSettingsOverlay] = useState(false);
 
+    const toggleSettingsOverlay = () => {
+        setShowSettingsOverlay(!showSettingsOverlay); // Toggle the state
+    };
+    
+    
+    const handleCloseSettings = () => {
+        setShowSettingsOverlay(false);
+    };
+    const handleOpenSettings = (screen) => {
+        setCurrentScreen(screen);
+        setShowSettingsOverlay(true); // Use setShowSettingsOverlay to show the settings overlay.
+      };
+      
+    
     useEffect(() => {
         function handleClickOutside(event) {
             if (leaderboardRef.current && !leaderboardRef.current.contains(event.target) &&
@@ -100,6 +117,7 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
                     <AccountCircleIcon
                         className="cursor-pointer"
                         style={{ color: "white" }}
+                        onClick={toggleSettingsOverlay}
                     />
                      </Tooltip>
                      </>
@@ -129,11 +147,11 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
                     <LeaderboardNavbar />
                 </div>
             )}
-            {/* {(
-                <div >
-                    <SettingsOverlay />
-                </div>
-            )} */}
+          {showSettingsOverlay && (
+    <div ref={settingsOverlayRef}>
+        <SettingsOverlay onClose={handleCloseSettings} />
+    </div>
+)}
         </>
     );
 };
