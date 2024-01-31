@@ -69,15 +69,15 @@ const EmailInputField = ({ placeholder, color, email, setEmail }) => {
                 InputLabelProps={{ style: { color: "#30475E" } }}
                 InputProps={{
                     style: {
-                        color: "#30475E",
-                        padding: "10px 14px",
+                        color: "#FFFFFF",
+                        padding: "10px",
                         "&:focusVisible": {
                             outline: "none",
                         },
                     },
                 }}
                 placeholder={placeholder}
-                sx={{ m: 1}}
+                sx={{ mb: 1 }}
             />
         </ThemeProvider>
     );

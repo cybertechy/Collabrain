@@ -65,11 +65,11 @@ export default function Home() {
         
     };
     return (
-        <div className="w-full md:w-3/4 lg:w-1/2 mx-auto">
+        <div className="max-sm:bg-secondary max-sm:min-w-full md:w-3/4 lg:w-1/2 mx-auto">
             <ToastContainer />
             <div className="justify-center items-center flex flex-col min-h-screen">
                 <img
-                    className="w-28 "
+                    className="w-28"
                     src=".//assets/images/logo_whitebackground.png"
                 />
                 <div className="bg-primary drop-shadow-lg flex flex-col justify-center items-center px-16 py-10 rounded-2xl">
