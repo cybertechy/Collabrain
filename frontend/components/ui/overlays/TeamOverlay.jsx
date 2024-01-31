@@ -55,13 +55,13 @@ const CreateJoinTeamScreen = ({ switchToCreateTeam, switchToJoinTeam , toggleMod
             <p className="text-xl text-center text-black mb-4 ml-20 mr-20 mt-10 font-light">Creating a team has never been simpler, you're only a few clicks away from your exclusive space.</p>
           </div>
           <div className="flex items-center mt-4 justify-center">
-            <button className="w-96 h-16 mb-4 focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-md text-lg dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900"
+            <button className="w-96 h-16 mb-4 focus:outline-none text-white bg-primary hover:bg-tertiary focus:ring-4 focus:ring-secondary font-medium rounded-md text-lg dark:bg-primary dark:hover:bg-primary dark:focus:ring-primary"
             onClick={switchToCreateTeam}>Create a Team</button>
           </div>
           {/* Adjusted bottom part to stick to the bottom */}
-          <div className="mt-auto flex flex-col items-center bg-purple-200 text-center p-4 w-full"> {/* mt-auto will push this div to the bottom */}
+          <div className="mt-auto flex flex-col items-center bg-secondary text-center p-4 w-full"> {/* mt-auto will push this div to the bottom */}
             <p className="text-3xl text-black font-medium font-poppins">Have an invite already?</p>
-            <button className='w-80 h-12 mt-4 mb-4 focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-md text-lg dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900'
+            <button className='w-80 h-12 mt-4 mb-4 focus:outline-none text-white bg-primary hover:bg-tertiary focus:ring-4 focus:ring-secondary font-medium rounded-md text-lg dark:bg-primary dark:hover:bg-primary dark:focus:ring-primary'
             onClick={switchToJoinTeam}>Join a Team</button>
           </div>
         </div>
@@ -84,7 +84,7 @@ const CreateTeamOverlay = ({ switchToHome }) => {
           <p className="text-xl mb-2 text-black font-light">Give your team a nice snazzy name and an icon.</p>
           <div className="relative text-center my-8"> {/* Adjusted margin and upload button position */}
             <img className='h-24' src={'/assets/images/upload_icon.png'} alt='Upload Icon'/>
-            <p className="text-purple-600 text-xs absolute inset-0 mt-10 mr-2 flex items-center justify-center">UPLOAD</p>
+            <p className="text-primary text-xs absolute inset-0 mt-10 mr-2 flex items-center justify-center">UPLOAD</p>
           </div>
           <div className="w-full">
             <label htmlFor="team-name" className="block pb-2 font-light text-black">Team Name</label>
@@ -92,9 +92,9 @@ const CreateTeamOverlay = ({ switchToHome }) => {
           </div>
           <p className="text-xs font-light mb-8 text-black text-poppins">By creating a team, you agree to Collabrain's <b>Community Guidelines*</b></p> {/* Adjusted margin */}
         </div>
-        <div className="bg-purple-200 p-6 w-full flex justify-between items-center"> {/* Adjusted padding and flex layout */}
+        <div className="bg-secondary p-6 w-full flex justify-between items-center"> {/* Adjusted padding and flex layout */}
           <button className="text-gray-500 text-lg" onClick={switchToHome}>Back</button>
-          <button className="w-24 h-12 focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 rounded-md text-lg dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900">Create</button>
+          <button className="w-24 h-12 focus:outline-none text-white bg-primary hover:bg-tertiary focus:ring-4 focus:ring-secondary rounded-md text-lg dark:bg-primary dark:hover:bg-primary dark:focus:ring-primary">Create</button>
         </div>
       </div>
     </div>
@@ -119,7 +119,7 @@ const JoinTeamOverlay = ({ switchToHome }) => {
           </div>
           <div className='w-full px-4 sm:px-6 lg:px-8 mb-8'> {/* Adjusted margin */}
         
-      <button className="h-20 w-full mt-5 max-w-screen-sm flex items-center justify-between focus:outline-none text-white bg-primary hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 rounded-md shadow-lg transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105">
+      <button className="h-20 w-full mt-5 max-w-screen-sm flex items-center justify-between focus:outline-none text-white bg-primary hover:bg-tertiary focus:ring-4 focus:ring-secondary rounded-md shadow-lg transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-105">
         <div className="flex items-center space-x-4 pl-4">
         <img className="h-14" src={'/assets/images/link.png'} alt= 'image2'/>
           <div>
@@ -134,9 +134,9 @@ const JoinTeamOverlay = ({ switchToHome }) => {
   
           </div>
         </div>
-        <div className="bg-purple-200 p-6 w-full flex justify-between items-center"> {/* Adjusted padding to match CreateTeamOverlay */}
+        <div className="bg-secondary p-6 w-full flex justify-between items-center"> {/* Adjusted padding to match CreateTeamOverlay */}
           <button className="text-gray-500 text-lg" onClick={switchToHome}>Back</button>
-          <button className="w-24 h-12 focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 rounded-md text-lg dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900">Join</button>
+          <button className="w-24 h-12 focus:outline-none text-white bg-primary hover:bg-tertiary focus:ring-4 focus:ring-secondary rounded-md text-lg dark:bg-primary dark:hover:bg-primary dark:focus:ring-primary">Join</button>
         </div>
       </div>
     </div>

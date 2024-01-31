@@ -430,7 +430,7 @@ function page() {
                             <ShareComponent getdata={getdata} updatecontent={updatecontent} contentMapName={IntialData?.name} setShare={setShare} sData={IntialData?.Access} isOwner={isOwner} />
                         </div>}
 
-                        {(IntialData?.userAccess === "edit" || IntialData?.userAccess === "owner") && <div id="save" className="flex items-center gap-2 bg-white text-purple-500 rounded-md  px-2 py-1 ">
+                        {(IntialData?.userAccess === "edit" || IntialData?.userAccess === "owner") && <div id="save" className="flex items-center gap-2 bg-white text-primary rounded-md  px-2 py-1 ">
                             <p className={`rounded-t-lg `}> <RefreshCcw width={20} height={20} className={`${!isSaved && "animate-spin"}`} />  </p>
                             <p className="lg:block hidden  "> {isSaved ? "Saved" : "Saving..."}</p>
                         </div>}
@@ -474,11 +474,11 @@ function page() {
             </Excalidraw>
 
             }
-            {!id && <h1 className="text-2xl font-bold text-purple-500 px-10 text-center"> Searching the cloud, Please wait ..</h1>}
-            {id && !Excalidraw && <h1 className="text-2xl font-bold text-purple-500 px-10">Loading...</h1>}
-            {id && Excalidraw && !IntialData && !Error && !OverrideMessage && <h1 className="text-2xl font-bold text-purple-500 px-10 text-center"> Working to load the Map ... </h1>}
-            {id && Excalidraw && !IntialData && Error && !OverrideMessage && <h1 className="text-2xl font-bold text-purple-500 px-10 text-center"> {Error.error} </h1>}
-            {id && Excalidraw && !IntialData && !Error && OverrideMessage && <h1 className="text-2xl font-bold text-purple-500 px-10 text-center"> {OverrideMessage} </h1>}
+            {!id && <h1 className="text-2xl font-bold text-primary px-10 text-center"> Searching the cloud, Please wait ..</h1>}
+            {id && !Excalidraw && <h1 className="text-2xl font-bold text-primary px-10">Loading...</h1>}
+            {id && Excalidraw && !IntialData && !Error && !OverrideMessage && <h1 className="text-2xl font-bold text-primary px-10 text-center"> Working to load the Map ... </h1>}
+            {id && Excalidraw && !IntialData && Error && !OverrideMessage && <h1 className="text-2xl font-bold text-primary px-10 text-center"> {Error.error} </h1>}
+            {id && Excalidraw && !IntialData && !Error && OverrideMessage && <h1 className="text-2xl font-bold text-primary px-10 text-center"> {OverrideMessage} </h1>}
         </div>
     </div>
 }

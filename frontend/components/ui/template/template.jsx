@@ -29,7 +29,7 @@ const Template = ({ children }) => {
       <>{
       ((isSidebarOpen) && (windowWidth < 550)) ? 
         (<div className="flex flex-col flex-grow overflow-hidden">
-          <div className=" bg-purple-600 h-screen">
+          <div className=" bg-primary h-screen">
 
           </div>
         </div>)

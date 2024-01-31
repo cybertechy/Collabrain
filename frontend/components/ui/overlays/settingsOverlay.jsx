@@ -8,7 +8,7 @@ const BadBehaviorStrikes = ({ strikes }) => {
     const renderSadFace = (_, index) => (
         <div key={index} style={{ marginRight: "10px", display: "inline-block" }}>
             <SentimentVeryDissatisfiedIcon
-                className="text-purple-500"
+                className="text-primary"
                 fontSize="large"
             />
         </div>
@@ -37,7 +37,7 @@ const Dropdown = ({ buttonLabel, dropdownItems, onSelect }) => {
             <button
                 id="dropdownDefaultButton"
                 onClick={toggleDropdown}
-                className="text-center text-xl sm:text-sm md:text-base lg:text-xl inline-flex items-center border border-purple-500 text-purple-500 hover:bg-purple-500 hover:text-white sm:px-8 md:px-12 lg:px-16 xl:px-20 py-3 rounded"
+                className="text-center text-xl sm:text-sm md:text-base lg:text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-white sm:px-8 md:px-12 lg:px-16 xl:px-20 py-3 rounded"
                 type="button"
             >
                 {buttonLabel}{" "}
@@ -72,7 +72,7 @@ const Dropdown = ({ buttonLabel, dropdownItems, onSelect }) => {
                                 <button
                                     href={item.link}
                                     onClick={() => handleItemClick(item.label)}
-                                    className="block text-center px-20 py-3 text-xl hover:bg-purple-500 hover:text-white dark:hover:bg-purple-600 dark:hover:text-white text-purple-500 w-full "
+                                    className="block text-center px-20 py-3 text-xl hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white text-primary w-full "
                                 >
                                     {item.label}
                                 </button>
@@ -94,7 +94,7 @@ const ToggleButtonExample = () => {
         <div>
             <button
                 className={`relative w-12 h-6 rounded-full focus:outline-none transition-colors duration-300 ease-in-out ${
-                    isToggled ? "bg-purple-500" : "bg-gray-400"
+                    isToggled ? "bg-primary" : "bg-gray-400"
                 }`}
                 onClick={handleToggle}
             >
@@ -290,12 +290,12 @@ const ProfileOverlay = ({  }) => {
                                             onChange={(e) =>
                                                 setName(e.target.value)
                                             }
-                                            className="border bg-white border-gray-400 p-2 w-5/6 rounded-md focus:outline-none focus:border-purple-500 text-gray-500"
+                                            className="border bg-white border-gray-400 p-2 w-5/6 rounded-md focus:outline-none focus:border-primary text-gray-500"
                                             disabled={!isNameEditMode}
                                         />
                                         <button
                                             onClick={handleNameEditClick}
-                                            className="text-center text-sm inline-flex items-center border border-purple-500 text-purple-500 hover:bg-purple-500 hover:text-white px-2 rounded-lg"
+                                            className="text-center text-sm inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-white px-2 rounded-lg"
                                         >
                                             {isNameEditMode ? "Save" : "Edit"}
                                         </button>
@@ -311,12 +311,12 @@ const ProfileOverlay = ({  }) => {
                                             onChange={(e) =>
                                                 setUsername(e.target.value)
                                             }
-                                            className="border bg-white border-gray-400 p-2 w-5/6 rounded-md focus:outline-none focus:border-purple-500 text-gray-500"
+                                            className="border bg-white border-gray-400 p-2 w-5/6 rounded-md focus:outline-none focus:border-primary text-gray-500"
                                             disabled={!isUsernameEditMode}
                                         />
                                         <button
                                             onClick={handleUsernameEditClick}
-                                            className="text-center text-sm inline-flex items-center border border-purple-500 text-purple-500 hover:bg-purple-500 hover:text-white px-2 rounded-lg"
+                                            className="text-center text-sm inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-white px-2 rounded-lg"
                                         >
                                             {isUsernameEditMode ? "Save" : "Edit"}
                                         </button>
@@ -332,12 +332,12 @@ const ProfileOverlay = ({  }) => {
                                             onChange={(e) =>
                                                 setEmail(e.target.value)
                                             }
-                                            className="border bg-white border-gray-400 p-2 w-5/6 rounded-md focus:outline-none focus:border-purple-500 text-gray-500"
+                                            className="border bg-white border-gray-400 p-2 w-5/6 rounded-md focus:outline-none focus:border-primary text-gray-500"
                                             disabled={!isEmailEditMode}
                                         />
                                         <button
                                             onClick={handleEmailEditClick}
-                                            className="text-center text-sm inline-flex items-center border border-purple-500 text-purple-500 hover:bg-purple-500 hover:text-white px-2 rounded-lg"
+                                            className="text-center text-sm inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-white px-2 rounded-lg"
                                         >
                                             {isEmailEditMode ? "Save" : "Edit"}
                                         </button>
@@ -349,7 +349,7 @@ const ProfileOverlay = ({  }) => {
                                         <p className="mb-2 text-2xl  text-black ">
                                             Password and Authentication
                                         </p>
-                                        <button className="text-center text-xl inline-flex items-center border border-purple-500 text-purple-500 hover:bg-purple-500 hover:text-white px-7 py-3 ">
+                                        <button className="text-center text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-white px-7 py-3 ">
                                             Change Password
                                         </button>
                                     </div>
@@ -361,7 +361,7 @@ const ProfileOverlay = ({  }) => {
                                             Protect your Collabrain account with
                                             an extra layer of security.
                                         </p>
-                                        <button className="text-center text-xl inline-flex items-center border border-purple-500 text-purple-500 hover:bg-purple-500 hover:text-white px-7 py-3 ">
+                                        <button className="text-center text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-white px-7 py-3 ">
                                             Enable
                                         </button>
                                     </div>
@@ -377,10 +377,10 @@ const ProfileOverlay = ({  }) => {
                                             this action
                                         </p>
                                         <div className="flex space-x-5">
-                                            <button className="text-center text-xl inline-flex items-center border border-purple-500 text-purple-500 hover:bg-purple-500 hover:text-white px-7 py-3 ">
+                                            <button className="text-center text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-white px-7 py-3 ">
                                                 Delete
                                             </button>
-                                            <button className="text-center text-xl inline-flex items-center border border-purple-500 text-purple-500 hover:bg-purple-500 hover:text-white px-7 py-3 ">
+                                            <button className="text-center text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-white px-7 py-3 ">
                                                 Disable
                                             </button>
                                         </div>
@@ -560,7 +560,7 @@ const PrivacyOverlay = () => {
                             Export my data
                         </p>
                         <button 
-                            className="text-xl inline-flex items-center border border-purple-500 text-purple-500 hover:bg-purple-500 hover:text-white px-7 py-3"
+                            className="text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-white px-7 py-3"
                             onClick={handleExportData}
                         >
                            &nbsp;&nbsp;Export&nbsp;
@@ -571,7 +571,7 @@ const PrivacyOverlay = () => {
                             Delete my data
                         </p>
                         <button 
-                            className="text-xl inline-flex items-center border border-purple-500 text-purple-500 hover:bg-purple-500 hover:text-white px-9 py-3"
+                            className="text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-white px-9 py-3"
                             onClick={handleDeleteData}
                         >
                             Delete
@@ -635,7 +635,7 @@ const NotificationsOverlay = () => {
                             Choose Notification Sound
                         </p>
                         <button 
-                            className="text-xl inline-flex items-center border border-purple-500 text-purple-500 hover:bg-purple-500 hover:text-white px-7 py-3"
+                            className="text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-white px-7 py-3"
                             onClick={handleConfigureNotificationSound}
                         >
                             Configure
@@ -672,7 +672,7 @@ const AccessibilityOverlay = () => {
                             Text-to-speech (TTS)
                         </p>
                         <button 
-                            className="text-xl inline-flex items-center border border-purple-500 text-purple-500 hover:bg-purple-500 hover:text-white px-7 py-3"
+                            className="text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-white px-7 py-3"
                             onClick={handleConfigureTTS}
                         >
                             Configure
@@ -683,7 +683,7 @@ const AccessibilityOverlay = () => {
                             Font-size
                         </p>
                         <button 
-                            className="text-xl inline-flex items-center border border-purple-500 text-purple-500 hover:bg-purple-500 hover:text-white px-7 py-3"
+                            className="text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-white px-7 py-3"
                             onClick={handleConfigureFontSize}
                         >
                             Configure
@@ -694,7 +694,7 @@ const AccessibilityOverlay = () => {
                             Colorblind Filters
                         </p>
                         <button 
-                            className="text-xl inline-flex items-center border border-purple-500 text-purple-500 hover:bg-purple-500 hover:text-white px-7 py-3"
+                            className="text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-white px-7 py-3"
                             onClick={handleConfigureColorblindFilters}
                         >
                             Configure

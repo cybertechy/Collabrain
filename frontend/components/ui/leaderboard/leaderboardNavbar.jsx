@@ -29,7 +29,7 @@ const LeaderboardNavbar = ({ user = {
 
     return (
         <div
-            className={`fixed right-5 w-[400px] h-min bg-purple-600 text-white p-4 rounded-b-lg shadow-lg overflow-y-hidden z-50 ${
+            className={`fixed right-5 w-[400px] h-min bg-primary text-white p-4 rounded-b-lg shadow-lg overflow-y-hidden z-50 ${
                 showAnimation ? 'transition-all duration-300 ease-in-out transform scale-y-100' : 'transition-all duration-300 ease-in-out transform scale-y-0'
             }`}
             style={{ transformOrigin: 'top' }} // BEGIN: Add transform origin to top
@@ -57,7 +57,7 @@ const LeaderboardNavbar = ({ user = {
                 </div>
             </div>
 
-            <div className="border-t border-purple-300 pt-2">
+            <div className="border-t border-secondary pt-2">
                 {/* Leaderboard Entries */}
                 {userLeaderboardData.map((entry) => (
                     <div className="flex justify-between items-center py-2" key={entry.rank}>

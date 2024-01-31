@@ -85,14 +85,14 @@ const ContentMapOverlay = ({ setOpenModal, switchToDocument }) =>
 						</div>
 						<div className=" h-32 mt-30 justify-center grid grid-rows-2 gap-10">
 
-							<button className="flex mt-11 mr-10 w-56 h-16 text-white font-normal rounded text-lg  dark:bg-purple-400 dark:hover:bg-purple-500">
+							<button className="flex mt-11 mr-10 w-56 h-16 text-white font-normal rounded text-lg  dark:bg-primary dark:hover:bg-primary">
 								<img className='h-6 mt-4 ml-3' src='/assets/images/content.png' />
 								<p className="mt-4 ml-8">Content Map</p></button>
 							<button className="flex mt-11 mr-10 w-56 h-16 text-black font-normal rounded text-lg" onClick={switchToDocument}>
 								<p className="mt-4 ml-16">Document</p></button>
 						</div>
 						<div className="mt-36 flex justify-end">
-							<button onClick={NewContentMap} className="mr-10 w-44 h-12  text-white bg-purple-600 hover:bg-purple-700  font-normal rounded text-lg shadow-xl ">Create Project</button>
+							<button onClick={NewContentMap} className="mr-10 w-44 h-12  text-white bg-primary hover:bg-primary  font-normal rounded text-lg shadow-xl ">Create Project</button>
 						</div>
 					</div>
 				</div>
@@ -123,12 +123,12 @@ const DocumentOverlay = ({ setOpenModal, switchToContent }) =>
 							<button className="flex mt-11 mr-10 w-56 h-16 text-black font-normal rounded text-lg " onClick={switchToContent}>
 								<p className="mt-4 ml-16">Content Map</p></button>
 							<img className='h-7 mt-4 ml-3' src='/assets/images/doc.png' />
-							<button className="flex mt-11 mr-10 w-56 h-16 text-white font-normal rounded text-lg dark:bg-purple-400 dark:hover:bg-purple-500">
+							<button className="flex mt-11 mr-10 w-56 h-16 text-white font-normal rounded text-lg dark:bg-primary dark:hover:bg-primary">
 								<img className='h-7 mt-4 ml-3' src='/assets/images/doc.png' />
 								<p className="mt-4 ml-10">Document</p></button>
 						</div>
 						<div className="mt-36 flex justify-end">
-							<button className="mr-10 w-44 h-12  text-white bg-purple-600 hover:bg-purple-700  font-normal rounded text-lg shadow-xl ">Create Project</button>
+							<button className="mr-10 w-44 h-12  text-white bg-primary hover:bg-primary  font-normal rounded text-lg shadow-xl ">Create Project</button>
 						</div>
 					</div>
 

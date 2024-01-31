@@ -127,7 +127,7 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
 
     return (
         <>
-            <nav className="bg-purple-600 p-4 flex items-center justify-between">
+            <nav className="bg-primary p-4 flex items-center justify-between">
                 <div className="flex-grow flex">
                     {navbarStyle()}
                 </div>
