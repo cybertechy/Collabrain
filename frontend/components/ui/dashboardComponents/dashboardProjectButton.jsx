@@ -87,13 +87,13 @@ const DashboardProjectButton = ({ title, project, type, color = "#FFFFFF", onCli
         });
     }
     const dialogStyles = {
-        color: "#972FFF",  // Text color
-        borderColor: "#972FFF",  // Border color
+        color: "#30475E",  // Text color
+        borderColor: "#30475E",  // Border color
     };
     
     const buttonStyles = {
         color: "#FFFFFF",  // Text color
-        backgroundColor: "#972FFF",  // Button background color
+        backgroundColor: "#30475E",  // Button background color
     };
     const handleRename = () => {
         renameContentMap(project.id, newProjectName);

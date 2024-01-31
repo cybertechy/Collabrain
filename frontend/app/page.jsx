@@ -72,8 +72,8 @@ export default function Home() {
                     className="w-28 "
                     src=".//assets/images/logo_whitebackground.png"
                 />
-                <div className="bg-secondary drop-shadow-lg flex flex-col justify-center items-center px-16 py-10 rounded-2xl">
-                    <h1 className="text-2xl text-basicallydark font-poppins mb-2">
+                <div className="bg-primary drop-shadow-lg flex flex-col justify-center items-center px-16 py-10 rounded-2xl">
+                    <h1 className="text-2xl text-basicallylight font-poppins mb-2">
                         Log into Collabrain
                     </h1>
 
@@ -90,7 +90,7 @@ export default function Home() {
                         <PasswordInput password={password} setPassword={setpassword} color="primary" />
                      
                         <br />
-                        <p className="text-xs text-gray-600 font-poppins text-left ml-2">
+                        <p className="text-xs text-basicallylight font-poppins text-left ml-2">
                             <a href="">Forgot your password?</a>
                         </p>
                         <Button
@@ -106,19 +106,17 @@ export default function Home() {
                             onClick={() => fb.serviceSignIn("google")}
                             className="bg-basicallylight py-1 px-1 rounded-full m-5"
                         >
-                            <GoogleIcon className="h-8 w-8 text-gray-500"></GoogleIcon>
+                            <GoogleIcon className="h-8 w-8 "></GoogleIcon>
                         </button>
                         <button
                             onClick={() => fb.serviceSignIn("microsoft")}
                             className="bg-basicallylight py-1 px-1 rounded-full m-5"
                         >
-                            <MicrosoftIcon className="h-8 w-8 text-gray-500"></MicrosoftIcon>
+                            <MicrosoftIcon className="h-8 w-8"></MicrosoftIcon>
                         </button>
-                        <button className="bg-basicallylight py-1 px-1 rounded-full m-5">
-                            <GitHubIcon fontSize = "large" className=" text-primary"/>
-                        </button>
+                      
                     </span>
-                    <p className="text-xs text-gray-600 font-poppins text-left ml-2">
+                    <p className="text-xs text-basicallylight font-poppins text-left ml-2">
                         Need an account?
                         <a href="/register" className="underline">
                             {" "}

@@ -57,13 +57,13 @@ body {
 }
 
 :root {
-  --primary-color: #972FFF; 
-  --secondary-color: #EBD7FF; 
-  --tertiary-color: #C58AFF; 
+  --primary-color: #30475E; 
+  --secondary-color: #81c3d7; 
+  --tertiary-color: #222831; 
 }
 
 .excalidraw {
-  --color-primary: #972FFF;
+  --color-primary: #30475E;
 }
 
 
@@ -105,7 +105,7 @@ body {
 }
 
 .scrollbar-thumb-scrollbar::-webkit-scrollbar-thumb {
-  background-color: #972FFF;
+  background-color: #81c3d7;
   border-radius: 10px;
 }
 

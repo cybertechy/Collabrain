@@ -23,7 +23,7 @@ module.exports = {
             },
             colors: {
                 primary: "#30475E",
-                secondary: "#cae9ff",
+                secondary: "#81c3d7",
                 tertiary: "#222831",
                 unselected: "#9DA5AF",
                 kindagrey: "#F5F5F5",

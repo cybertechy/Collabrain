@@ -12,7 +12,7 @@ const theme = createTheme({
             styleOverrides: {
                 input: {
                     "&::placeholder": {
-                        color: "#FFFFFF", // Change placeholder color here
+                        color: "#30475E", // Change placeholder color here
                         opacity: 1, // Ensure full opacity
                     },
                 },
@@ -26,10 +26,10 @@ const theme = createTheme({
                         borderWidth: "1px", // Ensure hover/focus border is visible
                     },
                     "&:hover .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#FFFFFF", // #FFFFFF border on hover
+                        borderColor: "#30475E", // #30475E border on hover
                     },
                     "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#FFFFFF", // #FFFFFF border on focus
+                        borderColor: "#30475E", // #FFFFFF border on focus
                     },
                 },
             },
@@ -43,16 +43,17 @@ const InputField = ({ placeholder, color, input, setinput }) => {
     return (
         <ThemeProvider theme={theme}>
             <TextField
+            className = "bg-aliceBlue text-primary rounded-md"
                 variant="outlined"
                 size="small"
                 fullWidth
                 value={input}
                 onChange={(e) => setinput(e.target.value)}
-                InputLabelProps={{ style: { color: "#FFFFFF" } }}
+                InputLabelProps={{ style: { color: "#30475E" } }}
                 InputProps={{
-                    className: backgroundColorClass,
+                    className:  "bg-aliceBlue text-basicallylight rounded-md",
                     style: {
-                        color: "#FFFFFF",
+                        color: "#30475E",
                         padding: "10px 14px",
                         "&:focusVisible": {
                             outline: "none",

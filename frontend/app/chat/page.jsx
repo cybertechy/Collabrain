@@ -165,7 +165,7 @@ export default function ChatRoom() {
 			<div className="flex flex-col flex-grow relative">
                     <div className="flex items-center justify-between bg-gray-100 w-full mb-3 h-min">
                         <Toolbar sx={{ backgroundColor: 'whitesmoke' }}>
-                            <h1 className='text-xl font-semibold text-primary items-center justify-center flex-row'>{<ShortTextIcon style={{ color: '#972FFF', opacity: '0.7' }} fontSize="large" />} General</h1>
+                            <h1 className='text-xl font-semibold text-primary items-center justify-center flex-row'>{<ShortTextIcon style={{ color: '#30475E', opacity: '0.7' }} fontSize="large" />} General</h1>
                         </Toolbar>
                     </div>
                     <div className="flex">

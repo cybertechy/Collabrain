@@ -28,10 +28,10 @@ const theme = createTheme({
                         borderWidth: "1px", // Ensure hover/focus border is visible
                     },
                     "&:hover .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#FFFFFF", // #FFFFFF border on hover
+                        borderColor: "#30475E", // #30475E border on hover
                     },
                     "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#FFFFFF", // #FFFFFF border on focus
+                        borderColor: "#30475E", // #30475E border on focus
                     },
                 },
             },
@@ -39,9 +39,9 @@ const theme = createTheme({
         MuiInputLabel: {
             styleOverrides: {
                 root: {
-                    color: "#FFFFFF", // Label color
+                    color: "#30475E", // Label color
                     "&.Mui-focused": {
-                        color: "#FFFFFF", // #FFFFFF label color on focus
+                        color: "#30475E", // #30475E label color on focus
                     },
                 },
             },
@@ -49,9 +49,9 @@ const theme = createTheme({
         MuiInput: {
             styleOverrides: {
                 root: {
-                    color: "#FFFFFF", // Input text color
+                    color: "#30475E", // Input text color
                     "&::placeholder": {
-                        color: "#FFFFFF", // Placeholder color
+                        color: "#30475E", // Placeholder color
                         opacity: 1,
                     },
                 },
@@ -60,7 +60,7 @@ const theme = createTheme({
         MuiIconButton: {
             styleOverrides: {
                 root: {
-                    color: "#FFFFFF", // Eye visibility icon color
+                    color: "#30475E", // Eye visibility icon color
                 },
             },
         },
@@ -101,7 +101,7 @@ const PasswordInput = ({ isConfirm, color, password, setPassword }) => {
                 sx={{ m: 1,  }}
                 fullWidth
                 variant="outlined"
-                className={backgroundColorClass}
+                className={"bg-aliceBlue text-primary rounded-md"}
             >
                 <InputLabel htmlFor="outlined-adornment-password">
                     {isConfirm ? "Confirm Password" : "Password"}
@@ -129,7 +129,7 @@ const PasswordInput = ({ isConfirm, color, password, setPassword }) => {
                     }
                     label={isConfirm ? "Confirm Password" : "Password"}
                     sx={{
-                        color: "#FFFFFF",
+                        color: "#30475E",
                         WebkitTextSecurity: showPassword ? "none" : "disc",
                         "&:focusVisible": {
                             outline: "none",

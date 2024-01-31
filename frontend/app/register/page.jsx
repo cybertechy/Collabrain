@@ -103,8 +103,8 @@
                         src="./assets/images/logo_whitebackground.png"
                         alt="Logo"
                     />
-                    <div className="bg-secondary drop-shadow-lg p-10 rounded-2xl mt-4">
-                        <h1 className="text-2xl text-basicallydark font-poppins mb-6 text-center">
+                    <div className="bg-primary drop-shadow-lg p-10 rounded-2xl mt-4">
+                        <h1 className="text-2xl text-basicallylight font-poppins mb-6 text-center">
                             Create Your Collabrain Account
                         </h1>
     
@@ -121,7 +121,7 @@
                             <PasswordInput name="password" value = {password} password={password} setPassword={setpassword} placeholder="Password" color = "primary" />
                             <PasswordInput  password={confirmPassword} setPassword={setconfirmPassword} isConfirm={true} placeholder="Confirm Password" color = "primary" />
                             </div>
-                            <p className="text-xs text-gray-600 text-left font-poppins ml-2">
+                            <p className="text-xs text-basicallylight text-left font-poppins ml-2">
                                 Already have an account?
                                 <a href="/" className="underline">
                                     {" "}

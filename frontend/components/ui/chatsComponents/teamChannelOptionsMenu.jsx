@@ -56,19 +56,19 @@ const TeamChannelOptionsMenu = ({ teamName, onOptionSelect }) => {
             >
                 <MenuItem onClick={() => handleClose('invite')}>
                     <ListItemIcon>
-                        <GroupAddIcon style={{ color: '#972FFF' }} />
+                        <GroupAddIcon style={{ color: '#30475E' }} />
                     </ListItemIcon>
                    <span className='text-primary'>Invite People</span> 
                 </MenuItem>
                 <MenuItem onClick={() => handleClose('settings')}>
                     <ListItemIcon>
-                        <SettingsIcon style={{ color: '#972FFF' }} />
+                        <SettingsIcon style={{ color: '#30475E' }} />
                     </ListItemIcon>
                     <span className='text-primary'>Team Settings</span>  
                 </MenuItem>
                 <MenuItem onClick={() => handleClose('leave')}>
                     <ListItemIcon>
-                        <ExitToAppIcon style={{ color: '#972FFF' }} />
+                        <ExitToAppIcon style={{ color: '#30475E' }} />
                     </ListItemIcon>
                     <span className='text-primary'>Leave Team</span> 
                 </MenuItem>

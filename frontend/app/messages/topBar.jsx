@@ -7,11 +7,11 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 const TopBar = ({ activeTab, onTabChange }) => {
   // Helper function to determine button styling
   const tabButtonStyle = (tabName) => ({
-    color: activeTab === tabName ? '#972FFF' : '#9DA5AF', // Tailwind primary color for active, secondary for inactive
-    borderBottom: activeTab === tabName ? '2px solid #972FFF' : 'none',
+    color: activeTab === tabName ? '#30475E' : '#9DA5AF', // Tailwind primary color for active, secondary for inactive
+    borderBottom: activeTab === tabName ? '2px solid #30475E' : 'none',
     borderRadius: '0', // Removes the rounding of the buttons
     '&:hover': {
-      borderBottom: '2px solid #972FFF',
+      borderBottom: '2px solid #30475E',
       opacity: 1,
     },
     marginRight: 2,
@@ -36,7 +36,7 @@ const TopBar = ({ activeTab, onTabChange }) => {
         startIcon={<AddCircleOutlineIcon />}
         onClick={() => onTabChange('addFriend')}
         sx={{
-          bgcolor: '#972FFF', // Tailwind primary color
+          bgcolor: '#30475E', // Tailwind primary color
           color: '#FFFFFF',
           '&:hover': {
             bgcolor: '#7f22ff', // A slightly darker shade for hover effect

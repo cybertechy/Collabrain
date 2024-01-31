@@ -22,17 +22,17 @@ const SearchBar = ({ onSearch }) => {
       padding: 2,
       '.MuiOutlinedInput-root': {
         '& fieldset': {
-          borderColor: '#972FFF',
+          borderColor: '#30475E',
         },
         '&.Mui-focused fieldset': {
-          borderColor: '#972FFF',
+          borderColor: '#30475E',
         },
         '&:hover fieldset': {
           borderColor: '#7f22ff',
         },
       },
       '.MuiInputAdornment-root': {
-        color: '#972FFF',
+        color: '#30475E',
       },
       '.MuiInputBase-input': {
         color: '#000000',
@@ -50,11 +50,11 @@ const SearchBar = ({ onSearch }) => {
         }}
         InputProps={{
           startAdornment: (
-            <SearchIcon sx={{ color: '#972FFF', marginRight: 1 }} />
+            <SearchIcon sx={{ color: '#30475E', marginRight: 1 }} />
           ),
           endAdornment: searchValue && (
             <IconButton onClick={handleClearSearch}>
-              <CloseIcon sx={{ color: '#972FFF' }} />
+              <CloseIcon sx={{ color: '#30475E' }} />
             </IconButton>
           ),
         }}

@@ -6,7 +6,7 @@ const AddChannelButton = ({ onAddChannel }) => {
         <div className="flex justify-center items-center text-primary">
                 
             <IconButton aria-label="add channel" onClick={onAddChannel}>
-                <AddCircleOutlineIcon style={{ color: '#972FFF' }} />
+                <AddCircleOutlineIcon style={{ color: '#30475E' }} />
             </IconButton>
         </div>
     );

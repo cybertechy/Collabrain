@@ -7,16 +7,16 @@ const CustomTextField = styled(TextField)({
     borderRadius: '20px', // Rounded border
     backgroundColor: 'transparent', // Background color similar to Discord
     '& fieldset': {
-      border: '1px solid #972FFF', // Light border
+      border: '1px solid #30475E', // Light border
     },
     '&:hover fieldset': {
-      borderColor: '#972FFF', // Slightly darker border on hover
+      borderColor: '#30475E', // Slightly darker border on hover
     },
     '&.Mui-focused fieldset': {
-      borderColor: '#972FFF', // Discord's brand color on focus
+      borderColor: '#30475E', // Discord's brand color on focus
     },
     '& .MuiInputBase-input::placeholder': {
-      color: '#972FFF', // Placeholder text color
+      color: '#30475E', // Placeholder text color
       opacity: 1,
     },
     '& .MuiInputBase-input': {
