@@ -110,16 +110,16 @@
     
                         <form onSubmit={handleFormSubmit} className="flex flex-col gap-4 max-w-md">
                             <div className="flex gap-4">
-                            <InputField name = "firstname" value = {firstname} input={firstname} setinput={setfirstname} placeholder="First Name" color="tertiary"/>
-                            <InputField name="lastname" value = {firstname} input={lastname} setinput={setlastname} placeholder="Last Name"  color="tertiary"/>
+                            <InputField name = "firstname" value = {firstname} input={firstname} setinput={setfirstname} placeholder="First Name" color="primary"/>
+                            <InputField name="lastname" value = {firstname} input={lastname} setinput={setlastname} placeholder="Last Name"  color="primary"/>
                             </div>
                             <div className="flex w-full">
                                 
-                                <EmailInputField name="email" value = {email}email={email} setEmail={setemail} placeholder="Email Address" color = "tertiary" />
+                                <EmailInputField name="email" value = {email}email={email} setEmail={setemail} placeholder="Email Address" color = "primary" />
                             </div>
                             <div className="flex gap-4">
-                            <PasswordInput name="password" value = {password} password={password} setPassword={setpassword} placeholder="Password" color = "tertiary" />
-                            <PasswordInput  password={confirmPassword} setPassword={setconfirmPassword} isConfirm={true} placeholder="Confirm Password" color = "tertiary" />
+                            <PasswordInput name="password" value = {password} password={password} setPassword={setpassword} placeholder="Password" color = "primary" />
+                            <PasswordInput  password={confirmPassword} setPassword={setconfirmPassword} isConfirm={true} placeholder="Confirm Password" color = "primary" />
                             </div>
                             <p className="text-xs text-gray-600 text-left font-poppins ml-2">
                                 Already have an account?

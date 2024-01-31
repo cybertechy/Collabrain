@@ -29,7 +29,7 @@ const SidebarButtonIcon = ({
         onClick={onClick}
     >
         <span
-            className="flex-grow text-center overflow-hidden"
+            className="flex-grow text-center overflow-hidden font-bold text-basicallylight"
             style={{
                 maxWidth: isExpanded ? "100%" : "0",
                 fontSize: isExpanded ? "1rem" : "0",
@@ -41,7 +41,7 @@ const SidebarButtonIcon = ({
             {isExpanded ? text : ""}
         </span>
         {Icon && (
-            <Icon className="py-4 ml-2 transition-all duration-445 ease-in-out " />
+            <Icon className="py-4 ml-2 transition-all  duration-445 ease-in-out " />
         
         )}
     </button>

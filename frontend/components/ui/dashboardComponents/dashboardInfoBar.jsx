@@ -31,7 +31,7 @@ const DashboardInfoBar = ({ sortName, setSortName, sortDate, setSortDate }) => {
   
 
   return (
-    <div className="flex items-center justify-between bg-gray-100 p-4 w-full drop-shadow-md mb-3">
+    <div className="flex items-center justify-between bg-aliceBlue p-4 w-full drop-shadow-md mb-3">
       <div className="flex items-center">
         {/* Dropdown Component */}
         {/* {isOpen && windowWidth > 550 ?  */}

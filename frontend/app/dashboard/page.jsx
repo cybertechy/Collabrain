@@ -355,8 +355,8 @@ export default function Dashboard() {
                     <div className="loader mb-5"></div>
 
                     <p className="text-lg font-bold text-primary mb-5 ">
-                        {isContentMapsLoading? "" : "If you're not signed in, sign in "}
-                        {isContentMapsLoading? "" :<span
+                        { "If you're not signed in, sign in "}
+                        {<span
                             className="underline cursor-pointer"
                             onClick={() => router.push("/")}
                         >

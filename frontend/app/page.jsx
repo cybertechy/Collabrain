@@ -85,9 +85,9 @@ export default function Home() {
                        onSubmit={handleFormSubmit}
                         style={{ textAlign: "center" }}
                     >
-                        <EmailInputField email={email} setEmail={setemail} placeholder="Email Address" color="tertiary" />
+                        <EmailInputField email={email} setEmail={setemail} placeholder="Email Address" color="primary" />
                         <br />
-                        <PasswordInput password={password} setPassword={setpassword} color="tertiary" />
+                        <PasswordInput password={password} setPassword={setpassword} color="primary" />
                      
                         <br />
                         <p className="text-xs text-gray-600 font-poppins text-left ml-2">

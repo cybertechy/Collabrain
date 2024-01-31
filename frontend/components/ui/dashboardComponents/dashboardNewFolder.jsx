@@ -25,9 +25,9 @@ const DashboardNewFolder = ({ onNewFolderCreated }) => {
               }}
             />
           )}
-          <div className="bg-tertiary flex items-center justify-center rounded-xl w-min hover:opacity-80 duration-300">
+          <div className="bg-aliceBlue shadow-md flex items-center justify-center rounded-xl w-min hover:bg-columbiablue duration-300">
             <IconButton onClick={toggleCreateFolderOverlay} color="inherit">
-              <AddCircleIcon fontSize="large" sx={{ color: '#FFFFFF' }} />
+              <AddCircleIcon fontSize="large" sx={{ color: '#30475E' }} />
             </IconButton>
           </div>
         </>

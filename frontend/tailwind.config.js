@@ -16,15 +16,15 @@ module.exports = {
                 '13': '3.25rem', // 52px if 1rem = 16px
               },
             boxShadow: {
-                custom: "7px 7px 18px 0 rgba(197, 138, 255, 1)",
+                custom: "0px 0px 9px 0 rgba(197, 138, 255, 1)",
             },
             borderRadius: {
                 custom: "4px", // Custom border-radius
             },
             colors: {
-                primary: "#972FFF",
-                secondary: "#EBD7FF",
-                tertiary: "#C58AFF",
+                primary: "#30475E",
+                secondary: "#cae9ff",
+                tertiary: "#222831",
                 unselected: "#9DA5AF",
                 kindagrey: "#F5F5F5",
                 foldergrey: "#F0F4F9",
@@ -32,6 +32,9 @@ module.exports = {
                 littlelessblack: "#5e5e5e",
                 basicallylight: "#FFFFFF",
                 basicallydark: "#000000",
+                aliceBlue: "#F0F5F9",
+                columbiablue: "#C9D6DF",
+                projectIconColor: "#f4b400",
             },
             backgroundImage: {
                 "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
