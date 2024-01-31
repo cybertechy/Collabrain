@@ -37,7 +37,7 @@ const TopBar = ({ activeTab, onTabChange }) => {
         onClick={() => onTabChange('addFriend')}
         sx={{
           bgcolor: '#972FFF', // Tailwind primary color
-          color: 'white',
+          color: '#FFFFFF',
           '&:hover': {
             bgcolor: '#7f22ff', // A slightly darker shade for hover effect
           },

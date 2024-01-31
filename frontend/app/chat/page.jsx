@@ -29,7 +29,7 @@ export default function ChatRoom() {
             console.log("Received message from server");
             setText((prevText) => [
                 ...prevText,
-                <h1 key={prevText.length} className="text-black">{`${data.sender}: ${data.msg}`}</h1>,
+                <h1 key={prevText.length} className="text-basicallydark">{`${data.sender}: ${data.msg}`}</h1>,
             ]);
         });
 
@@ -169,7 +169,7 @@ export default function ChatRoom() {
                         </Toolbar>
                     </div>
                     <div className="flex">
-                        <div className="p-5 h-5/6 scrollbar-thin scrollbar-thumb-primary text-black overflow-y-scroll">
+                        <div className="p-5 h-5/6 scrollbar-thin scrollbar-thumb-primary text-basicallydark overflow-y-scroll">
                             {text}
                         </div>
 

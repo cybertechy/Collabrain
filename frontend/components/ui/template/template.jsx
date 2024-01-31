@@ -21,7 +21,7 @@ const Template = ({ children }) => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-white ">
+    <div className="flex flex-col h-screen bg-basicallylight ">
          
         <div className="flex flex-grow overflow-hidden">
     {/* <div className="flex h-screen bg-gray-100 overflow-hidden"> */}

@@ -68,7 +68,7 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
         if (windowWidth < 400) {
             return (
                 <MenuIcon
-                                className="h-6 w-6 mb-2 text-lg text-white transition-all duration-500 ease-in-out"
+                                className="h-6 w-6 mb-2 text-lg text-basicallylight transition-all duration-500 ease-in-out"
                                 onClick={toggleSidebar}
                                 fontSize="large"
                             />
@@ -92,7 +92,7 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
                         ref={leaderboardToggleRef} // Attach the ref here
                         onClick={toggleLeaderboard}
                         className="cursor-pointer"
-                        style={{ color: "white" }}
+                        style={{ color: "#FFFFFF" }}
                     />
                     </Tooltip>
                     <Tooltip
@@ -105,7 +105,7 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
         > 
                     <NotificationsIcon
                         className="cursor-pointer"
-                        style={{ color: "white" }}
+                        style={{ color: "#FFFFFF" }}
                     />
                      </Tooltip>
                      <Tooltip
@@ -116,7 +116,7 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
         > 
                     <AccountCircleIcon
                         className="cursor-pointer"
-                        style={{ color: "white" }}
+                        style={{ color: "#FFFFFF" }}
                         onClick={toggleSettingsOverlay}
                     />
                      </Tooltip>

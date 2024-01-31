@@ -170,7 +170,7 @@ const share = ({ contentMapName = "Content Map", sData, setShare , isOwner, upda
                     <option>View</option>
                     <option>Edit</option>
                 </select>
-                <button onClick={()=>setPermission(selected.id,newShare,selected.type,selected.email,selected.name)} className="bg-primary text-white rounded-lg p-2">Share</button>
+                <button onClick={()=>setPermission(selected.id,newShare,selected.type,selected.email,selected.name)} className="bg-primary text-basicallylight rounded-lg p-2">Share</button>
                 </div>  
         }
     </div>

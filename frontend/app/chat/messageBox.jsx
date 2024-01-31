@@ -20,7 +20,7 @@ const CustomTextField = styled(TextField)({
       opacity: 1,
     },
     '& .MuiInputBase-input': {
-      color: 'black', // Text color
+      color: '#000000', // Text color
     },
   },
 });

@@ -35,7 +35,7 @@ const SearchBar = ({ onSearch }) => {
         color: '#972FFF',
       },
       '.MuiInputBase-input': {
-        color: 'black',
+        color: '#000000',
       },
     }}>
       <TextField

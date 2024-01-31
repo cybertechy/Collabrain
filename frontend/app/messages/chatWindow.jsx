@@ -12,11 +12,11 @@ export default function ChatWindow({ messages, sendPersonalMsg, userInfo, title 
                         </Toolbar>
                     </div>
                     <div className="flex">
-                        <div className="p-5 h-5/6 scrollbar-thin scrollbar-thumb-primary text-black overflow-y-scroll">
+                        <div className="p-5 h-5/6 scrollbar-thin scrollbar-thumb-primary text-basicallydark overflow-y-scroll">
                             {messages}
                         </div>
 
-                        <div className="absolute z-10 inset-x-0 bottom-5 mx-5 text-white">
+                        <div className="absolute z-10 inset-x-0 bottom-5 mx-5 text-basicallylight">
                             <MessageBox callback={sendPersonalMsg} />
                         </div>
                     </div>

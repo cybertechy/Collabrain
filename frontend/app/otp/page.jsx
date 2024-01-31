@@ -56,11 +56,11 @@ export default function OTP()
                     src=".//assets/images/logo_whitebackground.png"
                 />
                 <div className="bg-secondary drop-shadow-lg flex flex-col justify-center items-center px-16 py-10 rounded-2xl">
-                    <p className=" text-black font-poppins mb-2 ">
+                    <p className=" text-basicallydark font-poppins mb-2 ">
                         You have received an OTP in your email address!
                     </p>
                     <br />
-                    <p className=" text-black font-poppins mb-2 italic">
+                    <p className=" text-basicallydark font-poppins mb-2 italic">
                         Enter it in the input below!
                     </p>
                     <form onSubmit={() => {}} style={{ textAlign: "center" }}>

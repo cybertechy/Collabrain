@@ -34,8 +34,8 @@ const TeamChannelOptionsMenu = ({ teamName, onOptionSelect }) => {
                 className="w-full flex justify-between"
                 style={{ borderRadius: 0, justifyContent: 'space-around'}}
             >
-                <span className='text-white font-poppins text-lg'>{teamName}</span>
-                <MoreVertIcon style={{ color: 'white' }} fontSize='medium' />
+                <span className='text-basicallylight font-poppins text-lg'>{teamName}</span>
+                <MoreVertIcon style={{ color: '#FFFFFF' }} fontSize='medium' />
             </IconButton>
             <Menu
                 id="team-options-menu"

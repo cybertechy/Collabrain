@@ -12,7 +12,7 @@ const theme = createTheme({
             styleOverrides: {
                 input: {
                     "&::placeholder": {
-                        color: "white", // Change placeholder color here
+                        color: "#FFFFFF", // Change placeholder color here
                         opacity: 1, // Ensure full opacity
                     },
                 },
@@ -26,10 +26,10 @@ const theme = createTheme({
                         borderWidth: "1px", // Ensure hover/focus border is visible
                     },
                     "&:hover .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "white", // White border on hover
+                        borderColor: "#FFFFFF", // #FFFFFF border on hover
                     },
                     "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "white", // White border on focus
+                        borderColor: "#FFFFFF", // #FFFFFF border on focus
                     },
                 },
             },
@@ -48,11 +48,11 @@ const InputField = ({ placeholder, color, input, setinput }) => {
                 fullWidth
                 value={input}
                 onChange={(e) => setinput(e.target.value)}
-                InputLabelProps={{ style: { color: "white" } }}
+                InputLabelProps={{ style: { color: "#FFFFFF" } }}
                 InputProps={{
                     className: backgroundColorClass,
                     style: {
-                        color: "white",
+                        color: "#FFFFFF",
                         padding: "10px 14px",
                         "&:focusVisible": {
                             outline: "none",

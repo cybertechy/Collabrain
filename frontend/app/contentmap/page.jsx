@@ -353,11 +353,11 @@ function page() {
         }
     }
 
-    if (!user) return <div className="flex flex-col justify-center items-center text-black">
+    if (!user) return <div className="flex flex-col justify-center items-center text-basicallydark">
         <h1>You're not signed in</h1>
     </div>
 
-    if (loading) return <div className="flex flex-col justify-center items-center text-black">
+    if (loading) return <div className="flex flex-col justify-center items-center text-basicallydark">
         <h1>Loading...</h1>
     </div>
 
@@ -379,7 +379,7 @@ function page() {
                         {isEditing ? (
                             <div  className="flex items-center gap-2">
                                 <input
-                                    className="text-white bg-transparent border-b-2 border-white outline-none p-1 no-underline"
+                                    className="text-basicallylight bg-transparent border-b-2 border-basicallylight outline-none p-1 no-underline"
                                     type="text"
                                     value={ContentMapName}
                                     onChange={handleInputChange}
@@ -390,7 +390,7 @@ function page() {
                                 </button>
                             </div>
                         ) : (
-                            <div id="ContentMapName" className=" flex items-center gap-2"><h1 className="text-white text-lg font-semibold" onClick={handleEditClick}>
+                            <div id="ContentMapName" className=" flex items-center gap-2"><h1 className="text-basicallylight text-lg font-semibold" onClick={handleEditClick}>
                                 {ContentMapName}
                             </h1>
                                 <button disabled={!isOwner} className="" onClick={() => setIsEditing(isEditing => !isEditing)}>
@@ -407,30 +407,30 @@ function page() {
 
                     {/* Lower part of navbar */}
                     <div className="flex items-center gap-4 p-0 h-[50%]">
-                        <button id="new" onClick={() => setNew(New => !New)} className=" text-white rounded-md ">New</button>
+                        <button id="new" onClick={() => setNew(New => !New)} className=" text-basicallylight rounded-md ">New</button>
                         { /* New button dropdown containing first new content map, second new doument, It should be right below the new button*/
-                            New && <div  className="absolute z-10 top-[12%] left-[80px] bg-white rounded-md shadow-md p-2 flex flex-col gap-2">
+                            New && <div  className="absolute z-10 top-[12%] left-[80px] bg-basicallylight rounded-md shadow-md p-2 flex flex-col gap-2">
                                 <button onClick={NewContentMap} className="text-primary">New Content Map</button>
                                 <button onClick={duplicateContentMap} className="text-primary">Create a copy</button>
                             </div>
                         }
-                        <button id="delete" disabled={!(id && IntialData && Excalidraw) || !isOwner} onClick={() => setDelete(Delete => !Delete)} className=" text-white rounded-md ">Delete</button>
+                        <button id="delete" disabled={!(id && IntialData && Excalidraw) || !isOwner} onClick={() => setDelete(Delete => !Delete)} className=" text-basicallylight rounded-md ">Delete</button>
                         { /* Ask for confirmation before deleting the content map in the center of screen as pop out*/
-                            id && IntialData && Excalidraw && Delete && <div  className="absolute z-10 top-[50%] lg:left-[40%] md:left-[30%] left-[15%] w-72 bg-white rounded-md shadow-md py-2 px-4 flex flex-col gap-2 border border-primary">
+                            id && IntialData && Excalidraw && Delete && <div  className="absolute z-10 top-[50%] lg:left-[40%] md:left-[30%] left-[15%] w-72 bg-basicallylight rounded-md shadow-md py-2 px-4 flex flex-col gap-2 border border-primary">
                                 <h1 className="text-xl text-primary">Are you sure you want to delete this content map?</h1>
                                 <hr className="border-primary" />
                                 <div className="flex gap-8">
-                                    <button onClick={DeleteContentMap} className="text-white text-xl bg-primary rounded-lg px-3 py-1">Yes</button>
+                                    <button onClick={DeleteContentMap} className="text-basicallylight text-xl bg-primary rounded-lg px-3 py-1">Yes</button>
                                     <button onClick={() => setDelete(Delete => !Delete)} className="text-primary text-xl">No</button>
                                 </div>
                             </div>
                         }
                         <button disabled={!(id && IntialData && Excalidraw)} id="share" onClick={() => setShare(Share => !Share)} className="rounded-lg">Share</button>
-                        {Share && <div  className="absolute z-10 top-[13%] lg:left-[200px] left-[10px] md:left-[100px] bg-white rounded-md shadow-md p-2 flex flex-col gap-2 border border-primary">
+                        {Share && <div  className="absolute z-10 top-[13%] lg:left-[200px] left-[10px] md:left-[100px] bg-basicallylight rounded-md shadow-md p-2 flex flex-col gap-2 border border-primary">
                             <ShareComponent getdata={getdata} updatecontent={updatecontent} contentMapName={IntialData?.name} setShare={setShare} sData={IntialData?.Access} isOwner={isOwner} />
                         </div>}
 
-                        {(IntialData?.userAccess === "edit" || IntialData?.userAccess === "owner") && <div id="save" className="flex items-center gap-2 bg-white text-primary rounded-md  px-2 py-1 ">
+                        {(IntialData?.userAccess === "edit" || IntialData?.userAccess === "owner") && <div id="save" className="flex items-center gap-2 bg-basicallylight text-primary rounded-md  px-2 py-1 ">
                             <p className={`rounded-t-lg `}> <RefreshCcw width={20} height={20} className={`${!isSaved && "animate-spin"}`} />  </p>
                             <p className="lg:block hidden  "> {isSaved ? "Saved" : "Saving..."}</p>
                         </div>}
@@ -440,12 +440,12 @@ function page() {
 
 
         </div>
-        <div id="excalidraw" className="w-screen h-[88%] flex justify-center items-center text-black">
+        <div id="excalidraw" className="w-screen h-[88%] flex justify-center items-center text-basicallydark">
             {id && IntialData && Excalidraw && <Excalidraw
                 key={id}
                 renderTopRightUI={() => (
                     <>
-                        {/* <button className="bg-blue-600 py-1 px-3  text-white rounded-xl" onClick={() => setCollabaration(Collabaration => !Collabaration)}>
+                        {/* <button className="bg-blue-600 py-1 px-3  text-basicallylight rounded-xl" onClick={() => setCollabaration(Collabaration => !Collabaration)}>
                         {Collabaration ? "Stop" : "Start"} Collaboration
                     </button> */}
 

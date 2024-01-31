@@ -10,7 +10,7 @@ import ShareIcon from '@mui/icons-material/Share'; // Icon for Share
 import SortIcon from '@mui/icons-material/Sort'; // Icon for Organize
 import DeleteIcon from '@mui/icons-material/Delete'; // Icon for Delete
 import fb from '../../../app/_firebase/firebase';
-const DashboardProjectButton = ({ title, project, type, color = "white", onClick , id, createdAt, updatedAt,  renamedProject , handleProjectDeleted}) => {
+const DashboardProjectButton = ({ title, project, type, color = "#FFFFFF", onClick , id, createdAt, updatedAt,  renamedProject , handleProjectDeleted}) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [renameOverlayOpen, setRenameOverlayOpen] = useState(false);
     const [deleteOverlayOpen, setDeleteOverlayOpen] = useState(false);

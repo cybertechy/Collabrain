@@ -30,7 +30,7 @@ export default function InfoBar()
 			anchor='right'
 			>
 			<Toolbar>
-				<h1 className='text-3xl font-semibold text-white'>Members</h1>
+				<h1 className='text-3xl font-semibold text-basicallylight'>Members</h1>
 			</Toolbar>
 			<Divider />
 			<List>
@@ -39,7 +39,7 @@ export default function InfoBar()
 						<Avatar sx={{ bgcolor: status === 'online' ? deepOrange[500] : blue[500] }}>
 							{memberName[0]}
 						</Avatar>
-						<h1 className='ml-5 font-medium text-white'>{memberName}</h1>
+						<h1 className='ml-5 font-medium text-basicallylight'>{memberName}</h1>
 						<h1 className={`ml-5 font-normal ${status === 'online' ? 'text-green-500' : 'text-gray-400'} text-sm`}>
 							{status === 'online' ? 'Online' : 'Offline'}
 						</h1>

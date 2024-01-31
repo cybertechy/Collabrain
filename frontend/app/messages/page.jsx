@@ -34,7 +34,7 @@ export default function Messages() {
             console.log("Received message from server");
             setText((prevText) => [
                 ...prevText,
-                <h1 key={prevText.length} className="text-black">{`${data.sender}: ${data.msg}`}</h1>,
+                <h1 key={prevText.length} className="text-basicallydark">{`${data.sender}: ${data.msg}`}</h1>,
             ]);
         });
 

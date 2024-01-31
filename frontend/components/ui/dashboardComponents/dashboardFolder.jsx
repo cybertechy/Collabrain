@@ -120,7 +120,7 @@ const DashboardFolder = ({ title, folder, onClick  ,onFolderDeleted}) => {
     return (
         <Tooltip title={title} enterDelay={1000} leaveDelay={200}>
             <>
-            <div className="bg-tertiary text-white flex items-center justify-center rounded-md w-min pl-3 hover:opacity-80 duration-300">
+            <div className="bg-tertiary text-basicallylight flex items-center justify-center rounded-md w-min pl-3 hover:opacity-80 duration-300">
                 <FolderIcon fontSize="large" />
                 <span className='mx-5 w-24 text-lg font-semibold mr-10'>{truncateTitle(title)}</span>
                 <IconButton onClick={handleClick} color="inherit">

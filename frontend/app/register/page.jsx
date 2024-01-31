@@ -104,7 +104,7 @@
                         alt="Logo"
                     />
                     <div className="bg-secondary drop-shadow-lg p-10 rounded-2xl mt-4">
-                        <h1 className="text-2xl text-black font-poppins mb-6 text-center">
+                        <h1 className="text-2xl text-basicallydark font-poppins mb-6 text-center">
                             Create Your Collabrain Account
                         </h1>
     
