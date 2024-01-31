@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const fb = require("../helpers/firebase");
-
+const oci = require("../helpers/oracle");
 /************************************************************/
 /*                   User CRUD Operations                   */
 /************************************************************/
@@ -134,6 +134,88 @@ router.delete("/:user", async (req, res) => {
 	// Check that user is deleting their own account
 	if (req.params.user !== user.uid)
 		return res.status(401).json({ message: "Unauthorized" });
+
+	// get user data 
+	let userRef = await fb.db.doc(`users/${user.uid}`).get();
+	if (!userRef.exists)
+		return res.status(404).json({ error: "User not found" });
+
+	let userdata = userRef.data();
+
+	// delete the content maps and documents 
+	if(userdata.contentMaps) await Promise.all(userdata.contentMaps?.map(async (content) => {
+		let contentMapData = await fb.db.doc(`content/${content}`).get();
+		if (!contentMapData.exists)
+			return res.status(404).json({ error: "Content map not found" });
+
+		let contentMap = contentMapData.data();
+		let dataDelete = await oci.deleteData("B3", contentMap.data);
+
+		if (dataDelete.error)
+			return res.status(500).json({ error: dataDelete.error });
+
+		await fb.db.doc(`contentMaps/${content}`).delete();
+	}));
+
+	if(userdata.documents) await Promise.all(userdata.documents?.map(async (document) => {
+		let documentData = await fb.db.doc(`documents/${document}`).get();
+		if (!documentData.exists)
+			return res.status(404).json({ error: "Document not found" });
+
+		let documentMap = documentData.data();
+		let dataDelete = await oci.deleteData("B3", documentMap.data);
+
+		if (dataDelete.error)
+			return res.status(500).json({ error: dataDelete.error });
+
+		await fb.db.doc(`documents/${document}`).delete();
+	}));
+
+	
+	// remove user from any teams they are in
+	if(userdata.teams) await Promise.all(userdata.teams?.map(async (team) => {
+		let teamData = await fb.db.doc(`teams/${team}`).get();
+		if (!teamData.exists)
+			return res.status(404).json({ error: "Team not found" });
+
+		let teamMap = teamData.data();
+
+		// remove user from team
+		delete teamMap.members[user.uid];
+
+		await fb.db.doc(`teams/${team}`).update({members: teamMap.members});
+
+		// remove team if user is owner and only member
+		if (teamMap.owner == user.uid && Object.keys(teamMap.members).length == 0)
+			await fb.db.doc(`teams/${team}`).delete();
+
+	}));
+	
+
+
+	// remove members from any content maps or documents they access to
+	if(userdata.AccessContentMaps) await Promise.all(userdata.AccessContentMaps?.map(async (access) => {
+		let contentMapData = await fb.db.doc(`contentMaps/${access}`).get();
+		if (!contentMapData.exists)
+			return res.status(404).json({ error: "Content map not found" });
+
+		let contentMap = contentMapData.data();
+		delete contentMap.Access[user.uid];
+
+		fb.db.doc(`contentMaps/${access}`).update({Access: contentMap.Access});
+	}));
+
+	if(userdata.AccessDocuments) await Promise.all(userdata.AccessDocuments?.map(async (access) => {
+		let documentData = await fb.db.doc(`documents/${access}`).get();
+		if (!documentData.exists)
+			return res.status(404).json({ error: "Document not found" });
+
+		let document = documentData.data();
+		delete document.Access[user.uid];
+
+		fb.db.doc(`documents/${access}`).update({Access: document.Access});
+	}));
+
 
 	fb.db.doc(`users/${req.params.user}`).delete()
 		.then(() => { return res.json({ message: "User deleted" }); })
