@@ -95,7 +95,7 @@
         }
         };
         return (
-            <div className="max-sm:bg-secondary max-sm:min-h-screen flex items-center justify-center min-h-screen">
+            <div className="max-sm:bg-primary max-sm:min-h-screen flex items-center justify-center min-h-screen">
                 <ToastContainer />
                 <div className="flex flex-col items-center justify-center">
                     <img
@@ -103,7 +103,7 @@
                         src="./assets/images/logo_whitebackground.png"
                         alt="Logo"
                     />
-                    <div className="bg-secondary drop-shadow-lg sm:p-10 rounded-2xl sm:mt-4">
+                    <div className="bg-primary drop-shadow-lg sm:p-10 rounded-2xl sm:mt-4">
                         <h1 className="text-2xl text-basicallylight font-poppins mb-6 text-center">
                             Create Your Collabrain Account
                         </h1>
