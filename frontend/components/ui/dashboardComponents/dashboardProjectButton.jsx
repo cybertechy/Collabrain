@@ -10,7 +10,7 @@ import ShareIcon from '@mui/icons-material/Share'; // Icon for Share
 import SortIcon from '@mui/icons-material/Sort'; // Icon for Organize
 import DeleteIcon from '@mui/icons-material/Delete'; // Icon for Delete
 import fb from '../../../app/_firebase/firebase';
-const DashboardProjectButton = ({ title, project, type, color = "white", onClick , id, createdAt, updatedAt,  renamedProject , handleProjectDeleted}) => {
+const DashboardProjectButton = ({ title, project, type, color = "#FFFFFF", onClick , id, createdAt, updatedAt,  renamedProject , handleProjectDeleted}) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [renameOverlayOpen, setRenameOverlayOpen] = useState(false);
     const [deleteOverlayOpen, setDeleteOverlayOpen] = useState(false);
@@ -26,7 +26,7 @@ const DashboardProjectButton = ({ title, project, type, color = "white", onClick
     const handleClose = () => {
         setAnchorEl(null);
     };
-    const truncateTitle = (title, maxLength = 11) => {
+    const truncateTitle = (title, maxLength = 10) => {
         if (title.length > maxLength) {
             return title.substring(0, maxLength - 3) + '..';
         }
@@ -119,7 +119,7 @@ const DashboardProjectButton = ({ title, project, type, color = "white", onClick
                <div  onClick = {handleContentMapClick} >{type === 'Document' ? doc() : map()}</div> 
                 <div className="flex flex-row justify-between items-center w-full mt-2">
                     
-                    <span className="text-lg font-semibold">{truncateTitle(title)}</span>
+                    <span className="text-md font-semibold">{truncateTitle(title)}</span>
                     <IconButton color="inherit" onClick={handleClick} className="ml-2">
                 <MoreVertIcon fontSize="small" />
             </IconButton>

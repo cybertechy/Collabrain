@@ -13,7 +13,7 @@ const theme = createTheme({
             styleOverrides: {
                 input: {
                     "&::placeholder": {
-                        color: "white", // Change placeholder color here
+                        color: "#FFFFFF", // Change placeholder color here
                         opacity: 1, // Ensure full opacity
                     },
                 },
@@ -27,14 +27,14 @@ const theme = createTheme({
                         borderWidth: "1px", // Ensure hover/focus border is visible
                     },
                     "&:hover .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "white", // White border on hover
+                        borderColor: "#FFFFFF", // #FFFFFF border on hover
                     },
                     "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                        borderColor: (props) => (props.error ? "red" : "white"), // Red border on focus when there's an error
+                        borderColor: (props) => (props.error ? "red" : "#FFFFFF"), // Red border on focus when there's an error
                     },
                     "&.Mui-focused:not(:hover) .MuiOutlinedInput-notchedOutline":
                         {
-                            borderColor: "white", // White border on focus without hover
+                            borderColor: "#FFFFFF", // #FFFFFF border on focus without hover
                         },
                 },
             },
@@ -65,10 +65,10 @@ const EmailInputField = ({ placeholder, color, email, setEmail }) => {
                 onChange={handleChange}
                 error={error}
                 helperText={error && "Invalid email address"}
-                InputLabelProps={{ style: { color: "white" } }}
+                InputLabelProps={{ style: { color: "#FFFFFF" } }}
                 InputProps={{
                     style: {
-                        color: "white",
+                        color: "#FFFFFF",
                         padding: "10px",
                         "&:focusVisible": {
                             outline: "none",

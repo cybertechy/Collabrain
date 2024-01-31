@@ -28,10 +28,10 @@ const theme = createTheme({
                         borderWidth: "1px", // Ensure hover/focus border is visible
                     },
                     "&:hover .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "white", // White border on hover
+                        borderColor: "#FFFFFF", // #FFFFFF border on hover
                     },
                     "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "white", // White border on focus
+                        borderColor: "#FFFFFF", // #FFFFFF border on focus
                     },
                 },
             },
@@ -39,9 +39,9 @@ const theme = createTheme({
         MuiInputLabel: {
             styleOverrides: {
                 root: {
-                    color: "white", // Label color
+                    color: "#FFFFFF", // Label color
                     "&.Mui-focused": {
-                        color: "white", // White label color on focus
+                        color: "#FFFFFF", // #FFFFFF label color on focus
                     },
                 },
             },
@@ -49,9 +49,9 @@ const theme = createTheme({
         MuiInput: {
             styleOverrides: {
                 root: {
-                    color: "white", // Input text color
+                    color: "#FFFFFF", // Input text color
                     "&::placeholder": {
-                        color: "white", // Placeholder color
+                        color: "#FFFFFF", // Placeholder color
                         opacity: 1,
                     },
                 },
@@ -60,7 +60,7 @@ const theme = createTheme({
         MuiIconButton: {
             styleOverrides: {
                 root: {
-                    color: "white", // Eye visibility icon color
+                    color: "#FFFFFF", // Eye visibility icon color
                 },
             },
         },
@@ -129,7 +129,7 @@ const PasswordInput = ({ isConfirm, color, password, setPassword }) => {
                     }
                     label={isConfirm ? "Confirm Password" : "Password"}
                     sx={{
-                        color: "white",
+                        color: "#FFFFFF",
                         WebkitTextSecurity: showPassword ? "none" : "disc",
                         "&:focusVisible": {
                             outline: "none",

@@ -124,6 +124,9 @@ router.get("/:id", async (req, res) => {
     if (!getData) return res.status(500).json({ code: 500, error: "Getting data failed" });
 
     contentMapData.data = await oci.generateStringFromStream(getData.value);
+
+    contentMapData.createdAt = contentMapData.createdAt.toDate();
+    contentMapData.updatedAt = contentMapData.updatedAt.toDate();
  
     return res.status(200).json({...contentMapData,userAccess:contentMapData.Access[user.uid]?.role});
 });

@@ -104,17 +104,17 @@ export default function Home() {
                     <span className="items-center justify-center flex flex-row">
                         <button
                             onClick={() => fb.serviceSignIn("google")}
-                            className="bg-white py-1 px-1 rounded-full m-5"
+                            className="bg-basicallylight py-1 px-1 rounded-full m-5"
                         >
                             <GoogleIcon className="h-8 w-8 text-gray-500"></GoogleIcon>
                         </button>
                         <button
                             onClick={() => fb.serviceSignIn("microsoft")}
-                            className="bg-white py-1 px-1 rounded-full m-5"
+                            className="bg-basicallylight py-1 px-1 rounded-full m-5"
                         >
                             <MicrosoftIcon className="h-8 w-8 text-gray-500"></MicrosoftIcon>
                         </button>
-                        <button className="bg-white py-1 px-1 rounded-full m-5">
+                        <button className="bg-basicallylight py-1 px-1 rounded-full m-5">
                             <GitHubIcon fontSize = "large" className=" text-primary"/>
                         </button>
                     </span>

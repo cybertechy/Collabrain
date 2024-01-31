@@ -132,30 +132,16 @@ const UsernameOverlay = ({ isOpen, onClose }) =>
 		}
 	};
 
-	if (loading || !user || isCheckingUsername) return (
-		<div className="flex flex-col items-center justify-around min-h-screen">
-		  <div className="flex flex-col items-center justify-center min-h-screen">
-                <h1 className="text-xl font-bold mb-5 text-primary">Trying to sign in</h1>
-                <div className="loader mb-5"></div>
-
-                <p className="text-lg font-bold text-primary mb-5 ">
-                    If you're not signed in, sign in&nbsp;
-                    <span className="underline cursor-pointer" onClick={() => router.push("/")}>
-                        here
-                    </span>
-                </p>
-            </div>
-        </div>
-    );
+	if (loading || !user || isCheckingUsername) return;
 	return (
-		<div className={`fixed top-0 left-0 w-full h-full flex items-center justify-center ${user && !hasUserUsername ? 'block' : 'hidden'} z-50 bg-white bg-opacity-20 backdrop-blur-sm`}>
-		<div className="w-1/4 bg-white rounded-md shadow-lg">
+		<div className={`fixed top-0 left-0 w-full h-full flex items-center justify-center ${user && !hasUserUsername ? 'block' : 'hidden'} z-50 bg-basicallylight bg-opacity-20 backdrop-blur-sm`}>
+		<div className="w-1/4 bg-basicallylight rounded-md shadow-lg">
 				<div className="p-8">
-					<h2 className="text-2xl font-bold mb-4 text-black">Welcome! Let's Pick a Username</h2>
+					<h2 className="text-2xl font-bold mb-4 text-basicallydark">Welcome! Let's Pick a Username</h2>
 					<p className="mb-4 text-gray-600">Choose a unique username to represent you on our platform. It's the first step in creating your personal profile!</p>
 					<input
 						type="text"
-						className={`w-full text-black p-2 border ${error && error !== "Username is available" ? 'border-red-500' : 'border-gray-300'} rounded focus:outline-none focus:border-primary`}
+						className={`w-full text-basicallydark p-2 border ${error && error !== "Username is available" ? 'border-red-500' : 'border-gray-300'} rounded focus:outline-none focus:border-primary`}
 						placeholder="Enter your username"
 						value={username}
 						onChange={handleUsernameChange}
@@ -165,14 +151,14 @@ const UsernameOverlay = ({ isOpen, onClose }) =>
 					</p>
 					<div className="mt-4 flex justify-between">
           <button
-							className="px-4 py-2 bg-primary text-white rounded hover:bg-teritary"
+							className="px-4 py-2 bg-primary text-basicallylight rounded hover:bg-teritary"
 							onClick={fb.signOut}
 							
 						>
 							Sign out
 						</button>
 						<button
-							className="px-4 py-2 bg-primary text-white rounded hover:bg-teritary"
+							className="px-4 py-2 bg-primary text-basicallylight rounded hover:bg-teritary"
 							onClick={handleSave}
 							disabled={retrieve || error !== "Username is available"}
 						>

@@ -119,7 +119,7 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
         <aside
             className={`transition-all shadow-md h-screen pt-[height_of_navbar] z-10 duration-500 ease-in-out ${
                 isOpen ? "w-72" : "w-24"
-            } bg-white text-black`}
+            } bg-basicallylight text-basicallydark`}
             style={isOpen ? sidebarStyle() : sidebarStyle1()}
             // onClick={handleSidebarClick}
         >
@@ -163,7 +163,7 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
                         withShadow={true}
                         onClick={toggleProjectModal}
                         Icon={() => (
-                            <AddIcon fontSize = "medium" className="  text-white"></AddIcon>
+                            <AddIcon fontSize = "medium" className="  text-basicallylight"></AddIcon>
                         )}
                         //     <PlusIcon fontSize = "medium"className="h-4 w-4 pt-3 pb-3 pl-5 text-white"></PlusIcon>
                         // )}
@@ -197,7 +197,7 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
                 withShadow={true}
                 onClick={toggleModal} // Use toggleModal to open the overlay
                 Icon={() => (
-                    <GroupAddIcon fontSize="medium" className="text-white"></GroupAddIcon>
+                    <GroupAddIcon fontSize="medium" className="text-basicallylight"></GroupAddIcon>
                 )}
                 isExpanded={isOpen}
             />
@@ -222,7 +222,7 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
                         withShadow={true}
                         onClick={() => router.push("/new-project")}
                         Icon={() => (
-                            <ExploreIcon fontSize = "medium"className=" text-white"></ExploreIcon>
+                            <ExploreIcon fontSize = "medium"className=" text-basicallylight"></ExploreIcon>
                         )}
                         isExpanded={isOpen}
                     />

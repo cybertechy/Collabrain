@@ -99,7 +99,7 @@ const FriendTile = ({ friendData, onMoreOptions }) => {
         <ListItemAvatar>
           <Avatar {...stringAvatar(friendData.name)} />
         </ListItemAvatar>
-        <ListItemText primary={friendData.name} primaryTypographyProps={{ color: 'black' }} secondary={friendData.status} />
+        <ListItemText primary={friendData.name} primaryTypographyProps={{ color: '#000000' }} secondary={friendData.status} />
       </Box>
 
       <Box sx={{ display: 'flex', alignItems: 'center' }}>

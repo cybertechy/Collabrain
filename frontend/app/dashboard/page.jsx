@@ -243,37 +243,45 @@ export default function Dashboard() {
     // }, [user]);
 
     useEffect(() => {
-        const fetchContentMaps = async () => {
-            try {
-                const token = await fb.getToken();
-                console.log(token);
-                const response = await axios.get(
-                    "http://localhost:8080/api/maps",
-                    {
+        if (user) { // Check if user is logged in
+            const fetchContentMaps = () => {
+                new Promise((resolve, reject) => {
+                    const token = fb.getToken(); // Synchronously get the token
+                    if (token) {
+                        resolve(token);
+                    } else {
+                        reject("No token found");
+                    }
+                })
+                .then(token => {
+                    console.log(token);
+                    return axios.get("http://localhost:8080/api/maps", {
                         headers: {
                             Authorization: `Bearer ${token}`,
                         },
+                    });
+                })
+                .then(response => {
+                    if (response.status === 200) {
+                        setContentMaps(response.data);
+                        console.log("Content Maps Fetched:", response.data);
+                    } else {
+                        console.error("Failed to fetch content maps data", response.status);
                     }
-                );
-        
-                if (response.status === 200) {
-                    setContentMaps(response.data);
-                    console.log("Content Maps Fetched:", response.data);
-                } else {
-                    console.error(
-                        "Failed to fetch content maps data",
-                        response.status
-                    );
-                }
-            } catch (error) {
-                console.error("Error fetching content maps data:", error);
-            }finally {
-                setContentMapsLoading(false); // Update loading status
-            }
-        };
-
-        fetchContentMaps();
-        console.log("fetching content maps")
+                })
+                .catch(error => {
+                    console.error("Error fetching content maps data:", error);
+                })
+                .finally(() => {
+                    setContentMapsLoading(false); // Update loading status
+                });
+            };
+    
+            fetchContentMaps();
+            console.log("Fetching content maps...");
+        } else {
+            console.log("User not logged in, skipping fetch");
+        }
     }, [user, projectChanges]);
     const sortedContentMaps = [...contentMaps];
     if (sortName) {
@@ -288,37 +296,45 @@ export default function Dashboard() {
         });
     }
     useEffect(() => {
-        const fetchFolders = async () => {
-            try {
-                const token = await fb.getToken();
-              
-              
-                const response = await axios.get(
-                    "http://localhost:8080/api/dashboard/folders",
-                    {
+        if (user) { // Only proceed if the user is logged in
+            console.log("Fetching folders...")
+            const fetchFolders = () => {
+                // Wrap the token retrieval in a Promise to handle it asynchronously
+                new Promise((resolve, reject) => {
+                    const token = fb.getToken(); // Synchronously get the token
+                    if (token) {
+                        resolve(token);
+                    } else {
+                        reject("No token found");
+                    }
+                })
+                .then(token => {
+                    return axios.get("http://localhost:8080/api/dashboard/folders", {
                         headers: {
                             Authorization: `Bearer ${token}`,
                         },
+                    });
+                })
+                .then(response => {
+                    if (response.status === 200) {
+                        setFolders(response.data.folders);
+                    } else {
+                        console.error("Failed to fetch folders data", response.status);
                     }
-                );
-
-                if (response.status === 200) {
-                    setFolders(response.data.folders);
-                 
-                } else {
-                    console.error(
-                        "Failed to fetch folders data",
-                        response.status
-                    );
-                }
-            } catch (error) {
-                console.error("Error fetching folders data:", error);
-            }finally {
-                setFoldersLoading(false); // Update loading status
-            }
-        };
-
-        fetchFolders();
+                })
+                .catch(error => {
+                    console.error("Error fetching folders data:", error);
+                })
+                .finally(() => {
+                    setFoldersLoading(false); // Ensure loading status is updated
+                });
+            };
+    
+            fetchFolders();
+        } else {
+            console.log("User not logged in, skipping folder fetch");
+            // Optionally, you might want to handle the UI state here for when the user is not logged in
+        }
     }, [user, folderChanges]);
 
     const showToken = async () => {
@@ -328,14 +344,13 @@ export default function Dashboard() {
    
            
     if ( !user){
-        const tokenExists = showToken();;
-    const itemClasses = "hidden";
+  
         return (
            
-            <div className={`loader-container ${tokenExists? "":itemClasses + "mt-96"}`}>
+            <div className={``}>
                 <div className="flex flex-col items-center justify-center min-h-screen">
                     <h1 className="text-xl font-bold mb-5 text-primary">
-                        {isContentMapsLoading? "Loading Projects":"Trying to sign in"}
+                        {isContentMapsLoading? "Loading Projects":" Trying to sign in"}
                     </h1>
                     <div className="loader mb-5"></div>
 
@@ -396,13 +411,7 @@ export default function Dashboard() {
    
     return (
         <Template>
-            {/* <div className="flex flex-col h-screen bg-white ">
-         
-        <div className="flex flex-grow overflow-hidden">
-            <Sidebar />
-            <div className="flex-grow flex flex-col">
-                <div className="w-full">
-                    <Navbar /> */}
+ 
 
 <DashboardInfoBar
     sortName={sortName}
@@ -433,18 +442,21 @@ export default function Dashboard() {
                     </p>
 
                     <div className="flex flex-wrap content-start items-start w-full justify-start ml-4 gap-8 ">
-                        {folders.map((folder) => (
-                            <DashboardFolder
-                            key={folder?.id}
-                                id={folder?.id}
-                           
-                              
-                                title={folder?.name}
-                                folder={folder}
-                                onClick={() => {}}
-                                onFolderDeleted={handleFolderDeleted}
-                            />
-                        ))}
+                    {isFoldersLoading ? (
+        <div className="loader mb-t">Loading...</div> // Adjust loader class as needed
+    ) : folders.length > 0 ? (
+        folders.map((folder) => (
+            <DashboardFolder
+                key={folder?.id}
+                id={folder?.id}
+                title={folder?.name}
+                folder={folder}
+                onClick={() => {}}
+                onFolderDeleted={handleFolderDeleted}
+            />
+        ))
+    ) : null // Do not display any text if there are no folders
+    }
                         <DashboardNewFolder onNewFolderCreated={addNewFolder}/>
                     </div>
                 </div>
@@ -453,26 +465,32 @@ export default function Dashboard() {
                         Projects
                     </p>
                     <div
-                        className="scrollbar-thin scrollbar-thumb-primary  overflow-y-scroll pr-28"
+                        className="scrollbar-thin scrollbar-thumb-primary h-full  overflow-y-scroll pr-28"
                         style={{ maxHeight: "500px" }}
                     >
                         <div className="flex flex-wrap gap-4 ml-4 justify-start">
                             {console.log("Content Maps:", contentMaps)}
-                            {sortedContentMaps.map((contentMap) => (
-    <DashboardProjectButton
-    id={contentMap?.id}
-    key={contentMap?.id}
-  
-        title={contentMap?.name}
-        createdAt={contentMap?.createdAt}
-        updatedAt={contentMap?.updatedAt}
-        project={contentMap}
-        type="Content Map"
-        renamedProject={renamedProject}
-        handleProjectDeleted={handleProjectDeleted} // Pass the function
-        onClick={() => {}}
-    />
-))}
+                            
+                            {isContentMapsLoading ? (
+                <div className="loader mb-t">Loading...</div> // Adjust loader class as needed
+            ) : sortedContentMaps.length > 0 ? (
+                sortedContentMaps.map((contentMap) => (
+                    <DashboardProjectButton
+                        id={contentMap?.id}
+                        key={contentMap?.id}
+                        title={contentMap?.name}
+                        createdAt={contentMap?.createdAt}
+                        updatedAt={contentMap?.updatedAt}
+                        project={contentMap}
+                        type="Content Map"
+                        renamedProject={renamedProject}
+                        handleProjectDeleted={handleProjectDeleted} // Pass the function
+                        onClick={() => {}}
+                    />
+                ))
+            ) : (
+                <div>You have no content maps</div>
+            )}
                         </div>
                     </div>
                 </div>

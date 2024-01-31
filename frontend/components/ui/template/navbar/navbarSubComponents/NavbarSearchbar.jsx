@@ -7,7 +7,7 @@ const SearchBar = () => {
             {/* Adjust this to control the width of the search bar */}
             <input
                 type="search"
-                className="w-full bg-white text-primary placeholder-primary p-2 pl-10 rounded-full focus:outline-none  focus:border-secondary"
+                className="w-full bg-basicallylight text-primary placeholder-primary p-2 pl-10 rounded-full focus:outline-none  focus:border-secondary"
                 placeholder="Search Collabrain"
             />
             <SearchIcon

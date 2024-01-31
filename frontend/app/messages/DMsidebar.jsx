@@ -101,7 +101,7 @@ return (
                 </Button>
 
 
-                <List className="overflow-auto text-black">
+                <List className="overflow-auto text-basicallydark">
                     {directMessages.map((dm, index) => (
                         <DirectMessageItem
                             key={index}

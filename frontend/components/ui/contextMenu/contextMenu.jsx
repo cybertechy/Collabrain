@@ -6,7 +6,7 @@ const ContextMenu = ({ xPos, yPos, isVisible, menuOptions, onClose }) => {
     top: yPos,
     left: xPos,
     display: isVisible ? 'block' : 'none',
-    backgroundColor: 'white',
+    backgroundColor: '#FFFFFF',
     boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
     zIndex: 1000,
   };

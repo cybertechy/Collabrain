@@ -30,6 +30,8 @@ module.exports = {
                 foldergrey: "#F0F4F9",
                 kindablack: "#1f1f1f",
                 littlelessblack: "#5e5e5e",
+                basicallylight: "#FFFFFF",
+                basicallydark: "#000000",
             },
             backgroundImage: {
                 "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",

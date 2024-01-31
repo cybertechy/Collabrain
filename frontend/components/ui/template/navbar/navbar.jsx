@@ -19,10 +19,27 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
     const leaderboardToggleRef = useRef(null); // Ref for the leaderboard toggle icon
     const [windowWidth, setWindowWidth] = useState(window.innerWidth); 
     const [showSettings, setShowSettings] = useState(false);
+    const [currentScreen, setCurrentScreen] = useState("profile");
+    const settingsOverlayRef = useRef(null); 
     const toggleLeaderboard = () => {
         setShowLeaderboard(!showLeaderboard);
     };
+    const [showSettingsOverlay, setShowSettingsOverlay] = useState(false);
 
+    const toggleSettingsOverlay = () => {
+        setShowSettingsOverlay(!showSettingsOverlay); // Toggle the state
+    };
+    
+    
+    const handleCloseSettings = () => {
+        setShowSettingsOverlay(false);
+    };
+    const handleOpenSettings = (screen) => {
+        setCurrentScreen(screen);
+        setShowSettingsOverlay(true); // Use setShowSettingsOverlay to show the settings overlay.
+      };
+      
+    
     useEffect(() => {
         function handleClickOutside(event) {
             if (leaderboardRef.current && !leaderboardRef.current.contains(event.target) &&
@@ -51,7 +68,7 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
         if (windowWidth < 400) {
             return (
                 <MenuIcon
-                                className="h-6 w-6 mb-2 text-lg text-white transition-all duration-500 ease-in-out"
+                                className="h-6 w-6 mb-2 text-lg text-basicallylight transition-all duration-500 ease-in-out"
                                 onClick={toggleSidebar}
                                 fontSize="large"
                             />
@@ -75,7 +92,7 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
                         ref={leaderboardToggleRef} // Attach the ref here
                         onClick={toggleLeaderboard}
                         className="cursor-pointer"
-                        style={{ color: "white" }}
+                        style={{ color: "#FFFFFF" }}
                     />
                     </Tooltip>
                     <Tooltip
@@ -88,7 +105,7 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
         > 
                     <NotificationsIcon
                         className="cursor-pointer"
-                        style={{ color: "white" }}
+                        style={{ color: "#FFFFFF" }}
                     />
                      </Tooltip>
                      <Tooltip
@@ -99,7 +116,8 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
         > 
                     <AccountCircleIcon
                         className="cursor-pointer"
-                        style={{ color: "white" }}
+                        style={{ color: "#FFFFFF" }}
+                        onClick={toggleSettingsOverlay}
                     />
                      </Tooltip>
                      </>
@@ -109,7 +127,7 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
 
     return (
         <>
-            <nav className="bg-purple-600 p-4 flex items-center justify-between">
+            <nav className="bg-primary p-4 flex items-center justify-between">
                 <div className="flex-grow flex">
                     {navbarStyle()}
                 </div>
@@ -129,11 +147,11 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
                     <LeaderboardNavbar />
                 </div>
             )}
-            {(
-                <div >
-                    <SettingsOverlay />
-                </div>
-            )}
+          {showSettingsOverlay && (
+    <div ref={settingsOverlayRef}>
+        <SettingsOverlay onClose={handleCloseSettings} />
+    </div>
+)}
         </>
     );
 };
