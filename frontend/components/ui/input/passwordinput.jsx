@@ -98,7 +98,7 @@ const PasswordInput = ({ isConfirm, color, password, setPassword }) => {
     return (
         <ThemeProvider theme={theme}>
             <FormControl
-                sx={{ m: 1,  }}
+                sx={{ mb: 1,  }}
                 fullWidth
                 variant="outlined"
                 className={backgroundColorClass}
@@ -137,10 +137,12 @@ const PasswordInput = ({ isConfirm, color, password, setPassword }) => {
                     }}
                 />
                 {error && (
-                    <FormHelperText error>
+                    <div className="sm:w-60 max-sm:w-80">
+                    <FormHelperText error className="text-center">
                         Password must contain at least 8 characters including
                         uppercase letters, lowercase letters, and numbers.
                     </FormHelperText>
+                    </div>
                 )}
             </FormControl>
         </ThemeProvider>

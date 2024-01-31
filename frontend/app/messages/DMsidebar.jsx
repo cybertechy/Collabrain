@@ -6,8 +6,7 @@ import { useState } from 'react';
 import { Button } from '@mui/material';
 // Reusable Direct Message Item Component
 const DirectMessageItem = ({ name, message, avatar, onClick }) => {
-    const [isMuted, setIsMuted] = useState(false);
-    const [isDeafened, setIsDeafened] = useState(false);
+   
   
    
 
@@ -52,7 +51,12 @@ const DirectMessageItem = ({ name, message, avatar, onClick }) => {
 
 // Direct Messages Sidebar Component
 const DMSideBar = ({ friendsHandler, directMessages , userData}) => {
-
+  const [isMuted, setIsMuted] = useState(false);
+  const [isDeafened, setIsDeafened] = useState(false);
+  const onMute = () => {
+  }
+  const onDeafen = () => {
+  }
     const handleMute = () => {
         setIsMuted(!isMuted);
         onMute();

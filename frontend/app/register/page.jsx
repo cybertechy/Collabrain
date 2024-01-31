@@ -103,7 +103,7 @@
                             <InputField name = "firstname" value = {firstname} input={firstname} setinput={setfirstname} placeholder="First Name" color="tertiary"/>
                             <InputField name="lastname" value = {firstname} input={lastname} setinput={setlastname} placeholder="Last Name"  color="tertiary"/>
                             </div>
-                            <div className="flex w-full">
+                            <div className="flex w-full max-sm:pr-4">
                                 
                                 <EmailInputField name="email" value = {email}email={email} setEmail={setemail} placeholder="Email Address" color = "tertiary" />
                             </div>

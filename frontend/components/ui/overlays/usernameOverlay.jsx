@@ -25,7 +25,8 @@ const UsernameOverlay = ({ isOpen, onClose }) =>
             });
 
             const user = res.data;
-           
+			
+			console.log("Overlay open: " + isOpen);
             return user.username ? true : false;
         } catch (err) {
             console.log(err);

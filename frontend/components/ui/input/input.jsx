@@ -53,14 +53,14 @@ const InputField = ({ placeholder, color, input, setinput }) => {
                     className: backgroundColorClass,
                     style: {
                         color: "white",
-                        padding: "10px 14px",
+                        padding: "10px",
                         "&:focusVisible": {
                             outline: "none",
                         },
                     },
                 }}
                 placeholder={placeholder}
-                sx={{ m: 1, width: "37ch" }}
+                sx={{ mb: 1, width: "20rem" }}
             />
         </ThemeProvider>
     );
