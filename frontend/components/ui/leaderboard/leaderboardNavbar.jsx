@@ -5,7 +5,12 @@ import QueryBuilderIcon from '@mui/icons-material/QueryBuilder';
 import { IconButton } from '@mui/material';
 import ButtonIcon from '../button/buttonWithIcon';
 
-const LeaderboardNavbar = ({ user }) => {
+const LeaderboardNavbar = ({ user = {
+    rank: 0,
+    displayName: 'User',
+    xp: 0,
+    positionShift: 0,
+}}) => {
     const [showAnimation, setShowAnimation] = useState(false);
 
     useEffect(() => {
@@ -81,13 +86,6 @@ const LeaderboardNavbar = ({ user }) => {
     );
 };
 
-LeaderboardNavbar.defaultProps = {
-    user: {
-        rank: 0,
-        displayName: 'User',
-        xp: 0,
-        positionShift: 0,
-    },
-};
+
 
 export default LeaderboardNavbar;

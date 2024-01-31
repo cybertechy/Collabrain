@@ -26,7 +26,7 @@ const DashboardProjectButton = ({ title, project, type, color = "white", onClick
     const handleClose = () => {
         setAnchorEl(null);
     };
-    const truncateTitle = (title, maxLength = 11) => {
+    const truncateTitle = (title, maxLength = 10) => {
         if (title.length > maxLength) {
             return title.substring(0, maxLength - 3) + '..';
         }
@@ -119,7 +119,7 @@ const DashboardProjectButton = ({ title, project, type, color = "white", onClick
                <div  onClick = {handleContentMapClick} >{type === 'Document' ? doc() : map()}</div> 
                 <div className="flex flex-row justify-between items-center w-full mt-2">
                     
-                    <span className="text-lg font-semibold">{truncateTitle(title)}</span>
+                    <span className="text-md font-semibold">{truncateTitle(title)}</span>
                     <IconButton color="inherit" onClick={handleClick} className="ml-2">
                 <MoreVertIcon fontSize="small" />
             </IconButton>
