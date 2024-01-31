@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState , useEffect} from "react";
 import CloseIcon from "@mui/icons-material/Close";
-
+import UploadButton from "../button/uploadButton";
 import PersonIcon from "@mui/icons-material/Person";
 import SentimentVeryDissatisfiedIcon from "@mui/icons-material/SentimentVeryDissatisfied";
 import Image from 'next/image';
@@ -265,21 +265,9 @@ const ProfileOverlay = ({  }) => {
                     <div className="w-11/12 h-96  bg-basicallylight rounded-md">
                         <div className="flex flex-col justify-start h-full">
                             <div>
-                                <label className="relative group text-center">
-                                    <input type="file" className="hidden" />
-                                    <div className="group-hover:block relative w-24">
-                                        <PersonIcon
-                                            style={{ fontSize: 100 }}
-                                        />
-                                        <div className="absolute top-0 left-0 w-24 h-24 group-hover:bg-gray-300 opacity-0 group-hover:opacity-75 flex items-center py-5 justify-center">
-                                            <span className="text-basicallydark text-center font-bold">
-                                                Upload
-                                            </span>
-                                        </div>
-                                    </div>
-                                </label>
+                                <UploadButton />
                             </div>
-                            <div className="mb-6 mt-6">
+                            <div className=" mt-6">
                                 <div className="mb-4 block">
                                     <p className="text-lg text-basicallydark">Name</p>
                                     <div className="mb-4 flex justify-between">
@@ -301,7 +289,7 @@ const ProfileOverlay = ({  }) => {
                                         </button>
                                     </div>
                                 </div>
-                                <div className="mb-4 block">
+                                {/* <div className="mb-4 block">
                                     <p className="text-lg text-basicallydark">Username</p>
                                     <div className="mb-4 flex justify-between">
                                         <input
@@ -321,8 +309,8 @@ const ProfileOverlay = ({  }) => {
                                             {isUsernameEditMode ? "Save" : "Edit"}
                                         </button>
                                     </div>
-                                </div>
-                                <div className="mb-4 block">
+                                </div> */}
+                                {/* <div className="mb-4 block">
                                     <p className="text-lg text-basicallydark">Email</p>
                                     <div className="mb-4 flex justify-between">
                                         <input
@@ -342,10 +330,10 @@ const ProfileOverlay = ({  }) => {
                                             {isEmailEditMode ? "Save" : "Edit"}
                                         </button>
                                     </div>
-                                </div>
+                                </div> */}
                             </div>
                             <div className="w-11/12 h-11/12 bg-basicallylight rounded-md">
-                                    <div className="mb-6">
+                                    <div className="mb-4">
                                         <p className="mb-2 text-2xl  text-basicallydark ">
                                             Password and Authentication
                                         </p>
@@ -400,23 +388,34 @@ const GeneralOverlay = () => {
     const [selectedAppearance, setSelectedAppearance] = useState(null);
     const [badBehaviorStrikes, setBadBehaviorStrikes] = useState(3);
   
-    const handleLangSelect = (label) => {
-      setSelectedLangLabel(label);
-    };
-  
-    const handleAppearanceSelect = (index) => {
-      setSelectedAppearance(index);
-    };
+    useEffect(() => {
+        // Check if dark mode is enabled on component mount
+        const isDarkMode = document.documentElement.classList.contains('dark');
+        setSelectedAppearance(isDarkMode ? 0 : 1);
+      }, []);
+    
+      const handleLangSelect = (label) => {
+        setSelectedLangLabel(label);
+      };
+    
+      const handleAppearanceSelect = (index) => {
+        setSelectedAppearance(index);
+        // Toggle dark mode based on selection
+        if (appearanceOptions[index].darkMode) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      };
   
     const handleStrikeChange = (newStrikes) => {
       setBadBehaviorStrikes(newStrikes);
     };
   
     const appearanceOptions = [
-      { label: "Dark Background", colorClass: "bg-basicallydark" },
-      { label: "Default Background", colorClass: "bg-primary" },
-    ];
-  
+        { label: "Dark Background", colorClass: "bg-basicallydark", darkMode: true },
+        { label: "Default Background", colorClass: "bg-basicallylight", darkMode: false },
+      ];
   
     const dropdownItems4 = [
       { label: "Arabic", link: "/option1" },
@@ -426,13 +425,15 @@ const GeneralOverlay = () => {
     return (
       <>
         <div className="w-full h-5/6 flex justify-center items-start">
-          <div className="bg-basicallylight rounded-md flex w-full p-5 overflow-y-scroll scrollbar-thin scrollbar-thumb-primary">
+          <div className="bg-basicallylight  rounded-md flex w-full p-5 overflow-y-scroll scrollbar-thin scrollbar-thumb-primary">
             <div className="flex flex-col w-full">
               <p className="mb-2 text-2xl text-left text-basicallydark md:text-lg sm:text-sm lg:text-2xl">
                 Change Appearance
               </p>
               <div className="flex flex-wrap sm:flex-nowrap space-y-2 sm:space-x-5 sm:space-y-0 mb-4">
               {appearanceOptions.map((option, index) => (
+                option.darkMode ? (
+                // Render button for dark mode
                 <button
                   key={index}
                   className={`h-16 w-16 lg:w-32 lg:h-32 flex justify-center items-center relative ${
@@ -441,10 +442,26 @@ const GeneralOverlay = () => {
                   onClick={() => handleAppearanceSelect(index)}
                 >
                   <div className={`w-full h-full ${option.colorClass} flex justify-center items-center`}>
-                    <div className="w-12 h-12 bg-basicallylight"></div> {/* Adjust the size as needed */}
+                    <div className="w-12 h-12 bg-basicallylight"></div>
                   </div>
                 </button>
-              ))}
+              ) : (
+                // Render button for light mode
+                <button
+                  key={index}
+                  className={`h-16 w-16 lg:w-32 lg:h-32 flex justify-center items-center relative border-primary border-4 ${
+                    selectedAppearance === index ? "border-4 border-secondary" : ""
+                  }`}
+                  onClick={() => handleAppearanceSelect(index)}
+                >
+                  <div className={`w-full h-full ${option.colorClass} flex justify-center items-center`}>
+                    <div className="w-12 h-12 bg-primary"></div>
+                  </div>
+                </button>
+              )
+            ))
+          }
+             
             </div>
               <div className="mb-4">
                 <p className="mb-2 text-2xl text-left text-basicallydark md:text-lg sm:text-sm lg:text-2xl">

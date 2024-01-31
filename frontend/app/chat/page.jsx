@@ -41,8 +41,8 @@ export default function ChatRoom() {
             // Placeholder function to fetch channels data
             // Replace this with actual API call and set the state
             setChannelsData([
-                { name: 'Category 1', channels: ['General', 'Random'] },
-                { name: 'Category 2', channels: ['Updates', 'Launch'] },
+                { name: 'Everything', channels: ['General', 'Random', 'Updates', 'Launch'] },
+                
             ]);
         };
 
@@ -169,7 +169,7 @@ export default function ChatRoom() {
                         </Toolbar>
                     </div>
                     <div className="flex">
-                        <div className="p-5 h-5/6 scrollbar-thin scrollbar-thumb-primary text-basicallydark overflow-y-scroll">
+                        <div className="p-5 w-full h-full scrollbar-thin scrollbar-thumb-primary text-basicallydark overflow-y-scroll">
                             {text}
                         </div>
 

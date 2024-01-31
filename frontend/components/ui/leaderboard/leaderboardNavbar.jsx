@@ -6,9 +6,9 @@ import { IconButton } from '@mui/material';
 import ButtonIcon from '../button/buttonWithIcon';
 
 const LeaderboardNavbar = ({ user = {
-    rank: 0,
-    displayName: 'User',
-    xp: 0,
+    rank: 1,
+    displayName: 'Team Epsilon',
+    xp: 3000,
     positionShift: 0,
 }}) => {
     const [showAnimation, setShowAnimation] = useState(false);
@@ -22,9 +22,9 @@ const LeaderboardNavbar = ({ user = {
     };
 
     const userLeaderboardData = [
-        { rank: 1, displayName: 'User 1', xp: 2000 },
-        { rank: 2, displayName: 'User 2', xp: 2000 },
-        { rank: 3, displayName: 'User 3', xp: 2000 },
+        { rank: 1, displayName: 'Team Epsilon', xp: 3000 },
+        { rank: 2, displayName: 'Team Alpha', xp: 2450 },
+        { rank: 3, displayName: 'Team Gamma', xp: 1200 },
     ];
 
     return (
@@ -41,7 +41,7 @@ const LeaderboardNavbar = ({ user = {
                     <div className="text-xs uppercase font-bold font-poppins">Today</div>
                     <div className="text-sm text-center">
                         <SwapVertIcon className="mr-1" fontSize="small" />
-                        {user.positionShift || '?'} places
+                        {user.positionShift==0?"0":(user.positionShift || '?')} places
                     </div>
                 </div>
 
