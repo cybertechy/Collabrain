@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import CloseIcon from '@mui/icons-material/Close';
-
+import UploadButton from "../button/uploadButton";
 const TeamOverlay = ({ toggleModal, modalVisible }) => {
 
   // const [modalVisible, setModalVisible] = useState(true); // Set to false initially
@@ -83,8 +83,8 @@ const CreateTeamOverlay = ({ switchToHome }) => {
         <p className="text-4xl font-light text-basicallydark">Customize your team</p>
           <p className="text-xl mb-2 text-basicallydark font-light">Give your team a nice snazzy name and an icon.</p>
           <div className="relative text-center my-8"> {/* Adjusted margin and upload button position */}
-            <img className='h-24' src={'/assets/images/upload_icon.png'} alt='Upload Icon'/>
-            <p className="text-primary text-xs absolute inset-0 mt-10 mr-2 flex items-center justify-center">UPLOAD</p>
+            
+           <UploadButton/>
           </div>
           <div className="w-full">
             <label htmlFor="team-name" className="block pb-2 font-light text-basicallydark">Team Name</label>

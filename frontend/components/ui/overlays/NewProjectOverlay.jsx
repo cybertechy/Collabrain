@@ -4,7 +4,31 @@ const { useRouter } = require("next/navigation");
 import fb from '../../../app/_firebase/firebase';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+const ContentMapBackground = () => (
+	<svg
+    className="absolute top-0 right-8 w-full h-full"
+    width="100%"
+    height="100%"
+    viewBox="0 0 597 519"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+<line x1="196.083" y1="462.442" x2="105.083" y2="397.061" stroke="#30475E" stroke-width="10"/>
+<circle cx="217.5" cy="481.5" r="37.5" fill="#81C3D7"/>
+<line x1="47.8544" y1="237.802" x2="85.8544" y2="391.802" stroke="#30475E" stroke-width="10"/>
+<circle cx="98" cy="393" r="55" fill="#81C3D7"/>
 
+
+<line x1="570.711" y1="82.7658" x2="491.711" y2="13.7658" stroke="#30475E" stroke-width="10"/>
+<line x1="367.189" y1="35.0663" x2="488.819" y2="15.0663" stroke="#30475E" stroke-width="10"/>
+<line x1="334.372" y1="28.4408" x2="242.372" y2="-68.5592" stroke="#30475E" stroke-width="10"/>
+<circle cx="48" cy="236" r="25" fill="#81C3D7"/>
+<circle cx="486" cy="6" r="25" fill="#81C3D7"/>
+<circle cx="572" cy="79" r="25" fill="#81C3D7"/>
+<circle cx="346.5" cy="39.5" r="31.5" fill="#81C3D7"/>
+</svg>
+
+  );
 const NewProjectOverlay = ({ toggleModal, modalVisible }) =>
 {
 	const [currentScreen, setCurrentScreen] = useState("contentMap");
@@ -73,16 +97,22 @@ const ContentMapOverlay = ({ setOpenModal, switchToDocument }) =>
 	return (
 		<>
 			<div className="w-screen h-screen flex items-center justify-center">
+				
 				<div className="w-2/4 h-3/5 shadow-lg bg-basicallylight rounded-md ">
-					<div className="bg-[url('/assets/images/bgDesign.png')] w-full h-full bg-contain bg-no-repeat bg-left">
+				
+					<div className="w-full h-full bg-contain bg-no-repeat bg-left">
+					
 						<div className="flex justify-end">
+						
 							<button className=' bg-transparent border-none text-25 cursor-pointer pr-2 pt-2' onClick={setOpenModal}>
 								<CloseIcon fontSize="large" />
 							</button>
 						</div>
+						
 						<div className=" text-center mt-24 flex justify-center">
 							<p className='text-2xl block text-center font-light'>Choose the type of project you would like to create</p>
 						</div>
+						<ContentMapBackground />
 						<div className=" h-32 mt-30 justify-center grid grid-rows-2 gap-10">
 
 							<button className="flex mt-11 mr-10 w-56 h-16 text-basicallylight font-normal rounded text-lg  dark:bg-primary dark:hover:bg-primary">
