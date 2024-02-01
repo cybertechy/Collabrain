@@ -108,6 +108,50 @@ const DashboardFolder = ({ title, folder, onClick  ,onFolderDeleted}) => {
             }
         
     };
+    const moveFileToFolder = async (projectId, folderPath, type) => {
+        console.log(projectId, folderPath, type);
+        try {
+          const token = await fb.getToken(); // Assuming you have a function to get the user's token
+          const response = await axios.patch(
+            `http://localhost:8080/api/dashboard/moveFile/${projectId}`, // Adjust the endpoint URL
+            {
+              to: folderPath+"/", // Specify the folder path you want to move the file to
+              fileType: type, // Specify the file type ('contentMap' or 'document')
+            
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          if (response.status === 200) {
+            // File moved successfully, you can update your UI here if needed
+            console.log('File moved successfully');
+          } else {
+            // Handle the case where the request was not successful
+            console.error('Failed to move file');
+          }
+        } catch (error) {
+          // Handle any errors that occur during the request
+          console.error('Error moving file:', error);
+        }
+      };
+      
+    const handleDragOver = (e) => {
+        e.preventDefault();
+      };
+      
+      const handleDrop = (e, folderPath) => {
+        e.preventDefault();
+        const projectId = e.dataTransfer.getData("projectId");
+        const type = e.dataTransfer.getData("type") === "Content Map" ? "contentMap": "documents";
+      
+
+        moveFileToFolder(projectId, folderPath, type);
+        // Now you have the projectId and folderId, you can handle the move action.
+        // Call your method to move the file to the folder here.
+      };
     const dialogStyles = {
         color: "#30475E",  // Text color
         borderColor: "#30475E",  // Border color
@@ -120,7 +164,9 @@ const DashboardFolder = ({ title, folder, onClick  ,onFolderDeleted}) => {
     return (
         <Tooltip title={title} enterDelay={1000} leaveDelay={200}>
             <>
-            <div className="bg-aliceBlue shadow-md  text-primary flex items-center justify-center rounded-md w-min pl-3 hover:bg-columbiablue hover:customShadow duration-300">
+            <div className="bg-aliceBlue shadow-md  text-primary flex items-center justify-center rounded-md w-min pl-3 hover:bg-columbiablue hover:customShadow duration-300"
+            onDragOver={(e) => handleDragOver(e)}
+            onDrop={(e) => handleDrop(e, folder.path)}>
                 <FolderIcon className='' fontSize="large" />
                 <span className='mx-5 w-24 text-lg font-semibold mr-10'>{truncateTitle(title)}</span>
                 <IconButton onClick={handleClick} color="inherit">

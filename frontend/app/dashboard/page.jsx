@@ -33,6 +33,7 @@ export default function Dashboard() {
     const [isFoldersLoading, setFoldersLoading] = useState(true);
     const [sortName, setSortName] = useState(false);
     const [sortDate, setSortDate] = useState(false);
+    const [isAscending, setIsAscending] = useState(true);
     const [isCreateFolderOverlayOpen, setIsCreateFolderOverlayOpen] = useState(false);
 
     const toggleCreateFolderOverlay = () => {
@@ -284,16 +285,23 @@ export default function Dashboard() {
         }
     }, [user, projectChanges]);
     const sortedContentMaps = [...contentMaps];
-    if (sortName) {
-        sortedContentMaps.sort((a, b) => {
-            // Sort by name
-            return a.name.localeCompare(b.name);
-        });
-    } else if (sortDate) {
-        sortedContentMaps.sort((a, b) => {
-            // Sort by date (assuming createdAt is a valid date string)
-            return new Date(b.createdAt) - new Date(a.createdAt);
-        });
+
+    if (sortName || sortDate) {
+      sortedContentMaps.sort((a, b) => {
+        // Sort by name
+        if (sortName) {
+          return isAscending ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
+        }
+        
+        // Sort by date (assuming createdAt is a valid date string)
+        if (sortDate) {
+          return isAscending
+            ? new Date(a.createdAt) - new Date(b.createdAt)
+            : new Date(b.createdAt) - new Date(a.createdAt);
+        }
+    
+         
+      });
     }
     useEffect(() => {
         if (user) { // Only proceed if the user is logged in
@@ -418,6 +426,8 @@ export default function Dashboard() {
     setSortName={setSortName}
     sortDate={sortDate}
     setSortDate={setSortDate}
+    isAscending={isAscending}
+    setIsAscending={setIsAscending}
 />
 
 

@@ -3,10 +3,9 @@ import { MoreVert, Info, ArrowCircleUp, ArrowCircleDown } from '@mui/icons-mater
 import DropdownDashboard from './dropdownDashboard';
 
 
-const DashboardInfoBar = ({ sortName, setSortName, sortDate, setSortDate }) => {
+const DashboardInfoBar = ({ sortName, setSortName, sortDate, setSortDate, isAscending, setIsAscending }) => {
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-    const [isAscending, setIsAscending] = useState(true); // Track the sorting order
-  
+   
     useEffect(() => {
       const handleResize = () => {
         setWindowWidth(window.innerWidth);
