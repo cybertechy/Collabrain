@@ -24,9 +24,9 @@ const params = useSearchParams();
 	const [userInfo, setUserInfo] = useState({data:{username: "User"}});
    const teamId = params.get('teamId');
 
-   const channelId = params.get('channelId');
+   const channelName = params.get('channelName');
 
-    console.log(params);
+   
     let sockCli = useRef(null);
     useEffect(() => {
         if (!user) return;
@@ -49,7 +49,7 @@ const params = useSearchParams();
         if (!user) return;
 
         fb.getToken().then((token) => {
-            axios.get(`http://localhost:8080/api/teams/${teamId}/channels/${channelId}/messages`, {
+            axios.get(`http://localhost:8080/api/teams/${teamId}/channels/${channelName}/messages`, {
                 headers: { "Authorization": "Bearer " + token }
             }).then((res) => {
                 console.log(res.data);
@@ -68,7 +68,7 @@ const params = useSearchParams();
                 console.log("Messages retrieved", msgs);
             }).catch((err) => console.log(err));
         });
-    }, [user, teamId, channelId]);
+    }, [user, teamId, channelName]);
 	useEffect(() => {
 		if (!user) return;
 	  

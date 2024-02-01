@@ -93,7 +93,8 @@ router.post("/", async (req, res) =>
 					ref.collection("messages").add({
 						message: "Welcome to General!",
 						sender: "System",
-						timestamp: new Date().getSeconds()
+						timestamp: new Date().getSeconds(),
+						sentAt: fb.admin.firestore.FieldValue.serverTimestamp()
 					});
 				});
 
@@ -630,7 +631,7 @@ router.get("/:team/channels/:channel/messages", async (req, res) =>
 		.where("name", "==", req.params.channel).get()).docs[0].id;
 
 	fb.db.collection(`teams/${req.params.team}/channels/${channelID}/messages`)
-		.orderBy("sentAt.seconds").limit(100).get()
+		.orderBy("sentAt").limit(100).get()
 		.then(snapshot =>
 		{
 			let messages = [];

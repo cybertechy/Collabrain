@@ -12,7 +12,7 @@ const TeamSidebarItem = ({ team, isSelected , isExpanded = true }) => {
     const generalChannelId = generalChannel ? generalChannel.channelId : '';
     return (
         <Tooltip title={name} enterDelay={1000} leaveDelay={200}>
-            <Link href = {`chat?teamId=${team.teamId}&channelId=${generalChannelId}`}>
+            <Link href = {`chat?teamId=${team.teamId}&channelName=${"General"}`}>
             <div className={`group flex items-center  my-2 transition-colors duration-200 cursor-pointer ${isExpanded ? "hover:bg-gray-200" : ""} ${isSelected ? "bg-gray-200 rounded-lg" : ""}`}>
                 <img
                     src={defaultImage}
