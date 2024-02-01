@@ -11,16 +11,17 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit'; 
 import fb from '../../../app/_firebase/firebase';
 import axios from 'axios';
-const DashboardFolder = ({ title, folder, onClick  ,onFolderDeleted}) => {
+import {useRouter} from 'next/navigation';
+const DashboardFolder = ({ title, folder,  onFolderDeleted}) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
-   
+   const router = useRouter();
     const [renameOverlayOpen, setRenameOverlayOpen] = useState(false); // State for renaming overlay
     const [deleteOverlayOpen, setDeleteOverlayOpen] = useState(false); // State for delete confirmation overlay
     const [newFolderName, setNewFolderName] = useState(''); // State to store the new folder name
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
-
+    const path = folder?.path;
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
@@ -35,7 +36,7 @@ const DashboardFolder = ({ title, folder, onClick  ,onFolderDeleted}) => {
         }
         return title;
     };
-
+    
     //this will only work once there is a patch api endpoint to update the folder name
     const handleRename = async () => {
         handleClose(); // Close the menu
@@ -138,7 +139,11 @@ const DashboardFolder = ({ title, folder, onClick  ,onFolderDeleted}) => {
           console.error('Error moving file:', error);
         }
       };
-      
+     const handleDoubleClick = (e) => {
+        e.preventDefault();
+
+        router.push(`/dashboard?path=${path}`);
+      };
     const handleDragOver = (e) => {
         e.preventDefault();
       };
@@ -166,6 +171,7 @@ const DashboardFolder = ({ title, folder, onClick  ,onFolderDeleted}) => {
         <Tooltip title={title} enterDelay={1000} leaveDelay={200}>
             <>
             <div className="bg-aliceBlue shadow-md  text-primary flex items-center justify-center rounded-md w-min pl-3 hover:bg-columbiablue hover:customShadow duration-300"
+            onDoubleClick={(e) => handleDoubleClick(e)}
             onDragOver={(e) => handleDragOver(e)}
             onDrop={(e) => handleDrop(e, folder.path)}>
                 <FolderIcon className='' fontSize="large" />
@@ -243,7 +249,7 @@ const DashboardFolder = ({ title, folder, onClick  ,onFolderDeleted}) => {
 DashboardFolder.propTypes = {
     title: PropTypes.string.isRequired,
     folder: PropTypes.object.isRequired,
-    onClick: PropTypes.func.isRequired,
+   
 };
 
 export default DashboardFolder;

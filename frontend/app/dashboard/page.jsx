@@ -1,7 +1,7 @@
 "use client";
 const fb = require("_firebase/firebase"); // Import the authentication functions
 const socket = require("_socket/socket");
-const { useRouter } = require("next/navigation");
+const { useRouter, useSearchParams } = require("next/navigation");
 const { useEffect, useState } = require("react");
 const axios = require("axios");
 import Sidebar from "../../components/ui/template/sidebar/sidebar";
@@ -22,7 +22,7 @@ export default function Dashboard() {
     const [isUsernameOverlayOpen, setIsUsernameOverlayOpen] = useState(true);
     const [user, loading] = fb.useAuthState();
     const [folders, setFolders] = useState([]);
-    const [Projects, setProjects] = useState([]);
+    const [projects, setProjects] = useState([]);
     const [newFolderAdded, setNewFolderAdded] = useState(false); // State to track if a new folder has been added
     const [contextMenuVisible, setContextMenuVisible] = useState(false);
     const [teams, setTeams] = useState([]);
@@ -31,11 +31,13 @@ export default function Dashboard() {
     const [contentMaps, setContentMaps] = useState([]);
     const [isContentMapsLoading, setContentMapsLoading] = useState(true);
     const [isFoldersLoading, setFoldersLoading] = useState(true);
+    const [isProjectsLoading, setProjectsLoading] = useState(true);
     const [sortName, setSortName] = useState(false);
     const [sortDate, setSortDate] = useState(false);
     const [isAscending, setIsAscending] = useState(true);
     const [isCreateFolderOverlayOpen, setIsCreateFolderOverlayOpen] = useState(false);
-
+    const searchParams = useSearchParams();
+    const path = searchParams.get("path") || "/";
     const toggleCreateFolderOverlay = () => {
         setIsCreateFolderOverlayOpen(!isCreateFolderOverlayOpen);
     };
@@ -190,7 +192,53 @@ export default function Dashboard() {
         }
     }, [user]);
 
-  
+    useEffect(() => {
+        if (user) { // Check if user is logged in
+            const fetchProjects = () => {
+                new Promise((resolve, reject) => {
+                    const token = fb.getToken(); // Synchronously get the token
+                    if (token) {
+                        resolve(token);
+                    } else {
+                        reject("No token found");
+                    }
+                })
+                .then(token => {
+                    console.log(token);
+                    return axios.get("http://localhost:8080/api/dashboard/files", {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                        params: {
+                            path: path, // Pass the 'path' query parameter
+                        },
+                    });
+                })
+                .then(response => {
+                    if (response.status === 200) {
+                        setProjects(response.data.files); // Update the projects state
+                        console.log("Projects Fetched:", response.data.files);
+                    } else {
+                        console.error("Failed to fetch projects data", response.status);
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching projects data:", error);
+                })
+                .finally(() => {
+                    // Update loading status if needed
+                    setContentMapsLoading(false);
+                    setProjectsLoading(false);
+                });
+            };
+    
+            fetchProjects();
+            console.log("Fetching projects...");
+        } else {
+            console.log("User not logged in, skipping fetch");
+        }
+    }, [user, path, projectChanges]);
+    
     // const fetchTeams = async () => {
     //     try {
     //         const token = await fb.getToken();
@@ -243,47 +291,47 @@ export default function Dashboard() {
     //     }
     // }, [user]);
 
-    useEffect(() => {
-        if (user) { // Check if user is logged in
-            const fetchContentMaps = () => {
-                new Promise((resolve, reject) => {
-                    const token = fb.getToken(); // Synchronously get the token
-                    if (token) {
-                        resolve(token);
-                    } else {
-                        reject("No token found");
-                    }
-                })
-                .then(token => {
-                    console.log(token);
-                    return axios.get("http://localhost:8080/api/maps", {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    });
-                })
-                .then(response => {
-                    if (response.status === 200) {
-                        setContentMaps(response.data);
-                        console.log("Content Maps Fetched:", response.data);
-                    } else {
-                        console.error("Failed to fetch content maps data", response.status);
-                    }
-                })
-                .catch(error => {
-                    console.error("Error fetching content maps data:", error);
-                })
-                .finally(() => {
-                    setContentMapsLoading(false); // Update loading status
-                });
-            };
+    // useEffect(() => {
+    //     if (user) { // Check if user is logged in
+    //         const fetchContentMaps = () => {
+    //             new Promise((resolve, reject) => {
+    //                 const token = fb.getToken(); // Synchronously get the token
+    //                 if (token) {
+    //                     resolve(token);
+    //                 } else {
+    //                     reject("No token found");
+    //                 }
+    //             })
+    //             .then(token => {
+    //                 console.log(token);
+    //                 return axios.get("http://localhost:8080/api/maps", {
+    //                     headers: {
+    //                         Authorization: `Bearer ${token}`,
+    //                     },
+    //                 });
+    //             })
+    //             .then(response => {
+    //                 if (response.status === 200) {
+    //                     setContentMaps(response.data);
+    //                     console.log("Content Maps Fetched:", response.data);
+    //                 } else {
+    //                     console.error("Failed to fetch content maps data", response.status);
+    //                 }
+    //             })
+    //             .catch(error => {
+    //                 console.error("Error fetching content maps data:", error);
+    //             })
+    //             .finally(() => {
+    //                 setContentMapsLoading(false); // Update loading status
+    //             });
+    //         };
     
-            fetchContentMaps();
-            console.log("Fetching content maps...");
-        } else {
-            console.log("User not logged in, skipping fetch");
-        }
-    }, [user, projectChanges]);
+    //         fetchContentMaps();
+    //         console.log("Fetching content maps...");
+    //     } else {
+    //         console.log("User not logged in, skipping fetch");
+    //     }
+    // }, [user, projectChanges]);
     const sortedContentMaps = [...contentMaps];
 
     if (sortName || sortDate) {
@@ -326,6 +374,7 @@ export default function Dashboard() {
                 .then(response => {
                     if (response.status === 200) {
                         setFolders(response.data.folders);
+                        console.log("Folders Fetched:", response.data.folders);
                     } else {
                         console.error("Failed to fetch folders data", response.status);
                     }
@@ -358,7 +407,7 @@ export default function Dashboard() {
             <div className={``}>
                 <div className="flex flex-col items-center justify-center min-h-screen">
                     <h1 className="text-xl font-bold mb-5 text-primary">
-                        {isContentMapsLoading? "Loading Projects":" Trying to sign in"}
+                        {" Trying to sign in"}
                     </h1>
                     <div className="loader mb-5"></div>
 
@@ -422,12 +471,14 @@ export default function Dashboard() {
  
 
 <DashboardInfoBar
+    currentPath = {searchParams.get("path") ?  "My Brain" + searchParams.get("path") : "My Brain"}
     sortName={sortName}
     setSortName={setSortName}
     sortDate={sortDate}
     setSortDate={setSortDate}
     isAscending={isAscending}
     setIsAscending={setIsAscending}
+
 />
 
 
@@ -446,12 +497,12 @@ export default function Dashboard() {
                     menuOptions={contextMenuOptions}
                 />
 
-                <div>
+{path==="/" ?  <div>
                     <p className="text-2xl text-left text-primary ml-4 mb-4">
                         Folders
                     </p>
 
-                    <div className="flex flex-wrap content-start items-start w-full justify-start ml-4 gap-8 ">
+                  <div className="flex flex-wrap content-start items-start w-full justify-start ml-4 gap-8 ">
                     {isFoldersLoading ? (
         <div className="loader mb-5">Loading...</div> // Adjust loader class as needed
     ) : folders.length > 0 ? (
@@ -461,7 +512,7 @@ export default function Dashboard() {
                 id={folder?.id}
                 title={folder?.name}
                 folder={folder}
-                onClick={() => {}}
+                
                 onFolderDeleted={handleFolderDeleted}
             />
         ))
@@ -469,7 +520,7 @@ export default function Dashboard() {
     }
                         <DashboardNewFolder onNewFolderCreated={addNewFolder}/>
                     </div>
-                </div>
+                </div>:null}
                 <div>
                     <p className="text-2xl text-left text-primary ml-4 mb-4 mt-5">
                         Projects
@@ -481,25 +532,25 @@ export default function Dashboard() {
                         <div className="flex flex-wrap gap-y-4 ml-4 justify-start">
                             {console.log("Content Maps:", contentMaps)}
                             
-                            {isContentMapsLoading ? (
-                <div className="loader mb-5">Loading...</div> // Adjust loader class as needed
-            ) : sortedContentMaps.length > 0 ? (
-                sortedContentMaps.map((contentMap) => (
+                            {isProjectsLoading ? (
+                <div className="loader mb-5">Loading...</div>
+                ) : projects.length > 0 ? (
+                    projects.map((project) => (
                     <DashboardProjectButton
-                        id={contentMap?.id}
-                        key={contentMap?.id}
-                        title={contentMap?.name}
-                        createdAt={contentMap?.createdAt}
-                        updatedAt={contentMap?.updatedAt}
-                        project={contentMap}
-                        type="Content Map"
+                        id={project?.id}
+                        key={project?.id}
+                        title={project?.name}
+                        createdAt={project?.createdAt}
+                        updatedAt={project?.updatedAt}
+                        project={project}
+                        type={project?.type == "contentmap" ? "Content Map": "Document"}
                         renamedProject={renamedProject}
                         handleProjectDeleted={handleProjectDeleted} // Pass the function
                         onClick={() => {}}
                     />
                 ))
             ) : (
-                <div>You have no content maps</div>
+                <div className = "text-primary font-poppins text-xl italic">Right click to make your first project!</div>
             )}
                         </div>
                     </div>
