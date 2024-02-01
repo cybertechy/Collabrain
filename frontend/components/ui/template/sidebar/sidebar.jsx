@@ -21,20 +21,23 @@ import TeamSidebarItem from "./sidebarSubComponents/sidebarTeamButton"
 // Define the sidebar navigation items
 import { usePathname } from "next/navigation";
 import NewProjectOverlay from "../../overlays/NewProjectOverlay";
+import axios from "axios";
 const navigationItems1 = [
     { name: "My Brain", href: "/dashboard", icon: FolderIcon },
     { name: "Shared With Me", href: "/shared-with-me", icon: PeopleIcon },
     
 ];
-const groups = [
-    { name: 'Team Alpha',   imageUrl: '/path/to/image1.jpg', href: "/chat" },
-    { name: 'Team Beta',    imageUrl: '/path/to/image2.jpg'}, 
-    { name: 'Team Gamma',   imageUrl: '/path/to/image3.jpg'} ,
-    { name: 'Team Delta',   imageUrl: '/path/to/image4.jpg'},
-    { name: 'Team Epsilon', imageUrl: '/path/to/image5.jpg'},  
 
-    // Add more teams or use real data from your state
-];
+
+// const groups = [
+//     { name: 'Team Alpha',   imageUrl: '/path/to/image1.jpg', href: "/chat" },
+//     { name: 'Team Beta',    imageUrl: '/path/to/image2.jpg'}, 
+//     { name: 'Team Gamma',   imageUrl: '/path/to/image3.jpg'} ,
+//     { name: 'Team Delta',   imageUrl: '/path/to/image4.jpg'},
+//     { name: 'Team Epsilon', imageUrl: '/path/to/image5.jpg'},  
+
+//     // Add more teams or use real data from your state
+// ];
 
 const navigationItems2 = [
     { name: "Direct Messages", href: "/messages", icon: ForumIcon },
@@ -65,7 +68,64 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
 
     const pathname = usePathname(); 
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+    const [userTeams, setUserTeams] = useState(null);
     
+    useEffect(() => {
+        const fetchUserTeams = async () => {
+            try {
+                // Make a GET request to retrieve user's team IDs
+                const token = await fb.getToken();
+                const response = await axios.get('http://localhost:8080/api/teams', {
+                    headers: {
+                        Authorization: `Bearer ${token}`, // Replace with the actual auth token
+                    },
+                });
+    
+                // Check if the request was successful
+                if (response.status === 200) {
+                    const teamIds = response.data;
+    
+                    // Create an array of promises to fetch team information
+                    const teamPromises = teamIds.map(async (teamId) => {
+                        const teamResponse = await axios.get(`http://localhost:8080/api/teams/${teamId}`, {
+                            headers: {
+                                Authorization: `Bearer ${token}`, // Replace with the actual auth token
+                            },
+                        });
+    
+                        // Check if the request for team information was successful
+                        if (teamResponse.status === 200) {
+                            return teamResponse.data;
+                        } else {
+                            console.error('Failed to fetch team information:', teamResponse.statusText);
+                            return null;
+                        }
+                    });
+    
+                    // Use Promise.all to wait for all promises to resolve
+                    const teamsData = await Promise.all(teamPromises);
+    
+                    // Filter out any null values (failed requests)
+                    const filteredTeamsData = teamsData.filter((teamInfo) => teamInfo !== null);
+    
+                    // Update the userTeams state with the array of team information
+                    setUserTeams(filteredTeamsData);
+                    console.log(filteredTeamsData);
+                } else {
+                    throw new Error('Failed to fetch user teams');
+                }
+            } catch (error) {
+                console.error('Error fetching user teams:', error);
+                // You can handle errors and provide user feedback here
+            }
+        };
+    
+        // Call the function to fetch user teams when the component mounts
+        fetchUserTeams();
+    }, []);
+    
+     // Empty dependency array to run the effect only once
+
     useEffect(() => {
         const handleResize = () => {
             setWindowWidth(window.innerWidth);
@@ -227,9 +287,9 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
                         isExpanded={isOpen}
                     />
                       <div className={`max-h-48 scrollbar-thin scrollbar-thumb-primary ${isOpen ? "overflow-y-scroll overflow-x-hidden" : "overflow-hidden"}`}>
-    {groups.map((team, index) => (
+    {userTeams ? userTeams?.map((team, index) => (
         <TeamSidebarItem key={index} team={team} isExpanded={isOpen}  isSelected={pathname === team.href} />
-    ))}
+    )):null}
 </div>
 
                 </nav>

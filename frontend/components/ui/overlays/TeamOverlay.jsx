@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import CloseIcon from '@mui/icons-material/Close';
 import UploadButton from "../button/uploadButton";
+import axios from "axios";
+import fb from "../../../app/_firebase/firebase";
+import { FileVideo } from "lucide-react";
+
 const TeamOverlay = ({ toggleModal, modalVisible }) => {
 
   // const [modalVisible, setModalVisible] = useState(true); // Set to false initially
@@ -72,7 +76,52 @@ const CreateJoinTeamScreen = ({ switchToCreateTeam, switchToJoinTeam , toggleMod
 
 
   
-const CreateTeamOverlay = ({ switchToHome }) => {
+const CreateTeamOverlay = ({ switchToHome , toggleModal}) => {
+  const [image, setImage] = useState(null);
+  const [teamName, setTeamName] = useState('');
+  const handleUpload = async (file) => {
+   
+};
+
+const handleCreateTeam = async () => {
+    try {
+        // Check if a team name is provided
+        if (!teamName.trim()) {
+            throw new Error('Team name cannot be empty');
+        }
+
+        // Call the function to create a team with the provided team name and image URL
+        // const imageUrl = await handleUpload(image); // Get the image URL from the image upload
+
+        // Define your team data with the team name and image URL
+        const teamData = {
+            name: teamName, // Use the team name entered by the user
+            // image: imageUrl, // Image URL received from image upload
+            visibility: 'public', // Replace with the actual visibility
+        };
+
+        const token = await fb.getToken();
+        // Make a POST request to create the team
+        const response = await axios.post('http://localhost:8080/api/teams', teamData, {
+            headers: {
+                Authorization: `Bearer ${token}`, // Replace with the actual auth token
+            },
+        });
+
+        // Check if the team creation was successful
+        if (response.status === 200) {
+            const teamId = response.data.teamID;
+            // Handle team creation success (e.g., navigate to the team page)
+            console.log('Team created with ID:', teamId);
+            toggleModal();
+        } else {
+            throw new Error('Team creation failed');
+        }
+    } catch (error) {
+        console.error('Error during team creation:', error);
+        // You can handle errors and provide user feedback here
+    }
+};
   return (
     <div className="w-screen h-screen  flex items-center justify-center">
     <div className="w-full md:w-3/4 lg:w-2/4 shadow-lg bg-basicallylight rounded-md flex flex-col" style={{ maxHeight: '60%' }}> {/* Responsive width */}
@@ -84,17 +133,17 @@ const CreateTeamOverlay = ({ switchToHome }) => {
           <p className="text-xl mb-2 text-basicallydark font-light">Give your team a nice snazzy name and an icon.</p>
           <div className="relative text-center my-8"> {/* Adjusted margin and upload button position */}
             
-           <UploadButton/>
+           <UploadButton onUpload = {handleUpload} />
           </div>
           <div className="w-full">
             <label htmlFor="team-name" className="block pb-2 font-light text-basicallydark">Team Name</label>
-            <input id="team-name" className="bg-gray-200 w-full h-16 px-4 mb-4" type='text' placeholder="Enter team name"/> {/* Increased height */}
+            <input id="team-name" className="bg-gray-200 w-full h-16 px-4 mb-4" type='text' placeholder="Enter team name" onChange={(e) => setTeamName(e.target.value)}/> {/* Increased height */}
           </div>
           <p className="text-xs font-light mb-8 text-basicallydark text-poppins">By creating a team, you agree to Collabrain's <b>Community Guidelines*</b></p> {/* Adjusted margin */}
         </div>
         <div className="bg-secondary p-6 w-full flex justify-between items-center"> {/* Adjusted padding and flex layout */}
           <button className="text-gray-500 text-lg" onClick={switchToHome}>Back</button>
-          <button className="w-24 h-12 focus:outline-none text-basicallylight bg-primary hover:bg-tertiary focus:ring-4 focus:ring-secondary rounded-md text-lg dark:bg-primary dark:hover:bg-primary dark:focus:ring-primary">Create</button>
+          <button  onClick={handleCreateTeam} className="w-24 h-12 focus:outline-none text-basicallylight bg-primary hover:bg-tertiary focus:ring-4 focus:ring-secondary rounded-md text-lg dark:bg-primary dark:hover:bg-primary dark:focus:ring-primary">Create</button>
         </div>
       </div>
     </div>
