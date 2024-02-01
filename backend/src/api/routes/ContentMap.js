@@ -8,6 +8,7 @@ const router = Router();
 
 
 /* Create a New content map */
+// @RequestBody: { name: string, data: any, path: string }
 router.post("/", async (req, res) => {
    
     if(!req.headers.authorization || !req.body.name) return res.status(400).json({ code: 400, error: "Missing token or name" });
@@ -47,7 +48,8 @@ router.post("/", async (req, res) => {
         data: DataId,
         createdAt: fb.admin.firestore.FieldValue.serverTimestamp(),
         updatedAt: fb.admin.firestore.FieldValue.serverTimestamp(),
-        Access: { [user.uid]: { role: "owner", email: user.email, name: user.name, type: "users" } }
+        Access: { [user.uid]: { role: "owner", email: user.email, name: user.name, type: "users" } },
+        path: (req.body.path) ? req.body.path : "/"
     }
 
     const contentMapRef = await contentMapsRef.add(contentMap);
@@ -181,6 +183,7 @@ router.put("/:id", async (req, res) => {
 
         if(req.body.name) updatedContentMap.name = req.body.name;
         if(req.body.access) updatedContentMap.Access = req.body.access;
+        if(req.body.path) updatedContentMap.path = req.body.path;
     }
 
     updatedContentMap.updatedAt = fb.admin.firestore.FieldValue.serverTimestamp();
