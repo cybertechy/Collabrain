@@ -28,7 +28,7 @@ const SearchBar = ({ onSearch }) => {
           borderColor: '#30475E',
         },
         '&:hover fieldset': {
-          borderColor: '#7f22ff',
+          borderColor: '#81c3d7',
         },
       },
       '.MuiInputAdornment-root': {

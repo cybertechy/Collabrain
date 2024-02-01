@@ -115,7 +115,7 @@ const DashboardFolder = ({ title, folder, onClick  ,onFolderDeleted}) => {
           const response = await axios.patch(
             `http://localhost:8080/api/dashboard/moveFile/${projectId}`, // Adjust the endpoint URL
             {
-              to: folderPath+"/", // Specify the folder path you want to move the file to
+              to: folderPath, // Specify the folder path you want to move the file to
               fileType: type, // Specify the file type ('contentMap' or 'document')
             
             },
@@ -127,6 +127,7 @@ const DashboardFolder = ({ title, folder, onClick  ,onFolderDeleted}) => {
           );
           if (response.status === 200) {
             // File moved successfully, you can update your UI here if needed
+            onFolderDeleted(response.data.folder);
             console.log('File moved successfully');
           } else {
             // Handle the case where the request was not successful

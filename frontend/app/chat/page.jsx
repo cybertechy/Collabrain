@@ -8,23 +8,30 @@ import { Timestamp } from "firebase/firestore";
 import ChannelBar from "../../components/ui/chatsComponents/channelBar";
 import MessageItem from "./messageItem";
 import Template from "../../components/ui/template/template";
-const { useRouter } = require('next/navigation');
+const { useRouter , useSearchParams} = require('next/navigation');
 const axios = require("axios");
 const fb = require("_firebase/firebase");
 const socket = require("_socket/socket");
 import ShortTextIcon from '@mui/icons-material/ShortText'; // This can act as a hash
 
-
 export default function ChatRoom() {
-    const router = useRouter();
+   
+const router = useRouter();
+const params = useSearchParams();
     const [user, loading] = fb.useAuthState();
+    const [teamData, setTeamData] = useState({}); // This is the team name that will be displayed on the top of the chat
 	const [channelsData, setChannelsData] = useState([]);
 	const [userInfo, setUserInfo] = useState({data:{username: "User"}});
+   const teamId = params.get('teamId');
+
+   const channelId = params.get('channelId');
+
+    console.log(params);
     let sockCli = useRef(null);
     useEffect(() => {
         if (!user) return;
 
-        sockCli.current = socket.init('http://localhost:8080');
+        sockCli.current = socket.init('http://localhost:8080') || {};
         sockCli.current.on('teamMsg', (data) => {
             console.log("Received message from server");
             setText((prevText) => [
@@ -36,26 +43,13 @@ export default function ChatRoom() {
         return () => sockCli.current.off('teamMsg');
     }, [user]);
 
-	useEffect(() => {
-        const fetchChannels =  () => {
-            // Placeholder function to fetch channels data
-            // Replace this with actual API call and set the state
-            setChannelsData([
-                { name: 'Everything', channels: ['General', 'Random', 'Updates', 'Launch'] },
-                
-            ]);
-        };
-
-        if (user) {
-            fetchChannels();
-        }
-    }, [user]);
+	
 
     useEffect(() => {
         if (!user) return;
 
         fb.getToken().then((token) => {
-            axios.get(`http://localhost:8080/api/team/LoH1iHOGowBzcYDXEqnu/channel/General/messages`, {
+            axios.get(`http://localhost:8080/api/teams/${teamId}/channels/${channelId}/messages`, {
                 headers: { "Authorization": "Bearer " + token }
             }).then((res) => {
                 console.log(res.data);
@@ -71,9 +65,10 @@ export default function ChatRoom() {
                     />
                 ));
                 setText(msgs);
+                console.log("Messages retrieved", msgs);
             }).catch((err) => console.log(err));
         });
-    }, [user]);
+    }, [user, teamId, channelId]);
 	useEffect(() => {
 		if (!user) return;
 	  
@@ -94,7 +89,44 @@ export default function ChatRoom() {
 	  
 		fetchUser();
 	  }, [user]);
-	  
+      useEffect(() => {
+        const fetchTeamInformation = async (teamId) => {
+            try {
+                // Make a GET request to retrieve information for the specified team
+                const token = await fb.getToken();
+                const response = await axios.get(`http://localhost:8080/api/teams/${teamId}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`, // Replace with the actual auth token
+                    },
+                });
+    
+                // Check if the request was successful
+                if (response.status === 200) {
+                    const teamData = {
+                        teamId,
+                        ...response.data
+                    };
+    
+                    // Update the userTeams state with the team information
+                    setTeamData(teamData);
+                    console.log("Team data:",teamData);
+                } else {
+                    console.error('Failed to fetch team information:', response.statusText);
+                    // Handle the error and provide user feedback here
+                }
+            } catch (error) {
+                console.error('Error fetching team information:', error);
+                // Handle errors and provide user feedback here
+            }
+        };
+    
+      
+    
+        // Call the function to fetch team information when the component mounts
+        fetchTeamInformation(teamId);
+    }, [user]);
+    
+    
     const [text, setText] = useState([]);
 	const sendTeamMsg = async (msg) =>
 	{
@@ -160,7 +192,8 @@ export default function ChatRoom() {
 			{/* <Sidebar /> */}
 			<ChannelBar
                 user={userInfo}
-                channelsData={channelsData} // Pass the state variable directly
+                userUID={user.uid}
+                teamData = {teamData}
             />
 			<div className="flex flex-col flex-grow relative">
                     <div className="flex items-center justify-between bg-gray-100 w-full mb-3 h-min">

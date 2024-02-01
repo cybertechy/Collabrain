@@ -79,8 +79,9 @@ const DashboardProjectButton = ({ title, project, type, color = "#FFFFFF", onCli
             }
         })
         .then(function (response) {
-            console.log('Content Map deleted successfully');
-            deleteContentMap(response.data);
+            console.log('Content Map deleted successfully', response);
+            handleProjectDeleted(response.data);
+            
         })
         .catch(function (error) {
             console.error('Error deleting content map:', error);

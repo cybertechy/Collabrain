@@ -39,7 +39,8 @@ const TopBar = ({ activeTab, onTabChange }) => {
           bgcolor: '#30475E', // Tailwind primary color
           color: '#FFFFFF',
           '&:hover': {
-            bgcolor: '#7f22ff', // A slightly darker shade for hover effect
+            bgcolor: '#81c3d7',
+            color: '#30475E' // A slightly darker shade for hover effect
           },
         }}
       >

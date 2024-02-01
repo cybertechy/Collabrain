@@ -4,14 +4,15 @@ import { Tooltip } from '@mui/material';
 import Link from 'next/link';
 
 const TeamSidebarItem = ({ team, isSelected , isExpanded = true }) => {
-    const { name, imageUrl } = team;
+    const { name, imageUrl , channels} = team;
     const itemClasses = isSelected ? "text-primary" : "text-unselected";
     const defaultImage = '/assets/images/imagenotFound.jpg';
     const selectedBorder = isSelected ? "border-primary border-2 border-solid" : "group-hover:border-primary group-hover:border-2";
-
+    const generalChannel = channels.find(channel => channel.name === 'General');
+    const generalChannelId = generalChannel ? generalChannel.channelId : '';
     return (
         <Tooltip title={name} enterDelay={1000} leaveDelay={200}>
-            <Link href = "/chat">
+            <Link href = {`chat?teamId=${team.teamId}&channelId=${generalChannelId}`}>
             <div className={`group flex items-center  my-2 transition-colors duration-200 cursor-pointer ${isExpanded ? "hover:bg-gray-200" : ""} ${isSelected ? "bg-gray-200 rounded-lg" : ""}`}>
                 <img
                     src={defaultImage}

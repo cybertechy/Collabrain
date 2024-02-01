@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import AddChannelButton from './addChannelButton';
-import ChannelCategories from './channelCategories';
+import ChannelButton from './channelButton';
 import ProfileBox from './profileBox';
 import TeamChannelOptionsMenu from './teamChannelOptionsMenu';
-
-const ChannelBar = ({ user, channelsData }) => {
+import { useRouter } from 'next/navigation';
+const ChannelBar = ({ user,  teamData,  userUID }) => {
   // State and handlers for channel categories
   console.log(user);
 
@@ -39,17 +39,17 @@ const ChannelBar = ({ user, channelsData }) => {
   return (
     <div className="flex flex-col h-full w-1/6  bg-neutral-50 shadow-2xl">
       <div className="flex flex-col">
-        <TeamChannelOptionsMenu teamName = {"Team Alpha"} onOptionSelect={handleTeamOptionSelect} />
+        <TeamChannelOptionsMenu teamName = {teamData.name} onOptionSelect={handleTeamOptionSelect} isOwner = {teamData.owner === userUID} />
       </div>
       <div className="flex-grow">
-      {channelsData.map((category, index) => (
-          <ChannelCategories
-            key={index}
-            categoryName={category.name}
-            channels={category.channels}
+
+
+          <ChannelButton
+            
+            channels={teamData.channels}
             onChannelSelect={handleChannelSelect}
           />
-        ))}
+        
         <AddChannelButton onAddChannel={handleAddChannel} />
       </div>
       <div className="flex">

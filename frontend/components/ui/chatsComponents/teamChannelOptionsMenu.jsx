@@ -7,8 +7,9 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import DeleteIcon from '@mui/icons-material/Delete';
 
-const TeamChannelOptionsMenu = ({ teamName, onOptionSelect }) => {
+const TeamChannelOptionsMenu = ({ teamName, onOptionSelect, isOwner }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
 
@@ -66,12 +67,20 @@ const TeamChannelOptionsMenu = ({ teamName, onOptionSelect }) => {
                     </ListItemIcon>
                     <span className='text-primary'>Team Settings</span>  
                 </MenuItem>
-                <MenuItem onClick={() => handleClose('leave')}>
-                    <ListItemIcon>
-                        <ExitToAppIcon style={{ color: '#30475E' }} />
-                    </ListItemIcon>
-                    <span className='text-primary'>Leave Team</span> 
-                </MenuItem>
+                {isOwner ? (
+                    <MenuItem onClick={() => handleClose('delete')}>
+                        <ListItemIcon>
+                            <DeleteIcon style={{ color: '#30475E' }} />
+                        </ListItemIcon>
+                        <span className='text-primary'>Delete Team</span> 
+                    </MenuItem>
+                ) :  <MenuItem onClick={() => handleClose('leave')}>
+                <ListItemIcon>
+                    <ExitToAppIcon style={{ color: '#30475E' }} />
+                </ListItemIcon>
+                <span className='text-primary'>Leave Team</span> 
+            </MenuItem>}
+               
                 {/* You can add more options with icons here as needed */}
             </Menu>
         </div>

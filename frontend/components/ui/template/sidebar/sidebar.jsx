@@ -95,7 +95,11 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
     
                         // Check if the request for team information was successful
                         if (teamResponse.status === 200) {
-                            return teamResponse.data;
+                            // Merge teamId with the team data
+                            return {
+                                teamId,
+                                ...teamResponse.data
+                            };
                         } else {
                             console.error('Failed to fetch team information:', teamResponse.statusText);
                             return null;
@@ -123,6 +127,7 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
         // Call the function to fetch user teams when the component mounts
         fetchUserTeams();
     }, []);
+    
     
      // Empty dependency array to run the effect only once
 
@@ -288,7 +293,7 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
                     />
                       <div className={`max-h-48 scrollbar-thin scrollbar-thumb-primary ${isOpen ? "overflow-y-scroll overflow-x-hidden" : "overflow-hidden"}`}>
     {userTeams ? userTeams?.map((team, index) => (
-        <TeamSidebarItem key={index} team={team} isExpanded={isOpen}  isSelected={pathname === team.href} />
+        <TeamSidebarItem key={index} team={team} isExpanded={isOpen}  isSelected={pathname === `chat?teamId=${team.teamId}`} />
     )):null}
 </div>
 
