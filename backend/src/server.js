@@ -13,7 +13,8 @@ const teamsRoute = require("./api/routes/Teams");
 const userRoute = require("./api/routes/User");
 const dashboardRoute = require("./api/routes/Dashboard");
 const mapRoute = require("./api/routes/ContentMap");
-
+const reportReport = require("./api/routes/Report");
+const notificationsRoute = require("./api/routes/Notifications");
 // Helpers
 const sockServer = require("./api/helpers/socket");
 
@@ -38,6 +39,8 @@ app.use("/api/teams", teamsRoute);
 app.use("/api/users", userRoute);
 app.use("/api/dashboard", dashboardRoute);
 app.use("/api/maps", mapRoute);
+app.use("/api/reports", reportReport);
+app.use("/api/notifications", notificationsRoute);
 
 app.get("/api/home", (req, res) =>
 {

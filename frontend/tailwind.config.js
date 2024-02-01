@@ -6,26 +6,36 @@ module.exports = {
         "./components/**/*.{js,ts,jsx,tsx,mdx}",
         "./app/**/*.{js,ts,jsx,tsx,mdx}",
     ],
+    // darkMode: 'class',
     theme: {
         fontFamily: {
             poppins: ["Poppins", "sans-serif"],
         },
         extend: {
+            scrollbar: ['rounded'],
             height: {
                 '13': '3.25rem', // 52px if 1rem = 16px
               },
             boxShadow: {
-                custom: "7px 7px 18px 0 rgba(197, 138, 255, 1)",
+                custom: "0px 0px 9px 0 rgba(197, 138, 255, 1)",
             },
             borderRadius: {
                 custom: "4px", // Custom border-radius
             },
             colors: {
-                primary: "#972FFF",
-                secondary: "#EBD7FF",
-                tertiary: "#C58AFF",
+                primary: "#30475E",
+                secondary: "#81c3d7",
+                tertiary: "#222831",
                 unselected: "#9DA5AF",
                 kindagrey: "#F5F5F5",
+                foldergrey: "#F0F4F9",
+                kindablack: "#1f1f1f",
+                littlelessblack: "#5e5e5e",
+                basicallylight: "#FFFFFF",
+                basicallydark: "#000000",
+                aliceBlue: "#F0F5F9",
+                columbiablue: "#C9D6DF",
+                projectIconColor: "#f4b400",
             },
             backgroundImage: {
                 "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
@@ -34,5 +44,9 @@ module.exports = {
             },
         },
     },
-    plugins: [],
+    plugins: [
+       
+    require('tailwind-scrollbar')
+  
+    ],
 };

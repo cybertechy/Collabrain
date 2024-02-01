@@ -13,7 +13,7 @@ const theme = createTheme({
             styleOverrides: {
                 input: {
                     "&::placeholder": {
-                        color: "white", // Change placeholder color here
+                        color: "#30475E", // Change placeholder color here
                         opacity: 1, // Ensure full opacity
                     },
                 },
@@ -27,14 +27,14 @@ const theme = createTheme({
                         borderWidth: "1px", // Ensure hover/focus border is visible
                     },
                     "&:hover .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "white", // White border on hover
+                        borderColor: "#30475E", // #FFFFFF border on hover
                     },
                     "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                        borderColor: (props) => (props.error ? "red" : "white"), // Red border on focus when there's an error
+                        borderColor: (props) => (props.error ? "red" : "#30475E"), // Red border on focus when there's an error
                     },
                     "&.Mui-focused:not(:hover) .MuiOutlinedInput-notchedOutline":
                         {
-                            borderColor: "white", // White border on focus without hover
+                            borderColor: "#30475E", // #FFFFFF border on focus without hover
                         },
                 },
             },
@@ -46,6 +46,7 @@ const EmailInputField = ({ placeholder, color, email, setEmail }) => {
     const [error, setError] = useState(false);
     const backgroundColorClass = colorClasses[color] || colorClasses.primary;
 
+
     const handleChange = (event) => {
         const enteredEmail = event.target.value;
         setEmail(enteredEmail);
@@ -56,7 +57,7 @@ const EmailInputField = ({ placeholder, color, email, setEmail }) => {
     return (
         <ThemeProvider theme={theme}>
             <TextField
-                className={backgroundColorClass}
+                className={"bg-aliceBlue text-primary rounded-md"}
                 variant="outlined"
                 size="small"
                 fullWidth
@@ -65,18 +66,18 @@ const EmailInputField = ({ placeholder, color, email, setEmail }) => {
                 onChange={handleChange}
                 error={error}
                 helperText={error && "Invalid email address"}
-                InputLabelProps={{ style: { color: "white" } }}
+                InputLabelProps={{ style: { color: "#30475E" } }}
                 InputProps={{
                     style: {
-                        color: "white",
-                        padding: "10px 14px",
+                        color: "#30475E",
+                        padding: "10px",
                         "&:focusVisible": {
                             outline: "none",
                         },
                     },
                 }}
                 placeholder={placeholder}
-                sx={{ m: 1, width: "37ch" }}
+                sx={{ mb: 1 }}
             />
         </ThemeProvider>
     );

@@ -1,76 +1,133 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import InfoBar from "./infoBar";
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import MessageBox from "./messageBox";
-import Sidebar from "./sidebar";
 import Toolbar from '@mui/material/Toolbar';
 import { Timestamp } from "firebase/firestore";
-
-const { useRouter } = require('next/navigation');
+import ChannelBar from "../../components/ui/chatsComponents/channelBar";
+import MessageItem from "./messageItem";
+import Template from "../../components/ui/template/template";
+const { useRouter , useSearchParams} = require('next/navigation');
 const axios = require("axios");
-const fb = require("_firebase/firebase"); // Import the authentication functions
+const fb = require("_firebase/firebase");
 const socket = require("_socket/socket");
+import ShortTextIcon from '@mui/icons-material/ShortText'; // This can act as a hash
 
-export default function ChatRoom()
-{
-	const router = useRouter();
-	const [user, loading] = fb.useAuthState();
+export default function ChatRoom() {
+   
+const router = useRouter();
+const params = useSearchParams();
+    const [user, loading] = fb.useAuthState();
+    const [teamData, setTeamData] = useState({}); // This is the team name that will be displayed on the top of the chat
+	const [channelsData, setChannelsData] = useState([]);
+	const [userInfo, setUserInfo] = useState({data:{username: "User"}});
+   const teamId = params.get('teamId');
 
-	// Setup listener for new messages
-	// Only listen when on chat page
-	let sockCli = useRef(null);
-	useEffect(() =>
-	{
-		if (!user)
-			return;
+   const channelName = params.get('channelName');
 
-		sockCli.current = socket.init('http://localhost:8080');
-		sockCli.current.on('teamMsg', (data) =>
-		{
-			console.log("Received message from server");
-			setText((prevText) => [
-				...prevText,
-				<h1 key={prevText.length} className="text-white">{`${data.sender}: ${data.msg}`}</h1>,
-			]);
-		});
+   
+    let sockCli = useRef(null);
+    useEffect(() => {
+        if (!user) return;
 
-		return () => sockCli.current.off('teamMsg');
-	}, [user]);
+        sockCli.current = socket.init('http://localhost:8080') || {};
+        sockCli.current.on('teamMsg', (data) => {
+            console.log("Received message from server");
+            setText((prevText) => [
+                ...prevText,
+                <h1 key={prevText.length} className="text-basicallydark">{`${data.sender}: ${data.msg}`}</h1>,
+            ]);
+        });
 
-	// Get previous messages
-	useEffect(() =>
-	{
-		if (!user)
-			return;
+        return () => sockCli.current.off('teamMsg');
+    }, [user]);
 
-		fb.getToken().then((token) =>
-		{
-			// Get the messages from the server
-			axios.get(`http://localhost:8080/api/team/LoH1iHOGowBzcYDXEqnu/channel/General/messages`,
-				{ headers: { "Authorization": "Bearer " + token } })
-				.then((res) =>
-				{
-					console.log(res.data);
-					let data = res.data;
-					let msgs = [];
-					for (let i = 0; i < data.length; i++)
-					{
-						/**@type Date */
-						let msgDate = fb.fromFbTimestamp(new Timestamp(data[i].sentAt.seconds, data[i].sentAt.nanoseconds));
-						msgs.push(
-							<h1 key={i} className="text-white">
-								{`${data[i].sender}@${msgDate.toLocaleTimeString()}: ${data[i].message}`}
-							</h1>);
-					}
-					setText(msgs);
-				})
-				.catch((err) => console.log(err));
-		});
-	}, [user]);
+	
 
-	const [text, setText] = useState([]);
+    useEffect(() => {
+        if (!user) return;
 
+        fb.getToken().then((token) => {
+            axios.get(`http://localhost:8080/api/teams/${teamId}/channels/${channelName}/messages`, {
+                headers: { "Authorization": "Bearer " + token }
+            }).then((res) => {
+                console.log(res.data);
+                let data = res.data;
+                let msgs = data.map((messageData, i) => (
+                    <MessageItem
+                        key={i}
+                        sender={messageData.sender}
+                        timestamp={fb.fromFbTimestamp(new Timestamp(messageData.sentAt.seconds, messageData.sentAt.nanoseconds)).toLocaleTimeString()}
+                        message={messageData.message}
+                        reactions={{}}
+						userData = {userInfo.data}
+                    />
+                ));
+                setText(msgs);
+                console.log("Messages retrieved", msgs);
+            }).catch((err) => console.log(err));
+        });
+    }, [user, teamId, channelName]);
+	useEffect(() => {
+		if (!user) return;
+	  
+		const fetchUser = async () => {
+		  try {
+			const token = await fb.getToken();
+			const response = await axios.get(`http://localhost:8080/api/users/${user.uid}`, {
+			  headers: { "Authorization": "Bearer " + token }
+			});
+			// Set user info with the data obtained from the response
+			setUserInfo({ data: response.data });
+		  } catch (error) {
+			console.error('Error fetching user data:', error);
+			// Handle error, for example by setting a default user info
+			setUserInfo({ data: { username: "User" } });
+		  }
+		};
+	  
+		fetchUser();
+	  }, [user]);
+      useEffect(() => {
+        const fetchTeamInformation = async (teamId) => {
+            try {
+                // Make a GET request to retrieve information for the specified team
+                const token = await fb.getToken();
+                const response = await axios.get(`http://localhost:8080/api/teams/${teamId}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`, // Replace with the actual auth token
+                    },
+                });
+    
+                // Check if the request was successful
+                if (response.status === 200) {
+                    const teamData = {
+                        teamId,
+                        ...response.data
+                    };
+    
+                    // Update the userTeams state with the team information
+                    setTeamData(teamData);
+                    console.log("Team data:",teamData);
+                } else {
+                    console.error('Failed to fetch team information:', response.statusText);
+                    // Handle the error and provide user feedback here
+                }
+            } catch (error) {
+                console.error('Error fetching team information:', error);
+                // Handle errors and provide user feedback here
+            }
+        };
+    
+      
+    
+        // Call the function to fetch team information when the component mounts
+        fetchTeamInformation(teamId);
+    }, [user]);
+    
+    
+    const [text, setText] = useState([]);
 	const sendTeamMsg = async (msg) =>
 	{
 		if (!sockCli.current)
@@ -80,49 +137,84 @@ export default function ChatRoom()
 		}
 
 		let token = await fb.getToken();
-		let userData = axios.get(`http://localhost:8080/api/user/${user.uid}`,
+		let userData = await axios.get(`http://localhost:8080/api/users/${user.uid}`,
 			{ headers: { "Authorization": "Bearer " + token } });
-
-		let sentAt = new Date();
-		let data = {
-			senderID: fb.getUserID(),
-			sender: (userData.username) ? userData.username : user.email, // Change this to just username once implement username selection
-			team: "LoH1iHOGowBzcYDXEqnu",
-			channel: "General",
-			msg: msg,
-			sentAt: fb.toFbTimestamp(sentAt),
-		};
+			
+		
+			let sentAt = new Date();
+			const messageData = {
+				senderID: fb.getUserID(),
+				sender: userInfo.data.username,
+			  team: "LoH1iHOGowBzcYDXEqnu",
+			  channel: "General",
+			  msg: msg,
+			  sentAt: fb.toFbTimestamp(sentAt),
+			};
 
 		// Add the message to the real-time socket chat
 		setText((prevText) => [
 			...prevText,
-			<h1 key={prevText.length} className="text-white">{`${data.sender}@${sentAt.toLocaleTimeString()}: ${data.msg}`}</h1>,
-		]);
+			<MessageItem 
+			  key={prevText.length} 
+			  sender={messageData.sender}
+			  timestamp={sentAt.toLocaleTimeString()} 
+			  message={messageData.msg} 
+			  reactions={{}} // Add reactions if you have them
+			  userData = {userInfo.data}
+			/>,
+		  ]);
 
-		sockCli.current.emit('teamMsg', data); // Send the message to the server
+		sockCli.current.emit('teamMsg', messageData); // Send the message to the server
 	};
+	if (loading|| !user )
+    return (
+        <div className="flex flex-col items-center justify-around min-h-screen">
+            <div className="flex flex-col items-center justify-center min-h-screen">
+                <h1 className="text-xl font-bold mb-5 text-primary">Trying to sign in</h1>
+                <div className="loader mb-5"></div>
 
-	if (loading)
-		return <h1 className="text-xl font-bold  text-black">Please sign in</h1>;
+                <p className="text-lg font-bold text-primary mb-5 ">
+                    If you're not signed in, sign in&nbsp;
+                    <span className="underline cursor-pointer" onClick={() => router.push("/")}>
+                        here
+                    </span>
+                </p>
+            </div>
+        </div>
+    );
+
+
 
 	return (
-		<div className="flex h-full w-full">
-			<Sidebar />
-			<div className="relative h-full w-full bg-[#282b30] overflow-y-auto"> {/* Chat room */}
-				<Toolbar>
-					<h1 className='text-2xl font-semibold text-white'>#General</h1>
-				</Toolbar>
+		<Template>
+		{/* // <div className="flex h-full w-full drop-shadow-lg"> */}
+		<div className="flex flex-row flex-grow">
+			{/* <Sidebar /> */}
+			<ChannelBar
+                user={userInfo}
+                userUID={user.uid}
+                teamData = {teamData}
+            />
+			<div className="flex flex-col flex-grow relative">
+                    <div className="flex items-center justify-between bg-gray-100 w-full mb-3 h-min">
+                        <Toolbar sx={{ backgroundColor: 'whitesmoke' }}>
+                            <h1 className='text-xl font-semibold text-primary items-center justify-center flex-row'>{<ShortTextIcon style={{ color: '#30475E', opacity: '0.7' }} fontSize="large" />} General</h1>
+                        </Toolbar>
+                    </div>
+                    <div className="flex">
+                        <div className="p-5 w-full h-full scrollbar-thin scrollbar-thumb-primary text-basicallydark overflow-y-scroll">
+                            {text}
+                        </div>
 
-				<div className="p-5">
-					{text}
+                        <div className="absolute z-10 inset-x-0 bottom-5 mx-5 text-white">
+                            <MessageBox callback={sendTeamMsg} />
+                        </div>
+                    </div>
+                </div>
+					
 				</div>
-
-				<div className="absolute z-10 inset-x-0 bottom-5 mx-5 drop-shadow-lg shadow-slate-950">
-					<MessageBox callback={sendTeamMsg} />
-				</div>
-
-			</div>
-			<InfoBar />
-		</div>
-	);
+		{/* <ChannelBar /> */}
+		</Template>
+	)
+		{/* </div> */}
 }

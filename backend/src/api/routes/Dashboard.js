@@ -9,7 +9,7 @@ const fb = require("../helpers/firebase");
 router.post("/folder", async (req, res) =>
 {
 	// Make sure all required fields are present
-	if (!req.headers.authorization || !req.body.name || !req.body.path)
+	if (!req.headers.authorization || !req.body.name || !req.body.path|| !req.body.color)
 		return res.status(400).json({ error: "Missing required data" });
 
 	// verify token
@@ -27,6 +27,7 @@ router.post("/folder", async (req, res) =>
 	fb.db.collection(`users/${user.uid}/folders/`).add({
 		name: req.body.name,
 		path: req.body.path+req.body.name,
+		color: req.body.color,
 	})
 		.then(ref => res.status(200).json({ message: "Folder created", folderID: ref.id, path: req.body.path+req.body.name}))
 		.catch((err) => res.status(500).json({ error: err }));
@@ -114,7 +115,7 @@ router.patch("/moveFile/:file", async (req, res) =>
 		// search the folder in folders collection based on new path
 		
 		let newData = await fb.db.collection(`users/${user.uid}/folders`).where("path", "==", newPath).get().then((querySnapshot) => {return querySnapshot.docs[0];});
-		if (!newData.exists)
+		if (!newData?.exists)
 			return res.status(400).json({ error: "to Folder not found" });
 
 		// Add file to folder
@@ -160,7 +161,9 @@ router.get("/folders", async (req, res) =>
 	folders = folders.docs.map((doc) => {
 		return {
 			id: doc.id,
-			name: doc.data().name
+			name: doc.data().name,
+			path: doc.data().path,
+			color: doc.data().color
 		};
 	});
 
@@ -228,67 +231,6 @@ router.get("/:folder/files", async (req, res) =>
 	return res.status(200).json({ files: files });
 
 });
-
-// Get all files in root directory
-// router.get("/files", async (req, res) => 
-// {
-	
-// 	if(!req.headers.authorization)
-// 		return res.status(400).json({ error: "Missing required data" });
-
-// 	// verify token
-// 	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
-// 	if (!user)
-// 		return res.status(401).json({ error: "Unauthorized" });
-
-// 	let files = [];
-
-	
-// 	let userRef = await fb.db.collection(`users`).doc(user.uid).get();
-// 	if(!userRef.exists)
-// 		return res.status(400).json({ error: "User not found" });
-
-// 	let contentMapsIds = userRef.data().contentMaps;
-
-// 	// Get all documents in user's documents array
-// 	let documentsIds = userRef.data().documents;
-
-// 	// get name, id , updatedAt and type of each file
-// 	for(let i = 0; i < contentMapsIds?.length; i++)
-// 	{
-// 		let file = await fb.db.doc(`contentMaps/${contentMapsIds[i]}`).get();
-// 		if(!file)
-// 			return res.status(400).json({ error: "File not found" });
-
-// 		file = file.data();
-
-// 		files.push({
-// 			id: contentMapsIds[i],
-// 			name: file.name,
-// 			type: "contentmap"
-// 		});
-// 	}
-
-// 	for(let i = 0; i < documentsIds?.length; i++)
-// 	{
-// 		let file = await fb.db.doc(`documents/${documentsIds[i]}`).get();
-// 		if(!file)
-// 			return res.status(400).json({ error: "File not found" });
-
-// 		file = file.data();
-
-// 		files.push({
-// 			id: documentsIds[i],
-// 			name: file.name,
-// 			updatedAt: file.updatedAt.toDate(),
-// 			createdAt: file.createdAt.toDate(),
-// 			type: "document"
-// 		});
-// 	}
-
-// 	return res.status(200).json({ files: files });
-
-// });
 
 //Get all files by giving a path 
 // @requestQuery: {path: string}
@@ -496,6 +438,42 @@ router.delete("/file/:fileid", async (req, res) =>
 
 })
 
+// modify file (Name, colourCode)
+router.patch("/folder/:folderid", async (req, res) =>
+{
+	if(!req.headers.authorization || !req.params.folderid)
+		return res.status(400).json({ error: "Missing required data" });
+
+	// verify token
+	let user =await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
+	if (!user)
+		return res.status(401).json({ error: "Unauthorized" });
+
+	// Get folder
+	let folder = await fb.db.doc(`users/${user.uid}/folders/${req.params.folderid}`).get();
+	if (!folder)
+		return res.status(400).json({ error: "Folder not found" });
+
+	// Update folder
+	let folderDoc = folder.data();
+	if(!folderDoc)
+		return res.status(400).json({ error: "Folder not found" });
+
+	// Update folder
+	
+	let status = await fb.db.doc(`users/${user.uid}/folders/${req.params.folderid}`).update({
+			name: (req.body.name) ? req.body.name : folderDoc.name,
+			color: (req.body.color) ? req.body.color : folderDoc.color
+		});
+
+	if(!status)
+		return res.status(500).json({ error: "Error updating folder" });
+
+
+	return res.status(200).json({ message: "Folder updated" });
+
+	
+})
 
 
 module.exports = router;

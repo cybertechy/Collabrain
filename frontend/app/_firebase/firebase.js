@@ -21,6 +21,7 @@ const toFbTimestamp = (date) => Timestamp.fromDate(date);
 const fromFbTimestamp = (timestamp) => timestamp.toDate();
 const useAuthState = () => authHook.useAuthState(auth);
 
+
 async function emailSignIn(e)
 {
 	// This function should be adjusted to seperate log in and sign up
@@ -28,43 +29,31 @@ async function emailSignIn(e)
 	const { email, password } = e.target.elements;
 
 	let result;
-	try
-	{
-		result = await signInWithEmailAndPassword(auth, email.value, password.value);
-	}
+	try { result = await signInWithEmailAndPassword(auth, email.value, password.value); }
 	catch (err)
 	{
-		if (err.code === "auth/wrong-password" || err.code === "auth/invalid-email")
-		{
-			alert("Inccorect email or password");
-			return;
-		}
+		if (error.code == "auth/cancelled-popup-request") return;
+		return (err.code).slice(5);
+	}
+}
 
-		else if (err.code === "auth/user-not-found")
+async function emailSignUp(e)
+{
+	e.preventDefault();
+	const { email, password, firstname, lastname } = e.target.elements;
+	createUserWithEmailAndPassword(auth, email.value, password.value)
+		.then(result =>
 		{
-			alert("User doesnt exist, creating new user");
-			result = await createUserWithEmailAndPassword(auth, email.value, password.value);
-			axios.post("http://localhost:8080/api/user", {
+			axios.post("http://localhost:8080/api/users", {
 				email: email.value,
-				fname: fname.value,
-				lname: lname.value,
+				fname: firstname.value,
+				lname: lastname.value,
 				username: null,
 				photo: null,
 				uid: result.user.uid
-			})
-				.catch(err =>
-				{
-					alert(err.message);
-				});
-		}
-
-		else // Other errors
-		{
-			alert(err.message);
-		}
-
-	}
-
+			});
+		})
+		.catch(err => { return (err.code).slice(5); });
 }
 
 async function serviceSignIn(service)
@@ -99,7 +88,7 @@ async function serviceSignIn(service)
 	// Add user to database if new user
 	if (userInfo.isNewUser)
 	{
-		axios.post("http://localhost:8080/api/user", {
+		axios.post("http://localhost:8080/api/users", {
 			uid: result.user.uid,
 			email: result.user.email,
 			fname: userInfo.profile.given_name,
@@ -120,6 +109,7 @@ module.exports = {
 	signOut,
 	useAuthState,
 	emailSignIn,
+	emailSignUp,
 	serviceSignIn,
 	toFbTimestamp,
 	fromFbTimestamp
