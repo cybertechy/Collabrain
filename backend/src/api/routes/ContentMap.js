@@ -223,14 +223,26 @@ router.delete("/:id", async (req, res) => {
     const deleteData = await oci.deleteFile("B3", contentMapData.data);
     if (!deleteData.lastModified) return res.status(500).json({ code: 500, error: "Deleting data failed" });
 
-    await contentMapRef.delete();
+    let status = await contentMapRef.delete();
+    if (!status) return res.status(500).json({ code: 500, error: "Deleting content map failed" });
+
 
     // remove the content map from users content maps array, by filtering out the content map id
     let userContentMaps = doc.data().contentMaps;
     userContentMaps = userContentMaps.filter(contentMapId => contentMapId !== req.params.id);
-    await userRef.update({
+    let updateStatus =  await userRef.update({
         contentMaps: userContentMaps
     });
+
+    // If fails, add the content map back to the with same id
+    if (!updateStatus) {
+        let status = await contentMapsRef.doc(req.params.id).set(contentMapData);
+        if (!status)
+                return res.status(500).json({ code: 500, error: "Critical Server Error" });
+        
+
+        return res.status(500).json({ code: 500, error: "Deleting content map failed" });
+    }
 
     return res.status(200).json({ code: 200, id: req.params.id });
 });
