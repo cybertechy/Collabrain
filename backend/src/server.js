@@ -1,7 +1,6 @@
 // Libs
 const express = require("express");
 const cors = require("cors");
-const db = require("./api/helpers/firebase");
 
 const bodyParser = require('body-parser');
 const http = require('http');
