@@ -28,10 +28,10 @@ const theme = createTheme({
                         borderWidth: "1px", // Ensure hover/focus border is visible
                     },
                     "&:hover .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "white", // White border on hover
+                        borderColor: "#30475E", // #30475E border on hover
                     },
                     "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "white", // White border on focus
+                        borderColor: "#30475E", // #30475E border on focus
                     },
                 },
             },
@@ -39,9 +39,9 @@ const theme = createTheme({
         MuiInputLabel: {
             styleOverrides: {
                 root: {
-                    color: "white", // Label color
+                    color: "#30475E", // Label color
                     "&.Mui-focused": {
-                        color: "white", // White label color on focus
+                        color: "#30475E", // #30475E label color on focus
                     },
                 },
             },
@@ -49,9 +49,9 @@ const theme = createTheme({
         MuiInput: {
             styleOverrides: {
                 root: {
-                    color: "white", // Input text color
+                    color: "#30475E", // Input text color
                     "&::placeholder": {
-                        color: "white", // Placeholder color
+                        color: "#30475E", // Placeholder color
                         opacity: 1,
                     },
                 },
@@ -60,7 +60,7 @@ const theme = createTheme({
         MuiIconButton: {
             styleOverrides: {
                 root: {
-                    color: "white", // Eye visibility icon color
+                    color: "#30475E", // Eye visibility icon color
                 },
             },
         },
@@ -98,9 +98,10 @@ const PasswordInput = ({ isConfirm, color, password, setPassword }) => {
     return (
         <ThemeProvider theme={theme}>
             <FormControl
-                sx={{ m: 1, width: "37ch" }}
+                sx={{ mb: 1,  }}
+                fullWidth
                 variant="outlined"
-                className={backgroundColorClass}
+                className={"bg-aliceBlue text-primary rounded-md"}
             >
                 <InputLabel htmlFor="outlined-adornment-password">
                     {isConfirm ? "Confirm Password" : "Password"}
@@ -128,7 +129,7 @@ const PasswordInput = ({ isConfirm, color, password, setPassword }) => {
                     }
                     label={isConfirm ? "Confirm Password" : "Password"}
                     sx={{
-                        color: "white",
+                        color: "#30475E",
                         WebkitTextSecurity: showPassword ? "none" : "disc",
                         "&:focusVisible": {
                             outline: "none",
@@ -136,10 +137,12 @@ const PasswordInput = ({ isConfirm, color, password, setPassword }) => {
                     }}
                 />
                 {error && (
-                    <FormHelperText error>
+                    <div className="sm:w-60 max-sm:w-80">
+                    <FormHelperText error className="text-center">
                         Password must contain at least 8 characters including
                         uppercase letters, lowercase letters, and numbers.
                     </FormHelperText>
+                    </div>
                 )}
             </FormControl>
         </ThemeProvider>

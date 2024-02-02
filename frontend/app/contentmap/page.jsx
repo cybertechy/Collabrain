@@ -7,10 +7,13 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
 import Link from "next/link";
-import { RefreshCcw, FilePenLine } from 'lucide-react';
+import { RefreshCcw, FilePenLine, HelpCircle } from 'lucide-react';
 import ShareComponent from "../../components/ui/share";
 const { useAuthState, getToken } = require("_firebase/firebase");
 import { ToastContainer, toast } from "react-toastify";
+import { driver } from "driver.js";
+import { WelcomeScreen } from "@excalidraw/excalidraw";
+import "driver.js/dist/driver.css";
 
 
 
@@ -18,6 +21,7 @@ import { ToastContainer, toast } from "react-toastify";
 function page() {
     const [token, setToken] = useState(null);
     const [Excalidraw, setExcalidraw] = useState(null);
+    
     const [ExcalidrawAPI, setExcalidrawAPI] = useState(null);
     const [Collabaration, setCollabaration] = useState(false);
     const [ViewMode, setViewMode] = useState(false);
@@ -31,23 +35,48 @@ function page() {
     const [isOwner, setisOwner] = useState(false);
     const [user, loading] = useAuthState();
     const [OverrideMessage, setOverrideMessage] = useState("");
-
+    
     /* UI states */
     const [New, setNew] = useState(false);
     const [Delete, setDelete] = useState(false);
     const [Share, setShare] = useState(false);
 
-    
+
     const router = useRouter();
     const searchParms = useSearchParams();
 
-    
+    let Guide =   {
+        showProgress: true,
+        animate: true,
+        allowClose: true,
+        doneBtnText: "Understood",
+        closeBtnText: "Close",
+        nextBtnText: "Next",
+        prevBtnText: "Previous",
+        keyboardControl: true,
+        popoverClass: "recommendation-popover",
+        steps:[
+        { element: "#excalidraw", popover: { title: "Bring ideas onto life", description: "This is the content map, you can create diagrams and much more here"}},
+        { element: "#ContentMapName", popover: { title: "Content Map Name", description: "You can edit the content map name by clicking on the icon"}},
+        { element: "#new", popover: { title: "New Content Map", description: "You can create a new content map or create a copy of the current content map by clicking on it"}},
+        { element: "#delete", popover: { title: "Delete Content Map", description: "You can delete the current content map by clicking on it"}},
+        { element: "#share", popover: { title: "Share Content Map with others", description: "You can share the current content map to others by clicking on it"}},
+        { element: "#save", popover: { title: "Saved Status", description: "This icon shows the saving status of the content map"}},
+    ]
+}
+    ;
+
+    const driverObj = driver(Guide);
+   
+    ///Load excalidraw
     useEffect(() => {
-        import("@excalidraw/excalidraw").then((comp) =>
-            setExcalidraw(comp.Excalidraw),
+        import("@excalidraw/excalidraw").then((comp) =>{
+            setExcalidraw(comp.Excalidraw) 
+        }
         );
     }, []);
 
+    // load excalidraw Data
     useEffect(() => {
         getToken()?.then((token) => {
             setToken(token);
@@ -57,7 +86,15 @@ function page() {
         })
     }, [user]);
 
-   
+    // Initialize driver.js for the first time
+    useEffect(() => {
+        let createdAt = IntialData?.createdAt;
+        let updatedAt = IntialData?.updatedAt;
+
+        if(ExcalidrawAPI && ContentMapName=="New Content Map" && IntialData && createdAt === updatedAt ) driverObj.drive();
+    }, [IntialData,ExcalidrawAPI,ContentMapName])
+
+
     const getInitialData = async (token) => {
         let id = searchParms.get("id");
         if (!token || !id) return null;
@@ -74,14 +111,14 @@ function page() {
                 return null;
             }
             setisSaved(true);
-            setisOwner(res.data.userAccess==="owner");
+            setisOwner(res.data.userAccess === "owner");
             setContentMapName(res.data.name);
             return res.data;
         }
         catch (err) {
             // If there is an axios error, set the error state    
-            if(err?.response?.data) setError(err.response.data);
-            else if(err.message) setError({error:err.message});
+            if (err?.response?.data) setError(err.response.data);
+            else if (err.message) setError({ error: err.message });
             return null;
         }
     }
@@ -94,7 +131,7 @@ function page() {
         setIntialData(null);
         setOverrideMessage("Creating new content map, Please wait ...");
         setNew(false);
-    
+
         try {
             const res = await axios.post(`http://localhost:8080/api/maps`, {
                 name: "New Content Map",
@@ -111,7 +148,7 @@ function page() {
             console.log(res.data);
 
             setid(res.data.id);
-            setIntialData({ name: "New Content Map", data: "", userAccess: "owner"});
+            setIntialData({ name: "New Content Map", data: "", userAccess: "owner" });
             setContentMapName("New Content Map");
             setisOwner(true);
             setOverrideMessage("");
@@ -120,7 +157,7 @@ function page() {
         }
         catch (err) {
             console.log(err);
-            toast.error("Error creating new content map",{
+            toast.error("Error creating new content map", {
                 position: "bottom-right",
                 autoClose: 5000,
                 hideProgressBar: false,
@@ -149,7 +186,7 @@ function page() {
 
         try {
             const res = await axios.post(`http://localhost:8080/api/maps`, {
-                name: ContentMapName+" (copy)",
+                name: ContentMapName + " (copy)",
                 data: appdata
             }, {
                 headers: {
@@ -163,17 +200,17 @@ function page() {
             console.log(res.data);
 
             setid(res.data.id);
-            setIntialData({ name: ContentMapName+" (copy)", data: JSON.stringify(appdata), userAccess: "owner" });
-            setContentMapName(ContentMapName+" (copy)");
+            setIntialData({ name: ContentMapName + " (copy)", data: JSON.stringify(appdata), userAccess: "owner" });
+            setContentMapName(ContentMapName + " (copy)");
             setisOwner(true);
             setOverrideMessage("");
-            
+
             router.push(`/contentmap?&id=${res.data.id}`);
-            
+
         }
         catch (err) {
             console.log(err);
-            toast.error("Error creating new content map",{
+            toast.error("Error creating new content map", {
                 position: "bottom-right",
                 autoClose: 5000,
                 hideProgressBar: false,
@@ -184,7 +221,7 @@ function page() {
             setIntialData(backup);
             return null;
         }
-       
+
     }
 
     const DeleteContentMap = async () => {
@@ -216,7 +253,7 @@ function page() {
         }
         catch (err) {
             console.log(err);
-            toast.error("Error deleting content map",{
+            toast.error("Error deleting content map", {
                 position: "bottom-right",
                 autoClose: 5000,
                 hideProgressBar: false,
@@ -258,38 +295,38 @@ function page() {
 
     const updatecontent = async (data) => {
         try {
-            let res = await  axios.put(`http://localhost:8080/api/maps/${id}`, data , {
+            let res = await axios.put(`http://localhost:8080/api/maps/${id}`, data, {
                 headers: {
                     authorization: `Bearer ${token}`,
                 },
                 timeout: 100000
-    
+
             })
 
             return res;
 
         } catch (err) {
-            
+
             return null
         }
     }
 
     const updatecontentmap = async (data) => {
-        if(!(pointerState==="down" && data.button==="up")){
+        if (!(pointerState === "down" && data.button === "up")) {
             setPointerState(data.button);
             return;
         }
 
         setPointerState(data.button);
         setisSaved(false);
-        
-        if(!ExcalidrawAPI) {
+
+        if (!ExcalidrawAPI) {
             updatecontentmap(data);
             return;
         }
 
         let appState = ExcalidrawAPI.getAppState();
-        appState.collaborators=[];
+        appState.collaborators = [];
 
         let appdata = {
             elements: ExcalidrawAPI.getSceneElements(),
@@ -298,8 +335,8 @@ function page() {
         }
 
         let res = await updatecontent({ name: IntialData?.name, data: appdata })
-       
-        if(res?.status===200) setisSaved(true);
+
+        if (res?.status === 200) setisSaved(true);
     }
 
     const getdata = async (query) => {
@@ -316,75 +353,86 @@ function page() {
         }
     }
 
-    if(!user) return <div className="flex flex-col justify-center items-center text-black">
+    if (!user) return <div className="flex flex-col justify-center items-center text-basicallydark">
         <h1>You're not signed in</h1>
     </div>
 
-    if(loading) return <div className="flex flex-col justify-center items-center text-black">
+    if (loading) return <div className="flex flex-col justify-center items-center text-basicallydark">
         <h1>Loading...</h1>
     </div>
 
 
     return <div className="flex justify-center items-center flex-col h-screen w-screen">
         <ToastContainer />
-        <div className="flex justify-between items-center w-screen h-[12%]  bg-primary px-3 pt-2 ">
-            <div className="flex">
-                <Link href="/dashboard">
+        <div className="flex justify-between items-center w-screen h-[12%]  bg-primary px-3  ">
+            <div className="flex w-screen h-[100%]">
+                {/* Left side of navbar */}
+                <div className="flex items-center">
+                <Link tooltip="help" className="" href="/dashboard">
                     <Image src={LogoIcon} alt="Collabrain logo" width={75} height={50} />
                 </Link>
-                <div className="grid grid-rows-2 grid-cols-1 ml-8">
-                    <div className="mb-1">
+                </div> 
+                {/* Right side of navbar */}
+                <div className="grid grid-rows-2 grid-cols-1 ml-8 w-[100%] pt-3 ">
+                    {/* upper part of navbar */}
+                    <div className=" flex items-center justify-between h-[50%] pt-1 lg:pt-0">
                         {isEditing ? (
-                            <div className="flex items-center gap-2">
-                            <input
-                                className="text-white bg-transparent border-b-2 border-white outline-none p-1"
-                                type="text"
-                                value={ContentMapName}
-                                onChange={handleInputChange}
-                                onBlur={handleSaveClick}
-                            />
-                            <button className="mt-2" onClick={()=>setIsEditing(isEditing=>!isEditing)}> 
-                            <FilePenLine width={20} height={20} />
-                            </button>
+                            <div  className="flex items-center gap-2">
+                                <input
+                                    className="text-basicallylight bg-transparent border-b-2 border-basicallylight outline-none p-1 no-underline"
+                                    type="text"
+                                    value={ContentMapName}
+                                    onChange={handleInputChange}
+                                    onBlur={handleSaveClick}
+                                />
+                                <button className="" onClick={() => setIsEditing(isEditing => !isEditing)}>
+                                    <FilePenLine tooltip="Edit content map name" width={20} height={20} />
+                                </button>
                             </div>
                         ) : (
-                            <div className="flex items-center gap-2"><h1 className="text-white text-xl mt-2" onClick={handleEditClick}>
+                            <div id="ContentMapName" className=" flex items-center gap-2"><h1 className="text-basicallylight text-lg font-semibold" onClick={handleEditClick}>
                                 {ContentMapName}
                             </h1>
-                            <button disabled={!isOwner} className="mt-2" onClick={()=>setIsEditing(isEditing=>!isEditing)}> 
-                            <FilePenLine width={20} height={20} />
-                            </button>
-                            
+                                <button disabled={!isOwner} className="" onClick={() => setIsEditing(isEditing => !isEditing)}>
+                                    <FilePenLine width={20} height={20} />
+                                </button>
+
                             </div>
                         )}
+                        <button className="flex justify-center items-center gap-3" onClick={()=>driverObj.drive()} > 
+                        <HelpCircle width={20} height={20} /> 
+                        <p className="hidden lg:block"> Help </p>
+                        </button>
                     </div>
-                    <div className="flex gap-4 p-0">
-                        <button onClick={() => setNew(New => !New)} className=" text-white rounded-md px-1 py-1 ">New</button>
+
+                    {/* Lower part of navbar */}
+                    <div className="flex items-center gap-4 p-0 h-[50%]">
+                        <button id="new" onClick={() => setNew(New => !New)} className=" text-basicallylight rounded-md ">New</button>
                         { /* New button dropdown containing first new content map, second new doument, It should be right below the new button*/
-                            New && <div className="absolute z-10 top-[12%] left-[80px] bg-white rounded-md shadow-md p-2 flex flex-col gap-2">
+                            New && <div  className="absolute z-10 top-[12%] left-[80px] bg-basicallylight rounded-md shadow-md p-2 flex flex-col gap-2">
                                 <button onClick={NewContentMap} className="text-primary">New Content Map</button>
                                 <button onClick={duplicateContentMap} className="text-primary">Create a copy</button>
                             </div>
                         }
-                        <button disabled={!(id && IntialData && Excalidraw)||!isOwner} onClick={() => setDelete(Delete => !Delete)} className=" text-white rounded-md px-1 py-1 ">Delete</button>
+                        <button id="delete" disabled={!(id && IntialData && Excalidraw) || !isOwner} onClick={() => setDelete(Delete => !Delete)} className=" text-basicallylight rounded-md ">Delete</button>
                         { /* Ask for confirmation before deleting the content map in the center of screen as pop out*/
-                            id && IntialData && Excalidraw && Delete && <div className="absolute z-10 top-[50%] lg:left-[40%] md:left-[30%] left-[15%] w-72 bg-white rounded-md shadow-md py-2 px-4 flex flex-col gap-2 border border-primary">
+                            id && IntialData && Excalidraw && Delete && <div  className="absolute z-10 top-[50%] lg:left-[40%] md:left-[30%] left-[15%] w-72 bg-basicallylight rounded-md shadow-md py-2 px-4 flex flex-col gap-2 border border-primary">
                                 <h1 className="text-xl text-primary">Are you sure you want to delete this content map?</h1>
                                 <hr className="border-primary" />
                                 <div className="flex gap-8">
-                                    <button onClick={DeleteContentMap} className="text-white text-xl bg-primary rounded-lg px-3 py-1">Yes</button>
+                                    <button onClick={DeleteContentMap} className="text-basicallylight text-xl bg-primary rounded-lg px-3 py-1">Yes</button>
                                     <button onClick={() => setDelete(Delete => !Delete)} className="text-primary text-xl">No</button>
                                 </div>
                             </div>
                         }
-                        <button disabled={!(id && IntialData && Excalidraw)} onClick={()=>setShare(Share => !Share)} className="rounded-lg px-1">Share</button>
-                        {Share && <div className="absolute z-10 top-[13%] lg:left-[200px] left-[10px] md:left-[100px] bg-white rounded-md shadow-md p-2 flex flex-col gap-2 border border-primary">
-                                <ShareComponent getdata={getdata} updatecontent={updatecontent} contentMapName={IntialData?.name} setShare={setShare} sData={IntialData?.Access} isOwner={isOwner}  />
-                            </div>}
+                        <button disabled={!(id && IntialData && Excalidraw)} id="share" onClick={() => setShare(Share => !Share)} className="rounded-lg">Share</button>
+                        {Share && <div  className="absolute z-10 top-[13%] lg:left-[200px] left-[10px] md:left-[100px] bg-basicallylight rounded-md shadow-md p-2 flex flex-col gap-2 border border-primary">
+                            <ShareComponent getdata={getdata} updatecontent={updatecontent} contentMapName={IntialData?.name} setShare={setShare} sData={IntialData?.Access} isOwner={isOwner} />
+                        </div>}
 
-                        {(IntialData?.userAccess==="edit"||IntialData?.userAccess==="owner") && <div className="flex items-center bg-white text-purple-500 px-2 rounded-lg mb-1">
-                            <p className={`py-1 px-1 rounded-t-lg text-sm`}> <RefreshCcw width={20} height={20} className={`${!isSaved && "animate-spin"}`} />  </p>
-                            <p className="lg:block hidden px-1 py-1 text-sm "> {isSaved ? "Saved" : "Saving..."}</p>
+                        {(IntialData?.userAccess === "edit" || IntialData?.userAccess === "owner") && <div id="save" className="flex items-center gap-2 bg-basicallylight text-primary rounded-md  px-2 py-1 ">
+                            <p className={`rounded-t-lg `}> <RefreshCcw width={20} height={20} className={`${!isSaved && "animate-spin"}`} />  </p>
+                            <p className="lg:block hidden  "> {isSaved ? "Saved" : "Saving..."}</p>
                         </div>}
                     </div>
                 </div>
@@ -392,12 +440,12 @@ function page() {
 
 
         </div>
-        <div className="w-screen h-[88%] flex justify-center items-center text-black">
+        <div id="excalidraw" className="w-screen h-[88%] flex justify-center items-center text-basicallydark">
             {id && IntialData && Excalidraw && <Excalidraw
                 key={id}
                 renderTopRightUI={() => (
                     <>
-                        {/* <button className="bg-blue-600 py-1 px-3  text-white rounded-xl" onClick={() => setCollabaration(Collabaration => !Collabaration)}>
+                        {/* <button className="bg-blue-600 py-1 px-3  text-basicallylight rounded-xl" onClick={() => setCollabaration(Collabaration => !Collabaration)}>
                         {Collabaration ? "Stop" : "Start"} Collaboration
                     </button> */}
 
@@ -408,12 +456,29 @@ function page() {
                 excalidrawAPI={(api) => setExcalidrawAPI(api)}
                 initialData={IntialData?.data ? JSON.parse(IntialData?.data) : null}
                 onPointerUpdate={updatecontentmap}
-            />}
-            {!id && <h1 className="text-2xl font-bold text-purple-500 px-10 text-center"> Searching the cloud, Please wait ..</h1>}
-            {id && !Excalidraw && <h1 className="text-2xl font-bold text-purple-500 px-10">Loading...</h1>}
-            {id && Excalidraw && !IntialData && !Error && !OverrideMessage && <h1 className="text-2xl font-bold text-purple-500 px-10 text-center"> Working to load the Map ... </h1>}
-            {id && Excalidraw && !IntialData && Error && !OverrideMessage &&  <h1 className="text-2xl font-bold text-purple-500 px-10 text-center"> {Error.error} </h1>}
-            {id && Excalidraw && !IntialData && !Error && OverrideMessage && <h1 className="text-2xl font-bold text-purple-500 px-10 text-center"> {OverrideMessage} </h1>}
+                libraryReturnUrl={window.location.origin + window.location.pathname+`?id=${id}&`}
+            >
+                <WelcomeScreen>
+                    <WelcomeScreen.Center>
+                        <WelcomeScreen.Center.Logo >
+                            <Image src={LogoIcon} alt="Collabrain logo" width={75} height={50} />
+                        </WelcomeScreen.Center.Logo>
+                        <WelcomeScreen.Center.Heading>
+                            Welcome to Collabrain Content Map <br></br>
+                            Select the tools from top navbar and start creating your content map
+                        </WelcomeScreen.Center.Heading>
+                    </WelcomeScreen.Center>
+
+                </WelcomeScreen>
+
+            </Excalidraw>
+
+            }
+            {!id && <h1 className="text-2xl font-bold text-primary px-10 text-center"> Searching the cloud, Please wait ..</h1>}
+            {id && !Excalidraw && <h1 className="text-2xl font-bold text-primary px-10">Loading...</h1>}
+            {id && Excalidraw && !IntialData && !Error && !OverrideMessage && <h1 className="text-2xl font-bold text-primary px-10 text-center"> Working to load the Map ... </h1>}
+            {id && Excalidraw && !IntialData && Error && !OverrideMessage && <h1 className="text-2xl font-bold text-primary px-10 text-center"> {Error.error} </h1>}
+            {id && Excalidraw && !IntialData && !Error && OverrideMessage && <h1 className="text-2xl font-bold text-primary px-10 text-center"> {OverrideMessage} </h1>}
         </div>
     </div>
 }

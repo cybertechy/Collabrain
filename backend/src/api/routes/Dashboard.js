@@ -115,7 +115,7 @@ router.patch("/moveFile/:file", async (req, res) =>
 		// search the folder in folders collection based on new path
 		
 		let newData = await fb.db.collection(`users/${user.uid}/folders`).where("path", "==", newPath).get().then((querySnapshot) => {return querySnapshot.docs[0];});
-		if (!newData.exists)
+		if (!newData?.exists)
 			return res.status(400).json({ error: "to Folder not found" });
 
 		// Add file to folder

@@ -1,11 +1,10 @@
 // Libs
 const express = require("express");
 const cors = require("cors");
-const db = require("./api/helpers/firebase");
 
 const bodyParser = require('body-parser');
 const http = require('http');
-const treblle = require('@treblle/express')
+const treblle = require('@treblle/express');
 
 // Routes
 const chatRoute = require("./api/routes/Chat");
@@ -24,22 +23,22 @@ const server = http.createServer(app);
 
 app.use(
 	treblle({
-	  apiKey: "FWAsJIjJ9SUC48XJ52CmWPzrH5V5dDn7",
-	  projectId: "4n251kwdeS2Q4FUt",
-	  additionalFieldsToMask: [],
+		apiKey: "FWAsJIjJ9SUC48XJ52CmWPzrH5V5dDn7",
+		projectId: "4n251kwdeS2Q4FUt",
+		additionalFieldsToMask: [],
 	})
-  );
+);
 
 sockServer.init(server);
 
-app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.json({ limit: '50mb' }));
 app.use(cors());
 app.use("/api/chats", chatRoute);
-app.use("/api/teams",teamsRoute);
-app.use("/api/users",userRoute);
+app.use("/api/teams", teamsRoute);
+app.use("/api/users", userRoute);
 app.use("/api/dashboard", dashboardRoute);
-app.use("/api/maps",mapRoute);
-app.use("/api/reports",reportReport);
+app.use("/api/maps", mapRoute);
+app.use("/api/reports", reportReport);
 app.use("/api/notifications", notificationsRoute);
 
 app.get("/api/home", (req, res) =>
@@ -49,8 +48,10 @@ app.get("/api/home", (req, res) =>
 
 app.get("/api/cons", (req, res) =>
 {
-	res.json({ count: Object.keys(sockServer.currLinks).length,
-		cons: sockServer.currLinks });
+	res.json({
+		count: Object.keys(sockServer.currLinks).length,
+		cons: sockServer.currLinks
+	});
 });
 
 server.listen(port, () =>

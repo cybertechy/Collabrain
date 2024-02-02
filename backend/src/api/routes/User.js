@@ -63,18 +63,13 @@ router.get("/:user", async (req, res) => {
 // Create user
 router.post("/", (req, res) => {
 	// Make sure all required fields are present
-	if (!req.body.email || !req.body.fname || !req.body.lname || !req.body.photo || !req.body.uid)
+	if (!req.body.email || !req.body.fname || !req.body.lname || !req.body.uid)
 		return res.status(400).json({ error: "Missing required data" });
 
 	// Check if user already exists
 	let users = fb.db.collection("users").where("email", "==", req.body.email);
 	if (users.length > 0)
 		return res.status(400).json({ error: "User already exists" });
-
-	// Check if username is taken
-	users = fb.db.collection("users").where("username", "==", req.body.username);
-	if (users.length > 0)
-		return res.status(400).json({ error: "Username already taken" });
 
 	// Add user to database
 	fb.db.doc(`users/${req.body.uid}`).set(
@@ -83,11 +78,26 @@ router.post("/", (req, res) => {
 			fname: req.body.fname,
 			lname: req.body.lname,
 			username: null,
-			photo: req.body.photo,
+			photo: null,
 			bio: "",
 			teams: [],
 			friends: [],
-			blocked: []
+			aliases: [],
+			blocked: [],
+			contentMaps: [],
+			documents: [],
+			friendRequests: [],
+			teamInvites: [],
+			education: [],
+			courses: [],
+			achievements: [],
+			learningMaterials: [],
+			twoFA: false,
+			colorBlindFilter: false,
+			fontSize: 16,
+			theme: "light",
+			language: "en",
+			
 		})
 		.then(() => { return res.json({ message: "User added" }); })
 		.catch(err => { return res.status(500).json({ error: err }); });
@@ -144,8 +154,8 @@ router.delete("/:user", async (req, res) => {
 // Check if username is taken
 router.get("/username/:username", async (req, res) => {
 	// Check if username is taken
-	let users = fb.db.collection("users").where("username", "==", req.params.username);
-	if (users.length > 0)
+	let users = await fb.db.collection("users").where("username", "==", req.params.username).get();
+	if (users.docs.length > 0)
 		return res.status(400).json({ error: "Username already taken" });
 
 	return res.json({ message: "Username available" });

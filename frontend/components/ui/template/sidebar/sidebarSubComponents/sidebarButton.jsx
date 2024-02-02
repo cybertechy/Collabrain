@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-
+import {Tooltip}  from '@mui/material';
 const colorClasses = {
     primary: "bg-primary",
     secondary: "bg-secondary",
@@ -14,16 +14,22 @@ const SidebarButtonIcon = ({
     onClick,
     isExpanded,
 }) => (
+    <Tooltip
+            title={text}
+            enterDelay={1000}
+            leaveDelay={200}
+          
+        >
     <button
         className={`${
             colorClasses[color]
-        } px-4 py-4 h-13  rounded-custom font-poppins text-md my-4 text-white font-medium flex items-center justify-center transition-all duration-500 ease-in-out ${
-            withShadow ? "shadow-primary shadow-custom" : ""
+        } px-4 py-4 h-13  rounded-custom font-poppins text-md my-4 text-basicallylight font-medium flex items-center justify-center transition-all duration-500 ease-in-out hover:bg-tertiary ${
+            withShadow ? "shadow-gray-400 shadow-custom" : ""
         }`}
         onClick={onClick}
     >
         <span
-            className="flex-grow text-center overflow-hidden"
+            className="flex-grow text-center overflow-hidden font-bold text-basicallylight"
             style={{
                 maxWidth: isExpanded ? "100%" : "0",
                 fontSize: isExpanded ? "1rem" : "0",
@@ -35,10 +41,11 @@ const SidebarButtonIcon = ({
             {isExpanded ? text : ""}
         </span>
         {Icon && (
-            <Icon className="py-4 ml-2 transition-all duration-445 ease-in-out " />
+            <Icon className="py-4 ml-2 transition-all  duration-445 ease-in-out " />
         
         )}
     </button>
+    </Tooltip>
 );
 
 SidebarButtonIcon.propTypes = {

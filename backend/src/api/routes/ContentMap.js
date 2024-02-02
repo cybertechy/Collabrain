@@ -8,6 +8,7 @@ const router = Router();
 
 
 /* Create a New content map */
+// @RequestBody: { name: string, data: any, path: string }
 router.post("/", async (req, res) => {
    
     if(!req.headers.authorization || !req.body.name) return res.status(400).json({ code: 400, error: "Missing token or name" });
@@ -47,7 +48,8 @@ router.post("/", async (req, res) => {
         data: DataId,
         createdAt: fb.admin.firestore.FieldValue.serverTimestamp(),
         updatedAt: fb.admin.firestore.FieldValue.serverTimestamp(),
-        Access: { [user.uid]: { role: "owner", email: user.email, name: user.name, type: "users" } }
+        Access: { [user.uid]: { role: "owner", email: user.email, name: user.name, type: "users" } },
+        path: (req.body.path) ? req.body.path : "/"
     }
 
     const contentMapRef = await contentMapsRef.add(contentMap);
@@ -124,6 +126,9 @@ router.get("/:id", async (req, res) => {
     if (!getData) return res.status(500).json({ code: 500, error: "Getting data failed" });
 
     contentMapData.data = await oci.generateStringFromStream(getData.value);
+
+    contentMapData.createdAt = contentMapData.createdAt.toDate();
+    contentMapData.updatedAt = contentMapData.updatedAt.toDate();
  
     return res.status(200).json({...contentMapData,userAccess:contentMapData.Access[user.uid]?.role});
 });
@@ -178,6 +183,7 @@ router.put("/:id", async (req, res) => {
 
         if(req.body.name) updatedContentMap.name = req.body.name;
         if(req.body.access) updatedContentMap.Access = req.body.access;
+        if(req.body.path) updatedContentMap.path = req.body.path;
     }
 
     updatedContentMap.updatedAt = fb.admin.firestore.FieldValue.serverTimestamp();
@@ -220,14 +226,26 @@ router.delete("/:id", async (req, res) => {
     const deleteData = await oci.deleteFile("B3", contentMapData.data);
     if (!deleteData.lastModified) return res.status(500).json({ code: 500, error: "Deleting data failed" });
 
-    await contentMapRef.delete();
+    let status = await contentMapRef.delete();
+    if (!status) return res.status(500).json({ code: 500, error: "Deleting content map failed" });
+
 
     // remove the content map from users content maps array, by filtering out the content map id
     let userContentMaps = doc.data().contentMaps;
     userContentMaps = userContentMaps.filter(contentMapId => contentMapId !== req.params.id);
-    await userRef.update({
+    let updateStatus =  await userRef.update({
         contentMaps: userContentMaps
     });
+
+    // If fails, add the content map back to the with same id
+    if (!updateStatus) {
+        let status = await contentMapsRef.doc(req.params.id).set(contentMapData);
+        if (!status)
+                return res.status(500).json({ code: 500, error: "Critical Server Error" });
+        
+
+        return res.status(500).json({ code: 500, error: "Deleting content map failed" });
+    }
 
     return res.status(200).json({ code: 200, id: req.params.id });
 });

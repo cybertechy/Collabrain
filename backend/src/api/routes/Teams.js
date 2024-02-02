@@ -93,7 +93,8 @@ router.post("/", async (req, res) =>
 					ref.collection("messages").add({
 						message: "Welcome to General!",
 						sender: "System",
-						timestamp: new Date().getSeconds()
+						timestamp: new Date().getSeconds(),
+						sentAt: fb.admin.firestore.FieldValue.serverTimestamp()
 					});
 				});
 
@@ -107,24 +108,39 @@ router.post("/", async (req, res) =>
 		.catch(err => { return res.status(500).json({ error: err }); });
 });
 
-/* Endpoint for getting a team's data */
-router.get("/:team", async (req, res) =>
-{
-	// Make sure all required fields are present
-	if (!req.headers.authorization)
-		return res.status(400).json({ error: "Missing required data" });
+/* Endpoint for getting a team's data along with its channels including channelId */
+router.get("/:team", async (req, res) => {
+    if (!req.headers.authorization)
+        return res.status(400).json({ error: "Missing required data" });
 
-	// verify token
-	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
-	if (!user)
-		return res.status(401).json({ error: "Unauthorized" });
+    // verify token
+    let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
+    if (!user)
+        return res.status(401).json({ error: "Unauthorized" });
 
-	fb.db.doc(`teams/${req.params.team}`).get()
-		.then(doc =>
-		{
-			return res.status(200).json(doc.data());
-		})
-		.catch(err => { return res.status(500).json({ error: err }); });
+    // Get team data
+    let teamData = {};
+    fb.db.doc(`teams/${req.params.team}`).get()
+        .then(doc => {
+            teamData = doc.data();
+            
+            // Get list of channels for the team using the team's ID
+            return fb.db.collection(`teams/${req.params.team}/channels`).get();
+        })
+        .then(snapshot => {
+            let channels = [];
+            snapshot.forEach(doc => {
+                const channelData = doc.data();
+                channelData.channelId = doc.id; // Add channelId to channel data
+                channels.push(channelData);
+            });
+            
+            // Add the channels data to the team data
+            teamData.channels = channels;
+            
+            return res.status(200).json(teamData);
+        })
+        .catch(err => { return res.status(500).json({ error: err }); });
 });
 
 /* Endpoint for updating a team's data */
@@ -615,7 +631,7 @@ router.get("/:team/channels/:channel/messages", async (req, res) =>
 		.where("name", "==", req.params.channel).get()).docs[0].id;
 
 	fb.db.collection(`teams/${req.params.team}/channels/${channelID}/messages`)
-		.orderBy("sentAt.seconds").limit(100).get()
+		.orderBy("sentAt").limit(100).get()
 		.then(snapshot =>
 		{
 			let messages = [];
