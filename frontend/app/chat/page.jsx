@@ -43,7 +43,7 @@ const scrollToBottom = () => {
             console.log("Received message from server");
             setText((prevText) => [
                 ...prevText,
-                <h1 key={prevText.length} className="text-basicallydark">{`${data.username}: ${data.msg}`}</h1>,
+                <h1 key={prevText.length} className="text-basicallydark">{`${data.sender}: ${data.msg}`}</h1>,
             ]);
         });
 
@@ -71,7 +71,7 @@ const scrollToBottom = () => {
                         timestamp={fb.fromFbTimestamp(new Timestamp(messageData.sentAt.seconds, messageData.sentAt.nanoseconds)).toLocaleTimeString()}
                         message={messageData.message}
                         reactions={{}}
-						userData = {userInfo.data}
+						userId = {messageData.senderID}
                     />
                 ));
                 setText(msgs);
@@ -169,6 +169,8 @@ const scrollToBottom = () => {
 			  msg: msg,
 			  sentAt: fb.toFbTimestamp(sentAt),
 			};
+            const sentAtDate = messageData.sentAt.toDate();
+
 
 		// Add the message to the real-time socket chat
 		setText((prevText) => [
@@ -176,7 +178,7 @@ const scrollToBottom = () => {
 			<MessageItem 
 			  key={prevText.length} 
 			  sender={messageData.sender}
-			  timestamp={sentAt.toLocaleTimeString()} 
+			  timestamp={sentAtDate.toLocaleTimeString()} 
 			  message={messageData.msg} 
 			  reactions={{}} // Add reactions if you have them
 			  userData = {userInfo.data}

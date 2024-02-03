@@ -92,9 +92,9 @@ router.post("/", async (req, res) =>
 				{
 					ref.collection("messages").add({
 						message: "Welcome to General!",
-						sender: "System",
-						timestamp: new Date().getSeconds(),
-						sentAt: fb.admin.firestore.FieldValue.serverTimestamp()
+						username: "System",
+						timestamp: fb.admin.firestore.FieldValue.serverTimestamp(),
+						sentAt: fb.admin.firestore.FieldValue.serverTimestamp(),
 					});
 				});
 
