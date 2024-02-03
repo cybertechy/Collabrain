@@ -563,7 +563,7 @@ export default function Dashboard()
 
 					<div className="flex flex-wrap content-start items-start w-full justify-start ml-4 gap-8 ">
 						{isFoldersLoading ? (
-							<div className="loader mb-5">Loading...</div> // Adjust loader class as needed
+							<div className="loader mb-5"></div> // Adjust loader class as needed
 						) : folders.length > 0 ? (
 							folders.map((folder) => (
 								<DashboardFolder
@@ -588,11 +588,11 @@ export default function Dashboard()
 						className="scrollbar-thin scrollbar-thumb-primary h-full  overflow-y-scroll pr-28"
 						style={{ maxHeight: "500px" }}
 					>
-						<div className="flex flex-wrap gap-y-4 ml-4 justify-start">
+						<div className="flex flex-wrap gap-x-4 ml-4 justify-start">
 							{console.log("Content Maps:", contentMaps)}
 
 							{isProjectsLoading ? (
-								<div className="loader mb-5">Loading...</div>
+								<div className="loader mb-5"></div>
 							) : projects.length > 0 ? (
 								projects.map((project) => (
 									<DashboardProjectButton

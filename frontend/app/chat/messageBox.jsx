@@ -29,7 +29,7 @@ export default function MessageBox(props) {
   let inputMsg = useRef();
 
   return (
-    <div className='bg-transparent p-3 rounded-md'> {/* Updated container style */}
+    <div className='bg-basicallylight w-full p-3 rounded-md'> {/* Updated container style */}
       <CustomTextField
         size='large'
         fullWidth={true}

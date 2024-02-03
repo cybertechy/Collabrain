@@ -87,7 +87,8 @@ async function saveTeamMsg(data)
 	db.collection(`teams/${data.team}/channels/${channelID}/messages`)
 		.add({
 			"message": data.msg,
-			"sender": data.sender,
+			"sender": data.senderID,
+			"username": data.sender,
 			"sentAt": data.sentAt,
 		});
 
@@ -95,12 +96,14 @@ async function saveTeamMsg(data)
 
 	// Increase member score
 	let members = teamData.members;
-	members[data.sender].score++;
+	members[data.senderID].score ? members[data.senderID].score++ : members[data.senderID].score = 1; 
+	
 
 	//Increase team score
-	let score = teamData.score++;
+	
+	let score = teamData.score+=1;
 
-	db.doc(`team/${data.team}`).update({
+	db.doc(`teams/${data.team}`).update({
 		members,
 		score
 	}).catch(err => console.log(err));

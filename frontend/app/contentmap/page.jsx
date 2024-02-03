@@ -385,7 +385,7 @@ function page() {
                                     onChange={handleInputChange}
                                     onBlur={handleSaveClick}
                                 />
-                                <button className="" onClick={() => setIsEditing(isEditing => !isEditing)}>
+                                <button className="text-basicallylight" onClick={() => setIsEditing(isEditing => !isEditing)}>
                                     <FilePenLine tooltip="Edit content map name" width={20} height={20} />
                                 </button>
                             </div>
@@ -393,15 +393,15 @@ function page() {
                             <div id="ContentMapName" className=" flex items-center gap-2"><h1 className="text-basicallylight text-lg font-semibold" onClick={handleEditClick}>
                                 {ContentMapName}
                             </h1>
-                                <button disabled={!isOwner} className="" onClick={() => setIsEditing(isEditing => !isEditing)}>
+                                <button disabled={!isOwner} className="text-basicallylight" onClick={() => setIsEditing(isEditing => !isEditing)}>
                                     <FilePenLine width={20} height={20} />
                                 </button>
 
                             </div>
                         )}
                         <button className="flex justify-center items-center gap-3" onClick={()=>driverObj.drive()} > 
-                        <HelpCircle width={20} height={20} /> 
-                        <p className="hidden lg:block"> Help </p>
+                        <HelpCircle className="text-basicallylight" width={20} height={20} /> 
+                        <p className="hidden lg:block text-basicallylight"> Help </p>
                         </button>
                     </div>
 
@@ -425,7 +425,7 @@ function page() {
                                 </div>
                             </div>
                         }
-                        <button disabled={!(id && IntialData && Excalidraw)} id="share" onClick={() => setShare(Share => !Share)} className="rounded-lg">Share</button>
+                        <button disabled={!(id && IntialData && Excalidraw)} id="share" onClick={() => setShare(Share => !Share)} className="rounded-lg text-basicallylight">Share</button>
                         {Share && <div  className="absolute z-10 top-[13%] lg:left-[200px] left-[10px] md:left-[100px] bg-basicallylight rounded-md shadow-md p-2 flex flex-col gap-2 border border-primary">
                             <ShareComponent getdata={getdata} updatecontent={updatecontent} contentMapName={IntialData?.name} setShare={setShare} sData={IntialData?.Access} isOwner={isOwner} />
                         </div>}

@@ -193,7 +193,7 @@ const DashboardProjectButton = ({ title, project, type, color = "#FFFFFF", onCli
         </Button>
     </DialogActions>
 </Dialog>
-);</>
+</>
      
         </Tooltip>
     );
