@@ -90,6 +90,7 @@ async function saveTeamMsg(data)
 			"sender": data.senderID,
 			"username": data.sender,
 			"sentAt": data.sentAt,
+			"reactions": (data.reactions) ? data.reactions : []
 		});
 
 	let teamData = (await db.doc(`teams/${data.team}`).get()).data();
@@ -117,6 +118,7 @@ async function saveDirectMsg(data)
 			"message": data.msg,
 			"sender": data.sender,
 			"sentAt": data.sentAt,
+			"reactions": (data.reactions) ? data.reactions : []
 		});
 	
 	let userData = (await db.doc(`users/${data.sender}`).get()).data();
