@@ -88,6 +88,75 @@ router.get("/", async (req, res) =>
 	return res.status(200).json(chats);
 });
 
+/* Endpoint for adding a user to a chat */
+router.post("/:chat/members", async (req, res) =>
+{
+	// Make sure all required fields are present
+	if (!req.headers.authorization || !req.body.members)
+		return res.status(400).json({ error: "Missing required data" });
+
+	// verify token
+	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
+	if (!user)
+		return res.status(401).json({ error: "Unauthorized" });
+
+	// Check if user is in chat
+	let chat = await fb.db.doc(`chats/${req.params.chat}`).get();
+	if (!chat.data().members.includes(user.uid))
+		return res.status(401).json({ error: "Unauthorized" });
+
+	// Add members to chat
+	
+	let status = await fb.db.doc(`chats/${req.params.chat}`).update({
+		members: fb.admin.firestore.FieldValue.arrayUnion(...req.body.members)
+	});
+	if (!status) return res.status(500).json({ error: "Error adding member to chat" });
+
+	// Add chat to each member's chats
+	req.body.members.forEach(async (member) =>
+	{
+		let status = await fb.db.doc(`users/${member}`).update({
+			chats: fb.admin.firestore.FieldValue.arrayUnion(req.params.chat)
+		});
+		if (!status) return res.status(500).json({ error: "Error adding chat to user" });
+	}
+	);
+
+	return res.status(200).json({ message: "Member added to chat" });
+});
+
+/* Endpoint for removing a user from a chat */
+router.delete("/:chat/members/:member", async (req, res) =>
+{
+	// Make sure all required fields are present
+	if (!req.headers.authorization)
+		return res.status(400).json({ error: "Missing required data" });
+
+	// verify token
+	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
+	if (!user)
+		return res.status(401).json({ error: "Unauthorized" });
+
+	// Check if user is in chat
+	let chat = await fb.db.doc(`chats/${req.params.chat}`).get();
+	if (!chat.data().members.includes(user.uid))
+		return res.status(401).json({ error: "Unauthorized" });
+
+	// Remove member from chat
+	let status = await fb.db.doc(`chats/${req.params.chat}`).update({
+		members: fb.admin.firestore.FieldValue.arrayRemove(req.params.member)
+	});
+	if (!status) return res.status(500).json({ error: "Error removing member from chat" });
+
+	// Remove chat from member's chats
+	let status2 = await fb.db.doc(`users/${req.params.member}`).update({
+		chats: fb.admin.firestore.FieldValue.arrayRemove(req.params.chat)
+	});
+	if (!status2) return res.status(500).json({ error: "Error removing chat from user" });
+
+	return res.status(200).json({ message: "Member removed from chat" });
+});
+
 
 /* Endpoint for getting a chat's messages */
 router.get("/:chat/messages", async (req, res) =>
