@@ -38,7 +38,7 @@ router.get("/search", async (req, res) => {
 	// Get up to 1000 users
 	fb.db.collection("users").orderBy("lowUsername", "asc").where("lowUsername", ">=", req.query.username).where("lowUsername", "<=", req.query.username + "\uf8ff").limit(1000).get().then(records => {
 		let users = [];
-		records.forEach(doc => { users.push(doc.data()); });
+		records.forEach(doc => { users.push({id:doc.id,...doc.data()}); });
 		return res.status(200).json(users);
 	}).catch(err => { return res.status(500).json({ error: err }); });
 })
