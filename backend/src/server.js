@@ -14,6 +14,7 @@ const dashboardRoute = require("./api/routes/Dashboard");
 const mapRoute = require("./api/routes/ContentMap");
 const reportReport = require("./api/routes/Report");
 const notificationsRoute = require("./api/routes/Notifications");
+const storageRoute = require("./api/routes/Storage");
 // Helpers
 const sockServer = require("./api/helpers/socket");
 
@@ -40,6 +41,7 @@ app.use("/api/dashboard", dashboardRoute);
 app.use("/api/maps", mapRoute);
 app.use("/api/reports", reportReport);
 app.use("/api/notifications", notificationsRoute);
+app.use("/api/storage", storageRoute);
 
 app.get("/api/home", (req, res) =>
 {

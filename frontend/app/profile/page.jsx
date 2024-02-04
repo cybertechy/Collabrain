@@ -76,6 +76,7 @@ const ProfilePage = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [image, setImage] = useState(null);
 
   //     // let sockCli = useRef(null);
   const handleNameEditClick = () => {
@@ -123,6 +124,7 @@ const ProfilePage = () => {
         setUsername(response.data.username);
         setName(response.data.fname + " " + response.data.lname);
         setEmail(response.data.email);
+        setImage(response.data.photo);
         if (response.status === 200) {
           // Set user info with the data obtained from the response
           const newPath = `/profile?username=${response.data.username}`;
@@ -143,11 +145,7 @@ const ProfilePage = () => {
       }
     };
     fetchUser();
-  }, [user]);
 
-  const [userTeams, setUserTeams] = useState(null);
-
-  useEffect(() => {
     const fetchUserTeams = async () => {
       setIsLoading(true);
       setError(null);
@@ -209,7 +207,52 @@ const ProfilePage = () => {
 
     // Call the function to fetch user teams when the component mounts
     fetchUserTeams();
-  }, []);
+  }, [user]);
+
+  useEffect(() => {
+    // get axios request to fetch user info 
+    if (!image) return;
+    if( typeof image !== "string") return;
+    fb.getToken().then((token) => {
+      console.log("Fetch Image: ",image);
+      let response = axios.get(`http://localhost:8080/api/storage/media/${image}`, {
+        headers: { Authorization: "Bearer " + token }
+      });
+
+      response.then((res) => {
+        setImage(res.data);
+      });
+    });
+  }, [image]);
+
+  const [userTeams, setUserTeams] = useState(null);
+
+
+  const uploadImage = async (file, type) => {
+    try {
+      const token = await fb.getToken();
+
+      //send the photo and type as Patch body
+      const response = await axios.patch(`http://localhost:8080/api/users/`, {
+        photo: file,
+        type: type
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.status === 200) {
+        return response.data;
+      } else {
+        throw new Error('Failed to upload image');
+      }
+    }
+    catch (error) {
+      console.error('Error uploading image:', error);
+      // You can handle errors and provide user feedback here
+    }
+  }
 
   return (
     <Template>
@@ -224,9 +267,8 @@ const ProfilePage = () => {
             <div className="text-center">
               <div className="mb-4">
                 <UploadButton
-                  onUpload={(file) => {
-                    console.log('File uploaded:', file);
-                  }}
+                  onUpload={uploadImage}
+                  photo={image}
                 />
               </div>
               <div className='relative mb-4 flex items-center ml-6'>

@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const fb = require("../helpers/firebase");
+const uuid = require('uuid');
+const oci = require("../helpers/oracle");
 
 /************************************************************/
 /*                   User CRUD Operations                   */
@@ -80,7 +82,7 @@ router.post("/", (req, res) => {
 	let users = fb.db.collection("users").where("email", "==", req.body.email);
 	if (users.length > 0)
 		return res.status(400).json({ error: "User already exists" });
-
+	
 	// Add user to database
 	fb.db.doc(`users/${req.body.uid}`).set(
 		{
@@ -116,7 +118,7 @@ router.post("/", (req, res) => {
 // Update user info
 router.patch("/", async (req, res) => {
 	// Make sure all required fields are present
-	if (!req.headers.authorization)
+	if (!req.headers.authorization || Object.keys(req.body).length === 0)
 		return res.status(400).json({ error: "Missing required data" });
 
 	// Verify token
@@ -133,6 +135,24 @@ router.patch("/", async (req, res) => {
 		// Update lowUsername
 		req.body.lowUsername = req.body.username.toLowerCase();
 	}
+
+	if(req.body.photo && req.body.type){
+		// get current photo
+		let userRef = await fb.db.doc(`users/${user.uid}`).get();
+		if (!userRef.exists)
+			return res.status(404).json({ error: "User not found" });
+
+		let userdata = userRef.data();
+
+		if(!userdata.photo) userdata.photo = uuid.v4();
+
+		// Upload photo to OCI
+		let photo = await oci.addData("B1",userdata.photo,req.body.type,req.body.photo, { "user": user.uid });
+		if(!photo.eTag) return res.status(500).json({ error: "Image not updated" });
+
+		req.body.photo = userdata.photo
+	}
+
 
 	// Update user info
 	fb.db.doc(`users/${user.uid}`).update(req.body)

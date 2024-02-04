@@ -1,26 +1,55 @@
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import { CameraAlt } from '@mui/icons-material';
+import axios from 'axios';
+
+function convertBase64(file) {
+    return new Promise((resolve, reject) => {
+        const fileReader = new FileReader();
+        fileReader.readAsDataURL(file);
+
+        fileReader.onload = () => {
+            resolve(fileReader.result);
+        };
+
+        fileReader.onerror = (error) => {
+            reject(error);
+        }
+    }
+    );
+}
 
 
-const UploadButton = ({ onUpload }) => {
-    const [uploadedImage, setUploadedImage] = useState(null);
 
+
+const UploadButton = ({ onUpload , photo }) => {
+    const [uploadedImage, setUploadedImage] = useState(photo?.data );
+    
     const handleFileChange = async (event) => {
         const file = event.target.files[0];
-
+    
         try {
             // Call the onUpload function and pass the file
             // const imageUrl = await onUpload(file);
-            const temporaryUrl = URL.createObjectURL(file);
+            let Image = URL.createObjectURL(file);
+            Image = await convertBase64(file);
             // Update the UI with the uploaded image URL
-            setUploadedImage(temporaryUrl);
+            setUploadedImage(Image);
             // const imageUrl = await onUpload(file);
+            
+            if(onUpload) onUpload(Image,file.type);
         } catch (error) {
             // Handle any errors that occur during the upload
             console.error('Image upload error:', error);
             // You can also provide user feedback here
         }
     };
+
+    useEffect(() => {
+        if(photo){
+            setUploadedImage(photo.data);
+        }
+    }, [photo]);
+
 
     return (
         <div className="flex justify-center items-center w-full">
