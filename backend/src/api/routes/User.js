@@ -382,4 +382,36 @@ router.delete("/block/:user", async (req, res) => {
 		.catch(err => { return res.status(500).json({ error: err }); });
 });
 
+
+// Get blocked users
+router.get("/blocked/users", async (req, res) => {
+	// Make sure all required fields are present
+	if (!req.headers.authorization)
+		return res.status(400).json({ error: "Missing required data" });
+
+	// verfiy token
+	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
+	if (!user)
+		return res.status(401).json({ error: "Unauthorized" });
+
+	// Get blocked users
+	let userRef = await fb.db.doc(`users/${user.uid}`).get();
+	if (!userRef?.exists)
+		return res.status(404).json({ error: "User not found" });
+
+	let userdata = userRef.data();
+
+	let blocked = await Promise.all(userdata.blocked.map(async (uid) => {
+		let userRef = await fb.db.doc(`users/${uid}`).get();
+		if (!userRef?.exists)
+			return null;
+
+		return { id: userRef.id, fname: userRef.data().fname, lname: userRef.data().lname, username: userRef.data().username, email: userRef.data().email };
+	}));
+
+	// filter out null values
+	blocked = blocked.filter(user => user != null);
+
+	return res.json((blocked)? blocked : []);
+});
 module.exports = router;	
