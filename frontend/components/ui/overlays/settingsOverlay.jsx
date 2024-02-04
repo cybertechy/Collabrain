@@ -4,6 +4,8 @@ import UploadButton from "../button/uploadButton";
 import PersonIcon from "@mui/icons-material/Person";
 import SentimentVeryDissatisfiedIcon from "@mui/icons-material/SentimentVeryDissatisfied";
 import Image from 'next/image';
+import { useRouter } from "next/navigation";
+
 const BadBehaviorStrikes = ({ strikes }) => {
     const renderSadFace = (_, index) => (
         <div key={index} style={{ marginRight: "10px", display: "inline-block" }}>
@@ -237,25 +239,7 @@ const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
   };
 //  PROFILE SETTINGS PAGE
 const ProfileOverlay = ({  }) => {
-    const [name, setName] = useState("");
-    const [username, setUsername] = useState("");
-    const [email, setEmail] = useState("");
-    const [isNameEditMode, setIsNameEditMode] = useState(false);
-    const [isUsernameEditMode, setIsUsernameEditMode] = useState(false);
-    const [isEmailEditMode, setIsEmailEditMode] = useState(false);
-
-    const handleNameEditClick = () => {
-        setIsNameEditMode(!isNameEditMode);
-    };
-
-    const handleUsernameEditClick = () => {
-        setIsUsernameEditMode(!isUsernameEditMode);
-    };
-
-    const handleEmailEditClick = () => {
-        setIsEmailEditMode(!isEmailEditMode);
-    };
-
+    const router = useRouter();
     return (
         <>
         <div className="w-full h-5/6 flex ">
@@ -264,111 +248,52 @@ const ProfileOverlay = ({  }) => {
 
                     <div className="w-11/12 h-96  bg-basicallylight rounded-md">
                         <div className="flex flex-col justify-start h-full">
-                            <div>
-                                <UploadButton />
-                            </div>
-                            <div className=" mt-6">
-                                <div className="mb-4 block">
-                                    <p className="text-lg text-basicallydark">Name</p>
-                                    <div className="mb-4 flex justify-between">
-                                        <input
-                                            type="text"
-                                            placeholder="Enter your name"
-                                            value={name}
-                                            onChange={(e) =>
-                                                setName(e.target.value)
-                                            }
-                                            className="border bg-basicallylight border-gray-400 p-2 w-5/6 rounded-md focus:outline-none focus:border-primary text-gray-500"
-                                            disabled={!isNameEditMode}
-                                        />
-                                        <button
-                                            onClick={handleNameEditClick}
-                                            className="text-center text-sm inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-2 rounded-lg"
-                                        >
-                                            {isNameEditMode ? "Save" : "Edit"}
+                            
+
+                            <div className="w-11/12 h-11/12 bg-basicallylight rounded-md justify-center">
+                            <div className="mb-4">
+                                        
+                                        <button className="justify-center w-full font-semibold inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 rounded-full"
+                                        onClick= {() => router.push('/profile')}>
+                                            View your Profile
                                         </button>
                                     </div>
-                                </div>
-                                {/* <div className="mb-4 block">
-                                    <p className="text-lg text-basicallydark">Username</p>
-                                    <div className="mb-4 flex justify-between">
-                                        <input
-                                            type="text"
-                                            placeholder="Enter your username"
-                                            value={username}
-                                            onChange={(e) =>
-                                                setUsername(e.target.value)
-                                            }
-                                            className="border bg-basicallylight border-gray-400 p-2 w-5/6 rounded-md focus:outline-none focus:border-primary text-gray-500"
-                                            disabled={!isUsernameEditMode}
-                                        />
-                                        <button
-                                            onClick={handleUsernameEditClick}
-                                            className="text-center text-sm inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-2 rounded-lg"
-                                        >
-                                            {isUsernameEditMode ? "Save" : "Edit"}
-                                        </button>
-                                    </div>
-                                </div> */}
-                                {/* <div className="mb-4 block">
-                                    <p className="text-lg text-basicallydark">Email</p>
-                                    <div className="mb-4 flex justify-between">
-                                        <input
-                                            type="text"
-                                            placeholder="Enter your email"
-                                            value={email}
-                                            onChange={(e) =>
-                                                setEmail(e.target.value)
-                                            }
-                                            className="border bg-basicallylight border-gray-400 p-2 w-5/6 rounded-md focus:outline-none focus:border-primary text-gray-500"
-                                            disabled={!isEmailEditMode}
-                                        />
-                                        <button
-                                            onClick={handleEmailEditClick}
-                                            className="text-center text-sm inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-2 rounded-lg"
-                                        >
-                                            {isEmailEditMode ? "Save" : "Edit"}
-                                        </button>
-                                    </div>
-                                </div> */}
-                            </div>
-                            <div className="w-11/12 h-11/12 bg-basicallylight rounded-md">
-                                    <div className="mb-4">
-                                        <p className="mb-2 text-2xl  text-basicallydark ">
+                                    <div className="mt-8 mb-4">
+                                        <p className="mb-2 text-xl  text-basicallydark ">
                                             Password and Authentication
                                         </p>
-                                        <button className="text-center text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 ">
+                                        <button className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 ">
                                             Change Password
                                         </button>
                                     </div>
                                     <div className="mb-6 ">
-                                        <p className="mb-2 text-2xl text-basicallydark ">
+                                        <p className="mb-2 text-xl text-basicallydark ">
                                             Two-factor Authentication
                                         </p>
-                                        <p className="mb-2  text-base text-basicallydark ">
+                                        <p className="mb-2 text-base text-basicallydark ">
                                             Protect your Collabrain account with
                                             an extra layer of security.
                                         </p>
-                                        <button className="text-center text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 ">
+                                        <button className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 ">
                                             Enable
                                         </button>
                                     </div>
                                 </div>
                                 <div className="  w-11/12 h-48  bg-basicallylight rounded-md">
                                     <div className="mb-6 ">
-                                        <p className="mb-2 text-2xl  text-basicallydark   ">
+                                        <p className="mb-2 text-xl text-basicallydark   ">
                                             Account Removal
                                         </p>
-                                        <p className="mb-2  text-basicallydark  ">
+                                        <p className="mb-2 text-basicallydark  ">
                                             Disabling your account means you can
                                             recover it at any time after taking
                                             this action
                                         </p>
                                         <div className="flex space-x-5">
-                                            <button className="text-center text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 ">
+                                            <button className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 ">
                                                 Delete
                                             </button>
-                                            <button className="text-center text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 ">
+                                            <button className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 ">
                                                 Disable
                                             </button>
                                         </div>
