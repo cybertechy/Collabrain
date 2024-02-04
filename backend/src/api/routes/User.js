@@ -262,17 +262,19 @@ router.post("/friends/:user", async (req, res) => {
 		return res.status(400).json({ error: "No friend requests" });
 
 	let friendRequest = friendRequests.includes(req.params.user);
-	if (friendRequest == undefined)
+	if (!friendRequest)
 		return res.status(400).json({ error: "No friend requests" });
 
 	try {
 		// Add to friends lists
 		// Current user
-		fb.db.doc(`users/${user.uid}`).update({ friends: fb.admin.firestore.FieldValue.arrayUnion(req.params.user) });
+		fb.db.doc(`users/${user.uid}`).update({ friends: fb.admin.firestore.FieldValue.arrayUnion(req.params.user),
+			friendRequests: fb.admin.firestore.FieldValue.arrayRemove(req.params.user)
+		 });
 		// Other user
 		fb.db.doc(`users/${req.params.user}`).update({ friends: fb.admin.firestore.FieldValue.arrayUnion(user.uid) });
-		// Remove from friend requests
-		fb.db.doc(`users/${user.uid}`).update({ friendRequests: fb.admin.firestore.FieldValue.arrayRemove(friendRequest) });
+		
+		
 
 		return res.status(200).json({ message: "Friend request accepted" });
 	}
