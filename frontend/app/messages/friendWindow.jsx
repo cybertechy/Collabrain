@@ -92,8 +92,30 @@ const FriendsWindow = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-
-      setRecievedFriends(response.data);
+  
+      const friendRequests = response.data.map(async (friendRequest) => {
+        // Fetch user data for each friend request by ID
+        const userResponse = await axios.get(`http://localhost:8080/api/users/${friendRequest.user}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+  
+        // Add the 'listType' property with a value of 'pending' to each friend request
+        return {
+          ...friendRequest,
+          listType: 'pending',
+          username: userResponse.data.username,
+          name: userResponse.data.fname + " " + userResponse.data.lname,
+          senderData: userResponse.data, 
+        };
+      });
+  
+      // Use Promise.all to wait for all user data to be fetched
+      const receivedFriendRequests = await Promise.all(friendRequests);
+      
+      console.log("Recieved Friends", receivedFriendRequests);
+      setRecievedFriends(receivedFriendRequests);
     } catch (error) {
       console.error("Error fetching friend requests:", error);
     }

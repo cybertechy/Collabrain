@@ -5,6 +5,8 @@ import PersonIcon from "@mui/icons-material/Person";
 import SentimentVeryDissatisfiedIcon from "@mui/icons-material/SentimentVeryDissatisfied";
 import Image from 'next/image';
 import axios from "axios";
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
+import { useRouter } from 'next/navigation';
 import jsPDF from 'jspdf';
 const fb = require("_firebase/firebase");
 
@@ -260,7 +262,8 @@ const ProfileOverlay = ({ user }) => {
     const [isUsernameEditMode, setIsUsernameEditMode] = useState(false);
     const [isEmailEditMode, setIsEmailEditMode] = useState(false);
     const [userInfo, setUserInfo] = useState(null);
-    
+    const [openDialog, setOpenDialog] = useState(false); // State to control dialog visibility
+const router = useRouter();
     const handleNameEditClick = () => {
         setIsNameEditMode(!isNameEditMode);
     };
@@ -272,6 +275,7 @@ const ProfileOverlay = ({ user }) => {
     const handleEmailEditClick = () => {
         setIsEmailEditMode(!isEmailEditMode);
     };
+    
     useEffect(() => {
         if (!user) return;
         console.log(user, " exists")
@@ -299,7 +303,26 @@ const ProfileOverlay = ({ user }) => {
         setUsername(userInfo.username);
         setEmail(userInfo.email);
     }, [userInfo]);
+    const handleDeleteUser = async () => {
+        try {
+            const token = await fb.getToken(); // Assuming fb.getToken() gets the current user's token
+            await axios.delete(`http://localhost:8080/api/users/${user.uid}`, {
+                headers: { "Authorization": "Bearer " + token }
+            });
+            router.push('/'); 
+        } catch (error) {
+            console.error('Error deleting user:', error);
+            // Optionally, handle error (e.g., show an error message)
+        }
+    };
 
+    const handleClickOpen = () => {
+        setOpenDialog(true);
+    };
+
+    const handleClose = () => {
+        setOpenDialog(false);
+    };
     return (
         <>
         <div className="w-full h-5/6 flex ">
@@ -350,9 +373,27 @@ const ProfileOverlay = ({ user }) => {
                                             this action
                                         </p>
                                         <div className="flex space-x-5">
-                                            <button className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 ">
-                                                Delete
-                                            </button>
+                                        <button className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 " onClick={handleClickOpen}>
+                Delete
+            </button>
+            {/* Dialog for confirmation */}
+            <Dialog open={openDialog} onClose={handleClose}>
+                <DialogTitle>{"Confirm Account Deletion"}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Are you sure you want to delete your account? This action cannot be undone.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleClose}>Cancel</Button>
+                    <Button onClick={() => {
+                        handleDeleteUser();
+                        handleClose();
+                    }} autoFocus>
+                        Confirm
+                    </Button>
+                </DialogActions>
+            </Dialog>
                                             <button className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 ">
                                                 Disable
                                             </button>
