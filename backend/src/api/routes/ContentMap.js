@@ -274,7 +274,7 @@ router.get("/ut/search", async (req, res) => {
 
     const [usersBasedOnEmail, usersBasedOnUsername, teamsBasedOnName] = await Promise.all([
         usersRef.where("email", ">=", query).where("email", "<=", query + "\uf8ff").get(),
-        usersRef.where("username", ">=", query).where("username", "<=", query + "\uf8ff").get(),
+        usersRef.where("lowUsername", ">=", query).where("lowUsername", "<=", query + "\uf8ff").get(),
         teamsRef.where("name", ">=", query).where("name", "<=", query + "\uf8ff").get()
     ]);
     

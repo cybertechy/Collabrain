@@ -34,28 +34,28 @@ const DashboardInfoBar = ({ sortName, setSortName, sortDate, setSortDate, isAsce
   return (
     <div className="flex items-center justify-between bg-aliceBlue p-4 w-full drop-shadow-md mb-3">
       <div className="flex items-center">
-        {pathParts.map((part, index) => (
-          <React.Fragment key={index}>
-            {index === 0 ? (
-              // If it's the first part (MyBrain), link to /dashboard
-              <p
-                className='text-xl font-bold font-poppins text-primary cursor-pointer underline'
-                onClick={() => router.push('/dashboard')}
-              >
-                {part}
-              </p>
-            ) : (
-              // For other parts, link to /dashboard?path=${path}
-              <p
-                className='text-xl font-bold font-poppins text-primary cursor-pointer'
-                onClick={() => router.push(`/dashboard?path=${pathParts.slice(0, index + 1).join('/')}`)}
-              >
-                {part}
-              </p>
-            )}
-            {index < pathParts.length - 1 && <ChevronRight fontSize="large" className="text-primary mx-2" />}
-          </React.Fragment>
-        ))}
+
+      {pathParts.map((part, index) => (
+  <React.Fragment key={index}>
+    {index === 0 ? (
+      <p
+        className='text-xl font-bold font-poppins text-primary cursor-pointer underline'
+        onClick={() => router.push('/dashboard')}
+      >
+        {part}
+      </p>
+    ) : (
+      <p
+        className='text-xl font-bold font-poppins text-primary cursor-pointer'
+        onClick={() => router.push(`/dashboard?path=/${pathParts.slice(1, index + 1).join('/')}`)}
+        // Use pathParts.slice(1, index + 1) to include "MyBrain" as the initial slash
+      >
+        {part}
+      </p>
+    )}
+    {index < pathParts.length - 1 && <ChevronRight fontSize="large" className="text-primary mx-2" />}
+  </React.Fragment>
+))}
       </div>
       <div className="flex items-center">
         <DropdownDashboard

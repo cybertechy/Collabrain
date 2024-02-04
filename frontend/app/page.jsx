@@ -1,4 +1,3 @@
-
 "use client";
 
 const fb = require("_firebase/firebase"); // Import the authentication functions
