@@ -341,11 +341,14 @@ router.get("/files", async (req, res) => {
 		// For each file id, fetch the corresponding type data, such name and updateAt
 
 		for (let i = 0; i < folder.contentMaps?.length; i++) {
+			console.log(folder.contentMaps[i]);
 			let file = await fb.db.doc(`contentMaps/${folder.contentMaps[i]}`).get();
 			if (!file)
 				return res.status(400).json({ error: "File not found" });
 
 			file = file.data();
+			if(!file) continue
+			
 
 			files.push({
 				id: folder.contentMaps[i],

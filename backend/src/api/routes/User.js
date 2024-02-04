@@ -238,6 +238,7 @@ router.post("/friends/request/:user", async (req, res) => {
 		return res.status(404).json({ error: "User not found" });
 
 	let friends = doc.data().friends;
+	console.log(friends);
 	if (friends.includes(req.params.user))
 		return res.status(400).json({ error: "Already friends" });
 
