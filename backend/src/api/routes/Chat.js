@@ -19,73 +19,73 @@ router.post("/", async (req, res) =>
 		return res.status(401).json({ error: "Unauthorized" });
 
 	// Create new chat
+	let members = req.body.members?.concat(user.uid);
+
+	if(!members) return res.status(400).json({ error: "Missing required data" });
+	if (members?.length < 2) return res.status(400).json({ error: "Not enough members" });
+
 	let ref = await fb.db.collection("chats").add({
-		members: req.body.members + [user.uid],
+		members,
 	});
 
 	// Add chat to each member's chats
-	req.body.members.forEach(async (member) =>
+	members.forEach(async (member) =>
 	{
-		fb.db.doc(`users/${user.uid}`).update({
+		
+		let status = await fb.db.doc(`users/${member}`).update({
 			chats: fb.admin.firestore.FieldValue.arrayUnion(ref.id)
 		});
+
+		if (!status) return res.status(500).json({ error: "Error adding chat to user" });
 	});
 
 	return res.status(200).json({ message: "Chat created" });
 });
+
 /* Endpoint for retrieving all chats a user is part of */
-router.get("/user/chats", async (req, res) => {
-    if (!req.headers.authorization) {
-        return res.status(400).json({ error: "Missing required data" });
-    }
+router.get("/", async (req, res) =>
+{
+	// Make sure all required fields are present
+	if (!req.headers.authorization)
+		return res.status(400).json({ error: "Missing required data" });
 
-    let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]);
-    if (!user) {
-        return res.status(401).json({ error: "Unauthorized" });
-    }
+	// verify token
+	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
+	if (!user)
+		return res.status(401).json({ error: "Unauthorized" });
 
-    try {
-        const userDoc = await fb.db.doc(`users/${user.uid}`).get();
-        const userChats = userDoc.data()?.chats;
+	// get chats from users
+	let userRef = await fb.db.doc(`users/${user.uid}`).get();
+	if(!userRef?.data()?.chats)
+		return res.status(200).json({ message: "No chats" });
 
-        if (!userChats) {
-            return res.status(404).json({ message: "No chats found for user" });
-        }
+	//Promise.all and get the chats info
+	let chats = [];
+	let chatsStatus = await Promise.all(userRef.data().chats.map(async chat =>
+	{
+		// get chat info
+		let chatRef = await fb.db.doc(`chats/${chat}`).get();
+		chats.push({id:chat ,...chatRef.data()});
 
-        let chatsDetails = [];
-        for (let chatId of userChats) {
-            const chatDoc = await fb.db.doc(`chats/${chatId}`).get();
-            const chatData = chatDoc.data();
+		// get chat members info
+		let members = [];
+		let membersStatus = await Promise.all(chatRef.data().members.map(async member =>
+		{
+			let memberRef = await fb.db.doc(`users/${member}`).get();
+			members.push({ id: member, username: memberRef.data().username, email: memberRef.data().email , fname: memberRef.data().fname, lname: memberRef.data().lname});
+		}));
 
-            let membersDetails = [];
-            for (let memberId of chatData.members) {
-                const memberDoc = await fb.db.doc(`users/${memberId}`).get();
-                const memberData = memberDoc.data();
+		chats[chats.length-1].members = members;
 
-               
-                membersDetails.push({
-                    uid: memberId,
-                    fname: `${memberData?.fname}`,
-					lname: `${memberData?.lname}`,                     
-					photo: memberData?.photo, 
-                    bio: memberData?.bio, 
-                    email: memberData?.email, 
-                    username: memberData?.username, 
-                   
-                }); 
-            }
+		// also get the last message
+		let lastMessage = await fb.db.collection(`chats/${chat}/messages`).orderBy("sentAt", "desc").limit(1).get();
+		if(lastMessage.size > 0)
+			chats[chats.length-1].lastMessage = lastMessage.docs[0].data();
+		else
+			chats[chats.length-1].lastMessage = null;
+	}));
 
-            chatsDetails.push({
-                chatId: chatId,
-                members: membersDetails,
-            });
-        }
-
-        return res.status(200).json(chatsDetails);
-    } catch (err) {
-        console.error("Error retrieving chats: ", err);
-        return res.status(500).json({ error: "Internal server error" });
-    }
+	return res.status(200).json(chats);
 });
 
 
