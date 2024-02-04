@@ -10,34 +10,55 @@ const DirectMessageItem = ({ name, message, avatar, onClick }) => {
   
    
 
-    function stringAvatar(name = "User") {
-        return {
-          sx: {
-            bgcolor: stringToColor(name),
-          },
-          children: `${name.split(' ')[0][0]}${name.split(' ')[1] ? name.split(' ')[1][0] : ''}`,
-        };
-      }
-      
-      function stringToColor(string = "User") {
-        let hash = 0;
-        let i;
-      
-        /* Convert string to hash */
-        for (i = 0; i < string.length; i += 1) {
-          hash = string.charCodeAt(i) + ((hash << 5) - hash);
-        }
-      
-        /* Convert hash to color */
-        let color = '#';
-      
-        for (i = 0; i < 3; i += 1) {
-          const value = (hash >> (i * 8)) & 0xff;
-          color += `00${value.toString(16)}`.slice(-2);
-        }
-      
-        return color;
-      }
+  function stringAvatar(name = "User") {
+    // Split the name into words, capitalize the first letter of each, and join the initials
+    const initials = name.split(' ')
+      .map(word => word[0] ? word[0].toUpperCase() : '') // Capitalize the first letter of each word
+      .join('');
+  
+    return {
+      sx: {
+        bgcolor: stringToColor(name),
+      },
+      children: initials, // Use the capitalized initials
+    };
+  }
+  
+  function stringToColor(string = "User") {
+    let hash = 0;
+    let i;
+  
+    // Convert string to hash
+    for (i = 0; i < string.length; i += 1) {
+      hash = string.charCodeAt(i) + ((hash << 5) - hash);
+    }
+  
+    // Convert hash to color
+    let color = '#';
+    for (i = 0; i < 3; i += 1) {
+      const value = (hash >> (i * 8)) & 0xff;
+      color += `00${value.toString(16)}`.slice(-2);
+    }
+  
+    // Check if color is too light
+    if (isColorLight(color)) {
+      // If color is light, return a dark color or adjust the color as needed
+      return { backgroundColor: color, color: '#000' }; // light color background, dark text
+    } else {
+      // If color is dark, return it with a light text color
+      return { backgroundColor: color, color: '#fff' }; // dark color background, light text
+    }
+  }
+  
+  function isColorLight(color) {
+    const hex = color.replace('#', '');
+    const c_r = parseInt(hex.substr(0, 2), 16);
+    const c_g = parseInt(hex.substr(2, 2), 16);
+    const c_b = parseInt(hex.substr(4, 2), 16);
+    const brightness = ((c_r * 299) + (c_g * 587) + (c_b * 114)) / 1000;
+    return brightness > 155; // Brightness threshold, adjust if needed
+  }
+  
       
   return (
     <ListItem button onClick={onClick} className="border-b border-gray-200">
@@ -101,17 +122,21 @@ return (
                 </Button> */}
 
 
-                <List className="overflow-auto text-basicallydark">
-                    {directMessages.map((dm, index) => (
-                        <DirectMessageItem
-                            key={index}
-                            name={dm.name}
-                            message={dm.message}
-                            avatar={dm.avatar}
-                            onClick={() => console.log(`Clicked on ${dm.name}`)}
-                        />
-                    ))}
-                </List>
+<List className="overflow-auto text-basicallydark">
+  
+  {
+   Array.isArray(directMessages) &&
+  directMessages?.map((dm, index) => (
+    <DirectMessageItem
+      key={index}
+      data = {dm.members[1]}
+      name={dm.members[1].fname + " " + dm.members[1].lname} // Assuming the first member is the recipient
+      message={dm.lastMessage ? dm.lastMessage.message : 'Enter your first message!'} // Display the last message if available
+      avatar={dm.members[1].id} // You can use the member ID or another identifier for the avatar
+      onClick={() => console.log(`Clicked on ${dm.members[1].username}`)}
+    />
+  ))}
+</List>
             </div>
 
             <div>

@@ -107,7 +107,7 @@ const FriendTile = ({ friendData, onMoreOptions, id, setRefreshList, refreshList
         
         // Replace 'your_server_url' with your actual server URL
         const response = await axios.post('http://localhost:8080/api/chats/', {
-          members: [user.uid, id], // Include the current user and the friend in the chat
+          members: [id], // Include the current user and the friend in the chat
         }, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -260,7 +260,8 @@ const FriendTile = ({ friendData, onMoreOptions, id, setRefreshList, refreshList
           <IconButton sx={{ bgcolor: 'action.hover', borderRadius: '50%' }}>
             <NotificationsNoneIcon />
           </IconButton>
-          <IconButton sx={{ bgcolor: 'action.hover', borderRadius: '50%', marginX: 1 }}>
+          <IconButton sx={{ bgcolor: 'action.hover', borderRadius: '50%', marginX: 1 }}
+            onClick={() => handleChatClick(friendData)}>
             <ChatBubbleOutlineIcon />
           </IconButton>
         </>

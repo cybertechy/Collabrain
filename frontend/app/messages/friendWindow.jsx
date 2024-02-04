@@ -18,6 +18,8 @@ const FriendsWindow = () => {
   const [RecievedFriends, setRecievedFriends] = useState([]);
   const [blockedUsers, setBlockedUsers] = useState([]);
   const [refreshList, setRefreshList] = useState(0);
+  const [directMessages, setDirectMessages] = useState([]);
+  const [user, loading] = fb.useAuthState();
   const searchDelay = 500;
   const searchTimerRef = useRef(null);
 
@@ -44,7 +46,7 @@ const FriendsWindow = () => {
       return [];
     }
   };
-
+  
   useEffect(() => {
     if (activeTab === 'addFriend' && searchQuery.trim() !== '') {
       if (searchTimerRef.current) {
@@ -76,9 +78,27 @@ const FriendsWindow = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-
-      const { friends } = response.data;
-      setFriendsList(friends);
+  
+      const friends = response.data.friends;
+  
+      // Create an array of promises to fetch detailed information for each friend
+      const friendPromises = friends.map(async (friendId) => {
+        const friendResponse = await axios.get(`http://localhost:8080/api/users/${friendId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+  
+        return {
+          id: friendId,
+          ...friendResponse.data,
+        };
+      });
+  
+      // Use Promise.all to wait for all friend data to be fetched
+      const detailedFriends = await Promise.all(friendPromises);
+  
+      setFriendsList(detailedFriends);
     } catch (error) {
       console.error("Error fetching friends:", error);
     }
@@ -151,7 +171,9 @@ const FriendsWindow = () => {
   
     if (searchQuery && activeTab !== 'addFriend') {
       // Ensure list is an array before attempting to filter, to prevent "filter is not a function" errors
-      list = list.filter(friend => friend.name?.toLowerCase().includes(searchQuery.toLowerCase()));
+      if (Array.isArray(list)) {
+        list = list.filter(friend => friend.name?.toLowerCase().includes(searchQuery.toLowerCase()));
+      }
     }
   
     setVisibleList(list);

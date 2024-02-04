@@ -23,7 +23,7 @@ const sockServer = require("./api/helpers/socket");
 // Config
 const limiter = rateLimit({
 	windowMs: 2*1000, // 2 minutes
-	limit: 10, // Limit each IP to 100 requests per `window` (here, per 2 minutes).
+	limit: 100, // Limit each IP to 100 requests per `window` (here, per 2 minutes).
 	standardHeaders: 'draft-7', // draft-6: `RateLimit-*` headers; draft-7: combined `RateLimit` header
 	legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
 });

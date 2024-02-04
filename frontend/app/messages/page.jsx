@@ -25,6 +25,7 @@ export default function Messages() {
     const [showChat, setShowChat] = useState(false);
     const [userInfo, setUserInfo] = useState(null);
     const [text, setText] = useState([]);
+    const [directMessages, setDirectMessages] = useState([]);
     const sockCli = useRef(null);
     useEffect(() => {
         if (!user) return;
@@ -82,7 +83,32 @@ export default function Messages() {
             }).catch((err) => console.log(err));
         });
     }, [user]);
-	
+    useEffect(() => {
+        if (!user) return;
+    
+        // Fetch direct messages using the new function
+        fetchDirectMessages().then((directMessages) => {
+          // Update the state with the fetched direct messages
+          setDirectMessages(directMessages);
+        });
+      }, [user]);
+	const fetchDirectMessages = async () => {
+        try {
+          const token = await fb.getToken();
+          const response = await axios.get("http://localhost:8080/api/chats/", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+      
+          // Assuming the response data contains the list of direct messages
+          console.log("Direct messages:", response.data);
+          return response.data;
+        } catch (error) {
+          console.error("Error fetching direct messages:", error);
+          return [];
+        }
+      };
 
 	const sendPersonalMsg = async (msg) =>
 	{
@@ -140,23 +166,7 @@ export default function Messages() {
     );
 
 
-    const directMessages = [
-        {
-          name: 'Jane Doe',
-          message: 'Hey, how are you?',
-          avatar: 'https://i.pravatar.cc/300?img=1', // This is a placeholder avatar URL
-        },
-        {
-          name: 'John Smith',
-          message: 'Sent a photo',
-          avatar: 'https://i.pravatar.cc/300?img=2',
-        },
-        {
-          name: 'Alice Johnson',
-          message: 'Can we meet tomorrow?',
-          avatar: 'https://i.pravatar.cc/300?img=3',
-        },
-      ];
+   
     
       // Handler for the friends button
       const handleFriendsClick = () => {
