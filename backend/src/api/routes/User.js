@@ -218,7 +218,7 @@ router.post("/friends/request/:user", async (req, res) => {
 
 // Cancel/decline friend request
 router.delete("/friends/request/:user", async (req, res) => {
-	// req.body.type = "cancel" or "decline"
+	//Not needed:  req.body.type = "cancel" or "decline"
 
 	// Make sure all required fields are present
 	if (!req.headers.authorization || !req.body.type)
@@ -229,11 +229,11 @@ router.delete("/friends/request/:user", async (req, res) => {
 	if (!user)
 		return res.status(401).json({ error: "Unauthorized" });
 
-	let uid = (req.body.type == "cancel") ? req.params.user : user.uid;
+	//let uid = (req.body.type == "cancel") ? req.params.user : user.uid;
 
 	// Cancel friend request
-	fb.db.doc(`users/${uid}`).update({
-		friendRequests: fb.admin.firestore.FieldValue.arrayRemove({ user: uid })
+	fb.db.doc(`users/${user.uid}`).update({
+		friendRequests: fb.admin.firestore.FieldValue.arrayRemove(req.params.user)
 	})
 		.then(() => { return res.json({ message: "Removed friend request" }); })
 		.catch(err => { return res.status(500).json({ error: err }); });
