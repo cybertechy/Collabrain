@@ -10,14 +10,14 @@ const router = Router();
 /* Create a New content map */
 // @RequestBody: { name: string, data: any, path: string }
 router.post("/", async (req, res) => {
-   
-    if(!req.headers.authorization || !req.body.name) return res.status(400).json({ code: 400, error: "Missing token or name" });
+
+    if (!req.headers.authorization || !req.body.name) return res.status(400).json({ code: 400, error: "Missing token or name" });
 
     //verify user
     const token = req.headers.authorization.split(' ')[1];
     const user = await verifyUser(token);
     if (!user) return res.status(403).json({ code: "AM102", error: "Invalid token" });
-    
+
 
     const db = fb.admin.firestore();
     const userRef = db.collection("users").doc(user.uid);
@@ -33,9 +33,9 @@ router.post("/", async (req, res) => {
     if (!uploadData.eTag) return res.status(500).json({ code: 500, error: "Uploading data failed" });
 
     // get the user's name from the database
-    if(!user.name) {
+    if (!user.name) {
         await db.doc(`users/${user.uid}`).get().then(doc => {
-            if(doc.exists) {
+            if (doc.exists) {
                 user.name = doc.data().fname + " " + doc.data().lname;
             }
         })
@@ -92,7 +92,7 @@ router.get("/", async (req, res) => {
         const contentMapRef = db.collection("contentMaps").doc(contentMapId);
         const contentMap = await contentMapRef.get();
         const contentMapData = contentMap.data();
-        return { id: contentMapId, name: contentMapData.name, path: contentMapData.path, createdAt: contentMapData.createdAt.toDate(), updatedAt: contentMapData.updatedAt.toDate()};
+        return { id: contentMapId, name: contentMapData.name, path: contentMapData.path, createdAt: contentMapData.createdAt.toDate(), updatedAt: contentMapData.updatedAt.toDate() };
     }));
 
     return res.status(200).json(contentMapsData);
@@ -107,7 +107,7 @@ router.get("/:id", async (req, res) => {
 
     // Check if the token exists
     if (!token) return res.status(400).json({ code: "AM101", error: "Missing token" });
-    
+
     //verify user
     const user = await verifyUser(token);
     if (!user) return res.status(403).json({ code: "AM102", error: "Invalid token" });
@@ -117,8 +117,8 @@ router.get("/:id", async (req, res) => {
     if (!contentMap.exists) return res.status(404).json({ code: "AM108", error: "Content map not found" });
     const contentMapData = contentMap.data();
 
-     //check if user has access to the content map
-     if(!contentMapData.Access[user.uid]) return res.status(403).json({ code: "AM109", error: "User does not have access to the content map" });
+    //check if user has access to the content map
+    if (!contentMapData.Access[user.uid]) return res.status(403).json({ code: "AM109", error: "User does not have access to the content map" });
 
     // get the data from oracle cloud
     const getData = await oci.getData("B3", contentMapData.data);
@@ -129,19 +129,19 @@ router.get("/:id", async (req, res) => {
 
     contentMapData.createdAt = contentMapData.createdAt.toDate();
     contentMapData.updatedAt = contentMapData.updatedAt.toDate();
- 
-    return res.status(200).json({...contentMapData,userAccess:contentMapData.Access[user.uid]?.role});
+
+    return res.status(200).json({ ...contentMapData, userAccess: contentMapData.Access[user.uid]?.role });
 });
 
 /* Update a content map of a user */
 router.put("/:id", async (req, res) => {
-    
-    if(!req.headers.authorization || !req.body) return res.status(400).json({ code: 400, error: "Missing token or data" });
+
+    if (!req.headers.authorization || !req.body) return res.status(400).json({ code: 400, error: "Missing token or data" });
 
     // Check if the data exists
     let token = req.headers.authorization.split(' ')[1];
     if (!token) return res.status(400).json({ code: 400, error: "Missing token" });
-    
+
 
     //verify user
     const user = await verifyUser(token);
@@ -159,31 +159,31 @@ router.put("/:id", async (req, res) => {
     }
 
     let userRole = contentMapData.Access[user.uid].role;
-    let updatedContentMap = {...contentMapData};
+    let updatedContentMap = { ...contentMapData };
 
-    if(userRole === "read") return res.status(403).json({ code: 403, error: "User does not have access to the operation" });
+    if (userRole === "read") return res.status(403).json({ code: 403, error: "User does not have access to the operation" });
 
     if (req.body.data && (userRole === "owner" || userRole === "edit")) {
 
-        
+
         // check if the data is uuid else generate new uuid
         if (uuid.validate(contentMapData.data)) updatedContentMap.data = contentMapData.data;
         else updatedContentMap.data = uuid.v4();
-        
+
         // upload data to oracle cloud
         const uploadData = await oci.addData("B3", contentMapData.data, "application/json", JSON.stringify(req.body.data));
-        
+
 
         if (!uploadData.eTag) {
             return res.status(500).json({ code: 500, error: "Uploading data failed" });
         }
     }
 
-    if ( userRole === "owner") {
+    if (userRole === "owner") {
 
-        if(req.body.name) updatedContentMap.name = req.body.name;
-        if(req.body.access) updatedContentMap.Access = req.body.access;
-        if(req.body.path) updatedContentMap.path = req.body.path;
+        if (req.body.name) updatedContentMap.name = req.body.name;
+        if (req.body.access) updatedContentMap.Access = req.body.access;
+        if (req.body.path) updatedContentMap.path = req.body.path;
     }
 
     updatedContentMap.updatedAt = fb.admin.firestore.FieldValue.serverTimestamp();
@@ -197,7 +197,7 @@ router.put("/:id", async (req, res) => {
 /* Delete a content map of a user */
 router.delete("/:id", async (req, res) => {
 
-    if(!req.headers.authorization) return res.status(400).json({ code: 400, error: "Missing token" });
+    if (!req.headers.authorization) return res.status(400).json({ code: 400, error: "Missing token" });
     const token = req.headers.authorization?.split(' ')[1];
 
 
@@ -222,30 +222,57 @@ router.delete("/:id", async (req, res) => {
         return res.status(403).json({ code: 403, error: "User does not have access to the operation" });
     }
 
+    
+
+
+    // remove the content map from users content maps array, by filtering out the content map id
+
+    if (contentMapData.path === "/") {
+        let userContentMaps = doc.data().contentMaps;
+        userContentMaps = userContentMaps.filter(contentMapId => contentMapId !== req.params.id);
+        let updateStatus = await userRef.update({
+            contentMaps: userContentMaps
+        });
+
+        // If fails, add the content map back to the with same id
+        if (!updateStatus) {
+            let status = await contentMapsRef.doc(req.params.id).set(contentMapData);
+            if (!status)
+                return res.status(500).json({ code: 500, error: "Critical Server Error" });
+
+
+            return res.status(500).json({ code: 500, error: "Deleting content map failed" });
+        }
+    } else {
+        // get the folder with same path
+        let folderRef = await userRef.collection("folders").where("path", "==", contentMapData.path).get();
+        if (!folderRef) return res.status(404).json({ code: 404, error: "Folder not found" });
+
+
+        let folder = folderRef?.docs[0]?.data();
+        if(!folder?.contentMaps) return res.status(500).json({ code: 500, error: "Critical Server Error" });
+
+        let contentMaps = folder.contentMaps;
+        contentMaps = contentMaps.filter(contentMapId => contentMapId !== req.params.id);
+        let updateStatus = await fb.db.doc(`users/${user.uid}/folders/${folderRef.docs[0].id}`).update({
+            contentMaps: contentMaps
+        });
+
+        // If fails, add the content map back to the with same id
+        if (!updateStatus) {
+            let status = await contentMapsRef.doc(req.params.id).set(contentMapData);
+            if (!status)
+                return res.status(500).json({ code: 500, error: "Critical Server Error" });
+            return res.status(500).json({ code: 500, error: "Deleting content map failed" });
+        }
+    }
+
     // delete the data from oracle cloud
     const deleteData = await oci.deleteFile("B3", contentMapData.data);
     if (!deleteData.lastModified) return res.status(500).json({ code: 500, error: "Deleting data failed" });
 
     let status = await contentMapRef.delete();
     if (!status) return res.status(500).json({ code: 500, error: "Deleting content map failed" });
-
-
-    // remove the content map from users content maps array, by filtering out the content map id
-    let userContentMaps = doc.data().contentMaps;
-    userContentMaps = userContentMaps.filter(contentMapId => contentMapId !== req.params.id);
-    let updateStatus =  await userRef.update({
-        contentMaps: userContentMaps
-    });
-
-    // If fails, add the content map back to the with same id
-    if (!updateStatus) {
-        let status = await contentMapsRef.doc(req.params.id).set(contentMapData);
-        if (!status)
-                return res.status(500).json({ code: 500, error: "Critical Server Error" });
-        
-
-        return res.status(500).json({ code: 500, error: "Deleting content map failed" });
-    }
 
     return res.status(200).json({ code: 200, id: req.params.id });
 });
@@ -277,7 +304,7 @@ router.get("/ut/search", async (req, res) => {
         usersRef.where("lowUsername", ">=", query).where("lowUsername", "<=", query + "\uf8ff").get(),
         teamsRef.where("name", ">=", query).where("name", "<=", query + "\uf8ff").get()
     ]);
-    
+
     // add them to users array, remove duplicates
     users = [...usersBasedOnEmail.docs, ...usersBasedOnUsername.docs];
 

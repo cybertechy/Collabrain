@@ -22,8 +22,8 @@ const sockServer = require("./api/helpers/socket");
 
 // Config
 const limiter = rateLimit({
-	windowMs: 2*1000, // 2 minutes
-	limit: 10, // Limit each IP to 100 requests per `window` (here, per 2 minutes).
+	windowMs: 1000, // 2 minutes
+	limit: 100, // Limit each IP to 100 requests per `window` (here, per 2 minutes).
 	standardHeaders: 'draft-7', // draft-6: `RateLimit-*` headers; draft-7: combined `RateLimit` header
 	legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
 });
@@ -40,6 +40,34 @@ app.use(
 	})
 );
 
+// Set headers 
+app.use(function(req, res, next) {
+
+	// allow requests from any origin
+	res.setHeader('Access-Control-Allow-Origin', '*');
+	res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+	res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+	res.setHeader('Access-Control-Allow-Credentials', true);
+
+	// x-rate-limit
+	res.setHeader('X-RateLimit-Limit', 25);
+	res.setHeader('X-RateLimit-Reset', 1000);
+
+	//CSP
+	res.setHeader("Content-Security-Policy", "default-src 'self'");
+	res.setHeader("X-Content-Security-Policy", "default-src 'self'");
+	res.setHeader("X-WebKit-CSP", "default-src 'self'");
+
+	// Content type
+	res.setHeader('Content-Type', 'application/json');
+
+	// Cache the data
+	res.setHeader('Cache-Control', 'public, max-age=31557600');
+
+	
+	next();
+});
+
 app.use(limiter);
 
 sockServer.init(server);
@@ -54,6 +82,8 @@ app.use("/api/maps", mapRoute);
 app.use("/api/reports", reportReport);
 app.use("/api/notifications", notificationsRoute);
 app.use("/api/storage", storageRoute);
+
+
 
 app.get("/api/home", (req, res) =>
 {
