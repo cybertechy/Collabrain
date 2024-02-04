@@ -17,7 +17,7 @@ const FriendsWindow = () => {
   const [visibleList, setVisibleList] = useState([]);
   const [RecievedFriends, setRecievedFriends] = useState([]);
   const [blockedUsers, setBlockedUsers] = useState([]);
-
+  const [refreshList, setRefreshList] = useState(0);
   const searchDelay = 500;
   const searchTimerRef = useRef(null);
 
@@ -151,7 +151,7 @@ const FriendsWindow = () => {
   
     if (searchQuery && activeTab !== 'addFriend') {
       // Ensure list is an array before attempting to filter, to prevent "filter is not a function" errors
-      list = list.filter(friend => friend.name.toLowerCase().includes(searchQuery.toLowerCase()));
+      list = list.filter(friend => friend.name?.toLowerCase().includes(searchQuery.toLowerCase()));
     }
   
     setVisibleList(list);

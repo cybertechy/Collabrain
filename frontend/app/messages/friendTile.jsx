@@ -18,8 +18,9 @@ import axios from 'axios';
 import {Dialog ,DialogTitle,DialogContent,DialogActions,Button,ListItemIcon,List} from '@mui/material';
 import React, { useState } from 'react';
 const fb  = require("_firebase/firebase");
-const FriendTile = ({ friendData, onMoreOptions }) => {
+const FriendTile = ({ friendData, onMoreOptions, id, setRefreshList, refreshList }) => {
   // Function to generate avatar with initials
+  const [user, loading] = fb.useAuthState();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
   const openDialog = () => {
@@ -98,15 +99,39 @@ const FriendTile = ({ friendData, onMoreOptions }) => {
   }
   function handleChatClick(friend) {
     console.log('Chat clicked for:', friend.username);
+    if(!user) return;
+    // Create a new chat with the current user and the selected friend
+    const createChat = async () => {
+      try {
+        const token = await fb.getToken();
+        
+        // Replace 'your_server_url' with your actual server URL
+        const response = await axios.post('http://localhost:8080/api/chats/', {
+          members: [user.uid, id], // Include the current user and the friend in the chat
+        }, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+  
+        console.log(response.data.message); // Log the response message (e.g., "Chat created")
+  
+        // Handle any UI updates or navigation to the newly created chat here
+      } catch (error) {
+        console.error('Error creating chat:', error);
+      }
+    };
+  
+    createChat(); // Call the function to create the chat
   }
-  function handleAddFriendClick(friend) {
+  function handleAddFriendClick() {
     // Make a POST request to send a friend request
     const sendFriendRequest = async () => {
       try {
         const token = await fb.getToken();
   
        
-        const response = await axios.post(`http://localhost:8080/api/users/friends/request/${friend.uid}`, null, {
+        const response = await axios.post(`http://localhost:8080/api/users/friends/request/${id}`, null, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -137,7 +162,7 @@ const FriendTile = ({ friendData, onMoreOptions }) => {
         });
 
         console.log(response.data.message); // Log the response message (e.g., "Friend request accepted")
-
+        setRefreshList
         // Handle any UI updates or state changes here, such as changing the friend's listType to 'accepted'
       } catch (error) {
         console.error("Error accepting friend request:", error);
