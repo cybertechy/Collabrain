@@ -4,6 +4,10 @@ import UploadButton from "../button/uploadButton";
 import PersonIcon from "@mui/icons-material/Person";
 import SentimentVeryDissatisfiedIcon from "@mui/icons-material/SentimentVeryDissatisfied";
 import Image from 'next/image';
+import axios from "axios";
+import jsPDF from 'jspdf';
+const fb = require("_firebase/firebase");
+
 const BadBehaviorStrikes = ({ strikes }) => {
     const renderSadFace = (_, index) => (
         <div key={index} style={{ marginRight: "10px", display: "inline-block" }}>
@@ -192,8 +196,20 @@ const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
   
   const SettingsOverlay = ({ onClose }) => {
     const [currentScreen, setCurrentScreen] = useState("profile");
-  
+    const [user, loading] = fb.useAuthState();
+    if (loading|| !user )
     return (
+        <div className="flex flex-col items-center justify-around min-h-screen">
+            <div className="flex flex-col items-center justify-center min-h-screen">
+               
+                <div className="loader mb-5"></div>
+
+             
+            </div>
+        </div>
+    );
+    return (
+        
       <div className="flex flex-row fixed top-0 left-0 w-full h-full items-center justify-center z-50 text-basicallydark bg-basicallylight bg-opacity-20 backdrop-blur-sm">
         <div className="bg-basicallylight w-3/6 h-5/6 bg-opacity-100 flex flex-row  shadow-lg rounded-xl border-2 border-gray-300">
         <OverlaySidebar
@@ -212,7 +228,7 @@ const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
                     </button>
 
             {currentScreen === "profile" && (
-              <ProfileOverlay  />
+              <ProfileOverlay  user = {user}/>
             )}
             {currentScreen === "general" && (
               <GeneralOverlay  />
@@ -221,7 +237,7 @@ const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
               <SoundOverlay />
             )}
             {currentScreen === "privacy" && (
-              <PrivacyOverlay />
+              <PrivacyOverlay user = {user}/>
             )}
             {currentScreen === "notifications" && (
               <NotificationsOverlay />
@@ -236,14 +252,15 @@ const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
     );
   };
 //  PROFILE SETTINGS PAGE
-const ProfileOverlay = ({  }) => {
+const ProfileOverlay = ({ user }) => {
     const [name, setName] = useState("");
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [isNameEditMode, setIsNameEditMode] = useState(false);
     const [isUsernameEditMode, setIsUsernameEditMode] = useState(false);
     const [isEmailEditMode, setIsEmailEditMode] = useState(false);
-
+    const [userInfo, setUserInfo] = useState(null);
+    
     const handleNameEditClick = () => {
         setIsNameEditMode(!isNameEditMode);
     };
@@ -255,6 +272,33 @@ const ProfileOverlay = ({  }) => {
     const handleEmailEditClick = () => {
         setIsEmailEditMode(!isEmailEditMode);
     };
+    useEffect(() => {
+        if (!user) return;
+        console.log(user, " exists")
+        const fetchUser = async () => {
+            try {
+                const token = await fb.getToken();
+                const response = await axios.get(`http://localhost:8080/api/users/${user.uid}`, {
+                    headers: { "Authorization": "Bearer " + token }
+                });
+                
+                setUserInfo(response.data );
+                console.log(userInfo);
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+              
+            }
+        };
+
+        fetchUser();
+    }, [user]);
+
+    useEffect(() => {
+        if (!userInfo) return;
+        setName(userInfo.fname + " " + userInfo.lname);
+        setUsername(userInfo.username);
+        setEmail(userInfo.email);
+    }, [userInfo]);
 
     return (
         <>
@@ -542,23 +586,100 @@ const SoundOverlay = () => {
 };
 
 // PRIVACY SETTINGS PAGE
-const PrivacyOverlay = () => {
+const PrivacyOverlay = (user) => {
     const [isDndToggled, setIsDndToggled] = useState(false);
-
+    const [userInfo, setUserInfo] = useState(null);
     const handleDndToggle = () => {
         setIsDndToggled(!isDndToggled);
     };
 
-    // Functions to handle export and delete data can be added here
-    // For example:
-    const handleExportData = () => {
-        // Implement export data logic
-    };
+ 
+
 
     const handleDeleteData = () => {
         // Implement delete data logic
     };
+    
+    useEffect(() => {
+        if (!user) return;
+        console.log(user, " exists")
+        const fetchUser = async () => {
+            try {
+                const token = await fb.getToken();
+                const response = await axios.get(`http://localhost:8080/api/users/${user.user.uid}`, {
+                    headers: { "Authorization": "Bearer " + token }
+                });
+             
+                setUserInfo(response.data );
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+              
+            }
+        };
 
+        fetchUser();
+    }, [user]);
+  
+    const handleExportData = () => {
+        console.log("in handle export data")
+      if (!userInfo) return;
+
+  console.log("handle export data continued", userInfo, user)
+      // Create a new jsPDF instance
+      const pdf = new jsPDF();
+        
+      // Define the content for the PDF
+      const content = `
+      ---------User Information---------
+      Username: ${userInfo.username}
+      Name: ${userInfo.fname + " " + userInfo.lname}
+      Email: ${userInfo.email}
+      Bio: ${userInfo.bio}
+      Achievements: ${userInfo.achievements}
+      Aliases: ${userInfo.aliases}
+
+
+
+      -------------Education--------------
+      Courses: ${userInfo.courses}
+      Education: ${userInfo.education}
+      Learning Material: ${userInfo.learningMaterial}
+
+
+
+      -----------Accessibility------------
+      Color Blind Filter: ${userInfo.colorBlindFilter}
+      Preferred Font Size: ${userInfo.fontSize}
+      Language: ${userInfo.language}
+      Theme: ${userInfo.theme}
+
+
+
+      -------------Security--------------
+      Two Factor Authentication: ${userInfo.twoFA}
+
+
+
+      -------------Socials--------------
+      Friend Requests: ${userInfo.friendRequests}
+      Friends: ${userInfo.friends}
+      Team Invites: ${userInfo.teamInvites}
+      Teams: ${userInfo.teams}
+      Blocked: ${userInfo.blocked}
+
+
+
+      -------------Projects--------------
+      Content Maps: ${userInfo.contentMaps}
+      Documents: ${userInfo.documents}
+      `;
+  
+      // Add the content to the PDF
+      pdf.text(content, 10, 10); // Adjust coordinates as needed
+  
+      // Save the PDF with a specific filename
+      pdf.save('user_information.pdf');
+    };
     return (
         <div className="w-full h-5/6 flex justify-center items-start">
             <div className="bg-basicallylight rounded-md flex w-full p-5 overflow-y-scroll scrollbar-thin scrollbar-thumb-primary">
@@ -583,6 +704,7 @@ const PrivacyOverlay = () => {
                            &nbsp;&nbsp;Export&nbsp;
                         </button>
                     </div>
+                    
                     <div className="mb-4 flex justify-between">
                         <p className="text-2xl text-basicallydark">
                             Delete my data

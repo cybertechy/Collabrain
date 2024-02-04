@@ -33,6 +33,61 @@ router.post("/", async (req, res) =>
 
 	return res.status(200).json({ message: "Chat created" });
 });
+/* Endpoint for retrieving all chats a user is part of */
+router.get("/user/chats", async (req, res) => {
+    if (!req.headers.authorization) {
+        return res.status(400).json({ error: "Missing required data" });
+    }
+
+    let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]);
+    if (!user) {
+        return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    try {
+        const userDoc = await fb.db.doc(`users/${user.uid}`).get();
+        const userChats = userDoc.data()?.chats;
+
+        if (!userChats) {
+            return res.status(404).json({ message: "No chats found for user" });
+        }
+
+        let chatsDetails = [];
+        for (let chatId of userChats) {
+            const chatDoc = await fb.db.doc(`chats/${chatId}`).get();
+            const chatData = chatDoc.data();
+
+            let membersDetails = [];
+            for (let memberId of chatData.members) {
+                const memberDoc = await fb.db.doc(`users/${memberId}`).get();
+                const memberData = memberDoc.data();
+
+                // Expand this section to include more fields from the user object
+                membersDetails.push({
+                    uid: memberId,
+                    fname: `${memberData?.fname}`,
+					lname: `${memberData?.lname}`,                     
+					photo: memberData?.photo, // User's profile picture if available
+                    bio: memberData?.bio, // User's short bio
+                    email: memberData?.email, // User's email
+                    username: memberData?.username, // User's username
+                   
+                }); 
+            }
+
+            chatsDetails.push({
+                chatId: chatId,
+                members: membersDetails,
+            });
+        }
+
+        return res.status(200).json(chatsDetails);
+    } catch (err) {
+        console.error("Error retrieving chats: ", err);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+});
+
 
 /* Endpoint for getting a chat's messages */
 router.get("/:chat/messages", async (req, res) =>

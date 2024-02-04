@@ -28,20 +28,37 @@ router.get("/", async (req, res) => {
 // search users
 router.get("/search", async (req, res) => {
 	if (!req.headers.authorization || !req.query.username)
-		return res.status(400).json({ error: "Missing required data" });
-
+	  return res.status(400).json({ error: "Missing required data" });
+  
 	// Verify token
 	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
 	if (!user)
-		return res.status(401).json({ error: "Unauthorized" });
-
+	  return res.status(401).json({ error: "Unauthorized" });
+  
 	// Get up to 1000 users
-	fb.db.collection("users").orderBy("lowUsername", "asc").where("lowUsername", ">=", req.query.username).where("lowUsername", "<=", req.query.username + "\uf8ff").limit(1000).get().then(records => {
+	fb.db.collection("users")
+	  .orderBy("lowUsername", "asc")
+	  .where("lowUsername", ">=", req.query.username)
+	  .where("lowUsername", "<=", req.query.username + "\uf8ff")
+	  .limit(1000)
+	  .get()
+	  .then((records) => {
 		let users = [];
-		records.forEach(doc => { users.push(doc.data()); });
+		records.forEach((doc) => {
+		  // Include the UID at the top level of each user object
+		  const userData = doc.data();
+		  users.push({
+			uid: doc.id, // Add the UID
+			...userData, // Include other user data
+		  });
+		});
 		return res.status(200).json(users);
-	}).catch(err => { return res.status(500).json({ error: err }); });
-})
+	  })
+	  .catch((err) => {
+		return res.status(500).json({ error: err });
+	  });
+  });
+  
 
 
 // Get user from ID

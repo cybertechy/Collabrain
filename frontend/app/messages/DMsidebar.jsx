@@ -86,19 +86,19 @@ return (
     <div className="flex flex-col h-full w-1/5 bg-neutral shadow-md">
         <div className="flex-grow flex flex-col justify-between">
             <div>
-                <Button style={buttonStyle} onClick={friendsHandler}>
+                <Button style={buttonStyle} onClick={()=>{}}>
                     <div className='flex justify-around items-center p-2 w-full  text-primary border-gray-200'>
                         <h2 className="text-lg font-normal font-poppins">Friends</h2>
                         <MessageIcon className='text-primary'/>
                     </div>
                 </Button>
                 
-                <Button style={buttonStyle} onClick={handleAddDM}>
+                {/* <Button style={buttonStyle} onClick={handleAddDM}>
                     <div className="flex justify-around items-center p-2 w-full text-primary border-gray-200">
                         <h2 className="text-lg font-normal font-poppins">Direct Messages</h2>
                         <AddIcon className='text-primary'/>
                     </div>
-                </Button>
+                </Button> */}
 
 
                 <List className="overflow-auto text-basicallydark">
