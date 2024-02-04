@@ -8,6 +8,7 @@ import axios from "axios";
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import jsPDF from 'jspdf';
+import { useRouter } from "next/navigation";
 const fb = require("_firebase/firebase");
 
 const BadBehaviorStrikes = ({ strikes }) => {

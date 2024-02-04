@@ -44,14 +44,6 @@ router.get("/search", async (req, res) => {
 	  .get()
 	  .then((records) => {
 		let users = [];
-		records.forEach((doc) => {
-		  // Include the UID at the top level of each user object
-		  const userData = doc.data();
-		  users.push({
-			uid: doc.id, // Add the UID
-			...userData, // Include other user data
-		  });
-		});
 		records.forEach(doc => { users.push({id:doc.id,...doc.data()}); });
 		return res.status(200).json(users);
 	  })
