@@ -105,7 +105,7 @@ const FriendTile = ({ friendData, onMoreOptions }) => {
       try {
         const token = await fb.getToken();
   
-        // Replace 'your_server_url' with your actual server URL
+       
         const response = await axios.post(`http://localhost:8080/api/users/friends/request/${friend.uid}`, null, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -114,7 +114,7 @@ const FriendTile = ({ friendData, onMoreOptions }) => {
   
         console.log(response.data.message); // Log the response message (e.g., "Friend request sent")
   
-        // Handle any UI updates or state changes here, such as changing the friend's listType to 'pending'
+       
       } catch (error) {
         console.error("Error sending friend request:", error);
       }
@@ -122,6 +122,55 @@ const FriendTile = ({ friendData, onMoreOptions }) => {
   
     sendFriendRequest(); // Call the function to send the friend request
   }
+
+  const handleAcceptFriendRequest = () => {
+    // Make a POST request to accept the friend request
+    const acceptFriendRequest = async () => {
+      try {
+        const token = await fb.getToken();
+
+        console.log(token);
+        const response = await axios.post(`http://localhost:8080/api/users/friends/${friendData.user}`, null, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        console.log(response.data.message); // Log the response message (e.g., "Friend request accepted")
+
+        // Handle any UI updates or state changes here, such as changing the friend's listType to 'accepted'
+      } catch (error) {
+        console.error("Error accepting friend request:", error);
+      }
+    };
+
+    acceptFriendRequest(); // Call the function to accept the friend request
+  };
+
+  const handleDeclineFriendRequest = () => {
+    // Make a DELETE request to decline the friend request
+    const declineFriendRequest = async () => {
+      try {
+        const token = await fb.getToken();
+
+        // Replace 'your_server_url' with your actual server URL
+        const response = await axios.delete(`http://localhost:8080/api/users/friends/request/${friendData.user}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          data: { type: "decline" }, // Specify the type as "decline"
+        });
+
+        console.log(response.data.message); // Log the response message (e.g., "Friend request declined")
+
+        // Handle any UI updates or state changes here, such as removing the friend request from the list
+      } catch (error) {
+        console.error("Error declining friend request:", error);
+      }
+    };
+
+    declineFriendRequest(); // Call the function to decline the friend request
+  };
   const renderActionIcons = () => {
     if (friendData.listType === 'pending') {
       // Render Tick and Cross for pending friends
@@ -133,6 +182,7 @@ const FriendTile = ({ friendData, onMoreOptions }) => {
               borderRadius: '50%',
               color: 'green', // Apply green color to CheckCircleIcon
             }}
+            onClick={handleAcceptFriendRequest}
           >
             <CheckCircleIcon />
           </IconButton>
@@ -143,6 +193,7 @@ const FriendTile = ({ friendData, onMoreOptions }) => {
               marginX: 1,
               color: 'red', // Apply red color to CancelIcon
             }}
+            onClick={handleDeclineFriendRequest}
           >
             <CancelIcon />
           </IconButton>
