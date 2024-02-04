@@ -6,6 +6,7 @@ import SentimentVeryDissatisfiedIcon from "@mui/icons-material/SentimentVeryDiss
 import Image from 'next/image';
 import axios from "axios";
 import jsPDF from 'jspdf';
+import { useRouter } from "next/navigation";
 const fb = require("_firebase/firebase");
 
 const BadBehaviorStrikes = ({ strikes }) => {
@@ -260,6 +261,8 @@ const ProfileOverlay = ({ user }) => {
     const [isUsernameEditMode, setIsUsernameEditMode] = useState(false);
     const [isEmailEditMode, setIsEmailEditMode] = useState(false);
     const [userInfo, setUserInfo] = useState(null);
+
+    const router = useRouter();
     
     const handleNameEditClick = () => {
         setIsNameEditMode(!isNameEditMode);
