@@ -261,7 +261,7 @@ router.post("/friends/:user", async (req, res) => {
 	if (friendRequests == undefined)
 		return res.status(400).json({ error: "No friend requests" });
 
-	let friendRequest = friendRequests.find(request => request.uid == req.params.user);
+	let friendRequest = friendRequests.includes(req.params.user);
 	if (friendRequest == undefined)
 		return res.status(400).json({ error: "No friend requests" });
 
