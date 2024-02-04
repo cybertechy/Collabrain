@@ -191,8 +191,6 @@ router.delete("/:user", async (req, res) => {
 
 	}));
 	
-
-
 	// remove members from any content maps or documents they access to
 	if(userdata.AccessContentMaps) await Promise.all(userdata.AccessContentMaps?.map(async (access) => {
 		let contentMapData = await fb.db.doc(`contentMaps/${access}`).get();
@@ -216,6 +214,25 @@ router.delete("/:user", async (req, res) => {
 		fb.db.doc(`documents/${access}`).update({Access: document.Access});
 	}));
 
+	// remove user from chat
+	if(userdata.chats) await Promise.all(userdata.chats?.map(async (chat) => {
+		let chatData = await fb.db.doc(`chats/${chat}`).get();
+		if (!chatData.exists)
+			return res.status(404).json({ error: "Chat not found" });
+
+		// remove user from chat array
+		chatData.update({members: fb.admin.firestore.FieldValue.arrayRemove(user.uid)});
+	}));
+
+	// remove folders
+	await fb.db.collection(`users/${user.uid}/folders`).get().then(records => {
+		records.forEach(doc => { doc.ref.delete(); });
+	});
+
+	// remove notifications
+	await fb.db.collection(`users/${user.uid}/notifications`).get().then(records => {
+		records.forEach(doc => { doc.ref.delete(); });
+	});
 
 	fb.db.doc(`users/${req.params.user}`).delete()
 		.then(() => { return res.json({ message: "User deleted" }); })
