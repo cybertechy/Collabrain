@@ -7,6 +7,7 @@ const fb = require("../helpers/firebase");
 /************************************************************/
 
 /* Endpoint for creating new direct chat */
+// @request body : {members: [uid1, uid2]}
 router.post("/", async (req, res) =>
 {
 	// Make sure all required fields are present
@@ -89,6 +90,7 @@ router.get("/", async (req, res) =>
 });
 
 /* Endpoint for adding a user to a chat */
+// @request body : {members: [uid1, uid2]}
 router.post("/:chat/members", async (req, res) =>
 {
 	// Make sure all required fields are present
