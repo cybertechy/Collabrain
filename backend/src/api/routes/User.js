@@ -228,9 +228,31 @@ router.post("/friends/request/:user", async (req, res) => {
 	if (!user)
 		return res.status(401).json({ error: "Unauthorized" });
 
+	// don't send friend request to self
+	if (req.params.user === user.uid)
+		return res.status(400).json({ error: "Can't send friend request to self" });
+
+	// Check if user is already friends
+	let doc = await fb.db.doc(`users/${user.uid}`).get();
+	if (!doc.exists)
+		return res.status(404).json({ error: "User not found" });
+
+	let friends = doc.data().friends;
+	if (friends.includes(req.params.user))
+		return res.status(400).json({ error: "Already friends" });
+
+	// check if request already sent
+	let fUser = await fb.db.doc(`users/${req.params.user}`).get()
+	if (!fUser.exists)
+		return res.status(404).json({ error: "User not found" });
+
+	let fUserData = fUser.data();
+	if (fUserData.friendRequests && fUserData.friendRequests.includes(user.uid))
+		return res.status(400).json({ error: "Friend request already sent" });
+
 	// Send friend request
 	fb.db.doc(`users/${req.params.user}`).update({
-		friendRequests: fb.admin.firestore.FieldValue.arrayUnion({ user: user.uid })
+		friendRequests: fb.admin.firestore.FieldValue.arrayUnion(user.uid)
 	})
 		.then(() => { return res.json({ message: "Friend request sent" }); })
 		.catch(err => { return res.status(500).json({ error: err }); });
