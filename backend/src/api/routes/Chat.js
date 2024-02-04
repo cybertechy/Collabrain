@@ -62,15 +62,15 @@ router.get("/user/chats", async (req, res) => {
                 const memberDoc = await fb.db.doc(`users/${memberId}`).get();
                 const memberData = memberDoc.data();
 
-                // Expand this section to include more fields from the user object
+               
                 membersDetails.push({
                     uid: memberId,
                     fname: `${memberData?.fname}`,
 					lname: `${memberData?.lname}`,                     
-					photo: memberData?.photo, // User's profile picture if available
-                    bio: memberData?.bio, // User's short bio
-                    email: memberData?.email, // User's email
-                    username: memberData?.username, // User's username
+					photo: memberData?.photo, 
+                    bio: memberData?.bio, 
+                    email: memberData?.email, 
+                    username: memberData?.username, 
                    
                 }); 
             }
