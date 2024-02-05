@@ -671,7 +671,7 @@ export default function Dashboard()
 
 			{/* uncomment the below for username popup when the server can be used */}
 			{
-				isUsernameOverlayOpen && <UsernameOverlay onClose={closeUsernameOverlay} hasUserUsername = {hasUserUsername} setHasUserUsername = {setHasUserUsername}/>
+				isUsernameOverlayOpen && !isCheckingUsername && <UsernameOverlay onClose={closeUsernameOverlay} hasUserUsername = {hasUserUsername} setHasUserUsername = {setHasUserUsername}/>
 			}
 			{isCreateFolderOverlayOpen && (
 				<CreateFolderOverlay
