@@ -53,11 +53,12 @@
             };
         }, []);
     
-        if (user)
-        {
-            router.push("/dashboard"); // Redirect to dashboard
-            return null; // Prevents rendering the rest of the component
-        }
+        useEffect(() => {
+            if (user) {
+              router.push("/dashboard"); // Redirect to dashboard
+            }
+          }, [user, router]);
+          
     
         if (!backgroundLoaded)
         {

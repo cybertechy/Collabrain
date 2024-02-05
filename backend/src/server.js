@@ -61,8 +61,8 @@ app.use(function(req, res, next) {
 	// Content type
 	res.setHeader('Content-Type', 'application/json');
 
-	// Cache the data
-	res.setHeader('Cache-Control', 'public, max-age=31557600');
+	// // Cache the data
+	// res.setHeader('Cache-Control', 'public, max-age=31557600');
 
 	
 	next();

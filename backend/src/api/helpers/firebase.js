@@ -34,11 +34,36 @@ async function updateDoc(user, docID, title, content)
 	db.collection(`users/${user}/docs`).doc(docID).update({ "title": title, "content": content });
 }
 
-async function getTeamMembers(teamID)
-{
-	let doc = await db.doc(`teams/${teamID}`).get();
-	return doc.data().members;
+async function getTeamMembers(teamID) {
+    try {
+        const teamDoc = await db.doc(`teams/${teamID}`).get();
+        if (!teamDoc.exists) {
+            console.error(`No such team with ID ${teamID}`);
+            return []; // Return an empty array or null if the team doesn't exist
+        }
+        const teamData = teamDoc.data();
+        return teamData.members || []; // Return members or an empty array if members field is missing
+    } catch (error) {
+        console.error("Error getting team members:", error);
+        return []; // Return an empty array in case of error
+    }
 }
+
+async function getChatMembers(chatID) {
+    try {
+        const chatDoc = await db.doc(`chats/${chatID}`).get();
+        if (!chatDoc.exists) {
+            console.error(`No such chat with ID ${chatID}`);
+            return []; // Return an empty array if the chat doesn't exist
+        }
+        const chatData = chatDoc.data();
+        return chatData.members || []; // Return members array or an empty array if members field is missing
+    } catch (error) {
+        console.error("Error getting chat members:", error);
+        return []; // Return an empty array in case of error
+    }
+}
+
 
 async function deleteCollection(collectionPath, batchSize = 5)
 {
@@ -121,14 +146,14 @@ async function saveDirectMsg(data)
 			"reactions": (data.reactions) ? data.reactions : []
 		});
 	
-	let userData = (await db.doc(`users/${data.sender}`).get()).data();
+	// let userData = (await db.doc(`users/${data.sender}`).get()).data();
 
-	// Increase member score
-	let score = userData.score++;
+	
+	// let score = userData.score+=1;
 
-	db.doc(`users/${data.sender}`).update({
-		score
-	}).catch(err => console.log(err));
+	// db.doc(`users/${data.sender}`).update({
+	// 	score
+	// }).catch(err => console.log(err));
 }
 
 module.exports = {
@@ -139,6 +164,7 @@ module.exports = {
 	removeDoc,
 	updateDoc,
 	getTeamMembers,
+	getChatMembers,
 	deleteCollection,
 	saveTeamMsg,
 	saveDirectMsg

@@ -4,10 +4,11 @@ import React from 'react';
 import ProfileBox from '../../components/ui/chatsComponents/profileBox';
 import { useState } from 'react';
 import { Button } from '@mui/material';
+import { useRouter } from 'next/navigation';
+import { Router } from 'next/router';
 // Reusable Direct Message Item Component
-const DirectMessageItem = ({ name, message, avatar, onClick }) => {
-   
-  
+const DirectMessageItem = ({ name, message, avatar, openChat, username , data, chatID}) => {
+
    
 
   function stringAvatar(name = "User") {
@@ -61,9 +62,10 @@ const DirectMessageItem = ({ name, message, avatar, onClick }) => {
   
       
   return (
-    <ListItem button onClick={onClick} className="border-b border-gray-200">
+    <ListItem button onClick={() => openChat(chatID, data.id)} className="border-b border-gray-200">
+
       <ListItemAvatar>
-        <Avatar {...stringAvatar(name[0])} />
+        <Avatar {...stringAvatar(username)} />
       </ListItemAvatar>
       <ListItemText primary={name} secondary={message}   />
     </ListItem>
@@ -71,22 +73,27 @@ const DirectMessageItem = ({ name, message, avatar, onClick }) => {
 };
 
 // Direct Messages Sidebar Component
-const DMSideBar = ({ friendsHandler, directMessages , userData}) => {
+const DMSideBar = ({ friendsHandler, chatHandler, directMessages , userData}) => {
+  const router = useRouter();
   const [isMuted, setIsMuted] = useState(false);
   const [isDeafened, setIsDeafened] = useState(false);
   const onMute = () => {
   }
   const onDeafen = () => {
   }
-    const handleMute = () => {
-        setIsMuted(!isMuted);
-        onMute();
-    };
+ 
+  
 
-    const handleDeafen = () => {
-        setIsDeafened(!isDeafened);
-        onDeafen();
-    };
+  const handleMute = () => {
+   
+    onMute();
+  };
+  
+  const handleDeafen = () => {
+    
+    onDeafen();
+  };
+  
     const handleSettings = () => {
     console.log('Settings opened');
   };
@@ -95,7 +102,7 @@ const DMSideBar = ({ friendsHandler, directMessages , userData}) => {
     console.log('Add Direct Message');
   };
 
-  console.log(userData)
+ 
   const buttonStyle = {
     textTransform: 'none',
     justifyContent: 'start', // Aligns content to the left inside the button
@@ -103,11 +110,12 @@ const DMSideBar = ({ friendsHandler, directMessages , userData}) => {
     borderBottom: '2px solid rgb(229, 231, 235)', // Changes border color to rgb(229, 231, 235)
     borderRadius: '0' // Removes roundedness
   };
+  
 return (
     <div className="flex flex-col h-full w-1/5 bg-neutral shadow-md">
         <div className="flex-grow flex flex-col justify-between">
             <div>
-                <Button style={buttonStyle} onClick={()=>{}}>
+                <Button style={buttonStyle} onClick={()=>{router.push('/messages')}}>
                     <div className='flex justify-around items-center p-2 w-full  text-primary border-gray-200'>
                         <h2 className="text-lg font-normal font-poppins">Friends</h2>
                         <MessageIcon className='text-primary'/>
@@ -127,13 +135,16 @@ return (
   {
    Array.isArray(directMessages) &&
   directMessages?.map((dm, index) => (
+    
     <DirectMessageItem
       key={index}
+      chatID = {dm.id}
       data = {dm.members[1]}
+      username = {dm.members[1].username}
       name={dm.members[1].fname + " " + dm.members[1].lname} // Assuming the first member is the recipient
       message={dm.lastMessage ? dm.lastMessage.message : 'Enter your first message!'} // Display the last message if available
       avatar={dm.members[1].id} // You can use the member ID or another identifier for the avatar
-      onClick={() => console.log(`Clicked on ${dm.members[1].username}`)}
+      openChat={chatHandler}
     />
   ))}
 </List>

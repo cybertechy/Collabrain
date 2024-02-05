@@ -129,8 +129,8 @@ const FriendTile = ({ friendData, onMoreOptions, id, setRefreshList, refreshList
     const sendFriendRequest = async () => {
       try {
         const token = await fb.getToken();
-  
-       
+        
+        console.log(id);
         const response = await axios.post(`http://localhost:8080/api/users/friends/request/${id}`, null, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -155,14 +155,14 @@ const FriendTile = ({ friendData, onMoreOptions, id, setRefreshList, refreshList
         const token = await fb.getToken();
 
         console.log(token);
-        const response = await axios.post(`http://localhost:8080/api/users/friends/${friendData.user}`, null, {
+        const response = await axios.post(`http://localhost:8080/api/users/friends/${friendData.id}`, null, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
 
         console.log(response.data.message); // Log the response message (e.g., "Friend request accepted")
-        setRefreshList
+        
         // Handle any UI updates or state changes here, such as changing the friend's listType to 'accepted'
       } catch (error) {
         console.error("Error accepting friend request:", error);
@@ -179,7 +179,8 @@ const FriendTile = ({ friendData, onMoreOptions, id, setRefreshList, refreshList
         const token = await fb.getToken();
 
         // Replace 'your_server_url' with your actual server URL
-        const response = await axios.delete(`http://localhost:8080/api/users/friends/request/${friendData.user}`, {
+        console.log(friendData)
+        const response = await axios.delete(`http://localhost:8080/api/users/friends/request/${friendData.id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

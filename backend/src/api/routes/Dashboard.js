@@ -290,8 +290,8 @@ router.get("/files", async (req, res) => {
 			return res.status(400).json({ error: "Folder not found" });
 
 		// add contentMaps and documents with type
-		let contentMapsIds = root.data().contentMaps;
-		let documentsIds = root.data().documents;
+		let contentMapsIds = root?.data()?.contentMaps;
+		let documentsIds = root?.data()?.documents;
 
 		// get name, id , updatedAt and type of each file
 

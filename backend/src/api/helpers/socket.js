@@ -38,7 +38,7 @@ function init(server)
 
 async function broadcastMessage(data, type = "team")
 {
-	let members = await fb.getTeamMembers((type == "team") ? data.team : data.chat);
+	let members = type == "team" ? await fb.getTeamMembers(data.team): await fb.getChatMembers(data.chat) ;
 	let membersList = Object.keys(members);
 
 	// Remove the sender

@@ -8,7 +8,8 @@ import { Timestamp } from "firebase/firestore";
 import Sidebar from "../../components/ui/template/sidebar/sidebar";
 import DMSideBar from "./DMsidebar";
 import MessageItem from "../chat/messageItem";
-const { useRouter } = require('next/navigation');
+const { useRouter , useSearchParams} = require('next/navigation');
+
 const axios = require("axios");
 const fb = require("_firebase/firebase");
 const socket = require("_socket/socket");
@@ -22,16 +23,23 @@ export default function Messages() {
     const router = useRouter();
     const [user, loading] = fb.useAuthState();
     const [channelsData, setChannelsData] = useState([]);
-    const [showChat, setShowChat] = useState(false);
+   
     const [userInfo, setUserInfo] = useState(null);
     const [text, setText] = useState([]);
     const [directMessages, setDirectMessages] = useState([]);
+    const params = useSearchParams();
+    const [withUserInfo, setWithUserInfo] = useState(null);
+    const [showChat, setShowChat] = useState(false);
+
+    const withUser = params.get('user');
+    const chatId = params.get('chatID');
+    
     const sockCli = useRef(null);
     useEffect(() => {
         if (!user) return;
 
         sockCli.current = socket.init('http://localhost:8080');
-        sockCli.current.on('teamMsg', (data) => {
+        sockCli.current.on('directMsg', (data) => {
             console.log("Received message from server");
             setText((prevText) => [
                 ...prevText,
@@ -39,7 +47,7 @@ export default function Messages() {
             ]);
         });
 
-        return () => sockCli.current.off('teamMsg');
+        return () => sockCli.current.off('directMsg');
     }, [user]);
 
     useEffect(() => {
@@ -60,29 +68,63 @@ export default function Messages() {
 
         fetchUser();
     }, [user]);
+    
     useEffect(() => {
-        if (!user) return;
+        if (!user|| !withUser) return;
 
-        fb.getToken().then((token) => {
-            axios.get(`http://localhost:8080/api/team/LoH1iHOGowBzcYDXEqnu/channel/General/messages`, {
-                headers: { "Authorization": "Bearer " + token }
-            }).then((res) => {
-                console.log(res.data);
-                let data = res.data;
-                let msgs = data.map((messageData, i) => (
+        const fetchUser = async () => {
+            try {
+                const token = await fb.getToken();
+                const response = await axios.get(`http://localhost:8080/api/users/${withUser}`, {
+                    headers: { "Authorization": "Bearer " + token }
+                });
+                setWithUserInfo({ data: response.data });
+               
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+                setWithUserInfo({ data: { username: "User" } });
+            }
+        };
+
+        fetchUser();
+    }, [user, withUser]);
+    useEffect(() => {
+        if (!user || !chatId) return;
+    
+        const fetchMessages = async () => {
+            try {
+                const token = await fb.getToken();
+                const response = await axios.get(`http://localhost:8080/api/chats/${chatId}/messages`, { 
+                    headers: { "Authorization": "Bearer " + token }
+                });
+                const fetchedMessages = response.data.map((messageData, i) => (
                     <MessageItem
                         key={i}
                         sender={messageData.sender}
-                        timestamp={fb.fromFbTimestamp(new Timestamp(messageData.sentAt.seconds, messageData.sentAt.nanoseconds)).toLocaleTimeString()}
+                        timestamp={new Date(messageData.sentAt.seconds * 1000).toLocaleTimeString()}
                         message={messageData.message}
-                        reactions={{}}
-						userData = {userInfo.data}
+                        reactions={messageData.reactions || {}}
+                        userData={userInfo.data}
                     />
                 ));
-                setText(msgs);
-            }).catch((err) => console.log(err));
-        });
-    }, [user]);
+                setText(fetchedMessages);
+            } catch (error) {
+                console.error('Error fetching messages:', error);
+            }
+        };
+    
+        // Initial fetch
+        fetchMessages();
+    
+        // Set up an interval for refetching messages every 5 seconds
+        const intervalId = setInterval(fetchMessages, 5000);
+    
+        // Clear the interval when the component unmounts or when user or chatId changes
+        return () => clearInterval(intervalId);
+    }, [user, chatId]);
+    
+    
+    
     useEffect(() => {
         if (!user) return;
     
@@ -110,44 +152,47 @@ export default function Messages() {
         }
       };
 
-	const sendPersonalMsg = async (msg) =>
-	{
-		if (!sockCli.current)
-		{
-			console.log('Socket is not initialized yet.');
-			return;
-		}
-
-		let token = await fb.getToken();
-		let userData = await axios.get(`http://localhost:8080/api/users/${user.uid}`,
-			{ headers: { "Authorization": "Bearer " + token } });
-			
-		
-			let sentAt = new Date();
-			const messageData = {
-				senderID: fb.getUserID(),
-				sender: userInfo.data.username,
-			  team: "LoH1iHOGowBzcYDXEqnu",
-			  channel: "General",
-			  msg: msg,
-			  sentAt: fb.toFbTimestamp(sentAt),
-			};
-
-		// Add the message to the real-time socket chat
-		setText((prevText) => [
-			...prevText,
-			<MessageItem 
-			  key={prevText.length} 
-			  sender={messageData.sender}
-			  timestamp={sentAt.toLocaleTimeString()} 
-			  message={messageData.msg} 
-			  reactions={{}} // Add reactions if you have them
-			  userData = {userInfo.data}
-			/>,
-		  ]);
-
-		sockCli.current.emit('teamMsg', messageData); // Send the message to the server
-	};
+      const sendPersonalMsg = async (msg) => {
+        if (!sockCli.current) {
+            console.log('Socket is not initialized yet.');
+            return;
+        }
+    
+        // Assuming you've authenticated and have the user's token
+        let token = await fb.getToken();
+        let userData = await axios.get(`http://localhost:8080/api/users/${user.uid}`, { 
+            headers: { "Authorization": "Bearer " + token } 
+        });
+    
+        
+       
+    
+        let sentAt = new Date();
+        const messageData = {
+            senderID: user.uid, // Ensure this is the correct Firebase user ID
+            sender: userInfo.data.username,
+            chat: chatId, // The chat ID for the direct message
+            msg: msg,
+            sentAt: fb.toFbTimestamp(sentAt), // Convert the date to a Firebase timestamp if necessary
+            reactions: [] // Starting with an empty array for reactions
+        };
+    
+        // Add the message to the real-time socket chat
+        setText((prevText) => [
+            ...prevText,
+            <MessageItem 
+                key={prevText.length} 
+                sender={messageData.sender}
+                timestamp={sentAt.toLocaleTimeString()} 
+                message={messageData.msg} 
+                reactions={{}} // This is where you'd add reactions if you have them
+                userData={userInfo.data}
+            />,
+        ]);
+    
+        sockCli.current.emit('directMsg', messageData); // Send the direct message to the server
+    };
+    
 	if (loading|| !user )
     return (
         <div className="flex flex-col items-center justify-around min-h-screen">
@@ -169,21 +214,35 @@ export default function Messages() {
    
     
       // Handler for the friends button
-      const handleFriendsClick = () => {
+      const openFriends = () => {
         // Toggles the display between ChatWindow and FriendsWindow
-        setShowChat((prevShowChat) => !prevShowChat);
+        setShowChat(false);
       };
-    
+      const openChat = (id) => {
+        router.push("/messages?user="+id);
+       
+      }
+      
 	return (
         <Template>
             <div className="flex flex-row flex-grow">
-                <DMSideBar userData={userInfo} friendsHandler={handleFriendsClick} directMessages={directMessages} />
-                {showChat ? (
-                    <ChatWindow messages={text} sendPersonalMsg={sendPersonalMsg} userInfo={userInfo} title="General" />
+                <DMSideBar
+                    userData={userInfo}
+                    friendsHandler={() => setShowChat(false)}
+                    directMessages={directMessages}
+                    chatHandler={(id, user) => {router.push(`/messages?chatID=${id}&user=${user}`) }}
+                />
+                {withUser ? (
+                    <ChatWindow
+                        messages={text}
+                        sendPersonalMsg={sendPersonalMsg}
+                        userInfo={userInfo}
+                        withUserInfo={withUserInfo}
+                        
+                    />
                 ) : (
                     <FriendsWindow />
                 )}
-                {/* <ChatWindow messages={text} sendPersonalMsg={sendPersonalMsg} userInfo={userInfo} /> */}
             </div>
         </Template>
 	);

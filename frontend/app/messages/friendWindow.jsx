@@ -112,18 +112,18 @@ const FriendsWindow = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-  
+      console.log("friend Request recieved ", response.data);
       const friendRequests = response.data.map(async (friendRequest) => {
         // Fetch user data for each friend request by ID
-        const userResponse = await axios.get(`http://localhost:8080/api/users/${friendRequest.user}`, {
+        const userResponse = await axios.get(`http://localhost:8080/api/users/${friendRequest}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-  
+        console.log("User Response", userResponse.data);
         // Add the 'listType' property with a value of 'pending' to each friend request
         return {
-          ...friendRequest,
+          id:friendRequest,
           listType: 'pending',
           username: userResponse.data.username,
           name: userResponse.data.fname + " " + userResponse.data.lname,
