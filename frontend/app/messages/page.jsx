@@ -34,16 +34,23 @@ export default function Messages() {
     const withUser = params.get('user');
     const chatId = params.get('chatID');
     
-    const sockCli = useRef(null);
+    let sockCli = useRef(null);
+
     useEffect(() => {
         if (!user) return;
 
-        sockCli.current = socket.init('http://localhost:8080');
+        sockCli.current = socket.init('http://localhost:8080') || {};
         sockCli.current.on('directMsg', (data) => {
             console.log("Received message from server");
             setText((prevText) => [
                 ...prevText,
-                <h1 key={prevText.length} className="text-basicallydark">{`${data.sender}: ${data.msg}`}</h1>,
+                <MessageItem
+                    key={prevText.length}
+                    sender={data.sender}
+                    message={data.msg}
+                    timestamp={sentAt.toLocaleTimeString()}
+                    reactions={{}}
+                />,
             ]);
         });
 
