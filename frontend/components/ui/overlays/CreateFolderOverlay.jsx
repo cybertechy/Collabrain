@@ -21,6 +21,7 @@ const CreateFolderOverlay = ({ isOpen, onClose, onFolderCreated }) => {
             const token = await fb.getToken();
             console.log('Token:', token);
             console.log('Folder Name:', folderName); 
+            console.log('Folder Color:', folderColor)
             const response = await axios.post(
                 'http://localhost:8080/api/dashboard/folder',
                 {
@@ -34,6 +35,7 @@ const CreateFolderOverlay = ({ isOpen, onClose, onFolderCreated }) => {
                     },
                 }
             );
+
             console.log('Response:', response); // Add this line
            if (response.status === 200) {
     onFolderCreated(response.data.folder);

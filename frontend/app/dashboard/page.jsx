@@ -508,7 +508,7 @@ export default function Dashboard()
 	};
 
 
-	if (!user)
+	if (!user || isCheckingUsername)
 	{
 
 		return (
