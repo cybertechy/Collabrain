@@ -201,7 +201,8 @@ useEffect(() => {
     if (userInfo && userInfo.AccessContentMaps && userInfo.AccessContentMaps.length > 0) {
       // Extract content map IDs from userInfo.AccessContentMaps
       
-      const contentMapIds = userInfo.AccessContentMaps.map((accessMap) => accessMap.id);
+      const contentMapIds = userInfo.AccessContentMaps
+      console.log("Content Map IDs:", contentMapIds);
   
       // Fetch content maps based on the IDs
       const fetchContentMaps = async () => {
@@ -209,12 +210,14 @@ useEffect(() => {
           const token = await fb.getToken();
           const contentMapsData = await Promise.all(
             contentMapIds.map(async (contentMapId) => {
-              const response = await axios.get(`http://localhost:8080/api/contentmaps/${contentMapId}`, {
+              console.log("Fetching content map with ID:", contentMapId);
+              const response = await axios.get(`http://localhost:8080/api/maps/${contentMapId}`, {
                 headers: {
                   Authorization: `Bearer ${token}`,
                 },
               });
-              return response.data;
+              console.log("Fetched content map:", response.data);
+              return {...response.data , id: contentMapId};
             })
           );
   
@@ -324,10 +327,10 @@ useEffect(() => {
                     createdAt={project?.createdAt}
                     updatedAt={project?.updatedAt}
                     project={project}
-                    type={project?.type == "contentmap" ? "Content Map" : "Document"}
-                    renamedProject={renamedProject}
+                    type={"Content Map" }
+                    
                     handleProjectDeleted={handleProjectDeleted} // Pass the function
-                    onClick={() => { }}
+                    onClick={() => {console.log("clicked", project?.id); router.push(`/contentmap?id=${project?.id}`)}}
                   />
                 ))
               ) : (
