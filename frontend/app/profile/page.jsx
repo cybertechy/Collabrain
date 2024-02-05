@@ -79,35 +79,78 @@ const ProfilePage = () => {
   const [image, setImage] = useState(null);
 
   //     // let sockCli = useRef(null);
-  const handleNameEditClick = () => {
-    setIsNameEditMode(!isNameEditMode);
+  const handleNameEditClick = async () => {
+    try {
+      await saveProfileChanges();
+      setIsNameEditMode(!isNameEditMode);
+    } catch (error) {
+      console.error('Error saving profile changes:', error);
+      // Handle errors here, if needed
+    }
+  };
+  
+  const handleEmailEditClick = async () => {
+    try {
+      await saveProfileChanges();
+      setIsEmailEditMode(!isEmailEditMode);
+    } catch (error) {
+      console.error('Error saving profile changes:', error);
+      // Handle errors here, if needed
+    }
   };
 
-  const handleEmailEditClick = () => {
-    setIsEmailEditMode(!isEmailEditMode);
-  };
 
-  const handleBioEditClick = () => {
-    setIsBioEditMode(!isBioEditMode);
+  const saveProfileChanges = async () => {
+    const updatedUserInfo = {
+      bio: bio, // Assuming 'bio' state holds the biography text
+      education: education, // Assuming 'education' state holds an array of education objects
+      certifications: certifications, // Assuming 'certifications' state holds an array of certification objects
+    };
+
+    try {
+      const token = await fb.getToken(); // Retrieve the current user's auth token
+      console.log("New certifications are: ",updatedUserInfo.certifications);
+      await axios.patch("http://localhost:8080/api/users/", updatedUserInfo, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      console.log("Profile updated successfully.");
+      setIsBioEditMode(false);
+      setIsEduEditMode(false);
+      setIsLCEditMode(false);
+      // Handle successful update (e.g., show a message to the user)
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      // Handle errors (e.g., show error message)
+    }
   };
 
 
   //add user entries to a list
-  const addEducation = () => {
+  const addEducation = async () => {
     if (newEdu.school && newEdu.degree && newEdu.startYear && newEdu.endYear) {
-      setEducation([...education, newEdu]);
+      setEducation(prevEdu => [...prevEdu, newEdu]);
       setNewEdu({ school: '', degree: '', startYear: '', endYear: '' });
+      await saveProfileChanges(); // Save changes after adding
     }
-    setIsEduEditMode(false);
   };
-
-  const addCertification = () => {
+  
+  const addCertification = async () => {
     if (newCert.title && newCert.date) {
-      setCertifications([...certifications, newCert]);
+      // Update certifications state first
+      setCertifications(prevCerts => [...prevCerts, newCert]);
       setNewCert({ title: '', date: '' });
+  
+      try {
+        // Now, call saveProfileChanges to save the changes including certifications
+        await saveProfileChanges();
+      } catch (error) {
+        console.error('Error saving profile changes:', error);
+        // Handle errors here, if needed
+      }
     }
-    setIsLCEditMode(false);
   };
+  
+  
 
   useEffect(() => {
     if (!user) return;
@@ -115,18 +158,27 @@ const ProfilePage = () => {
     const fetchUser = async () => {
       setIsLoading(true);
       setError(null);
-
+    
       try {
         const token = await fb.getToken();
         const response = await axios.get(`http://localhost:8080/api/users/${user.uid}`, {
           headers: { "Authorization": "Bearer " + token }
         });
-        setUsername(response.data.username);
-        setName(response.data.fname + " " + response.data.lname);
-        setEmail(response.data.email);
-        setImage(response.data.photo);
+    
         if (response.status === 200) {
-          // Set user info with the data obtained from the response
+          // Assuming the response data structure matches the one you've provided
+          console.log(response.data);
+          const { fname, lname, email, photo, bio, education, certifications } = response.data;
+    
+          setUsername(response.data.username);
+          setName(`${fname} ${lname}`);
+          setEmail(email);
+          setImage(photo);
+          setBio(bio); // Set bio from response
+          setEducation(education); // Set education from response
+          setCertifications(certifications); // Set certifications from response
+    
+          // Navigate to the profile page with updated information
           const newPath = `/profile?username=${response.data.username}`;
           router.push(newPath);
         } else {
@@ -135,17 +187,14 @@ const ProfilePage = () => {
       } catch (error) {
         setError('Error displaying profile');
         console.error('Error:', error);
-        setUsername("username");
-        setName("name");
-        setEmail("email");
-        setUserInfo({ data: { username: "User" } });
       } finally {
-        console.log('Displaying profile.');
         setIsLoading(false);
       }
     };
     fetchUser();
 
+  
+    
     const fetchUserTeams = async () => {
       setIsLoading(true);
       setError(null);
@@ -208,7 +257,32 @@ const ProfilePage = () => {
     // Call the function to fetch user teams when the component mounts
     fetchUserTeams();
   }, [user]);
+  const handleBioEditClick = async () => {
+    if (isBioEditMode) {
+      // Attempt to save changes when exiting bio edit mode
+      await saveProfileChanges();
+    }
+    setIsBioEditMode(!isBioEditMode); // Toggle edit mode regardless of save success
+  };
 
+  const handleEducationSaveClick = async () => {
+    if (isEduEditMode) {
+      // Exiting edit mode, implicitly add the new education entry (if valid) and save all changes
+      await addEducation(); // Ensure this function now also calls saveProfileChanges
+    }
+    setIsEduEditMode(!isEduEditMode);
+  };
+  
+
+  const handleCertificationSaveClick = async () => {
+    if (isLCEditMode) {
+      // Exiting edit mode, implicitly add the new certification (if valid) and save all changes
+      await addCertification(); // Ensure this function now also calls saveProfileChanges
+    }
+    setIsLCEditMode(!isLCEditMode);
+  };
+  
+  
   useEffect(() => {
     // get axios request to fetch user info 
     if (!image) return;
@@ -427,7 +501,7 @@ const ProfilePage = () => {
                 {certifications.map((cert, index) => (
                   <li key={index}>
                     <hr className="border-t-1 mx-1 border-solid border-gray-400 opacity-30 py-1"></hr>
-                    <i>- {cert.title}</i>, obtained on {cert.date}
+                    <i>{cert.title}</i>, obtained on {cert.date}
                   </li>
                 ))}
               </ul>

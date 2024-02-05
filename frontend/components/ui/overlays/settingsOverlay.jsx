@@ -395,8 +395,8 @@ const router = useRouter();
                     </Button>
                 </DialogActions>
             </Dialog>
-                                            <button className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 ">
-                                                Disable
+                                            <button  onClick  = {fb.signOut} className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 ">
+                                                Sign Out
                                             </button>
                                         </div>
                                     </div>
