@@ -182,8 +182,24 @@ router.put("/:id", async (req, res) => {
     if (userRole === "owner") {
 
         if (req.body.name) updatedContentMap.name = req.body.name;
-        if (req.body.access) updatedContentMap.Access = req.body.access;
+    
         if (req.body.path) updatedContentMap.path = req.body.path;
+
+        // TODO: Revoke access Incomplete
+        if (req.body.access) {
+            updatedContentMap.Access = req.body.access;
+
+            
+            Object.keys(req.body.access).forEach(userId => {
+                // Add the  content map to users access content maps array
+                if(userId !== user.uid){
+                db.collection("users").doc(userId).update({
+                    AccessContentMaps: fb.admin.firestore.FieldValue.arrayUnion(req.params.id)
+                });
+            }
+            });
+
+        }
     }
 
     updatedContentMap.updatedAt = fb.admin.firestore.FieldValue.serverTimestamp();
