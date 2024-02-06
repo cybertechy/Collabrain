@@ -186,19 +186,18 @@ router.put("/:id", async (req, res) => {
         if (req.body.path) updatedContentMap.path = req.body.path;
 
         // TODO: Revoke access Incomplete
-        if (req.body.access) {
+        if (req.body.access && req.body.user || req.body.revokeAccess) {
             updatedContentMap.Access = req.body.access;
 
-            
-            Object.keys(req.body.access).forEach(userId => {
-                // Add the  content map to users access content maps array
-                if(userId !== user.uid){
-                db.collection("users").doc(userId).update({
+            if(req.body.revokeAccess) {
+                fb.db.collection("users").doc(req.body.user).update({
+                    AccessContentMaps: fb.admin.firestore.FieldValue.arrayRemove(req.params.id)
+                });
+            } else {
+                fb.db.collection("users").doc(req.body.user).update({
                     AccessContentMaps: fb.admin.firestore.FieldValue.arrayUnion(req.params.id)
                 });
             }
-            });
-
         }
     }
 

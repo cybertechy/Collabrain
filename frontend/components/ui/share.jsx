@@ -29,8 +29,9 @@ const share = ({ contentMapName = "Content Map", sData, setShare , isOwner, upda
         //set permission for user
         let temp = shareData;
         let backupRole = temp[id]?.role;
+        let revokeAccess = false;
 
-        if(permission==="Revoke Access") delete temp[id];
+        if(permission==="Revoke Access") { delete temp[id]; revokeAccess = true; }
         else if (backupRole) temp[id].role = permission.toLowerCase();
 
     
@@ -40,7 +41,7 @@ const share = ({ contentMapName = "Content Map", sData, setShare , isOwner, upda
         setShare(false);
         
         try{
-           let res = await updatecontent({access: temp});
+           let res = await updatecontent({access: temp,user:id,revokeAccess});
            toast.success("Permission Updated",{
             position: "bottom-right",
             autoClose: 2000,
