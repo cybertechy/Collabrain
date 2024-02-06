@@ -500,7 +500,7 @@ function page() {
             </div>
             }
             {id && Excalidraw && !IntialData && !Error && OverrideMessage &&<div className="flex items-center flex-col w-screen h-[88%]">
-                <Lottie animationData={ErrorJSON} style={{width:300,height:300}} />
+                <Lottie animationData={WorkingJSON} style={{width:300,height:300}} />
              <h1 className="text-2xl font-bold text-primary px-10 text-center"> {OverrideMessage} </h1>
              </div>
              }
