@@ -15,6 +15,11 @@ import { driver } from "driver.js";
 import { WelcomeScreen } from "@excalidraw/excalidraw";
 import "driver.js/dist/driver.css";
 
+import SearchingJSON from "../../public/assets/json/Searching.json";
+import LoadingJSON from "../../public/assets/json/Loading.json";
+import ErrorJSON from "../../public/assets/json/Error.json";
+import WorkingJSON from "../../public/assets/json/Working.json";
+import Lottie from "lottie-react";
 
 
 
@@ -474,11 +479,31 @@ function page() {
             </Excalidraw>
 
             }
-            {!id && <h1 className="text-2xl font-bold text-primary px-10 text-center"> Searching the cloud, Please wait ..</h1>}
-            {id && !Excalidraw && <h1 className="text-2xl font-bold text-primary px-10">Loading...</h1>}
-            {id && Excalidraw && !IntialData && !Error && !OverrideMessage && <h1 className="text-2xl font-bold text-primary px-10 text-center"> Working to load the Map ... </h1>}
-            {id && Excalidraw && !IntialData && Error && !OverrideMessage && <h1 className="text-2xl font-bold text-primary px-10 text-center"> {Error.error} </h1>}
-            {id && Excalidraw && !IntialData && !Error && OverrideMessage && <h1 className="text-2xl font-bold text-primary px-10 text-center"> {OverrideMessage} </h1>}
+            {!id && <div className="flex items-center flex-col w-screen h-[88%]">
+            <Lottie animationData={SearchingJSON} style={{width:300,height:300}} />
+            <h1 className="text-2xl font-bold text-primary px-10 text-center"> Searching the cloud, Please wait ...</h1>
+            </div> 
+            }
+            {id && !Excalidraw && <div className="flex items-center flex-col w-screen h-[88%]">
+            <Lottie animationData={LoadingJSON} style={{width:300,height:300}} />
+            <h1 className="text-2xl font-bold text-primary px-10">Loading...</h1>
+            </div>
+            }
+            {id && Excalidraw && !IntialData && !Error && !OverrideMessage && <div className="flex items-center flex-col w-screen h-[88%]">
+            <Lottie animationData={WorkingJSON} style={{width:300,height:300}} />
+            <h1 className="text-2xl font-bold text-primary px-10 text-center"> Working to load the Map ... </h1>
+            </div>
+            }
+            {id && Excalidraw && !IntialData && Error && !OverrideMessage &&  <div className="flex items-center flex-col w-screen h-[88%]">
+            <Lottie animationData={ErrorJSON} style={{width:300,height:300}} />
+            <h1 className="text-2xl font-bold text-primary px-10 text-center"> {Error.error} </h1>
+            </div>
+            }
+            {id && Excalidraw && !IntialData && !Error && OverrideMessage &&<div className="flex items-center flex-col w-screen h-[88%]">
+                <Lottie animationData={ErrorJSON} style={{width:300,height:300}} />
+             <h1 className="text-2xl font-bold text-primary px-10 text-center"> {OverrideMessage} </h1>
+             </div>
+             }
         </div>
     </div>
 }
