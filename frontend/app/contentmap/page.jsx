@@ -23,6 +23,7 @@ import Lottie from "lottie-react";
 
 
 
+
 function page() {
     const [token, setToken] = useState(null);
     const [Excalidraw, setExcalidraw] = useState(null);
@@ -95,7 +96,10 @@ function page() {
     useEffect(() => {
         let createdAt = IntialData?.createdAt;
         let updatedAt = IntialData?.updatedAt;
+        if(!IntialData) return;
 
+
+        console.log(createdAt,updatedAt,ContentMapName,ExcalidrawAPI);
         if(ExcalidrawAPI && ContentMapName=="New Content Map" && IntialData && createdAt === updatedAt ) driverObj.drive();
     }, [IntialData,ExcalidrawAPI,ContentMapName])
 
@@ -232,6 +236,7 @@ function page() {
     const DeleteContentMap = async () => {
         let token = await getToken();
         if (!token) return null;
+        driverObj.destroy();
 
         let backup = IntialData;
         setIntialData(null);
@@ -248,13 +253,13 @@ function page() {
             setDelete(false);
             if (res.status !== 200) return null;
 
+           
             setid(null);
             setIntialData(null);
             setContentMapName("New Content Map");
             setisOwner(false);
             setOverrideMessage("");
             router.push(`/dashboard`);
-            router.reload();
         }
         catch (err) {
             console.log(err);
