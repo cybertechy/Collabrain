@@ -36,6 +36,15 @@ router.get("/search", async (req, res) => {
 	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
 	if (!user)
 	  return res.status(401).json({ error: "Unauthorized" });
+
+	// Get the current user's friends
+	let userRef = await fb.db.doc(`users/${user.uid}`).get();
+	if (!userRef.exists)
+		return res.status(404).json({ error: "User not found" });
+
+	let userdata = userRef.data();
+
+	if(!userdata.friends) userdata.friends = [];
   
 	// Get up to 1000 users
 	fb.db.collection("users")
@@ -46,7 +55,11 @@ router.get("/search", async (req, res) => {
 	  .get()
 	  .then((records) => {
 		let users = [];
-		records.forEach(doc => { users.push({id:doc.id,...doc.data()}); });
+		records.forEach(doc => { 
+			if(userdata?.friends?.includes(doc.id) && !req.query.noFriends) return;
+			if(doc.id === user.uid) return;
+			users.push({id:doc.id,...doc.data()}); 
+		});
 		return res.status(200).json(users);
 	  })
 	  .catch((err) => {
@@ -237,8 +250,11 @@ router.post("/friends/request/:user", async (req, res) => {
 	if (!doc.exists)
 		return res.status(404).json({ error: "User not found" });
 
+	
+
 	let friends = doc.data().friends;
-	console.log(friends);
+	if(!friends) friends = [];
+
 	if (friends.includes(req.params.user))
 		return res.status(400).json({ error: "Already friends" });
 
