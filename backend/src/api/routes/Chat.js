@@ -59,37 +59,42 @@ router.get("/", async (req, res) => {
     if (!userRef?.data()?.chats)
         return res.status(200).json({ message: "No chats" });
 
-    //Promise.all and get the chats info
-    let chats = [];
-    await Promise.all(userRef.data().chats.map(async chat => {
-        // get chat info
-        let chatRef = await fb.db.doc(`chats/${chat}`).get();
-        chats.push({id: chat, ...chatRef.data()});
+    //get the chats info
+    let chats = userRef.data().chats;
+	let chatsLength = chats.length;
+	let result = [];
 
+    for(let i=0; i<chatsLength; i++){
+        // get chat info
+		let chatId = chats[i];
+        let chatRef = await fb.db.doc(`chats/${chatId}`).get();
+        result.push({id: chatId, ...chatRef.data()});
+	
         // get chat members info
         let members = [];
-        await Promise.all(chatRef.data().members.map(async member => {
+        Promise.all(chatRef.data().members.map(async member => {
+			if(member === user.uid) return; // Skip the user themselves
             let memberRef = await fb.db.doc(`users/${member}`).get();
             // Prepend the user themselves to the members list if it's their ID
             let memberData = { id: member, username: memberRef.data().username, email: memberRef.data().email, fname: memberRef.data().fname, lname: memberRef.data().lname };
-            if (member === user.uid) {
-                members.unshift(memberData); // Prepend the user themselves
-            } else {
-                members.push(memberData);
-            }
+            
+			if (member === user.uid) members.unshift(memberData); // Prepend the user themselves
+			else members.push(memberData);  
         }));
 
-        chats[chats.length-1].members = members;
-
+		// add the current user to the members list
+		members.unshift({ id: user.uid, username: userRef.data().username, email: userRef.data().email, fname: userRef.data().fname, lname: userRef.data().lname });
+        result[result.length-1].members = members;
+	
         // also get the last message
-        let lastMessage = await fb.db.collection(`chats/${chat}/messages`).orderBy("sentAt", "desc").limit(1).get();
+        let lastMessage = await fb.db.collection(`chats/${chatId}/messages`).orderBy("sentAt", "desc").limit(1).get();	
         if (lastMessage.size > 0)
-            chats[chats.length-1].lastMessage = lastMessage.docs[0].data();
+            result[result.length-1].lastMessage = lastMessage.docs[0].data();
         else
-            chats[chats.length-1].lastMessage = null;
-    }));
+            result[result.length-1].lastMessage = {};	
+    }
 
-    return res.status(200).json(chats);
+    return res.status(200).json(result);
 });
 
 
