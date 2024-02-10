@@ -94,6 +94,8 @@ router.get("/", async (req, res) => {
             result[result.length-1].lastMessage = {};	
     }
 
+	res.setHeader('Content-Type', 'application/json');
+	res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate');
     return res.status(200).json(result);
 });
 

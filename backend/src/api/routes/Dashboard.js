@@ -378,6 +378,8 @@ router.get("/files", async (req, res) => {
 
 	}
 
+	res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=600');
+
 	return res.status(200).json({ files: files });
 
 })

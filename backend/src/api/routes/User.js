@@ -80,9 +80,12 @@ router.get("/:user", async (req, res) => {
 	if (!user)
 		return res.status(401).json({ error: "Unauthorized" });
 
+	res.setHeader('Cache-Control', 'public, max-age=31557600');
+
 	fb.db.doc(`users/${req.params.user}`).get()
 		.then(doc => { res.json(doc.data()); })
 		.catch(err => { return res.status(500).json({ error: err }); });
+
 });
 
 // Create user

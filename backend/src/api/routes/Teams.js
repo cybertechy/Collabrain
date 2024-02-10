@@ -118,6 +118,8 @@ router.get("/:team", async (req, res) => {
     if (!user)
         return res.status(401).json({ error: "Unauthorized" });
 
+	res.setHeader('Cache-Control', 's-max-age=1, stale-while-revalidate')
+
     // Get team data
     let teamData = {};
     fb.db.doc(`teams/${req.params.team}`).get()
@@ -235,6 +237,9 @@ router.get("/", async (req, res) =>
 	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
 	if (!user)
 		return res.status(401).json({ error: "Unauthorized" });
+
+	res.setHeader('Content-Type', 'application/json');
+	res.setHeader('Cache-Control', 's-max-age=1, stale-while-revalidate');
 
 	// Get user's teams
 	fb.db.doc(`users/${user.uid}`).get()
