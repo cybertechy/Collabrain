@@ -138,14 +138,19 @@ async function saveTeamMsg(data)
 // Untested after modification
 async function saveDirectMsg(data)
 {
+	// convert sent at to firebase timestamp seconds and nanoseconds
+	let sentAt = admin.firestore.Timestamp.fromDate(new Date(data.sentAt));
+
+	// Save message to chat
 	db.collection(`chats/${data.chat}/messages`)
 		.add({
 			"message": data.msg,
 			"sender": data.sender,
-			"sentAt": data.sentAt,
+			"sentAt": sentAt,
 			"reactions": (data.reactions) ? data.reactions : []
 		});
 	
+	// This part is for Points (Check no.of messages)
 	// let userData = (await db.doc(`users/${data.sender}`).get()).data();
 
 	

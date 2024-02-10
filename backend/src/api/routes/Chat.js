@@ -188,7 +188,7 @@ router.get("/:chat/messages", async (req, res) =>
 
 	// Get messages
 	fb.db.collection(`chats/${req.params.chat}/messages`)
-		.orderBy("sentAt.seconds").limit(100).get()
+		.orderBy("sentAt").limit(100).get()
 		.then(snapshot =>
 		{
 			let messages = [];

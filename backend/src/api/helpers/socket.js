@@ -39,7 +39,13 @@ function init(server)
 async function broadcastMessage(data, type = "team")
 {
 	let members = type == "team" ? await fb.getTeamMembers(data.team): await fb.getChatMembers(data.chat) ;
-	let membersList = Object.keys(members);
+	let membersList = members;
+
+	// if their is a sentAt field, convert it to a firebase timestamp
+	let DateBackup = data.sentAt;
+	if (data.sentAt){
+		data.sentAt = fb.admin.firestore.Timestamp.fromDate(new Date(data.sentAt));
+	}
 
 	// Remove the sender
 	const index = membersList.indexOf(data.senderID);
@@ -53,6 +59,8 @@ async function broadcastMessage(data, type = "team")
 			io.to(currLinks[member]).emit((type == "team") ? "teamMsg" : "directMsg", data);
 	});
 
+	// Restore the sentAt field
+	data.sentAt = DateBackup;
 	(type == "team") ? fb.saveTeamMsg(data) : fb.saveDirectMsg(data);
 }
 
