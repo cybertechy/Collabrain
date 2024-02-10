@@ -35,13 +35,16 @@ export default function Messages() {
     const chatId = params.get('chatID');
     
     let sockCli = useRef(null);
+    
 
     useEffect(() => {
         if (!user) return;
 
         sockCli.current = socket.init('http://localhost:8080') || {};
+        console.log('Socket initialized',sockCli);
         sockCli.current.on('directMsg', (data) => {
             console.log("Received message from server");
+            console.log(data);
             setText((prevText) => [
                 ...prevText,
                 <MessageItem
@@ -55,7 +58,7 @@ export default function Messages() {
         });
 
         return () => sockCli.current.off('directMsg');
-    }, [user]);
+    }, [sockCli]);
 
     useEffect(() => {
         if (!user) return;
@@ -96,7 +99,7 @@ export default function Messages() {
         fetchUser();
     }, [user, withUser]);
     useEffect(() => {
-        if (!user || !chatId) return;
+        if (!user || !chatId || !userInfo) return;
     
         const fetchMessages = async () => {
             try {
@@ -128,7 +131,7 @@ export default function Messages() {
     
         // Clear the interval when the component unmounts or when user or chatId changes
         return () => clearInterval(intervalId);
-    }, [user, chatId]);
+    }, [user, chatId, userInfo]);
     
     
     
