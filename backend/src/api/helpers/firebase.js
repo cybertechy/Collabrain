@@ -7,9 +7,22 @@ admin.initializeApp({
 
 });
 
-function verifyUser(token)
+async function verifyUser(token)
 {
 	return admin.auth().verifyIdToken(token).catch((error) => { return null; });
+}
+
+async function deleteUser(uid){
+	return admin.auth().deleteUser(uid).catch((error) => { console.log("Error deleting user:", error); });
+
+}
+
+async function updateUser(uid, data){
+	return admin.auth().updateUser(uid, data).catch((error) => { console.log("Error updating user:", error); });
+}
+
+async function getUser(uid){
+	return admin.auth().getUser(uid).catch((error) => { console.log("Error getting user:", error); });
 }
 
 const db = admin.firestore();
@@ -172,5 +185,8 @@ module.exports = {
 	getChatMembers,
 	deleteCollection,
 	saveTeamMsg,
-	saveDirectMsg
+	saveDirectMsg,
+	deleteUser,
+	updateUser,
+	getUser
 };
