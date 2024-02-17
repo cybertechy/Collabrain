@@ -12,7 +12,6 @@ import ShareComponent from "../../components/ui/share";
 const { useAuthState, getToken } = require("_firebase/firebase");
 import { ToastContainer, toast } from "react-toastify";
 import { driver } from "driver.js";
-import { WelcomeScreen } from "@excalidraw/excalidraw";
 import "driver.js/dist/driver.css";
 
 import SearchingJSON from "../../public/assets/json/Searching.json";
@@ -468,7 +467,7 @@ function page() {
                 onPointerUpdate={updatecontentmap}
                 libraryReturnUrl={window.location.origin + window.location.pathname+`?id=${id}&`}
             >
-                <WelcomeScreen>
+                {/* <WelcomeScreen>
                     <WelcomeScreen.Center>
                         <WelcomeScreen.Center.Logo >
                             <Image src={LogoIcon} alt="Collabrain logo" width={75} height={50} />
@@ -478,8 +477,7 @@ function page() {
                             Select the tools from top navbar and start creating your content map
                         </WelcomeScreen.Center.Heading>
                     </WelcomeScreen.Center>
-
-                </WelcomeScreen>
+                </WelcomeScreen> */}
 
             </Excalidraw>
 
