@@ -1,6 +1,5 @@
 "use client";
-import React, { use } from "react";
-
+import React from "react";
 import Image from "next/image";
 import LogoIcon from "../../public/assets/images/logo_whitebackground.png";
 import { useState, useEffect, useRef } from "react";
@@ -12,7 +11,6 @@ import ShareComponent from "../../components/ui/share";
 const { useAuthState, getToken } = require("_firebase/firebase");
 import { ToastContainer, toast } from "react-toastify";
 import { driver } from "driver.js";
-import { WelcomeScreen } from "@excalidraw/excalidraw";
 import "driver.js/dist/driver.css";
 import Socket from "_socket/socket";
 
@@ -22,14 +20,9 @@ import ErrorJSON from "../../public/assets/json/Error.json";
 import WorkingJSON from "../../public/assets/json/Working.json";
 import Lottie from "lottie-react";
 
-
-
-
-
 function page() {
     const [token, setToken] = useState(null);
     const [Excalidraw, setExcalidraw] = useState(null);
-
     const [ExcalidrawAPI, setExcalidrawAPI] = useState(null);
     const [Collabaration, setCollabaration] = useState(false);
     const [ViewMode, setViewMode] = useState(false);
@@ -51,11 +44,8 @@ function page() {
 
     /* Excalidraw states */
 
+    
 
-
-
-    const router = useRouter();
-    const searchParms = useSearchParams();
 
     let Guide = {
         showProgress: true,
@@ -75,9 +65,11 @@ function page() {
             { element: "#share", popover: { title: "Share Content Map with others", description: "You can share the current content map to others by clicking on it" } },
             { element: "#save", popover: { title: "Saved Status", description: "This icon shows the saving status of the content map" } },
         ]
-    }
-        ;
+    };
 
+
+    const router = useRouter();
+    const searchParms = useSearchParams();
     const driverObj = driver(Guide);
     let sockCli = useRef(null);
 
@@ -85,8 +77,7 @@ function page() {
     useEffect(() => {
         import("@excalidraw/excalidraw").then((comp) => {
             setExcalidraw(comp.Excalidraw)
-        }
-        );
+        });
     }, []);
 
     // load excalidraw Data
@@ -101,11 +92,6 @@ function page() {
             });
         })
 
-
-
-
-
-
     }, [user]);
 
     // Recieve collabData
@@ -119,7 +105,7 @@ function page() {
             console.log("Received collabData");
             console.log(updateInfo);
 
-            if(updateInfo?.ActiveMembers > 1) setCollabaration(true);
+            if (updateInfo?.ActiveMembers > 1) setCollabaration(true);
             else setCollabaration(false);
 
 
@@ -151,7 +137,7 @@ function page() {
 
         let appState = ExcalidrawAPI.getAppState();
         // find the index (if exists) of the user in the collaborators array
-        if(!Collabaration) return;
+        if (!Collabaration) return;
         let index = appState.collaborators.findIndex((collaborator) => collaborator.id === user.uid);
         if (index === -1) index = appState.collaborators.length;
         appState.collaborators[index] = {
@@ -168,11 +154,18 @@ function page() {
 
     // Start collab 
     useEffect(() => {
-        if (!user || !id) return;
+        if (!user || !id || !sockCli.current) return;
         console.log("Starting collab");
-        if(sockCli.current) sockCli.current.emit('startCollab', { user: { id: user.uid, name: (user.displayName) ? user.displayName : "Anonymous" }, id: id });
 
+        sockCli.current.emit('startCollab', { user: { id: user.uid, name: (user.displayName) ? user.displayName : "Anonymous" }, id: id });
 
+        sockCli.current.io.on('reconnect', () => {
+            sockCli.current.emit('startCollab', { user: { id: user.uid, name: (user.displayName) ? user.displayName : "Anonymous" }, id: id });
+        });
+
+        sockCli.current.io.on('reconnect_failed', () => {
+            setCollabaration(false);
+        });
 
     }, [id, user, sockCli.current]);
 
@@ -184,9 +177,11 @@ function page() {
 
         if (ExcalidrawAPI && ContentMapName == "New Content Map" && IntialData && createdAt === updatedAt) driverObj.drive();
 
-        if((IntialData?.userAccess === "edit" || IntialData?.userAccess === "owner")) sockCli.current = Socket.init('http://localhost:8080') || {};
+        if ((IntialData?.userAccess === "edit" || IntialData?.userAccess === "owner")) sockCli.current = Socket.init('http://localhost:8080', {
+            reconnection: true,
+        }) || {};
 
-        if(sockCli) sockCli.current.on('roomFull', (data) => {
+        if (sockCli.current) sockCli.current.on('roomFull', (data) => {
             toast.error(data.msg, {
                 position: "bottom-right",
                 autoClose: 5000,
@@ -197,7 +192,9 @@ function page() {
             });
             setCollabaration(false);
         });
-    }, [IntialData, ExcalidrawAPI, ContentMapName])
+    }, [IntialData, ExcalidrawAPI, ContentMapName, sockCli.current]);
+
+    
 
 
     const getInitialData = async (token) => {
@@ -569,19 +566,6 @@ function page() {
                 onPointerUpdate={updatecontentmap}
                 libraryReturnUrl={window.location.origin + window.location.pathname + `?id=${id}&`}
             >
-                <WelcomeScreen>
-                    <WelcomeScreen.Center>
-                        <WelcomeScreen.Center.Logo >
-                            <Image src={LogoIcon} alt="Collabrain logo" width={75} height={50} />
-                        </WelcomeScreen.Center.Logo>
-                        <WelcomeScreen.Center.Heading>
-                            Welcome to Collabrain Content Map <br></br>
-                            Select the tools from top navbar and start creating your content map
-                        </WelcomeScreen.Center.Heading>
-                    </WelcomeScreen.Center>
-
-                </WelcomeScreen>
-
             </Excalidraw>
 
             }
