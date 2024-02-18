@@ -133,6 +133,8 @@ async function saveTeamMsg(data)
 		members,
 		score
 	}).catch(err => console.log(err));
+
+	// Add code for FSR2 here
 }
 
 // Untested after modification
@@ -159,6 +161,8 @@ async function saveDirectMsg(data)
 	// db.doc(`users/${data.sender}`).update({
 	// 	score
 	// }).catch(err => console.log(err));
+
+	// Add code for FSR2 here
 }
 
 module.exports = {

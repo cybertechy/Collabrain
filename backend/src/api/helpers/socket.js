@@ -17,7 +17,10 @@ function init(server)
 		{
 			console.log(`user ${msg.id} connected`);
 			currLinks[msg.id] = socket.id;
+			// FSR1 - Difference between user connecting and disconnecting
 		});
+
+		
 
 		socket.on('disconnect', () =>
 		{
@@ -25,6 +28,8 @@ function init(server)
 			let ref = Object.keys(currLinks).find((key) => currLinks[key] === socket.id);
 			delete currLinks[ref];
 			console.log('user disconnected');
+
+			// FSR1 - Difference between user connecting and disconnecting
 		});
 
 		socket.on('teamMsg', (data) => broadcastMessage(data));
