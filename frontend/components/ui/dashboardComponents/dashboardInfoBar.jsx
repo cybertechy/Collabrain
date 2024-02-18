@@ -4,17 +4,17 @@ import DropdownDashboard from './dropdownDashboard';
 import { useRouter } from 'next/navigation'; 
 
 const DashboardInfoBar = ({ sortName, setSortName, sortDate, setSortDate, isAscending, setIsAscending, currentPath }) => {
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  // const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const router = useRouter(); // Initialize useRouter
 
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth);
-    };
+  // useEffect(() => {
+  //   const handleResize = () => {
+  //     setWindowWidth(window.innerWidth);
+  //   };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  //   window.addEventListener('resize', handleResize);
+  //   return () => window.removeEventListener('resize', handleResize);
+  // }, []);
 
   const toggleSortOrder = (sortBy) => {
     setIsAscending(!isAscending);

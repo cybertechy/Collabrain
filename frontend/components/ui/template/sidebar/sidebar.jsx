@@ -67,7 +67,7 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
     // };
 
     const pathname = usePathname(); 
-    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+    // const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     const [userTeams, setUserTeams] = useState(null);
     
     useEffect(() => {
@@ -131,61 +131,63 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
     
      // Empty dependency array to run the effect only once
 
-    useEffect(() => {
-        const handleResize = () => {
-            setWindowWidth(window.innerWidth);
-        };
+    // useEffect(() => {
+    //     const handleResize = () => {
+    //         setWindowWidth(window.innerWidth);
+    //     };
         
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
+    //     window.addEventListener('resize', handleResize);
+    //     return () => window.removeEventListener('resize', handleResize);
+    // }, []);
 
-    const sidebarStyle = () => {
-        if (windowWidth >= 800) {
-            return {
-                width: '18rem'
-            }
-        }
-        if (windowWidth > 550 && windowWidth < 800) {
-            return {
-                width: '18rem'
-            }
-        }
-        else {
-            return {
-                width: '100%',  // Use '100vw' for full width
-                // maxWidth: '100%'
+    // const sidebarStyle = () => {
+    //     if (windowWidth >= 800) {
+    //         return {
+    //             width: '18rem'
+    //         }
+    //     }
+    //     if (windowWidth > 550 && windowWidth < 800) {
+    //         return {
+    //             width: '18rem'
+    //         }
+    //     }
+    //     else {
+    //         return {
+    //             width: '100%',  // Use '100vw' for full width
+    //             // maxWidth: '100%'
     
-            }
-        }
-    }
+    //         }
+    //     }
+    // }
     
-    const sidebarStyle1 = () => {
-        if (windowWidth >= 800) {
-            return {
-                width: '5rem'
-            }
-        }
-        if (windowWidth >= 400 && windowWidth < 800) {
-            return {
-                width: '5rem'
-            }
-        }
-        else {
-            return {
-                // overflow: 'hidden',
-                display: 'none',
-                // width: '0px'
-            }
-        }
-    }
+    // const sidebarStyle1 = () => {
+    //     if (windowWidth >= 800) {
+    //         return {
+    //             width: '5rem'
+    //         }
+    //     }
+    //     if (windowWidth >= 400 && windowWidth < 800) {
+    //         return {
+    //             width: '5rem'
+    //         }
+    //     }
+    //     else {
+    //         return {
+    //             // overflow: 'hidden',
+    //             display: 'none',
+    //             // width: '0px'
+    //         }
+    //     }
+    // }
 
     return (
         <aside
-            className={`transition-all shadow-md h-screen pt-[height_of_navbar] z-10 duration-500 ease-in-out ${
-                isOpen ? "w-72" : "w-24"
-            } bg-basicallylight text-basicallydark`}
-            style={isOpen ? sidebarStyle() : sidebarStyle1()}
+            className={`transition-all shadow-md h-screen pt-[height_of_navbar] z-10 duration-500 ease-in-out 
+            ${
+                isOpen ? "max-sm:w-screen" : "max-sm:hidden"
+            }
+             bg-basicallylight text-basicallydark`}
+            // style={isOpen ? sidebarStyle() : sidebarStyle1()}
             // onClick={handleSidebarClick}
         >
             <div className="flex flex-col">
@@ -210,11 +212,13 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
                                 />
                             </div>
                         ) : (
+                            <div className="flex-grow flex max-sm:hidden">
                             <MenuIcon
                                 className="h-6 w-6 mb-2 text-lg text-primary transition-all duration-500 ease-in-out"
                                 onClick={toggleSidebar}
                                 fontSize="large"
                             />
+                            </div>
                         )}
                     </div>
                 </div>

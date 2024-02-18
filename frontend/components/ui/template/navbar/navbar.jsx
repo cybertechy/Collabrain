@@ -17,7 +17,6 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
     const [showLeaderboard, setShowLeaderboard] = useState(false);
     const leaderboardRef = useRef(null);
     const leaderboardToggleRef = useRef(null); // Ref for the leaderboard toggle icon
-    const [windowWidth, setWindowWidth] = useState(window.innerWidth); 
     const [showSettings, setShowSettings] = useState(false);
     const [currentScreen, setCurrentScreen] = useState("profile");
     const settingsOverlayRef = useRef(null); 
@@ -53,31 +52,6 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
-
-    useEffect(() => {
-      const handleResize = () => {
-        setWindowWidth(window.innerWidth);
-      };
-
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
-    }, []);
-
-    const navbarStyle = () => {
-    if (!isOpen) {
-        if (windowWidth < 400) {
-            return (
-                <MenuIcon
-                                className="h-6 w-6 mb-2 text-lg text-basicallylight transition-all duration-500 ease-in-out"
-                                onClick={toggleSidebar}
-                                fontSize="large"
-                            />
-            
-              
-            )
-        }
-    }
-}
 
     const tooltips = () => {
         return (
@@ -128,18 +102,17 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
     return (
         <>
             <nav className="bg-primary p-4 flex items-center justify-between">
-                <div className="flex-grow flex">
-                    {navbarStyle()}
+                <div className={`flex-grow flex sm:hidden ${isOpen ? "hidden" : ""}`}>
+                    <MenuIcon
+                    className="h-6 w-6 mb-2 text-lg text-basicallylight transition-all duration-500 ease-in-out"
+                    onClick={toggleSidebar}
+                    fontSize="large"
+                    />
                 </div>
-                {(windowWidth > 500) ? 
-                (<div className="flex items-center space-x-10">
+                <div className={`h-1 hidden sm:block transition-all duration-1000 ease-in-out ${isOpen ? "max-sm:hidden" : ""}`}></div>
+                <div className="flex items-end space-x-10 lg:space-x-7">
                     {tooltips()}
-                </div>) 
-                : 
-                (<div className="flex items-center space-x-7">
-                   {tooltips()}
-                </div>)}
-                
+                </div>                
             </nav>
 
             {showLeaderboard && (
