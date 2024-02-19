@@ -83,7 +83,9 @@ function init(server)
 		socket.on('collabData', ({id,user,data}) =>
 		{
 			if(! rooms[id]?.members[user]) return socket.emit('reconnectRoom', {msg: "You are not a member of this room"});
-			data.ActiveMembers = rooms[id]?.members ? Object.keys(rooms[id].members).length : 0;
+			
+			data.activeMembers = Object.keys(rooms[id].members).filter((member) => member != user);
+			
 			io.to(id).emit('updateCollabData', data);
 		});
 

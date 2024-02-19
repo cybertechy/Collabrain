@@ -20,6 +20,9 @@ import ErrorJSON from "../../public/assets/json/Error.json";
 import WorkingJSON from "../../public/assets/json/Working.json";
 import Lottie from "lottie-react";
 
+const SOCKET_DEBUG = false;
+const POINTER_DEBUG = true;
+
 function page() {
     const [token, setToken] = useState(null);
     const [Excalidraw, setExcalidraw] = useState(null);
@@ -36,15 +39,17 @@ function page() {
     const [isOwner, setisOwner] = useState(false);
     const [user, loading] = useAuthState();
     const [OverrideMessage, setOverrideMessage] = useState("");
+    const [ConcurrencyStop, setConcurrencyStop] = useState(false);
+    
 
     /* UI states */
     const [New, setNew] = useState(false);
     const [Delete, setDelete] = useState(false);
     const [Share, setShare] = useState(false);
 
-    /* Excalidraw states */
+    const Serverlocation = "http://192.168.0.115:8080";
 
-    
+
 
 
     let Guide = {
@@ -72,6 +77,7 @@ function page() {
     const searchParms = useSearchParams();
     const driverObj = driver(Guide);
     let sockCli = useRef(null);
+    const abortController = new AbortController();
 
     ///Load excalidraw
     useEffect(() => {
@@ -101,17 +107,31 @@ function page() {
 
         sockCli.current.on('updateCollabData', (updateInfo) => {
 
-            console.log(ExcalidrawAPI.getAppState());
-            console.log("Received collabData");
-            console.log(updateInfo);
+            if (SOCKET_DEBUG) {
+                console.log(ExcalidrawAPI.getAppState());
+                console.log("Received collabData");
+                console.log(updateInfo);
+            }
 
-            if (updateInfo?.ActiveMembers > 1) setCollabaration(true);
+            if (updateInfo?.activeMembers?.length > 0) setCollabaration(true);
             else setCollabaration(false);
 
+            // filter out collabortors that have button up
+            updateInfo.collaborators = updateInfo.collaborators.filter((collaborator) => collaborator.button === "down" && collaborator.id !== user.uid);
 
-            let collabData = [];
-            ExcalidrawAPI.updateScene({ elements: updateInfo.elements, collaborators: collabData, appState: { files: updateInfo.files } });
-            console.log("Updated scene");
+            // abort any ongoing requests
+            if(updateInfo?.collaborators?.length > 0){
+                abortController.abort();
+                setConcurrencyStop(true);
+            }
+           
+
+            ExcalidrawAPI.updateScene({ elements: updateInfo.elements, collaborators: updateInfo.collaborators, appState: { files: updateInfo.files } });
+
+            //timeout to prevent concurrency
+            if(updateInfo?.collaborators?.length > 0) setTimeout(() => {
+                setConcurrencyStop(false);
+            }, 1000);
         });
 
 
@@ -134,13 +154,15 @@ function page() {
     useEffect(() => {
         if (!ExcalidrawAPI) return;
         if (!pointerState) return;
+        if (!Collabaration) return;
 
         let appState = ExcalidrawAPI.getAppState();
         // find the index (if exists) of the user in the collaborators array
-        if (!Collabaration) return;
+
         let index = appState.collaborators.findIndex((collaborator) => collaborator.id === user.uid);
         if (index === -1) index = appState.collaborators.length;
-        appState.collaborators[index] = {
+        let mstate = appState.collaborators[index];
+        mstate = {
             pointer: {
                 x: pointerState.pointer.x,
                 y: pointerState.pointer.y,
@@ -150,12 +172,21 @@ function page() {
             id: user.uid,
             selectedElementIds: appState.selectedElementIds,
         }
-    }, [pointerState, ExcalidrawAPI]);
+
+        // TEMP : send the current user mstate to the room
+        if(POINTER_DEBUG) {
+            console.log("Sending mstate");
+            console.log({ id: id, user: user.uid, data: { collaborators: [...appState.collaborators.slice(0, index), mstate, ...appState.collaborators.slice(index + 1)] } });
+        }
+        if (sockCli.current && mstate.button==="down" ) sockCli.current.emit('collabData', { id: id, user: user.uid, data: { collaborators: [...appState.collaborators.slice(0, index), mstate, ...appState.collaborators.slice(index + 1)] } });
+
+
+    }, [pointerState, ExcalidrawAPI, Collabaration]);
 
     // Start collab 
     useEffect(() => {
         if (!user || !id || !sockCli.current) return;
-        console.log("Starting collab");
+        if (SOCKET_DEBUG) console.log("Starting collab");
 
         sockCli.current.emit('startCollab', { user: { id: user.uid, name: (user.displayName) ? user.displayName : "Anonymous" }, id: id });
 
@@ -177,7 +208,7 @@ function page() {
 
         if (ExcalidrawAPI && ContentMapName == "New Content Map" && IntialData && createdAt === updatedAt) driverObj.drive();
 
-        if ((IntialData?.userAccess === "edit" || IntialData?.userAccess === "owner")) sockCli.current = Socket.init('http://localhost:8080', {
+        if ((IntialData?.userAccess === "edit" || IntialData?.userAccess === "owner")) sockCli.current = Socket.init(Serverlocation, {
             reconnection: true,
         }) || {};
 
@@ -194,7 +225,7 @@ function page() {
         });
     }, [IntialData, ExcalidrawAPI, ContentMapName, sockCli.current]);
 
-    
+
 
 
     const getInitialData = async (token) => {
@@ -204,7 +235,7 @@ function page() {
         setid(id);
 
         try {
-            const res = await axios.get(`http://localhost:8080/api/maps/${id}`, {
+            const res = await axios.get(`${Serverlocation}/api/maps/${id}`, {
                 headers: {
                     authorization: `Bearer ${token}`,
                 },
@@ -235,7 +266,7 @@ function page() {
         setNew(false);
 
         try {
-            const res = await axios.post(`http://localhost:8080/api/maps`, {
+            const res = await axios.post(`${Serverlocation}/api/maps`, {
                 name: "New Content Map",
                 data: ""
             }, {
@@ -246,8 +277,6 @@ function page() {
 
             setNew(false);
             if (res.status !== 200) return null;
-
-            console.log(res.data);
 
             setid(res.data.id);
             setIntialData({ name: "New Content Map", data: "", userAccess: "owner" });
@@ -287,7 +316,7 @@ function page() {
         setNew(false);
 
         try {
-            const res = await axios.post(`http://localhost:8080/api/maps`, {
+            const res = await axios.post(`${Serverlocation}/api/maps`, {
                 name: ContentMapName + " (copy)",
                 data: appdata
             }, {
@@ -298,8 +327,6 @@ function page() {
 
             setNew(false);
             if (res.status !== 200) return null;
-
-            console.log(res.data);
 
             setid(res.data.id);
             setIntialData({ name: ContentMapName + " (copy)", data: JSON.stringify(appdata), userAccess: "owner" });
@@ -337,7 +364,7 @@ function page() {
         setDelete(false);
 
         try {
-            const res = await axios.delete(`http://localhost:8080/api/maps/${id}`, {
+            const res = await axios.delete(`${Serverlocation}/api/maps/${id}`, {
                 headers: {
                     authorization: `Bearer ${token}`,
                 },
@@ -386,7 +413,7 @@ function page() {
         if (!token) return null;
 
         // make axois put rquest with token in header to update the content map, pass data (appState) in body
-        axios.put(`http://localhost:8080/api/maps/${id}`, { name: ContentMapName }, {
+        axios.put(`${Serverlocation}/api/maps/${id}`, { name: ContentMapName }, {
             headers: {
                 authorization: `Bearer ${token}`,
             },
@@ -398,7 +425,7 @@ function page() {
 
     const updatecontent = async (data) => {
         try {
-            let res = await axios.put(`http://localhost:8080/api/maps/${id}`, data, {
+            let res = await axios.put(`${Serverlocation}/api/maps/${id}`, data, {
                 headers: {
                     authorization: `Bearer ${token}`,
                 },
@@ -419,6 +446,8 @@ function page() {
             setPointerState(data);
             return;
         }
+
+        
 
         setPointerState(data);
         setisSaved(false);
@@ -442,11 +471,19 @@ function page() {
             collaborators: appState.collaborators
         }
 
-        console.log("Emitting collabData");
-        console.log(appdata);
+        if (SOCKET_DEBUG) {
+            console.log("Emitting collabData");
+            console.log(appdata);
+        }
         if (sockCli.current) sockCli.current.emit('collabData', { id: id, user: user.uid, data: appdata });
 
         appdata.appState.collaborators = [];
+
+        if(ConcurrencyStop) {
+            setisSaved(false);
+            
+            return;
+        }
 
         let res = await updatecontent({ name: IntialData?.name, data: appdata })
 
@@ -456,7 +493,7 @@ function page() {
 
     const getdata = async (query) => {
         try {
-            let res = await axios.get(`http://localhost:8080/api/maps/ut/search?${query}`, {
+            let res = await axios.get(`${Serverlocation}/api/maps/ut/search?${query}`, {
                 headers: {
                     authorization: `Bearer ${token}`,
                 },
