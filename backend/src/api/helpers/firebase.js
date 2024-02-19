@@ -7,20 +7,6 @@ admin.initializeApp({
 
 });
 
-// Retrieves the current month
-function getCurrentMonth() {
-    const now = new Date();
-    return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}`;
-}
-
-// Retrieves the current week
-function getCurrentWeek() {
-    const now = new Date();
-    const firstDayOfYear = new Date(now.getFullYear(), 0, 1);
-    const pastDaysOfYear = (now - firstDayOfYear) / 86400000;
-    return `${now.getFullYear()}-W${Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7).toString().padStart(2, '0')}`;
-}
-
 function verifyUser(token)
 {
 	return admin.auth().verifyIdToken(token).catch((error) => { return null; });
@@ -148,27 +134,6 @@ async function saveTeamMsg(data)
 	}).catch(err => console.log(err));
 
 	// Add code for FSR2 here
-	if (members[data.senderID].score > 0) {
-		const month = getCurrentMonth();
-		const week = getCurrentWeek();
-	
-		const activeUserRefMonth = db.doc(`activeUsers/monthly/${month}/users/${data.senderID}`);
-		const activeUserRefWeek = db.doc(`activeUsers/weekly/${week}/users/${data.senderID}`);
-	
-		// Check and set the user as active for the month
-		activeUserRefMonth.get().then((doc) => {
-			if (!doc.exists) {
-				activeUserRefMonth.set({ active: true });
-			}
-		});
-	
-		// Check and set the user as active for the week
-		activeUserRefWeek.get().then((doc) => {
-			if (!doc.exists) {
-				activeUserRefWeek.set({ active: true });
-			}
-		});
-	}
 }
 
 // Untested after modification
@@ -197,27 +162,6 @@ async function saveDirectMsg(data)
 	}).catch(err => console.log(err));
 
 	// Add code for FSR2 here
-	if (members[data.sender].score > 0) {
-		const month = getCurrentMonth();
-		const week = getCurrentWeek();
-	
-		const activeUserRefMonth = db.doc(`activeUsers/monthly/${month}/users/${data.sender}`);
-		const activeUserRefWeek = db.doc(`activeUsers/weekly/${week}/users/${data.sender}`);
-	
-		// Check and set the user as active for the month
-		activeUserRefMonth.get().then((doc) => {
-			if (!doc.exists) {
-				activeUserRefMonth.set({ active: true });
-			}
-		});
-	
-		// Check and set the user as active for the week
-		activeUserRefWeek.get().then((doc) => {
-			if (!doc.exists) {
-				activeUserRefWeek.set({ active: true });
-			}
-		});
-	}
 }
 
 module.exports = {
