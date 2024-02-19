@@ -184,7 +184,7 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
         <aside
             className={`transition-all shadow-md h-screen pt-[height_of_navbar] z-10 duration-500 ease-in-out 
             ${
-                isOpen ? "max-sm:w-screen" : "max-sm:hidden"
+                isOpen ? "sm:w-80 max-sm:w-screen" : "sm:w-20 max-sm:hidden"
             }
              bg-basicallylight text-basicallydark`}
             // style={isOpen ? sidebarStyle() : sidebarStyle1()}

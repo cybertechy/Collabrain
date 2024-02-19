@@ -638,7 +638,7 @@ export default function Dashboard()
 						Projects
 					</p>
 					<div
-						className="scrollbar-thin scrollbar-thumb-primary h-full  overflow-y-scroll pr-28"
+						className="scrollbar-thin scrollbar-thumb-primary h-full  overflow-y-scroll pr-1"
 						style={{ maxHeight: "500px" }}
 					>
 						<div className="flex flex-wrap gap-x-4 ml-4 justify-start">

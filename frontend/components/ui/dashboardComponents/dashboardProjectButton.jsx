@@ -119,7 +119,7 @@ const DashboardProjectButton = ({ title, project, type, color = "#FFFFFF", onCli
             leaveDelay={200}
           
         >
-            <>   <div className="flex flex-col items-center justify-center bg-aliceBlue text-primary rounded-md hover:bg-columbiablue duration-300 w-32 h-28 pt-3 pl-1"
+            <>   <div className="flex flex-col items-center justify-center bg-aliceBlue text-primary rounded-md hover:bg-columbiablue duration-300 w-32 h-28 pt-3 pl-1 mb-3"
             draggable="true"
             onDragStart={(e) => handleDragStart(e, project.id, type)}>
             <div className="flex flex-col items-center justify-center h-full">
