@@ -72,7 +72,7 @@ router.get("/", async (req, res) => {
 	
         // get chat members info
         let members = [];
-        Promise.all(chatRef.data().members.map(async member => {
+        await Promise.all(chatRef.data().members.map(async member => {
 			if(member === user.uid) return; // Skip the user themselves
             let memberRef = await fb.db.doc(`users/${member}`).get();
             // Prepend the user themselves to the members list if it's their ID
