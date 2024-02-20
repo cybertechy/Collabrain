@@ -7,12 +7,25 @@ admin.initializeApp({
 
 });
 
-function verifyUser(token)
+const db = admin.firestore();
+
+async function verifyUser(token)
 {
 	return admin.auth().verifyIdToken(token).catch((error) => { return null; });
 }
 
-const db = admin.firestore();
+async function deleteUser(uid){
+	return admin.auth().deleteUser(uid).catch((error) => { console.log("Error deleting user:", error); });
+
+}
+
+async function updateUser(uid, data){
+	return admin.auth().updateUser(uid, data).catch((error) => { console.log("Error updating user:", error); });
+}
+
+async function getUser(uid){
+	return admin.auth().getUser(uid).catch((error) => { console.log("Error getting user:", error); });
+}
 
 // Functions to manipulate docs in Firestore
 async function createDoc(user)
@@ -172,5 +185,8 @@ module.exports = {
 	getChatMembers,
 	deleteCollection,
 	saveTeamMsg,
-	saveDirectMsg
+	saveDirectMsg,
+	deleteUser,
+	updateUser,
+	getUser
 };

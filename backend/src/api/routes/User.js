@@ -80,7 +80,8 @@ router.get("/:user", async (req, res) => {
 	if (!user)
 		return res.status(401).json({ error: "Unauthorized" });
 
-	res.setHeader('Cache-Control', 'public, max-age=31557600');
+	//set cache
+	res.set('Cache-Control', 'public, max-age=300, s-maxage=600');
 
 	fb.db.doc(`users/${req.params.user}`).get()
 		.then(doc => { res.json(doc.data()); })
@@ -98,6 +99,9 @@ router.post("/", (req, res) => {
 	let users = fb.db.collection("users").where("email", "==", req.body.email);
 	if (users.length > 0)
 		return res.status(400).json({ error: "User already exists" });
+
+	// Update user info
+	fb.updateUser(req.body.uid, { email: req.body.email, displayName: req.body.fname + " " + req.body.lname })
 	
 	// Add user to database
 	fb.db.doc(`users/${req.body.uid}`).set(
@@ -125,7 +129,7 @@ router.post("/", (req, res) => {
 			fontSize: 16,
 			theme: "light",
 			language: "en",
-			
+			role: "user",
 		})
 		.then(() => { return res.json({ message: "User added" }); })
 		.catch(err => { return res.status(500).json({ error: err }); });
