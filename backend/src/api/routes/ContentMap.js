@@ -133,6 +133,33 @@ router.get("/:id", async (req, res) => {
     return res.status(200).json({ ...contentMapData, userAccess: contentMapData.Access[user.uid]?.role });
 });
 
+/* Get a content map of a user , Public Access  */
+router.get("/public/:id", async (req, res) => {
+    const id = req.params.id;
+
+   
+    const db = fb.admin.firestore();
+    const contentMap = await db.collection("contentMaps").doc(id).get();
+    if (!contentMap.exists) return res.status(404).json({ code: "AM108", error: "Content map not found" });
+
+    const contentMapData = contentMap.data();
+
+    //check if Public Access is enabled
+    if (!contentMapData.Access["public"]) return res.status(403).json({ code: "AM109", error: "Access Denied" });
+
+    // get the data from oracle cloud
+    const getData = await oci.getData("B3", contentMapData.data);
+
+    if (!getData) return res.status(500).json({ code: 500, error: "Getting data failed" });
+
+    contentMapData.data = await oci.generateStringFromStream(getData.value);
+
+    contentMapData.createdAt = contentMapData.createdAt.toDate();
+    contentMapData.updatedAt = contentMapData.updatedAt.toDate();
+
+    return res.status(200).json({ ...contentMapData, userAccess: "view" });
+});
+
 /* Update a content map of a user */
 router.put("/:id", async (req, res) => {
 
@@ -294,7 +321,6 @@ router.delete("/:id", async (req, res) => {
 
 
 /* A search API that returns similar matching users or teams */
-
 router.get("/ut/search", async (req, res) => {
 
     const auth = req.headers.authorization;
