@@ -35,9 +35,9 @@ function init(server)
             		let timeSpent = disconnectTime - connectTime; // Time spent in milliseconds
 
             		// Update the timeSpent for the user in Firebase
-            		//await fb.firestore().collection('users').doc(ref).update({
-                	//	timeSpent: fb.admin.firestore.FieldValue.increment(timeSpent)
-            		//});
+            		await fb.db.collection('users').doc(ref).update({
+						timeSpent: fb.admin.firestore.FieldValue.increment(timeSpent)
+					  });
 
             		// Cleanup
             		delete currLinks[ref];
