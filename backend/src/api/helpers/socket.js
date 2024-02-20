@@ -7,6 +7,8 @@ let io;
 // Current connections
 let currLinks = {};
 
+let connectionTimes = {};
+
 function init(server)
 {
 	io = new Server(server, { cors: { origin: "*" } });
@@ -18,18 +20,31 @@ function init(server)
 			console.log(`user ${msg.id} connected`);
 			currLinks[msg.id] = socket.id;
 			// FSR1 - Difference between user connecting and disconnecting
+			connectionTimes[msg.id] = Date.now();
 		});
 
 		
 
-		socket.on('disconnect', () =>
+		socket.on('disconnect', async () =>
 		{
-			// Find the user and delete it
-			let ref = Object.keys(currLinks).find((key) => currLinks[key] === socket.id);
-			delete currLinks[ref];
-			console.log('user disconnected');
+    		let ref = Object.keys(currLinks).find((key) => currLinks[key] === socket.id);
+    		if (ref) {
+        		let disconnectTime = Date.now();
+        		let connectTime = connectionTimes[ref];
+        		if (connectTime) {
+            		let timeSpent = disconnectTime - connectTime; // Time spent in milliseconds
 
-			// FSR1 - Difference between user connecting and disconnecting
+            		// Update the timeSpent for the user in Firebase
+            		await fb.firestore().collection('users').doc(ref).update({
+                		timeSpent: fb.admin.firestore.FieldValue.increment(timeSpent)
+            		});
+
+            		// Cleanup
+            		delete currLinks[ref];
+            		delete connectionTimes[fef]; // Ensure to remove the user from here as well
+            		console.log(`user disconnected, time spent: ${timeSpent}ms`);
+        		}
+    		}
 		});
 
 		socket.on('teamMsg', (data) => broadcastMessage(data));
