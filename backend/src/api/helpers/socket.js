@@ -7,9 +7,6 @@ let io;
 // Current connections
 let currLinks = {};
 
-// Store connection times
-let connectionTimes = {};
-
 function init(server)
 {
 	io = new Server(server, { cors: { origin: "*" } });
@@ -21,7 +18,6 @@ function init(server)
 			console.log(`user ${msg.id} connected`);
 			currLinks[msg.id] = socket.id;
 			// FSR1 - Difference between user connecting and disconnecting
-			connectionTimes[msg.id] = Date.now();
 		});
 
 		
@@ -30,11 +26,6 @@ function init(server)
 		{
 			// Find the user and delete it
 			let ref = Object.keys(currLinks).find((key) => currLinks[key] === socket.id);
-			if (ref && connectionTimes[ref]) {
-				let sessionDuration = Date.now() - connectionTimes[ref]; // Calculate session duration
-				console.log(`User ${ref} session duration: ${sessionDuration} ms`);
-			}
-			
 			delete currLinks[ref];
 			console.log('user disconnected');
 
