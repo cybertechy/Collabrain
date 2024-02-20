@@ -195,6 +195,105 @@ router.delete("/:user", async (req, res) => {
 	if (req.params.user !== user.uid)
 		return res.status(401).json({ message: "Unauthorized" });
 
+	// get user data 
+	let userRef = await fb.db.doc(`users/${user.uid}`).get();
+	if (!userRef.exists)
+		return res.status(404).json({ error: "User not found" });
+
+	let userdata = userRef.data();
+
+	// delete the content maps and documents 
+	if(userdata.contentMaps) await Promise.all(userdata.contentMaps?.map(async (content) => {
+		let contentMapData = await fb.db.doc(`content/${content}`).get();
+		if (!contentMapData.exists)
+			return res.status(404).json({ error: "Content map not found" });
+
+		let contentMap = contentMapData.data();
+		let dataDelete = await oci.deleteData("B3", contentMap.data);
+
+		if (dataDelete.error)
+			return res.status(500).json({ error: dataDelete.error });
+
+		await fb.db.doc(`contentMaps/${content}`).delete();
+	}));
+
+	if(userdata.documents) await Promise.all(userdata.documents?.map(async (document) => {
+		let documentData = await fb.db.doc(`documents/${document}`).get();
+		if (!documentData.exists)
+			return res.status(404).json({ error: "Document not found" });
+
+		let documentMap = documentData.data();
+		let dataDelete = await oci.deleteData("B3", documentMap.data);
+
+		if (dataDelete.error)
+			return res.status(500).json({ error: dataDelete.error });
+
+		await fb.db.doc(`documents/${document}`).delete();
+	}));
+
+	
+	// remove user from any teams they are in
+	if(userdata.teams) await Promise.all(userdata.teams?.map(async (team) => {
+		let teamData = await fb.db.doc(`teams/${team}`).get();
+		if (!teamData.exists)
+			return res.status(404).json({ error: "Team not found" });
+
+		let teamMap = teamData.data();
+
+		// remove user from team
+		delete teamMap.members[user.uid];
+
+		await fb.db.doc(`teams/${team}`).update({members: teamMap.members});
+
+		// remove team if user is owner and only member
+		if (teamMap.owner == user.uid && Object.keys(teamMap.members).length == 0)
+			await fb.db.doc(`teams/${team}`).delete();
+
+	}));
+	
+	// remove members from any content maps or documents they access to
+	if(userdata.AccessContentMaps) await Promise.all(userdata.AccessContentMaps?.map(async (access) => {
+		let contentMapData = await fb.db.doc(`contentMaps/${access}`).get();
+		if (!contentMapData.exists)
+			return res.status(404).json({ error: "Content map not found" });
+
+		let contentMap = contentMapData.data();
+		delete contentMap.Access[user.uid];
+
+		fb.db.doc(`contentMaps/${access}`).update({Access: contentMap.Access});
+	}));
+
+	if(userdata.AccessDocuments) await Promise.all(userdata.AccessDocuments?.map(async (access) => {
+		let documentData = await fb.db.doc(`documents/${access}`).get();
+		if (!documentData.exists)
+			return res.status(404).json({ error: "Document not found" });
+
+		let document = documentData.data();
+		delete document.Access[user.uid];
+
+		fb.db.doc(`documents/${access}`).update({Access: document.Access});
+	}));
+
+	// remove user from chat
+	if(userdata.chats) await Promise.all(userdata.chats?.map(async (chat) => {
+		let chatData = await fb.db.doc(`chats/${chat}`).get();
+		if (!chatData.exists)
+			return res.status(404).json({ error: "Chat not found" });
+
+		// remove user from chat array
+		chatData.update({members: fb.admin.firestore.FieldValue.arrayRemove(user.uid)});
+	}));
+
+	// remove folders
+	await fb.db.collection(`users/${user.uid}/folders`).get().then(records => {
+		records.forEach(doc => { doc.ref.delete(); });
+	});
+
+	// remove notifications
+	await fb.db.collection(`users/${user.uid}/notifications`).get().then(records => {
+		records.forEach(doc => { doc.ref.delete(); });
+	});
+
 	fb.db.doc(`users/${req.params.user}`).delete()
 		.then(() => { return res.json({ message: "User deleted" }); })
 		.catch(err => { return res.status(500).json({ error: err }); });
@@ -283,8 +382,9 @@ router.post("/friends/request/:user", async (req, res) => {
 });
 
 // Cancel/decline friend request
-router.delete("/friends/request/:user", async (req, res) => {
-	//Not needed:  req.body.type = "cancel" or "decline"
+router.delete("/friends/request/:user", async (req, res) =>
+{
+	// req.body.type = "cancel" or "decline"
 
 	// Make sure all required fields are present
 	if (!req.headers.authorization || !req.body.type)

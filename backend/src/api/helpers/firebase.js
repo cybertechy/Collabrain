@@ -118,6 +118,7 @@ async function deleteQueryBatch(query, resolve)
 }
 
 // Untested after modification
+// Untested after modification
 async function saveTeamMsg(data)
 {
 	let channels = (await db.collection(`teams/${data.team}/channels/`).where("name", "==", data.channel).get());

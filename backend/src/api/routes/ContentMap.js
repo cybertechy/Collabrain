@@ -123,6 +123,8 @@ router.get("/:id", async (req, res) => {
     // get the data from oracle cloud
     const getData = await oci.getData("B3", contentMapData.data);
 
+    // Add Here: console.log(getData)
+
     if (!getData) return res.status(500).json({ code: 500, error: "Getting data failed" });
 
     contentMapData.data = await oci.generateStringFromStream(getData.value);
@@ -227,6 +229,21 @@ router.put("/:id", async (req, res) => {
             }
         }
     }
+
+    // async update the users who access and the content map to AccessContentMaps array of user
+    await Promise.all(Object.keys(updatedContentMap.Access).map(async userId => {
+        const userRef = db.collection("users").doc(userId);
+        const user = await userRef.get();
+        if (!user.exists) return res.status(404).json({ code: 404, error: "User not found" });
+
+        let userContentMaps = user.data().AccessContentMaps;
+        if (!userContentMaps) userContentMaps = [];
+
+        userContentMaps.push(req.params.id);
+        await userRef.update({
+            AccessContentMaps: userContentMaps
+        });
+    }));
 
     updatedContentMap.updatedAt = fb.admin.firestore.FieldValue.serverTimestamp();
 
