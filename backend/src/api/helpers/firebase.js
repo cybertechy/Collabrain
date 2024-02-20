@@ -21,10 +21,10 @@ function getWeekNumber(d) {
     return [d.getUTCFullYear(), weekNo];
 }
 
-function getCurrentMonth() {
-    const now = new Date();
-    return `${now.getUTCFullYear()}-${now.getUTCMonth() + 1}`;
-}
+//function getCurrentMonth() {
+//    const now = new Date();
+//    return `${now.getUTCFullYear()}-${now.getUTCMonth() + 1}`;
+//}
 
 function verifyUser(token)
 {
@@ -155,32 +155,33 @@ async function saveTeamMsg(data)
 	// Adds an active user to the "stats" collection.
 	// Generates identifiers for docs that will hold weekly/ monthly stats
 	// Score greater than 0 means that the user is active
-	if (members[data.senderID].score > 0) {
-		const [year, weekNumber] = getWeekNumber(new Date());
-		const month = getCurrentMonth();
-		const weekDocId = `week-${year}-${weekNumber}`;
-		const monthDocId = `month-${month}`;
+	
+	//if (members[data.senderID].score > 0) {
+	//	const [year, weekNumber] = getWeekNumber(new Date());
+	//	const month = getCurrentMonth();
+	//	const weekDocId = `week-${year}-${weekNumber}`;
+	//	const monthDocId = `month-${month}`;
 	
 		// Update weekly stats
-		const weekRef = db.collection('stats').doc(weekDocId);
-		weekRef.get().then(doc => {
-			if (!doc.exists) {
-				weekRef.set({ activeUsers: 1 });
-			} else {
-				weekRef.update({ activeUsers: admin.firestore.FieldValue.increment(1) });
-			}
-		});
+	//	const weekRef = db.collection('stats').doc(weekDocId);
+	//	weekRef.get().then(doc => {
+	//		if (!doc.exists) {
+	//			weekRef.set({ activeUsers: 1 });
+	//		} else {
+	//			weekRef.update({ activeUsers: admin.firestore.FieldValue.increment(1) });
+	//		}
+	//	});
 	
-		// Update monthly stats
-		const monthRef = db.collection('stats').doc(monthDocId);
-		monthRef.get().then(doc => {
-			if (!doc.exists) {
-				monthRef.set({ activeUsers: 1 });
-			} else {
-				monthRef.update({ activeUsers: admin.firestore.FieldValue.increment(1) });
-			}
-		});
-	}
+	//	// Update monthly stats
+	//	const monthRef = db.collection('stats').doc(monthDocId);
+	//	monthRef.get().then(doc => {
+	//		if (!doc.exists) {
+	//			monthRef.set({ activeUsers: 1 });
+	//		} else {
+	//			monthRef.update({ activeUsers: admin.firestore.FieldValue.increment(1) });
+	//		}
+	//	});
+	//}
 }
 
 // Untested after modification
@@ -202,43 +203,43 @@ async function saveDirectMsg(data)
 	let userData = (await db.doc(`users/${data.sender}`).get()).data();
 
 	// Increase user score
-	let score = userData.score+=1;
+	//let score = userData.score+=1;
 
-	db.doc(`users/${data.sender}`).update({
-		score
-	}).catch(err => console.log(err));
+	//db.doc(`users/${data.sender}`).update({
+	//	score
+	//}).catch(err => console.log(err));
 
 	// Adds an active user to the "stats" collection.
 	// Generates identifiers for docs that will hold weekly/ monthly stats
 	// Score greater than 0 means that the user is active
-	if (score > 0) {
-        const now = new Date();
-        const [year, weekNumber] = getWeekNumber(now); // Assuming getWeekNumber returns [year, weekNumber]
-        const month = now.getMonth() + 1; // Assuming getCurrentMonth is similar to this logic
-        const weekDocId = `week-${year}-${weekNumber}`;
-        const monthDocId = `month-${year}-${month}`;
+	//if (score > 0) {
+    //    const now = new Date();
+    //    const [year, weekNumber] = getWeekNumber(now); // Assuming getWeekNumber returns [year, weekNumber]
+    //    const month = now.getMonth() + 1; // Assuming getCurrentMonth is similar to this logic
+    //    const weekDocId = `week-${year}-${weekNumber}`;
+    //    const monthDocId = `month-${year}-${month}`;
 
         // Update weekly stats
-        const weekRef = db.collection('stats').doc(weekDocId);
-        weekRef.get().then(doc => {
-            if (!doc.exists) {
-                weekRef.set({ activeUsers: admin.firestore.FieldValue.increment(1) });
-            } else {
-                weekRef.update({ activeUsers: admin.firestore.FieldValue.increment(1) });
-            }
-        });
+    //    const weekRef = db.collection('stats').doc(weekDocId);
+    //    weekRef.get().then(doc => {
+    //        if (!doc.exists) {
+    //            weekRef.set({ activeUsers: admin.firestore.FieldValue.increment(1) });
+    //        } else {
+    //            weekRef.update({ activeUsers: admin.firestore.FieldValue.increment(1) });
+    //        }
+    //    });
 
         // Update monthly stats
-        const monthRef = db.collection('stats').doc(monthDocId);
-        monthRef.get().then(doc => {
-            if (!doc.exists) {
-                monthRef.set({ activeUsers: admin.firestore.FieldValue.increment(1) });
-            } else {
-                monthRef.update({ activeUsers: admin.firestore.FieldValue.increment(1) });
-            }
-        });
+    //    const monthRef = db.collection('stats').doc(monthDocId);
+    //   monthRef.get().then(doc => {
+    //        if (!doc.exists) {
+    //            monthRef.set({ activeUsers: admin.firestore.FieldValue.increment(1) });
+    //        } else {
+    //            monthRef.update({ activeUsers: admin.firestore.FieldValue.increment(1) });
+    //        }
+    //    });
     }
-}
+
 
 module.exports = {
 	db,
