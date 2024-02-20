@@ -35,13 +35,13 @@ function init(server)
             		let timeSpent = disconnectTime - connectTime; // Time spent in milliseconds
 
             		// Update the timeSpent for the user in Firebase
-            		await fb.firestore().collection('users').doc(ref).update({
-                		timeSpent: fb.admin.firestore.FieldValue.increment(timeSpent)
-            		});
+            		//await fb.firestore().collection('users').doc(ref).update({
+                	//	timeSpent: fb.admin.firestore.FieldValue.increment(timeSpent)
+            		//});
 
             		// Cleanup
             		delete currLinks[ref];
-            		delete connectionTimes[fef]; // Ensure to remove the user from here as well
+            		delete connectionTimes[ref]; // Ensure to remove the user from here as well
             		console.log(`user disconnected, time spent: ${timeSpent}ms`);
         		}
     		}
