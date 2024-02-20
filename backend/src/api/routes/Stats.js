@@ -2,8 +2,6 @@ const express = require('express');
 const router = express.Router();
 const fb = require("../helpers/firebase");
 
-// Assuming Firebase Admin has been initialized elsewhere in your project
-
 // Get the number of active users for a specific week
 router.get('/weekly/:year/:week', async (req, res) => {
     const { year, week } = req.params;
