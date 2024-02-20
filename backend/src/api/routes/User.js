@@ -204,7 +204,7 @@ router.delete("/:user", async (req, res) => {
 
 	// delete the content maps and documents 
 	if(userdata.contentMaps) await Promise.all(userdata.contentMaps?.map(async (content) => {
-		let contentMapData = await fb.db.doc(`content/${content}`).get();
+		let contentMapData = await fb.db.doc(`contentMaps/${content}`).get();
 		if (!contentMapData.exists)
 			return res.status(404).json({ error: "Content map not found" });
 
@@ -293,6 +293,8 @@ router.delete("/:user", async (req, res) => {
 	await fb.db.collection(`users/${user.uid}/notifications`).get().then(records => {
 		records.forEach(doc => { doc.ref.delete(); });
 	});
+
+	await fb.deleteUser(user.uid);
 
 	fb.db.doc(`users/${req.params.user}`).delete()
 		.then(() => { return res.json({ message: "User deleted" }); })
