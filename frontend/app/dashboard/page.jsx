@@ -615,7 +615,8 @@ export default function Dashboard()
 					</p>
 
 					<div className="flex flex-wrap content-start items-start w-full justify-start ml-4 gap-8 ">
-						{isFoldersLoading ? (
+					<DashboardNewFolder onNewFolderCreated={addNewFolder} />
+					{isFoldersLoading ? (
 							<div className="loader mb-5"></div> // Adjust loader class as needed
 						) : folders.length > 0 ? (
 							folders.map((folder) => (
@@ -630,7 +631,7 @@ export default function Dashboard()
 							))
 						) : null // Do not display any text if there are no folders
 						}
-						<DashboardNewFolder onNewFolderCreated={addNewFolder} />
+						
 					</div>
 				</div> : null}
 				<div>
