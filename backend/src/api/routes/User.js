@@ -68,7 +68,6 @@ router.get("/search", async (req, res) => {
   });
   
 
-
 // Get user from ID
 router.get("/:user", async (req, res) => {
 	// Make sure all required fields are present
@@ -80,11 +79,10 @@ router.get("/:user", async (req, res) => {
 	if (!user)
 		return res.status(401).json({ error: "Unauthorized" });
 
-	//set cache
-	res.set('Cache-Control', 'public, max-age=300, s-maxage=600');
-
 	fb.db.doc(`users/${req.params.user}`).get()
-		.then(doc => { res.json(doc.data()); })
+		.then(doc => { 
+			res.json(doc.data()); 
+		})
 		.catch(err => { return res.status(500).json({ error: err }); });
 
 });
@@ -130,6 +128,8 @@ router.post("/", (req, res) => {
 			theme: "light",
 			language: "en",
 			role: "user",
+			createdAt: new Date(),
+			updatedAt: new Date()
 		})
 		.then(() => { return res.json({ message: "User added" }); })
 		.catch(err => { return res.status(500).json({ error: err }); });
@@ -173,6 +173,7 @@ router.patch("/", async (req, res) => {
 		req.body.photo = userdata.photo
 	}
 
+	req.body.updatedAt = new Date();
 
 	// Update user info
 	fb.db.doc(`users/${user.uid}`).update(req.body)
