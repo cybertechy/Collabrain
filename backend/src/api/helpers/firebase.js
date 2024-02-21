@@ -200,7 +200,7 @@ async function saveDirectMsg(data)
 		});
 	
 	// This part is for Points (Check no.of messages)
-	let userData = (await db.doc(`users/${data.sender}`).get()).data();
+	//let userData = (await db.doc(`users/${data.sender}`).get()).data();
 
 	// Increase user score
 	//let score = userData.score+=1;
