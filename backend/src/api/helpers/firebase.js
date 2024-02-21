@@ -137,7 +137,6 @@ async function saveTeamMsg(data)
 	let members = teamData.members;
 	members[data.senderID].score ? members[data.senderID].score++ : members[data.senderID].score = 1; 
 	
-
 	//Increase team score
 	let score = teamData.score+=1;
 
@@ -146,6 +145,25 @@ async function saveTeamMsg(data)
 		score
 	}).catch(err => console.log(err));
 
+	// Increment the user's score in the "users" collection
+    await db.runTransaction(async (transaction) => {
+        const userRef = db.collection('users').where("username", "==", data.sender);
+        const snapshot = await userRef.get();
+
+        if (!snapshot.empty) {
+            const userDoc = snapshot.docs[0]; // Assuming 'username' is unique and only gets one document
+            const userData = userDoc.data();
+            const newScore = (userData.score || 0) + 1; // Increment score or initialize to 1 if undefined
+
+            // Update the user's score
+            transaction.update(userDoc.ref, { score: newScore });
+        } else {
+            console.log("User not found");
+            // Handle case where user is not found, if necessary
+        }
+    }).catch(err => console.log(err));
+
+	
 	// Adds an active user to the "stats" collection.
 	// Generates identifiers for docs that will hold weekly/ monthly stats
     const senderID = data.senderID;
@@ -201,16 +219,24 @@ async function saveDirectMsg(data)
 			"sentAt": sentAt,
 			"reactions": (data.reactions) ? data.reactions : []
 		});
-	
-	// This part is for Points (Check no.of messages)
-	//let userData = (await db.doc(`users/${data.sender}`).get()).data();
 
-	// Increase user score
-	//let score = userData.score+=1;
+	// Start a Firestore transaction to ensure atomicity
+	await db.runTransaction(async (transaction) => {
+		const userRef = db.collection('users').where("username", "==", data.sender);
+        const snapshot = await userRef.get();
 
-	//db.doc(`users/${data.sender}`).update({
-	//	score
-	//}).catch(err => console.log(err));
+        if (!snapshot.empty) {
+            const userDoc = snapshot.docs[0]; // Assuming 'username' is unique and only gets one document
+            const userData = userDoc.data();
+            const newScore = (userData.score || 0) + 1; // Increment score or initialize to 1 if undefined
+
+            // Update the user's score
+            transaction.update(userDoc.ref, { score: newScore });
+        } else {
+            console.log("User not found");
+            // Handle case where user is not found, if necessary
+        }
+    }).catch(err => console.log(err));
 
 	// Adds an active user to the "stats" collection.
 	// Generates identifiers for docs that will hold weekly/ monthly stats
