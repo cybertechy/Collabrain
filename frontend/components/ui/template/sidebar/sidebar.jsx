@@ -184,7 +184,7 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
         <aside
             className={`transition-all shadow-md h-screen pt-[height_of_navbar] z-10 duration-500 ease-in-out 
             ${
-                isOpen ? "sm:w-80 max-sm:w-screen" : "sm:w-20 max-sm:hidden"
+                isOpen ? "xsm:w-80 max-xsm:w-screen" : "xsm:w-20 max-xsm:hidden"
             }
              bg-basicallylight text-basicallydark`}
             // style={isOpen ? sidebarStyle() : sidebarStyle1()}
@@ -212,7 +212,7 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
                                 />
                             </div>
                         ) : (
-                            <div className="flex-grow flex max-sm:hidden">
+                            <div className="flex-grow flex max-xsm:hidden">
                             <MenuIcon
                                 className="h-6 w-6 mb-2 text-lg text-primary transition-all duration-500 ease-in-out"
                                 onClick={toggleSidebar}
