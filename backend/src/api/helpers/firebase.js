@@ -8,23 +8,17 @@ admin.initializeApp({
 });
 
 function getWeekNumber(d) {
-    // Copy date so don't modify original
     d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-    // Set to nearest Thursday: current date + 4 - current day number
-    // Make Sunday's day number 7
     d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
-    // Get first day of year
     const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
-    // Calculate full weeks to nearest Thursday
     const weekNo = Math.ceil(( ( (d - yearStart) / 86400000) + 1)/7);
-    // Return array of year and week number
     return [d.getUTCFullYear(), weekNo];
 }
 
-//function getCurrentMonth() {
-//    const now = new Date();
-//    return `${now.getUTCFullYear()}-${now.getUTCMonth() + 1}`;
-//}
+function getCurrentMonth() {
+    const now = new Date();
+    return `${now.getUTCFullYear()}-${now.getUTCMonth() + 1}`;
+}
 
 function verifyUser(token)
 {
@@ -154,34 +148,43 @@ async function saveTeamMsg(data)
 
 	// Adds an active user to the "stats" collection.
 	// Generates identifiers for docs that will hold weekly/ monthly stats
-	// Score greater than 0 means that the user is active
-	
-	//if (members[data.senderID].score > 0) {
-	//	const [year, weekNumber] = getWeekNumber(new Date());
-	//	const month = getCurrentMonth();
-	//	const weekDocId = `week-${year}-${weekNumber}`;
-	//	const monthDocId = `month-${month}`;
-	
-		// Update weekly stats
-	//	const weekRef = db.collection('stats').doc(weekDocId);
-	//	weekRef.get().then(doc => {
-	//		if (!doc.exists) {
-	//			weekRef.set({ activeUsers: 1 });
-	//		} else {
-	//			weekRef.update({ activeUsers: admin.firestore.FieldValue.increment(1) });
-	//		}
-	//	});
-	
-	//	// Update monthly stats
-	//	const monthRef = db.collection('stats').doc(monthDocId);
-	//	monthRef.get().then(doc => {
-	//		if (!doc.exists) {
-	//			monthRef.set({ activeUsers: 1 });
-	//		} else {
-	//			monthRef.update({ activeUsers: admin.firestore.FieldValue.increment(1) });
-	//		}
-	//	});
-	//}
+    const senderID = data.senderID;
+    const [year, weekNumber] = getWeekNumber(new Date());
+    const month = getCurrentMonth();
+    const weekDocId = `week-${year}-${weekNumber}`;
+    const monthDocId = `month-${month}`;
+
+    // Check and update weekly stats
+    const weekRef = db.collection('stats').doc(weekDocId);
+    weekRef.get().then(doc => {
+        if (!doc.exists) {
+            weekRef.set({ activeUsers: 1, activeUserIDs: [senderID] });
+        } else {
+            let data = doc.data();
+            if (!data.activeUserIDs.includes(senderID)) {
+                weekRef.update({
+                    activeUsers: admin.firestore.FieldValue.increment(1),
+                    activeUserIDs: admin.firestore.FieldValue.arrayUnion(senderID)
+                });
+            }
+        }
+    });
+
+    // Check and update monthly stats
+    const monthRef = db.collection('stats').doc(monthDocId);
+    monthRef.get().then(doc => {
+        if (!doc.exists) {
+            monthRef.set({ activeUsers: 1, activeUserIDs: [senderID] });
+        } else {
+            let data = doc.data();
+            if (!data.activeUserIDs.includes(senderID)) {
+                monthRef.update({
+                    activeUsers: admin.firestore.FieldValue.increment(1),
+                    activeUserIDs: admin.firestore.FieldValue.arrayUnion(senderID)
+                });
+            }
+        }
+    });
 }
 
 // Untested after modification
