@@ -154,19 +154,19 @@ async function saveTeamMsg(data)
             const userData = userDoc.data();
             const newScore = (userData.score || 0) + 1; // Increment score or initialize to 1 if undefined
 
-            // Update the user's score
             transaction.update(userDoc.ref, { score: newScore });
         } else {
             console.log("User not found");
-            // Handle case where user is not found, if necessary
         }
     }).catch(err => console.log(err));
 
-	// Increment the user's monthly message count in the "users" collection
+
+	// Identifiers to be used in monthly message incrementing
     const userRef = db.collection('users').doc(data.senderID);
     const month = getCurrentMonth();
-    const messageCountField = `monthlyMessageCount.${month}`; // Construct the field name for the monthly message count
+    const messageCountField = `monthlyMessageCount.${month}`;
 
+	// Increment the user's monthly message count in the "users" collection
     await db.runTransaction(async (transaction) => {
         const userDoc = await transaction.get(userRef);
 
@@ -175,14 +175,12 @@ async function saveTeamMsg(data)
             return;
         }
 
-        // Increment the message count for the current month
         transaction.update(userRef, {
             [messageCountField]: admin.firestore.FieldValue.increment(1)
         });
     }).catch(err => console.log(err));
 
-	// Adds an active user to the "stats" collection.
-	// Generates identifiers for docs that will hold weekly/ monthly stats
+	// Identifiers for docs that will hold weekly/ monthly stats
     const senderID = data.senderID;
     const [year, weekNumber] = getWeekNumber(new Date());
     const weekDocId = `week-${year}-${weekNumber}`;
@@ -190,35 +188,36 @@ async function saveTeamMsg(data)
 
     // Check and update weekly stats
     const weekRef = db.collection('stats').doc(weekDocId);
-    weekRef.get().then(doc => {
-        if (!doc.exists) {
-            weekRef.set({ activeUsers: 1, activeUserIDs: [senderID] });
-        } else {
-            let data = doc.data();
-            if (!data.activeUserIDs.includes(senderID)) {
-                weekRef.update({
-                    activeUsers: admin.firestore.FieldValue.increment(1),
-                    activeUserIDs: admin.firestore.FieldValue.arrayUnion(senderID)
-                });
-            }
-        }
-    });
+	weekRef.get().then(doc => {
+    	if (!doc.exists) {
+        	weekRef.set({ activeUsers: 1, activeUserIDs: [senderID] });
+    	} else {
+        	let statsData = doc.data(); // Renamed variable to avoid confusion with outer `data`
+        	// Ensure activeUserIDs is always an array before calling includes
+        	if (!(statsData.activeUserIDs || []).includes(senderID)) {
+            	weekRef.update({
+                	activeUsers: admin.firestore.FieldValue.increment(1),
+                	activeUserIDs: admin.firestore.FieldValue.arrayUnion(senderID)
+            	});
+        	}
+    	}
+	});
 
     // Check and update monthly stats
     const monthRef = db.collection('stats').doc(monthDocId);
-    monthRef.get().then(doc => {
-        if (!doc.exists) {
-            monthRef.set({ activeUsers: 1, activeUserIDs: [senderID] });
-        } else {
-            let data = doc.data();
-            if (!data.activeUserIDs.includes(senderID)) {
-                monthRef.update({
-                    activeUsers: admin.firestore.FieldValue.increment(1),
-                    activeUserIDs: admin.firestore.FieldValue.arrayUnion(senderID)
-                });
-            }
-        }
-    });
+	monthRef.get().then(doc => {
+    	if (!doc.exists) {
+        	monthRef.set({ activeUsers: 1, activeUserIDs: [senderID] });
+    	} else {
+        	let statsData = doc.data();
+        	if (!(statsData.activeUserIDs || []).includes(senderID)) {
+            	monthRef.update({
+                	activeUsers: admin.firestore.FieldValue.increment(1),
+                	activeUserIDs: admin.firestore.FieldValue.arrayUnion(senderID)
+            	});
+        	}
+    	}
+	});
 
 	// Updates active users in a team's document
 	const teamRef = db.collection('teams').doc(data.team);
