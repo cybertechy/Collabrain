@@ -169,12 +169,10 @@ async function saveTeamMsg(data)
 	// Increment the user's monthly message count in the "users" collection
     await db.runTransaction(async (transaction) => {
         const userDoc = await transaction.get(userRef);
-
         if (!userDoc.exists) {
             console.log("User document does not exist");
             return;
         }
-
         transaction.update(userRef, {
             [messageCountField]: admin.firestore.FieldValue.increment(1)
         });
@@ -187,16 +185,15 @@ async function saveTeamMsg(data)
     const monthDocId = `month-${month}`;
 
     // Check and update weekly stats
-    const weekRef = db.collection('stats').doc(weekDocId);
+	const weekRef = db.collection('stats').doc(weekDocId);
 	weekRef.get().then(doc => {
     	if (!doc.exists) {
-        	weekRef.set({ activeUsers: 1, activeUserIDs: [senderID] });
+     		weekRef.set({ activeUserIDs: [senderID] });
     	} else {
         	let statsData = doc.data(); // Renamed variable to avoid confusion with outer `data`
         	// Ensure activeUserIDs is always an array before calling includes
         	if (!(statsData.activeUserIDs || []).includes(senderID)) {
             	weekRef.update({
-                	activeUsers: admin.firestore.FieldValue.increment(1),
                 	activeUserIDs: admin.firestore.FieldValue.arrayUnion(senderID)
             	});
         	}
@@ -204,15 +201,14 @@ async function saveTeamMsg(data)
 	});
 
     // Check and update monthly stats
-    const monthRef = db.collection('stats').doc(monthDocId);
+	const monthRef = db.collection('stats').doc(monthDocId);
 	monthRef.get().then(doc => {
     	if (!doc.exists) {
-        	monthRef.set({ activeUsers: 1, activeUserIDs: [senderID] });
+        	monthRef.set({ activeUserIDs: [senderID] });
     	} else {
         	let statsData = doc.data();
         	if (!(statsData.activeUserIDs || []).includes(senderID)) {
             	monthRef.update({
-                	activeUsers: admin.firestore.FieldValue.increment(1),
                 	activeUserIDs: admin.firestore.FieldValue.arrayUnion(senderID)
             	});
         	}
@@ -221,27 +217,24 @@ async function saveTeamMsg(data)
 
 	// Updates active users in a team's document
 	const teamRef = db.collection('teams').doc(data.team);
-    await db.runTransaction(async (transaction) => {
-        const teamDoc = await transaction.get(teamRef);
-        if (!teamDoc.exists) {
-            console.log("Team not found");
-            return;
-        }
-        let teamData = teamDoc.data();
-        teamData.activeUserIDs = teamData.activeUserIDs || [];
+	await db.runTransaction(async (transaction) => {
+    	const teamDoc = await transaction.get(teamRef);
+    	if (!teamDoc.exists) {
+        	console.log("Team not found");
+       		return;
+    	}
+    	let teamData = teamDoc.data();
+    	teamData.activeUserIDs = teamData.activeUserIDs || [];
 
-        if (!teamData.activeUserIDs.includes(data.senderID)) {
-            teamData.activeUserIDs.push(data.senderID);
-            teamData.activeUsers = (teamData.activeUsers || 0) + 1;
-            transaction.update(teamRef, {
-                activeUserIDs: teamData.activeUserIDs,
-                activeUsers: teamData.activeUsers
-            });
-        }
-    }).catch(err => console.log(err));
+    	if (!teamData.activeUserIDs.includes(data.senderID)) {
+     		transaction.update(teamRef, {
+            	activeUserIDs: admin.firestore.FieldValue.arrayUnion(data.senderID)
+        	});
+    	}
+	}).catch(err => console.log(err));
 }
 
-// Untested after modification
+
 async function saveDirectMsg(data) {
     // convert sent at to firebase timestamp seconds and nanoseconds
     let sentAt = admin.firestore.Timestamp.fromDate(new Date(data.sentAt));
@@ -305,7 +298,6 @@ async function saveDirectMsg(data) {
             let data = doc.data();
             if (!data.activeUserIDs.includes(senderID)) {
                 weekRef.update({
-                    activeUsers: admin.firestore.FieldValue.increment(1),
                     activeUserIDs: admin.firestore.FieldValue.arrayUnion(senderID)
                 });
             }
@@ -321,7 +313,6 @@ async function saveDirectMsg(data) {
             let data = doc.data();
             if (!data.activeUserIDs.includes(senderID)) {
                 monthRef.update({
-                    activeUsers: admin.firestore.FieldValue.increment(1),
                     activeUserIDs: admin.firestore.FieldValue.arrayUnion(senderID)
                 });
             }
