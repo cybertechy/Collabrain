@@ -33,6 +33,15 @@ const app = express();
 const port = process.env.PORT || 8080;
 const server = http.createServer(app);
 
+// Database usage counter
+let dbUsageCount = 0;
+
+// Middleware to increment database usage count
+app.use((req, res, next) => {
+    dbUsageCount++;
+    next();
+});
+
 app.use(
 	treblle({
 		apiKey: "FWAsJIjJ9SUC48XJ52CmWPzrH5V5dDn7",
@@ -85,6 +94,10 @@ app.use("/api/notifications", notificationsRoute);
 app.use("/api/storage", storageRoute);
 app.use("/api/stats", statsRoute);
 
+// Endpoint to display DB usage
+app.get("/api/dbUsage", (req, res) => {
+    res.json({ message: "Database Usage", count: dbUsageCount });
+});
 
 app.get("/api/home", (req, res) =>
 {
