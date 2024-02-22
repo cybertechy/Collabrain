@@ -117,7 +117,6 @@ async function deleteQueryBatch(query, resolve)
 	});
 }
 
-// Untested after modification
 async function saveTeamMsg(data)
 {
 	let channels = (await db.collection(`teams/${data.team}/channels/`).where("name", "==", data.channel).get());
@@ -203,24 +202,44 @@ async function saveTeamMsg(data)
             }
         }
     });
+
+	// Updates active users in a team's document
+	const teamRef = db.collection('teams').doc(data.team);
+    await db.runTransaction(async (transaction) => {
+        const teamDoc = await transaction.get(teamRef);
+        if (!teamDoc.exists) {
+            console.log("Team not found");
+            return;
+        }
+        let teamData = teamDoc.data();
+        teamData.activeUserIDs = teamData.activeUserIDs || [];
+
+        if (!teamData.activeUserIDs.includes(data.senderID)) {
+            teamData.activeUserIDs.push(data.senderID);
+            teamData.activeUsers = (teamData.activeUsers || 0) + 1;
+            transaction.update(teamRef, {
+                activeUserIDs: teamData.activeUserIDs,
+                activeUsers: teamData.activeUsers
+            });
+        }
+    }).catch(err => console.log(err));
 }
 
 // Untested after modification
-async function saveDirectMsg(data)
-{
-	// convert sent at to firebase timestamp seconds and nanoseconds
-	let sentAt = admin.firestore.Timestamp.fromDate(new Date(data.sentAt));
+async function saveDirectMsg(data) {
+    // convert sent at to firebase timestamp seconds and nanoseconds
+    let sentAt = admin.firestore.Timestamp.fromDate(new Date(data.sentAt));
 
-	// Save message to chat
-	db.collection(`chats/${data.chat}/messages`)
-		.add({
-			"message": data.msg,
-			"sender": data.sender,
-			"sentAt": sentAt,
-			"reactions": (data.reactions) ? data.reactions : []
-		});
+    // Save message to chat
+    await db.collection(`chats/${data.chat}/messages`)
+        .add({
+            "message": data.msg,
+            "sender": data.sender,
+            "sentAt": sentAt,
+            "reactions": (data.reactions) ? data.reactions : []
+        });
 
-	// Start a Firestore transaction to ensure atomicity
+	// Increment the user's score in the "users" collection
 	await db.runTransaction(async (transaction) => {
 		const userRef = db.collection('users').where("username", "==", data.sender);
         const snapshot = await userRef.get();
@@ -234,41 +253,48 @@ async function saveDirectMsg(data)
             transaction.update(userDoc.ref, { score: newScore });
         } else {
             console.log("User not found");
-            // Handle case where user is not found, if necessary
         }
     }).catch(err => console.log(err));
 
-	// Adds an active user to the "stats" collection.
-	// Generates identifiers for docs that will hold weekly/ monthly stats
-	// Score greater than 0 means that the user is active
-	//if (score > 0) {
-    //    const now = new Date();
-    //    const [year, weekNumber] = getWeekNumber(now); // Assuming getWeekNumber returns [year, weekNumber]
-    //    const month = now.getMonth() + 1; // Assuming getCurrentMonth is similar to this logic
-    //    const weekDocId = `week-${year}-${weekNumber}`;
-    //    const monthDocId = `month-${year}-${month}`;
+    // Identifiers for weekly/monthly stats
+    const senderID = data.senderID; // Assuming 'senderID' represents the unique ID of the sender
+    const [year, weekNumber] = getWeekNumber(new Date());
+    const month = getCurrentMonth();
+    const weekDocId = `week-${year}-${weekNumber}`;
+    const monthDocId = `month-${month}`;
 
-        // Update weekly stats
-    //    const weekRef = db.collection('stats').doc(weekDocId);
-    //    weekRef.get().then(doc => {
-    //        if (!doc.exists) {
-    //            weekRef.set({ activeUsers: admin.firestore.FieldValue.increment(1) });
-    //        } else {
-    //            weekRef.update({ activeUsers: admin.firestore.FieldValue.increment(1) });
-    //        }
-    //    });
+    // Update weekly stats
+    const weekRef = db.collection('stats').doc(weekDocId);
+    weekRef.get().then(doc => {
+        if (!doc.exists) {
+            weekRef.set({ activeUsers: 1, activeUserIDs: [senderID] });
+        } else {
+            let data = doc.data();
+            if (!data.activeUserIDs.includes(senderID)) {
+                weekRef.update({
+                    activeUsers: admin.firestore.FieldValue.increment(1),
+                    activeUserIDs: admin.firestore.FieldValue.arrayUnion(senderID)
+                });
+            }
+        }
+    });
 
-        // Update monthly stats
-    //    const monthRef = db.collection('stats').doc(monthDocId);
-    //   monthRef.get().then(doc => {
-    //        if (!doc.exists) {
-    //            monthRef.set({ activeUsers: admin.firestore.FieldValue.increment(1) });
-    //        } else {
-    //            monthRef.update({ activeUsers: admin.firestore.FieldValue.increment(1) });
-    //        }
-    //    });
-    }
-
+    // Update monthly stats
+    const monthRef = db.collection('stats').doc(monthDocId);
+    monthRef.get().then(doc => {
+        if (!doc.exists) {
+            monthRef.set({ activeUsers: 1, activeUserIDs: [senderID] });
+        } else {
+            let data = doc.data();
+            if (!data.activeUserIDs.includes(senderID)) {
+                monthRef.update({
+                    activeUsers: admin.firestore.FieldValue.increment(1),
+                    activeUserIDs: admin.firestore.FieldValue.arrayUnion(senderID)
+                });
+            }
+        }
+    });
+}
 
 module.exports = {
 	db,
