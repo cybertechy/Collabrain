@@ -1,23 +1,37 @@
 "use client";
 
-const fb = require("_firebase/firebase");
 import Template from "@/components/ui/template/template";
-import { Editor } from "novel";
+import Quill from "./quill";
+const socket = require("_socket/socket");
+const fb = require("_firebase/firebase");
+import "./quillStyle.css";
+import { useRef, useState, useEffect } from "react";
 
-export default function TextEditor()
+export default function Editor()
 {
+	const [user, loading] = fb.useAuthState();
+	const [value, setValue] = useState("");
+	const quillRef = useRef(null);
+
+	let sock_cli = useRef(null);
+	useEffect(() =>
+	{
+		if (!user) return;
+
+		sock_cli.current = socket.init('http://localhost:8080') || {};
+		sock_cli.current.on('get-doc-changes', (delta) =>
+		{
+			quillRef.current.getEditor().updateContents(delta);
+		});
+
+		return () => sock_cli.current.off('get-doc-changes');
+	}, [user]);
+
 	return (
-		<Template> 
-			<div className="flex flex-grow overflow-hidden">
-				<div className="flex justify-center bg-gray-200 shadow-md rounded-md flex-1">
-					<Editor
-						defaultValue={{
-							type: "doc",
-							content: []
-						}}
-						disableLocalStorage={true}
-						className="w-full overflow-x-hidden overflow-y-auto bg-white"
-					/>
+		<Template>
+			<div className="bg-[#F3F3F3] h-full">
+				<div className="editor-container bg-[#F3F3F3] overflow-auto">
+					<Quill socket={sock_cli} quillRef={quillRef} value={value} setValue={setValue}/>
 				</div>
 			</div>
 		</Template>

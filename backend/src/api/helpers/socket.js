@@ -27,12 +27,10 @@ function init(server)
 			console.log('user disconnected');
 		});
 
-		socket.on('teamMsg', (data) => broadcastMessage(data));
+		socket.on('teamMsg', data => broadcastMessage(data));
+		socket.on('directMsg', data => broadcastMessage(data, "direct"));
 
-		socket.on('directMsg', (data) =>
-		{
-			broadcastMessage(data, "direct");
-		});
+		socket.on('send-doc-changes', delta => broadcastDocChanges(delta, socket));
 	});
 }
 
@@ -54,6 +52,18 @@ async function broadcastMessage(data, type = "team")
 	});
 
 	(type == "team") ? fb.saveTeamMsg(data) : fb.saveDirectMsg(data);
+}
+
+async function broadcastDocChanges(delta, socket)
+{
+	console.log(delta);
+	// Emit changes to all users except the sender
+	let clients = await io.fetchSockets();
+	clients.forEach((client) =>
+	{
+		if (client.id != socket.id)
+			client.emit('get-doc-changes', delta);
+	});
 }
 
 module.exports = {
