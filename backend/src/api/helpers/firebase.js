@@ -162,12 +162,29 @@ async function saveTeamMsg(data)
         }
     }).catch(err => console.log(err));
 
-	
+	// Increment the user's monthly message count in the "users" collection
+    const userRef = db.collection('users').doc(data.senderID);
+    const month = getCurrentMonth();
+    const messageCountField = `monthlyMessageCount.${month}`; // Construct the field name for the monthly message count
+
+    await db.runTransaction(async (transaction) => {
+        const userDoc = await transaction.get(userRef);
+
+        if (!userDoc.exists) {
+            console.log("User document does not exist");
+            return;
+        }
+
+        // Increment the message count for the current month
+        transaction.update(userRef, {
+            [messageCountField]: admin.firestore.FieldValue.increment(1)
+        });
+    }).catch(err => console.log(err));
+
 	// Adds an active user to the "stats" collection.
 	// Generates identifiers for docs that will hold weekly/ monthly stats
     const senderID = data.senderID;
     const [year, weekNumber] = getWeekNumber(new Date());
-    const month = getCurrentMonth();
     const weekDocId = `week-${year}-${weekNumber}`;
     const monthDocId = `month-${month}`;
 
@@ -238,6 +255,23 @@ async function saveDirectMsg(data) {
             "sentAt": sentAt,
             "reactions": (data.reactions) ? data.reactions : []
         });
+
+	// Update the user's message count for the month
+    await db.runTransaction(async (transaction) => {
+        const userRef = db.collection('users').doc(data.senderID);
+        const userDoc = await transaction.get(userRef);
+
+        if (userDoc.exists) {
+            const month = getCurrentMonth();
+            // Create or update the field for the current month's message count
+            const messageCountField = `monthlyMessageCount.${month}`;
+            const increment = admin.firestore.FieldValue.increment(1);
+
+            transaction.update(userRef, { [messageCountField]: increment });
+        } else {
+            console.log("User not found");
+        }
+    }).catch(err => console.log(err));
 
 	// Increment the user's score in the "users" collection
 	await db.runTransaction(async (transaction) => {
