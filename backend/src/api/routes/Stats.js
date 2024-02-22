@@ -1,38 +1,35 @@
 const express = require('express');
 const router = express.Router();
-const fb = require("../helpers/firebase");
+const { db, getWeekNumber, getCurrentMonth } = require('./firebase');
 
-// Get the number of active users for a specific week
-router.get('/weekly/:year/:week', async (req, res) => {
-    const { year, week } = req.params;
-    const weekDocId = `week-${year}-${week}`;
-
+// Endpoint to get weekly active users
+router.get('/weekly-active-users', async (req, res) => {
+    const [year, weekNumber] = getWeekNumber(new Date());
+    const weekDocId = `week-${year}-${weekNumber}`;
     try {
-        const doc = await fb.admin.firestore().collection('stats').doc(weekDocId).get();
+        const doc = await db.collection('stats').doc(weekDocId).get();
         if (!doc.exists) {
-            return res.status(404).send({ error: 'Week stats not found' });
+            return res.status(404).json({ message: 'No data found for this week.' });
         }
-        return res.status(200).send(doc.data());
+        return res.json(doc.data().activeUserIDs);
     } catch (error) {
-        console.error('Error fetching weekly stats:', error);
-        return res.status(500).send({ error: 'Internal server error' });
+        console.error('Error fetching weekly active users:', error);
+        return res.status(500).json({ error: 'Internal server error' });
     }
 });
 
-// Get the number of active users for a specific month
-router.get('/monthly/:year/:month', async (req, res) => {
-    const { year, month } = req.params;
-    const monthDocId = `month-${year}-${month}`;
-
+// Endpoint to get monthly active users
+router.get('/monthly-active-users', async (req, res) => {
+    const monthDocId = `month-${getCurrentMonth()}`;
     try {
-        const doc = await fb.admin.firestore().collection('stats').doc(monthDocId).get();
+        const doc = await db.collection('stats').doc(monthDocId).get();
         if (!doc.exists) {
-            return res.status(404).send({ error: 'Month stats not found' });
+            return res.status(404).json({ message: 'No data found for this month.' });
         }
-        return res.status(200).send(doc.data());
+        return res.json(doc.data().activeUserIDs);
     } catch (error) {
-        console.error('Error fetching monthly stats:', error);
-        return res.status(500).send({ error: 'Internal server error' });
+        console.error('Error fetching monthly active users:', error);
+        return res.status(500).json({ error: 'Internal server error' });
     }
 });
 

@@ -16,7 +16,7 @@ const mapRoute = require("./api/routes/ContentMap");
 const reportReport = require("./api/routes/Report");
 const notificationsRoute = require("./api/routes/Notifications");
 const storageRoute = require("./api/routes/Storage");
-//const statsRoute = require("./api/routes/Stats");
+const statsRoute = require("./api/routes/Stats");
 
 // Helpers
 const sockServer = require("./api/helpers/socket");
@@ -83,7 +83,7 @@ app.use("/api/maps", mapRoute);
 app.use("/api/reports", reportReport);
 app.use("/api/notifications", notificationsRoute);
 app.use("/api/storage", storageRoute);
-//app.use("/api/stats", statsRoute);
+app.use("/api/stats", statsRoute);
 
 
 app.get("/api/home", (req, res) =>
