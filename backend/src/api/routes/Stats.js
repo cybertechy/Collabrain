@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { db, getWeekNumber, getCurrentMonth } = require('./firebase');
+const { db, getWeekNumber, getCurrentMonth } = require("../helpers/firebase");
 
 // Endpoint to get weekly active users
 router.get('/weekly-active-users', async (req, res) => {
