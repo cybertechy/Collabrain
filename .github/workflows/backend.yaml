@@ -15,7 +15,8 @@ jobs:
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       OCI_PEM: ${{ secrets.OCI_PEM }}
       OCI_CONFIG: ${{ secrets.OCI_CONFIG }}
-      WEBSITE_URL: "https://cb1.cybertech13.eu.org/api/home"
+      TRIGGER_URL: "https://api.render.com/deploy/srv-cnc9mdqcn0vc7397hgfg?key=6bocT-qDrHk"
+      WEBSITE_URL: "https://collabrainbackend1-latest.onrender.com/api/home"
       WAIT_TIMEOUT_SECONDS: 300
       
     steps:
@@ -60,33 +61,9 @@ jobs:
           -t siddh13/collabrainbackend1:latest \
           -f ./backend/dockerfile ./backend
           
-    - name: Set up kubectl
-      uses: azure/k8s-set-context@v1
-      with:
-        method: kubeconfig
-        kubeconfig: ${{ secrets.KUBE_CONFIG }}
-        version: 'v1.21.0'
-
-    - name: Delete existing deployment
+    - name: Retrigger Deployment
       run: |
-        kubectl delete deployment collabrain-backend-deployment -n collabrain
-
-    - name: Deploy to Kubernetes
-      run: |
-        kubectl apply -f ./backend/.kube/deployment.yaml
-    
-    - name: Wait for Deployment to be Ready
-      run: |
-        timeout=$((SECONDS+WAIT_TIMEOUT_SECONDS))
-        while [ $SECONDS -lt $timeout ]; do
-          if kubectl rollout status deployment collabrain-backend-deployment -n collabrain; then
-            echo "Deployment is ready."
-            break
-          else
-            echo "Waiting for deployment to be ready..."
-            sleep 10
-          fi
-        done
+        curl -X GET $TRIGGER_URL
 
     - name: Verify deployment
       run: |

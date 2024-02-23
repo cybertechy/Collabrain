@@ -47,7 +47,7 @@ function page() {
     const [Delete, setDelete] = useState(false);
     const [Share, setShare] = useState(false);
 
-    const Serverlocation = "http://192.168.0.115:8080";
+    const Serverlocation = "https://collabrainbackend1-latest.onrender.com";
 
 
 
