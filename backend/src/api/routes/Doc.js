@@ -124,7 +124,7 @@ router.delete('/:id', async (req, res) =>
 			// Get all users with access to document
 			let users = Object.keys(doc.data().access);
 			// Delete document from all users
-			fb.db.collection(`users`).where("uid", "in", users).get()
+			fb.db.collection(`users`).where(fb.admin.firestore.FieldPath.documentId(), "in", users).get()
 				.then((snapshot) =>
 				{
 					snapshot.forEach((userDoc) =>
@@ -136,7 +136,7 @@ router.delete('/:id', async (req, res) =>
 				});
 
 			// Remove doc from oracle cloud
-			oci.deleteData("B3", doc.data().data);
+			oci.deleteFile("B3", doc.data().data);
 			// Delete document
 			docRef.delete()
 				.then(() => { res.status(200).json({ message: "Document deleted" }); })
