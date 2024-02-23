@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const { db, getCurrentMonth, getUserMetrics } = require("../helpers/firebase");
+const { db, getWeekNumber, getCurrentMonth, getUserMetrics } = require("../helpers/firebase");
 const dbUsageCount = require("../../../../backend/src/server.js");
 
-// Endpoint to retrieve the total time spent by a specific user
-router.get('/user-time-spent/:userId', async (req, res) => {
+// Endpoint to retrieve the total time spent by a specific user, as well as their monthly message count
+router.get('/userinfo/:userId', async (req, res) => {
     const userId = req.params.userId;
+    const currentMonth = getCurrentMonth();
     try {
         const userRef = db.collection('users').doc(userId);
         const doc = await userRef.get();
@@ -13,38 +14,43 @@ router.get('/user-time-spent/:userId', async (req, res) => {
             return res.status(404).send('User not found');
         }
         const userData = doc.data();
-       
         const timeSpent = userData.timeSpent || 0;
-        res.json({ userId, timeSpent });
+        const monthlyMessageCount = userData.monthlyMessageCount ? userData.monthlyMessageCount[currentMonth] : 0;
+        
+        res.json({
+            userId,
+            timeSpent,
+            month: currentMonth,
+            monthlyMessageCount
+        });
     } catch (error) {
-        console.error('Error getting user time spent:', error);
+        console.error('Error getting user stats:', error);
         res.status(500).send('Internal Server Error');
     }
 });
 
-// Endpoint to retrieve the number of active users for a given week or month
+// Endpoint to retrieve the number of active users for the current week and month
 router.get('/active-users', async (req, res) => {
-    const { period, year, weekNumber, month } = req.query;
-    let docId;
+    const now = new Date();
+    const [currentYear, currentWeekNumber] = getWeekNumber(now);
+    const currentMonth = getCurrentMonth(); // Returns "YYYY-MM"
 
-    if (period === 'week') {
-        docId = `week-${year}-${weekNumber}`;
-    } else if (period === 'month') {
-        docId = `month-${year}-${month}`;
-    } else {
-        return res.status(400).send('Invalid period specified. Please use "week" or "month".');
-    }
+    const weekDocId = `week-${currentYear}-${currentWeekNumber}`;
+    const monthDocId = `month-${currentMonth}`;
+
     try {
-        const statsRef = db.collection('stats').doc(docId);
-        const doc = await statsRef.get();
-        if (!doc.exists) {
-            return res.status(404).send('Stats document not found.');
-        }
-        const data = doc.data();
-        const activeUserCount = data.activeUserIDs ? data.activeUserIDs.length : 0;
-        res.json({ period: docId, activeUserCount });
+        const weekStats = await db.collection('stats').doc(weekDocId).get();
+        const monthStats = await db.collection('stats').doc(monthDocId).get();
+
+        const weeklyActiveUsers = weekStats.exists ? (weekStats.data().activeUserIDs || []).length : 0;
+        const monthlyActiveUsers = monthStats.exists ? (monthStats.data().activeUserIDs || []).length : 0;
+
+        res.json({
+            weekly: { period: weekDocId, activeUserCount: weeklyActiveUsers },
+            monthly: { period: monthDocId, activeUserCount: monthlyActiveUsers }
+        });
     } catch (error) {
-        console.error('Error retrieving active users:', error);
+        console.error('Error retrieving active users summary:', error);
         res.status(500).send('Internal Server Error');
     }
 });
@@ -71,30 +77,6 @@ router.get('/random-user-metrics', async (req, res) => {
     }
   });
 
-
-// Endpoint to retrieve the monthly message count for a user
-router.get('/monthly-messages/:userId', async (req, res) => {
-    const userId = req.params.userId;
-    const currentMonth = getCurrentMonth();
-    const userRef = db.collection('users').doc(userId);
-    
-    try {
-        const doc = await userRef.get();
-        if (!doc.exists) {
-            return res.status(404).send('User not found');
-        }
-        const userData = doc.data();
-        const monthlyMessageCount = userData.monthlyMessageCount ? userData.monthlyMessageCount[currentMonth] : 0;
-        res.json({
-            userId,
-            month: currentMonth,
-            monthlyMessageCount
-        });
-    } catch (error) {
-        console.error('Error retrieving monthly message count:', error);
-        res.status(500).send('Internal Server Error');
-    }
-});
 
 // Endpoint to retrieve the number of active members in a team
 router.get('/team/:teamId/active-members', async (req, res) => {
