@@ -30,7 +30,8 @@ function init(server)
 		socket.on('teamMsg', data => broadcastMessage(data));
 		socket.on('directMsg', data => broadcastMessage(data, "direct"));
 
-		socket.on('send-doc-changes', delta => broadcastDocChanges(delta, socket));
+		socket.on('send-doc-changes', delta => broadcastDocChanges(delta, socket, "input"));
+		socket.on('send-doc-cursor-changes', range => broadcastDocChanges(range, socket, "cursor"));
 	});
 }
 
@@ -54,15 +55,20 @@ async function broadcastMessage(data, type = "team")
 	(type == "team") ? fb.saveTeamMsg(data) : fb.saveDirectMsg(data);
 }
 
-async function broadcastDocChanges(delta, socket)
+async function broadcastDocChanges(data, socket, type)
 {
-	console.log(delta);
+	console.log(data);
 	// Emit changes to all users except the sender
 	let clients = await io.fetchSockets();
 	clients.forEach((client) =>
 	{
 		if (client.id != socket.id)
-			client.emit('get-doc-changes', delta);
+			if (type == "cursor")
+			{
+				client.emit('get-doc-cursor-changes', data);
+			}
+			else
+				client.emit('get-doc-changes', data);
 	});
 }
 

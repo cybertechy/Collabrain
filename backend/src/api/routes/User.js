@@ -43,7 +43,6 @@ router.get("/search", async (req, res) => {
 	}).catch(err => { return res.status(500).json({ error: err }); });
 })
 
-
 // Get user from ID
 router.get("/:user", async (req, res) => {
 	// Make sure all required fields are present

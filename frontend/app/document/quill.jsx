@@ -1,9 +1,12 @@
-import { useRef } from 'react';
 const ReactQuill = require("react-quill");
 import "react-quill/dist/quill.snow.css";
+const QuillCursors = require('quill-cursors');
+
+ReactQuill.Quill.register('modules/cursors', QuillCursors);
 
 export default function Quill(props)
 {
+	// Handle input changes
 	const onChange = (content, delta, source, editor) =>
 	{
 		props.setValue(content);
@@ -13,7 +16,28 @@ export default function Quill(props)
 		props.socket.current.emit("send-doc-changes", delta);
 	};
 
+	// Handle cursor changes
+	const onChangeSelection = (range, source, editor) =>
+	{
+		if (props.socket.current == null)
+			return;
+
+		const data = {
+			username: props.user.username,
+			range: range,
+		};
+
+		props.socket.current.emit("send-doc-cursor-changes", data);
+	};
+
 	var toolbarOptions = [
+		[{ 'font': [] }],
+		[{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+		[{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+
+		[{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+		[{ 'align': [] }],
+
 		['bold', 'italic', 'underline', 'strike'],        // toggled buttons
 		['image', 'blockquote', 'code-block'],
 
@@ -23,19 +47,15 @@ export default function Quill(props)
 		[{ 'indent': '-1' }, { 'indent': '+1' }],          // outdent/indent
 		[{ 'direction': 'rtl' }],                         // text direction
 
-		[{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
-		[{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-
-		[{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
-		[{ 'font': [] }],
-		[{ 'align': [] }],
-
 		['clean'],                                        // remove formatting button
 	];
 
 	const module = {
 		toolbar: toolbarOptions,
+		cursors: {
+			transformOnTextChange: true,
+		}
 	};
 
-	return <ReactQuill ref={props.quillRef} modules={module} theme="snow" value={props.value} onChange={onChange} />;
+	return <ReactQuill ref={props.quillRef} modules={module} theme="snow" value={props.value} onChange={onChange} onChangeSelection={onChangeSelection} />;
 }
