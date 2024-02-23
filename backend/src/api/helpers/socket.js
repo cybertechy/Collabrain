@@ -69,7 +69,7 @@ async function broadcastMessage(data, type = "team")
             // If sentAt is in date format, creates a timestamp
             data.sentAt = fb.admin.firestore.Timestamp.fromDate(new Date(data.sentAt));;
         } else {
-			// Otherwise, converts milliseconds and nanoseconds into a timestamp
+			// Otherwise, converts seconds and nanoseconds into a timestamp
             data.sentAt = fb.admin.firestore.Timestamp.fromDate(new Date(new Date(data.sentAt.seconds * 1000 + 
                 data.sentAt.nanoseconds / 1000, ).toLocaleDateString()));
         }

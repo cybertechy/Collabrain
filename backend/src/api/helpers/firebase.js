@@ -362,5 +362,7 @@ module.exports = {
 	deleteCollection,
 	saveTeamMsg,
 	saveDirectMsg,
-	getUserMetrics
+	getUserMetrics,
+    getCurrentMonth,
+    getWeekNumber
 };
