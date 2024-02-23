@@ -34,11 +34,11 @@ const port = process.env.PORT || 8080;
 const server = http.createServer(app);
 
 // Database usage counter
-let dbUsageCount = 0;
+let APIUsageCount = 0;
 
 // Middleware to increment database usage count
 app.use((req, res, next) => {
-    dbUsageCount++;
+    APIUsageCount++;
     next();
 });
 
@@ -96,7 +96,7 @@ app.use("/api/stats", statsRoute);
 
 // Endpoint to display DB usage
 app.get("/api/dbUsage", (req, res) => {
-    res.json({ message: "Database Usage", count: dbUsageCount });
+    res.json({ message: "Database Usage", count: APIUsageCount });
 });
 
 app.get("/api/home", (req, res) =>
@@ -116,7 +116,3 @@ server.listen(port, () =>
 {
 	console.log(`Server started at: http://localhost:${port}`);
 });
-
-module.exports = {
-	dbUsageCount
-};
