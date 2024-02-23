@@ -38,7 +38,7 @@ const share = ({ contentMapName = "Content Map", sData, setShare, isOwner, updat
         setShare(false);
 
         try {
-            let res = await updatecontent({ access: temp, user: id, revokeAccess });
+            let res = await updatecontent({ access: temp, [type==="users"?"user":"team"]: id, revokeAccess });
             toast.success("Permission Updated", {
                 position: "bottom-right",
                 autoClose: 2000,
@@ -186,7 +186,7 @@ const share = ({ contentMapName = "Content Map", sData, setShare, isOwner, updat
                         </div>
                     </div>
 
-                    {shareData[key].role === "owner" ? <p>Owner</p> : <select onChange={(e) => setPermission(key, e.target.value)} value={shareData[key].role === "edit" ? "Edit" : "View"} disabled={!isOwner} className="outline-none bg-none p-2 rounded-lg bg-inherit text-sm">
+                    {shareData[key].role === "owner" ? <p>Owner</p> : <select onChange={(e) => setPermission(key, e.target.value,shareData[key]?.type)} value={shareData[key].role === "edit" ? "Edit" : "View"} disabled={!isOwner} className="outline-none bg-none p-2 rounded-lg bg-inherit text-sm">
                         <option >View</option>
                         <option>Edit</option>
                         {/*Add divider to show this is a special operation*/}
