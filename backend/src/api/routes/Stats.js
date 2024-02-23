@@ -67,7 +67,8 @@ async function getActiveUsers(period, year, weekNumber, month, res) {
     res.json({ period: docId, activeUserCount });
 }
 
-// Retrieves metrics of a random user
+// Retrieves metrics of a random user 
+// The metrics are timeSpent, monthlyMessageCount and score
 async function getRandomUserMetrics(res) {
     const userData = await getUserMetrics();
         if (userData) {
