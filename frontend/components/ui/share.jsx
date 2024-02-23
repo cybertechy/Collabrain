@@ -212,9 +212,9 @@ const share = ({ contentMapName = "Content Map", sData, setShare, isOwner, updat
             </div>
         }
 
-        {Object.keys(selected).length < 1  && <div className="flex flex-col ">
+        { Object.keys(selected).length < 1  && <div className="flex flex-col ">
             <h2 className="text-lg ">Anyone can access: </h2>
-            <select value={publicShare} onChange={(e) => setpublicShare(e.target.value)} className="outline-none bg-none p-2 rounded-lg bg-inherit text-sm mb-3">
+            <select disabled={!isOwner} value={publicShare} onChange={(e) => setpublicShare(e.target.value)} className="outline-none bg-none p-2 rounded-lg bg-inherit text-sm mb-3">
                 <option value="No">No</option>
                 <option value="Yes">Yes</option>
             </select>
