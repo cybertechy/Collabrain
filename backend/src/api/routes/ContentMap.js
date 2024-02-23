@@ -214,7 +214,7 @@ router.put("/:id", async (req, res) => {
     
         if (req.body.path) updatedContentMap.path = req.body.path;
 
-        // TODO: Revoke access Incomplete
+        // Revoke access
         if (req.body.access && req.body.user || req.body.revokeAccess) {
             updatedContentMap.Access = req.body.access;
 
@@ -233,21 +233,6 @@ router.put("/:id", async (req, res) => {
             updatedContentMap.public = req.body.public;
         }
     }
-
-    // async update the users who access and the content map to AccessContentMaps array of user
-    // await Promise.all(Object.keys(updatedContentMap.Access).map(async userId => {
-    //     const userRef = db.collection("users").doc(userId);
-    //     const user = await userRef.get();
-    //     if (!user.exists) return res.status(404).json({ code: 404, error: "User not found" });
-
-    //     let userContentMaps = user.data().AccessContentMaps;
-    //     if (!userContentMaps) userContentMaps = [];
-
-    //     userContentMaps.push(req.params.id);
-    //     await userRef.update({
-    //         AccessContentMaps: userContentMaps
-    //     });
-    // }));
 
     updatedContentMap.updatedAt = fb.admin.firestore.FieldValue.serverTimestamp();
 
