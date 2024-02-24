@@ -11,7 +11,28 @@ let rooms = {};
 
 function init(server)
 {
+	
 	io = new Server(server, { cors: { origin: "*" } });
+
+	// Sync up with the database
+	fb.getObjectFromRealtimeDB("currLinks").then((data) => {
+		currLinks = data.val() || {};
+	});
+	fb.getObjectFromRealtimeDB("rooms").then((data) => {
+		rooms = data.val() || {};
+	});
+
+	// Listen for connections
+	fb.listenToRealtimeDB("currLinks", (data) => {
+		currLinks = data || {};
+		console.log("Listen currLinks: ", currLinks);
+	});
+
+	fb.listenToRealtimeDB("rooms", (data) => {
+		rooms = data || {};
+	});
+	
+	
 
 	io.on('connection', (socket) =>
 	{
@@ -19,6 +40,9 @@ function init(server)
 		{
 			console.log(`user ${msg.id} connected`);
 			currLinks[msg.id] = socket.id;
+
+			// Save the user to the database
+			fb.addObjectToRealtimeDB("currLinks", currLinks);
 		});
 
 		socket.on('disconnect', () =>
@@ -38,6 +62,10 @@ function init(server)
 				}
 				console.log(`user ${ref} left room ${room}`)
 			});
+
+			// Save the user to the database
+			fb.addObjectToRealtimeDB("currLinks", currLinks);
+			fb.addObjectToRealtimeDB("rooms", rooms);
 			
 			console.log('user disconnected');
 		});
@@ -63,20 +91,27 @@ function init(server)
 		
 			socket.join(data.id);
 			console.log(`user ${data.user.id} joined room ${data.id}`)
+
+			// Sync up with the database
+			fb.addObjectToRealtimeDB("rooms", rooms);
 			
 		});
 
 		//Leave a collab room
 		socket.on('stopCollab', (data) =>
 		{
-			// Remove the user from the room
-			rooms[data.id].members = rooms[data.id].members.filter((member) => member != data.user);
-			socket.leave(data.id);
+			Object.keys(rooms).forEach((room) =>
+			{
+				if (rooms[room].members[data.user.id])
+				{
+					delete rooms[room].members[data.user.id];
+					if (Object.keys(rooms[room].members).length == 0) delete rooms[room];
+					
+				}
+				console.log(`user ${data.user.id} left room ${room}`)
+			});
 
-			// Delete the room if it's empty
-			if (rooms[data.id].members.length == 0) delete rooms[data.id];
-
-			console.log(`user ${data.user} left room ${data.id}`)
+			fb.addObjectToRealtimeDB("rooms", rooms);
 		});
 
 		//send collab data to all members

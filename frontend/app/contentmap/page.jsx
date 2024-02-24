@@ -47,7 +47,7 @@ function page() {
     const [Delete, setDelete] = useState(false);
     const [Share, setShare] = useState(false);
 
-    const Serverlocation = "https://collabrainbackend1-latest.onrender.com";
+    const Serverlocation = "http://localhost:8080";
 
 
 
@@ -197,6 +197,8 @@ function page() {
         sockCli.current.io.on('reconnect_failed', () => {
             setCollabaration(false);
         });
+
+        return () => sockCli.current.emit("stopCollab", { user: { id: user.uid, name: (user.displayName) ? user.displayName : "Anonymous" }, id: id });
 
     }, [id, user, sockCli.current]);
 

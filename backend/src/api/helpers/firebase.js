@@ -4,7 +4,7 @@ const serviceAccount = require("./ServiceAccountKey.json");
 // Initialize Firebase admin
 admin.initializeApp({
 	credential: admin.credential.cert(serviceAccount),
-
+	databaseURL: "https://collabrain-group-project-default-rtdb.asia-southeast1.firebasedatabase.app"
 });
 
 async function verifyUser(token)
@@ -174,6 +174,40 @@ async function saveDirectMsg(data)
 	// }).catch(err => console.log(err));
 }
 
+const realtimeDB = admin.database();
+
+
+// add object to realtime database
+async function addObjectToRealtimeDB(path, object)
+{
+	return realtimeDB.ref(path).set(object);
+}
+
+// get object from realtime database
+async function getObjectFromRealtimeDB(path)
+{
+	return realtimeDB.ref(path).once("value");
+}
+
+// update object in realtime database
+async function updateObjectInRealtimeDB(path, object)
+{
+	return realtimeDB.ref(path).update(object);
+}
+
+// remove object from realtime database
+async function removeObjectFromRealtimeDB(path)
+{
+	return realtimeDB.ref(path).remove();
+}
+
+// Database event listeners
+async function listenToRealtimeDB(path, callback)
+{
+	realtimeDB.ref(path).on("value", (snapshot) => callback(snapshot.val()));
+}
+
+
 module.exports = {
 	db,
 	admin,
@@ -188,5 +222,10 @@ module.exports = {
 	saveDirectMsg,
 	deleteUser,
 	updateUser,
-	getUser
+	getUser,
+	addObjectToRealtimeDB,
+	getObjectFromRealtimeDB,
+	updateObjectInRealtimeDB,
+	removeObjectFromRealtimeDB,
+	listenToRealtimeDB
 };
