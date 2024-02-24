@@ -1,6 +1,8 @@
 const { Server } = require("socket.io");
 const fb = require("./firebase");
 const uuid = require("uuid");
+const { createAdapter } = require('@socket.io/redis-adapter');
+const { createClient } = require('redis');
 
 /** @type Server */
 let io;
@@ -9,10 +11,25 @@ let io;
 let currLinks = {};
 let rooms = {};
 
-function init(server)
-{
-	
+function init(server) {
+
 	io = new Server(server, { cors: { origin: "*" } });
+
+	const pubClient = createClient({
+		socket: {
+			host: 'redis-15906.c301.ap-south-1-1.ec2.cloud.redislabs.com',
+			port: 15906
+		},
+		username: "socket",
+		password: "P3(.2=7M$+oa",
+	});
+	const subClient = pubClient.duplicate();
+
+	Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
+		console.log("Connected to redis");
+		io.adapter(createAdapter(pubClient, subClient));
+	});
+
 
 	// Sync up with the database
 	fb.getObjectFromRealtimeDB("currLinks").then((data) => {
@@ -31,13 +48,11 @@ function init(server)
 	fb.listenToRealtimeDB("rooms", (data) => {
 		rooms = data || {};
 	});
-	
-	
 
-	io.on('connection', (socket) =>
-	{
-		socket.on('user', (msg) =>
-		{
+
+
+	io.on('connection', (socket) => {
+		socket.on('user', (msg) => {
 			console.log(`user ${msg.id} connected`);
 			currLinks[msg.id] = socket.id;
 
@@ -45,20 +60,17 @@ function init(server)
 			fb.addObjectToRealtimeDB("currLinks", currLinks);
 		});
 
-		socket.on('disconnect', () =>
-		{
+		socket.on('disconnect', () => {
 			// Find the user and delete it
 			let ref = Object.keys(currLinks).find((key) => currLinks[key] === socket.id);
 			delete currLinks[ref];
 
 			// Remove the user from all rooms
-			Object.keys(rooms).forEach((room) =>
-			{
-				if (rooms[room].members[ref])
-				{
+			Object.keys(rooms).forEach((room) => {
+				if (rooms[room].members[ref]) {
 					delete rooms[room].members[ref];
 					if (Object.keys(rooms[room].members).length == 0) delete rooms[room];
-					
+
 				}
 				console.log(`user ${ref} left room ${room}`)
 			});
@@ -66,47 +78,42 @@ function init(server)
 			// Save the user to the database
 			fb.addObjectToRealtimeDB("currLinks", currLinks);
 			fb.addObjectToRealtimeDB("rooms", rooms);
-			
+
 			console.log('user disconnected');
 		});
 
 		socket.on('teamMsg', (data) => broadcastMessage(data));
 
-		socket.on('directMsg', (data) =>
-		{
+		socket.on('directMsg', (data) => {
 			broadcastMessage(data, "direct");
 		});
 
 		//Join a collab room
-		socket.on('startCollab', (data) =>
-		{
+		socket.on('startCollab', (data) => {
 
 			// Limit room capacity to 10
-			if( Object.keys(rooms).length > 10 ) return socket.emit('roomFull', {msg: "Sever is overloaded, try again later"});
+			if (Object.keys(rooms).length > 10) return socket.emit('roomFull', { msg: "Sever is overloaded, try again later" });
 
 			// Create a room
-			if (!rooms[data.id]) rooms[data.id] = {id: data.id, members: {[data.user.id]:data.user}};
+			if (!rooms[data.id]) rooms[data.id] = { id: data.id, members: { [data.user.id]: data.user } };
 			else rooms[data.id].members[data.user.id] = data.user;
 
-		
+
 			socket.join(data.id);
 			console.log(`user ${data.user.id} joined room ${data.id}`)
 
 			// Sync up with the database
 			fb.addObjectToRealtimeDB("rooms", rooms);
-			
+
 		});
 
 		//Leave a collab room
-		socket.on('stopCollab', (data) =>
-		{
-			Object.keys(rooms).forEach((room) =>
-			{
-				if (rooms[room].members[data.user.id])
-				{
+		socket.on('stopCollab', (data) => {
+			Object.keys(rooms).forEach((room) => {
+				if (rooms[room].members[data.user.id]) {
 					delete rooms[room].members[data.user.id];
 					if (Object.keys(rooms[room].members).length == 0) delete rooms[room];
-					
+
 				}
 				console.log(`user ${data.user.id} left room ${room}`)
 			});
@@ -115,27 +122,25 @@ function init(server)
 		});
 
 		//send collab data to all members
-		socket.on('collabData', ({id,user,data}) =>
-		{
-			if(! rooms[id]?.members[user]) return socket.emit('reconnectRoom', {msg: "You are not a member of this room"});
-			
+		socket.on('collabData', ({ id, user, data }) => {
+			if (!rooms[id]?.members[user]) return socket.emit('reconnectRoom', { msg: "You are not a member of this room" });
+
 			data.activeMembers = Object.keys(rooms[id].members).filter((member) => member != user);
-			
+
 			io.to(id).emit('updateCollabData', data);
 		});
 
-		
+
 	});
 }
 
-async function broadcastMessage(data, type = "team")
-{
-	let members = type == "team" ? await fb.getTeamMembers(data.team): await fb.getChatMembers(data.chat) ;
+async function broadcastMessage(data, type = "team") {
+	let members = type == "team" ? await fb.getTeamMembers(data.team) : await fb.getChatMembers(data.chat);
 	let membersList = members;
 
 	// if their is a sentAt field, convert it to a firebase timestamp
 	let DateBackup = data.sentAt;
-	if (data.sentAt){
+	if (data.sentAt) {
 		data.sentAt = fb.admin.firestore.Timestamp.fromDate(new Date(data.sentAt));
 	}
 
@@ -145,8 +150,7 @@ async function broadcastMessage(data, type = "team")
 		membersList.splice(index, 1); // 2nd parameter means remove one item only
 
 	// Send to all online members
-	membersList.forEach((member) =>
-	{
+	membersList.forEach((member) => {
 		if (Object.keys(currLinks).includes(member))
 			io.to(currLinks[member]).emit((type == "team") ? "teamMsg" : "directMsg", data);
 	});
