@@ -5,7 +5,7 @@ const cors = require("cors");
 const bodyParser = require('body-parser');
 const http = require('http');
 const treblle = require('@treblle/express');
-const { rateLimit } = require("express-rate-limit")
+
 
 // Routes
 const chatRoute = require("./api/routes/Chat");
@@ -21,12 +21,6 @@ const storageRoute = require("./api/routes/Storage");
 const sockServer = require("./api/helpers/socket");
 
 // Config
-const limiter = rateLimit({
-	windowMs: 1000, // 2 minutes
-	limit: 100, // Limit each IP to 100 requests per `window` (here, per 2 minutes).
-	standardHeaders: 'draft-7', // draft-6: `RateLimit-*` headers; draft-7: combined `RateLimit` header
-	legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
-});
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -67,8 +61,6 @@ app.use(function(req, res, next) {
 	
 	next();
 });
-
-app.use(limiter);
 
 sockServer.init(server);
 
