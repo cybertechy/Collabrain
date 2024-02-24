@@ -63,10 +63,10 @@ router.get('/random-user-metrics', async (req, res) => {
       if (!userMetrics) {
         return res.status(404).send('User metrics not found');
       }
-      // Ensure the response includes all expected fields
+     
       const response = {
         userId: userMetrics.userId,
-        score: userMetrics.score || 0, // Provide default values if the fields are undefined
+        score: userMetrics.score || 0,
         monthlyMessageCount: userMetrics.monthlyMessageCount || 0,
         timeSpent: userMetrics.timeSpent || 0
       };
