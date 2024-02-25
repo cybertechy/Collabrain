@@ -38,7 +38,7 @@ const scrollToBottom = () => {
     useEffect(() => {
         if (!user) return;
 
-        sockCli.current = socket.init('http://localhost:8080') || {};
+        sockCli.current = socket.init('https://collabrain-backend.cybertech13.eu.org') || {};
         sockCli.current.on('teamMsg', (data) => {
             console.log("Received message from server");
             setText((prevText) => [
@@ -59,7 +59,7 @@ const scrollToBottom = () => {
         if (!user) return;
 
         fb.getToken().then((token) => {
-            axios.get(`http://localhost:8080/api/teams/${teamId}/channels/${channelName}/messages`, {
+            axios.get(`https://collabrain-backend.cybertech13.eu.org/api/teams/${teamId}/channels/${channelName}/messages`, {
                 headers: { "Authorization": "Bearer " + token }
             }).then((res) => {
                 console.log(res.data);
@@ -85,7 +85,7 @@ const scrollToBottom = () => {
 		const fetchUser = async () => {
 		  try {
 			const token = await fb.getToken();
-			const response = await axios.get(`http://localhost:8080/api/users/${user.uid}`, {
+			const response = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/users/${user.uid}`, {
 			  headers: { "Authorization": "Bearer " + token }
 			});
 			// Set user info with the data obtained from the response
@@ -104,7 +104,7 @@ const scrollToBottom = () => {
             try {
                 // Make a GET request to retrieve information for the specified team
                 const token = await fb.getToken();
-                const response = await axios.get(`http://localhost:8080/api/teams/${teamId}`, {
+                const response = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/teams/${teamId}`, {
                     headers: {
                         Authorization: `Bearer ${token}`, // Replace with the actual auth token
                     },
@@ -156,7 +156,7 @@ const scrollToBottom = () => {
 		}
 
 		let token = await fb.getToken();
-		let userData = await axios.get(`http://localhost:8080/api/users/${user.uid}`,
+		let userData = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/users/${user.uid}`,
 			{ headers: { "Authorization": "Bearer " + token } });
 			
 		

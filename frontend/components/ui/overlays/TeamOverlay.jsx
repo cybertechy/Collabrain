@@ -102,7 +102,7 @@ const handleCreateTeam = async () => {
 
         const token = await fb.getToken();
         // Make a POST request to create the team
-        const response = await axios.post('http://localhost:8080/api/teams', teamData, {
+        const response = await axios.post('https://collabrain-backend.cybertech13.eu.org/api/teams', teamData, {
             headers: {
                 Authorization: `Bearer ${token}`, // Replace with the actual auth token
             },
