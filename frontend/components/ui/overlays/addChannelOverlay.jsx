@@ -9,7 +9,7 @@ const AddChannelOverlay = ({ isOpen, onClose, onChannelAdded, teamData }) => {
 
         const token = await fb.getToken(); // Get the auth token
       
-        axios.post(`http://localhost:8080/api/teams/${teamData.teamId}/channels`, {
+        axios.post(`https://collabrain-backend.cybertech13.eu.org/api/teams/${teamData.teamId}/channels`, {
           name: channelName,
         }, {
           headers: {

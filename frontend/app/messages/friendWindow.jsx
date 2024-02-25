@@ -26,7 +26,7 @@ const FriendsWindow = () => {
   const searchUsers = async (username) => {
     try {
       const token = await fb.getToken();
-      const response = await axios.get(`http://localhost:8080/api/users/search`, {
+      const response = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/users/search`, {
         headers: {
           authorization: `Bearer ${token}`,
         },
@@ -73,7 +73,7 @@ const FriendsWindow = () => {
   const getFriends = async () => {
     try {
       const token = await fb.getToken();
-      const response = await axios.get("http://localhost:8080/api/users/f/friends", {
+      const response = await axios.get("https://collabrain-backend.cybertech13.eu.org/api/users/f/friends", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -83,7 +83,7 @@ const FriendsWindow = () => {
   
       // Create an array of promises to fetch detailed information for each friend
       const friendPromises = friends.map(async (friendId) => {
-        const friendResponse = await axios.get(`http://localhost:8080/api/users/${friendId}`, {
+        const friendResponse = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/users/${friendId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -107,7 +107,7 @@ const FriendsWindow = () => {
   const getFriendRequests = async () => {
     try {
       const token = await fb.getToken();
-      const response = await axios.get("http://localhost:8080/api/users/friends/requests", {
+      const response = await axios.get("https://collabrain-backend.cybertech13.eu.org/api/users/friends/requests", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -115,7 +115,7 @@ const FriendsWindow = () => {
       console.log("friend Request recieved ", response.data);
       const friendRequests = response.data.map(async (friendRequest) => {
         // Fetch user data for each friend request by ID
-        const userResponse = await axios.get(`http://localhost:8080/api/users/${friendRequest}`, {
+        const userResponse = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/users/${friendRequest}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

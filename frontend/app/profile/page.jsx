@@ -110,7 +110,7 @@ const ProfilePage = () => {
     try {
       const token = await fb.getToken(); // Retrieve the current user's auth token
       console.log("New certifications are: ",updatedUserInfo.certifications);
-      await axios.patch("http://localhost:8080/api/users/", updatedUserInfo, {
+      await axios.patch("https://collabrain-backend.cybertech13.eu.org/api/users/", updatedUserInfo, {
         headers: { Authorization: `Bearer ${token}` },
       });
       console.log("Profile updated successfully.");
@@ -161,7 +161,7 @@ const ProfilePage = () => {
     
       try {
         const token = await fb.getToken();
-        const response = await axios.get(`http://localhost:8080/api/users/${user.uid}`, {
+        const response = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/users/${user.uid}`, {
           headers: { "Authorization": "Bearer " + token }
         });
     
@@ -203,7 +203,7 @@ const ProfilePage = () => {
       try {
         // Make a GET request to retrieve user's team IDs
         const token = await fb.getToken();
-        const response = await axios.get('http://localhost:8080/api/teams', {
+        const response = await axios.get('https://collabrain-backend.cybertech13.eu.org/api/teams', {
           headers: {
             Authorization: `Bearer ${token}`, // Replace with the actual auth token
           },
@@ -215,7 +215,7 @@ const ProfilePage = () => {
 
           // Create an array of promises to fetch team information
           const teamPromises = teamIds.map(async (teamId) => {
-            const teamResponse = await axios.get(`http://localhost:8080/api/teams/${teamId}`, {
+            const teamResponse = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/teams/${teamId}`, {
               headers: {
                 Authorization: `Bearer ${token}`, // Replace with the actual auth token
               },
@@ -289,7 +289,7 @@ const ProfilePage = () => {
     if( typeof image !== "string") return;
     fb.getToken().then((token) => {
       console.log("Fetch Image: ",image);
-      let response = axios.get(`http://localhost:8080/api/storage/media/${image}`, {
+      let response = axios.get(`https://collabrain-backend.cybertech13.eu.org/api/storage/media/${image}`, {
         headers: { Authorization: "Bearer " + token }
       });
 
@@ -307,7 +307,7 @@ const ProfilePage = () => {
       const token = await fb.getToken();
 
       //send the photo and type as Patch body
-      const response = await axios.patch(`http://localhost:8080/api/users/`, {
+      const response = await axios.patch(`https://collabrain-backend.cybertech13.eu.org/api/users/`, {
         photo: file,
         type: type
       }, {

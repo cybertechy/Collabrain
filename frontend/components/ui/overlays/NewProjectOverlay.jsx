@@ -56,7 +56,7 @@ const ContentMapOverlay = ({ setOpenModal, switchToDocument }) =>
 
 		try
 		{
-			const res = await axios.post(`http://localhost:8080/api/maps`, {
+			const res = await axios.post(`https://collabrain-backend.cybertech13.eu.org/api/maps`, {
 				name: "New Content Map",
 				data: ""
 			}, {

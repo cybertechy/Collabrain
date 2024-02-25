@@ -23,7 +23,7 @@ const CreateFolderOverlay = ({ isOpen, onClose, onFolderCreated }) => {
             console.log('Folder Name:', folderName); 
             console.log('Folder Color:', folderColor)
             const response = await axios.post(
-                'http://localhost:8080/api/dashboard/folder',
+                'https://collabrain-backend.cybertech13.eu.org/api/dashboard/folder',
                 {
                     name: folderName,
                     color: folderColor, // Add folderColor here
