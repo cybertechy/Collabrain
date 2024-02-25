@@ -83,7 +83,7 @@ router.get("/:user", async (req, res) => {
 		return res.status(401).json({ error: "Unauthorized" });
 
 	fb.db.doc(`users/${req.params.user}`).get()
-		.then(doc => { res.json(doc.data()); console.log(doc.data()); })
+		.then(doc => { res.json(doc.data())})
 		.catch(err => { return res.status(500).json({ error: err }); });
 
 });
