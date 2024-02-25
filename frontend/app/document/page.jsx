@@ -7,19 +7,21 @@ const socket = require("_socket/socket");
 const fb = require("_firebase/firebase");
 import "./quillStyle.css";
 import { useRef, useState, useEffect } from "react";
-
+import { useSearchParams } from 'next/navigation';
 
 export default function Editor()
 {
 	const [user, loading] = fb.useAuthState();
+	const searchParams = useSearchParams();
 	const [userData, setUserData] = useState({});
-	const [value, setValue] = useState("");
+	const [value, setValue] = useState("Loading...");
+	const [isDisabled, setIsDisabled] = useState(true);
+	const [ociID, setOciID] = useState("");
 	const quillRef = useRef(null);
 
 	const randomColor = () =>
 	{
 		const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-
 		var h = randomInt(0, 360);
 		var s = randomInt(42, 98);
 		var l = randomInt(40, 90);
@@ -64,11 +66,53 @@ export default function Editor()
 		};
 	}, [user]);
 
+	// Load document
+	useEffect(() =>
+	{
+		if (!user || !sockCli.current)
+			return;
+
+		const id = searchParams.get('id');
+		// Get document
+		fb.getToken().then(token =>
+		{
+			axios.get(`http://localhost:8080/api/docs/${id}`, {
+				headers: {
+					"Authorization": `Bearer ${token}`
+				}
+			}).then(res =>
+			{
+				setOciID(res.data.data);
+				setValue(JSON.parse(res.data.contents));
+				setIsDisabled(false);
+			});
+		});
+
+		sockCli.current.emit('join-doc', id);
+		return () => sockCli.current.emit('leave-doc', id);
+	}, [user]);
+
+	if (!user)
+	{
+		// Not signed in
+		return (
+			<Template>
+				<div className="bg-[#F3F3F3] h-full">
+					<div className="editor-container bg-[#F3F3F3] overflow-auto">
+						<div className="text-center text-3xl mt-20">Loading...</div>
+					</div>
+				</div>
+			</Template>
+		);
+	}
+
 	return (
 		<Template>
 			<div className="bg-[#F3F3F3] h-full">
 				<div className="editor-container bg-[#F3F3F3] overflow-auto">
-					<Quill socket={sockCli} user={userData} quillRef={quillRef} value={value} setValue={setValue} />
+					<Quill socket={sockCli} user={userData} quillRef={quillRef}
+						value={value} setValue={setValue} isDisabled={isDisabled}
+						docID={searchParams.get('id')} ociID={ociID}/>
 				</div>
 			</div>
 		</Template>

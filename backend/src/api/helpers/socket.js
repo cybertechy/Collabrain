@@ -1,5 +1,6 @@
 const { Server } = require("socket.io");
 const fb = require("./firebase");
+const oci = require("../helpers/oracle");
 
 /** @type Server */
 let io;
@@ -30,8 +31,23 @@ function init(server)
 		socket.on('teamMsg', data => broadcastMessage(data));
 		socket.on('directMsg', data => broadcastMessage(data, "direct"));
 
-		socket.on('send-doc-changes', delta => broadcastDocChanges(delta, socket, "input"));
-		socket.on('send-doc-cursor-changes', range => broadcastDocChanges(range, socket, "cursor"));
+		socket.on('send-doc-changes', data => broadcastDocChanges(data, socket, "input"));
+
+		socket.on('send-doc-cursor-changes', data => broadcastDocChanges(data, socket, "cursor"));
+
+		socket.on('join-doc', doc => 
+		{
+			console.log(`${socket.id} joined doc: ${doc}`);
+			socket.join(doc);
+		});
+
+		socket.on('leave-doc', doc => 
+		{
+			console.log(`${socket.id} left doc: ${doc}`);
+			socket.leave(doc);
+		});
+
+		socket.on('save-doc', data => oci.addData("B3", data.ociID, "application/json", JSON.stringify(data.data)));
 	});
 }
 
@@ -57,19 +73,10 @@ async function broadcastMessage(data, type = "team")
 
 async function broadcastDocChanges(data, socket, type)
 {
-	console.log(data);
-	// Emit changes to all users except the sender
-	let clients = await io.fetchSockets();
-	clients.forEach((client) =>
-	{
-		if (client.id != socket.id)
-			if (type == "cursor")
-			{
-				client.emit('get-doc-cursor-changes', data);
-			}
-			else
-				client.emit('get-doc-changes', data);
-	});
+	if (type == "cursor")
+		socket.broadcast.to(data.doc).emit('get-doc-cursor-changes', data.data);
+	else
+		socket.broadcast.to(data.doc).emit('get-doc-changes', data.data);
 }
 
 module.exports = {

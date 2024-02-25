@@ -23,9 +23,13 @@ router.post('/', async (req, res) =>
 	if (!user)
 		return res.status(401).json({ error: "Unauthorized" });
 
-	// Create andn upload new document to oracle cloud
+	// Create and upload new document to oracle cloud
 	let dataId = uuid.v4();
-	const uploadData = await oci.addData("B3", dataId, "application/json", JSON.stringify({}));
+	const emptyDoc = {
+		"ops": [
+		]
+	};
+	const uploadData = await oci.addData("B3", dataId, "application/json", JSON.stringify(emptyDoc));
 	if (!uploadData.eTag)
 		return res.status(500).json({ error: "Failed to create document" });
 
@@ -87,18 +91,24 @@ router.get('/:id', async (req, res) =>
 		return res.status(401).json({ error: "Unauthorized" });
 
 	// Check if user has access to document
-	fb.db.doc(`users/${user.uid}`).get()
-		.then((doc) =>
-		{
-			if (!doc.data().documents.includes(req.params.id))
-				return res.status(401).json({ error: "Unauthorized" });
+	const userRef = await fb.db.doc(`users/${user.uid}`).get();
+	if (!userRef.data().documents.includes(req.params.id))
+		return res.status(400).json({ error: "No Access" });
 
-			// Get document
-			fb.db.doc(`documents/${req.params.id}`).get()
-				.then((doc) => { res.status(200).json({ id: doc.id, ...doc.data() }); })
-				.catch((error) => { res.status(500).json({ error: "Failed to get document" }); });
-		})
-		.catch((error) => { res.status(500).json({ error: "Failed to get document" }); });
+	try
+	{
+		// Get document
+		const docData = await fb.db.doc(`documents/${req.params.id}`).get()
+			.catch((error) => { throw error; });
+
+		// Get data from oracle cloud
+		const oracleData = await oci.getData("B3", docData.data().data)
+			.catch((error) => { throw error; });
+
+		const contents = await oci.generateStringFromStream(oracleData.value); 
+		res.status(200).json({ ...docData.data(), contents: contents });
+	}
+	catch (err) { res.status(500).json({ error: "Failed to get document" }); }
 });
 
 // Delete document

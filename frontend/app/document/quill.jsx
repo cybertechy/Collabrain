@@ -1,4 +1,5 @@
 const ReactQuill = require("react-quill");
+import React from "react";
 import "react-quill/dist/quill.snow.css";
 const QuillCursors = require('quill-cursors');
 
@@ -13,7 +14,10 @@ export default function Quill(props)
 		if (source != "user" || props.socket.current == null)
 			return;
 
-		props.socket.current.emit("send-doc-changes", delta);
+		props.socket.current.emit("send-doc-changes", { doc: props.docID, data: delta });
+
+		// Save changes to database
+		props.socket.current.emit("save-doc", { ociID: props.ociID, data: props.quillRef.current.getEditor().getContents() });
 	};
 
 	// Handle cursor changes
@@ -27,7 +31,7 @@ export default function Quill(props)
 			range: range,
 		};
 
-		props.socket.current.emit("send-doc-cursor-changes", data);
+		props.socket.current.emit("send-doc-cursor-changes", { doc: props.docID, data: data });
 	};
 
 	var toolbarOptions = [
@@ -53,9 +57,9 @@ export default function Quill(props)
 	const module = {
 		toolbar: toolbarOptions,
 		cursors: {
-			transformOnTextChange: true,
+			transformOnTextChange: false,
 		}
 	};
 
-	return <ReactQuill ref={props.quillRef} modules={module} theme="snow" value={props.value} onChange={onChange} onChangeSelection={onChangeSelection} />;
+	return <ReactQuill ref={props.quillRef} modules={module} theme="snow" value={props.value} readOnly={props.isDisabled} onChange={onChange} onChangeSelection={onChangeSelection} />;
 }

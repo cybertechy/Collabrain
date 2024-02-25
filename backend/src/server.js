@@ -42,7 +42,7 @@ app.use("/api/dashboard", dashboardRoute);
 app.use("/api/maps", mapRoute);
 app.use("/api/reports", reportReport);
 app.use("/api/notifications", notificationsRoute);
-app.use("/api/docs", docRoute);
+app.use("/api/docs", docRoute); 
 
 app.get("/api/home", (req, res) =>
 {
