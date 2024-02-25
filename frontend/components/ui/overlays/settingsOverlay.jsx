@@ -327,7 +327,7 @@ const router = useRouter();
     return (
         <>
         <div className="w-full h-5/6 flex ">
-            <div className=" bg-basicallylight p-5 rounded-md flex overflow-y-scroll scrollbar-thin scrollbar-thumb-primary ">
+            <div className=" bg-basicallylight p-5 rounded-md flex overflow-y-auto scrollbar-thin scrollbar-thumb-primary ">
                 <div className="w-full h-full">
 
                     <div className="w-11/12 h-96  bg-basicallylight rounded-md">
@@ -452,7 +452,7 @@ const GeneralOverlay = () => {
     return (
       <>
         <div className="w-full h-5/6 flex justify-center items-start">
-          <div className="bg-basicallylight  rounded-md flex w-full p-5 overflow-y-scroll scrollbar-thin scrollbar-thumb-primary">
+          <div className="bg-basicallylight  rounded-md flex w-full p-5 overflow-y-auto scrollbar-thin scrollbar-thumb-primary">
             <div className="flex flex-col w-full">
               <p className="mb-2 text-2xl text-left text-basicallydark md:text-lg sm:text-sm lg:text-2xl">
                 Change Appearance
@@ -540,7 +540,7 @@ const SoundOverlay = () => {
 
     return (
         <div className="w-full h-5/6 flex justify-center items-start">
-            <div className="bg-basicallylight rounded-md flex h-full w-full p-5 overflow-y-scroll scrollbar-thin scrollbar-thumb-primary">
+            <div className="bg-basicallylight rounded-md flex h-full w-full p-5 overflow-y-auto scrollbar-thin scrollbar-thumb-primary">
                 <div className="flex flex-col w-full">
                     <div className="mb-4">
                         <p className="text-2xl text-left text-basicallydark mb-2">
@@ -665,7 +665,7 @@ const PrivacyOverlay = (user) => {
     };
     return (
         <div className="w-full h-5/6 flex justify-center items-start">
-            <div className="bg-basicallylight rounded-md flex w-full p-5 overflow-y-scroll scrollbar-thin scrollbar-thumb-primary">
+            <div className="bg-basicallylight rounded-md flex w-full p-5 overflow-y-auto scrollbar-thin scrollbar-thumb-primary">
                 <div className="flex flex-col w-full space-y-5">
                     <div className="mb-4 flex justify-between">
                         <p className="text-2xl text-basicallydark">
