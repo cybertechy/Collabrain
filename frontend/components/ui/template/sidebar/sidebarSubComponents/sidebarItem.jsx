@@ -7,16 +7,16 @@ import { Tooltip } from '@mui/material';
 const SidebarItem = ({ href, icon: Icon, text = "", isSelected = false, isExpanded = true }) => {
     const itemClasses = isSelected ? "text-primary" : "text-unselected hover:text-primary";
     const [showChevron, setShowChevron] = useState(false);
-    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+    // const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
-    useEffect(() => {
-        const handleResize = () => {
-            setWindowWidth(window.innerWidth);
-        };
+    // useEffect(() => {
+    //     const handleResize = () => {
+    //         setWindowWidth(window.innerWidth);
+    //     };
         
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
+    //     window.addEventListener('resize', handleResize);
+    //     return () => window.removeEventListener('resize', handleResize);
+    // }, []);
 
     useEffect(() => {
         if (isExpanded) {
@@ -29,7 +29,7 @@ const SidebarItem = ({ href, icon: Icon, text = "", isSelected = false, isExpand
         }
     }, [isExpanded]);
 
-    const widthClass = windowWidth < 550 ? "w-full" : "w-64";
+    // const widthClass = isExpanded ? "w-full lg:w-64" : "w-64";
 
     return (
         <Tooltip
@@ -40,7 +40,7 @@ const SidebarItem = ({ href, icon: Icon, text = "", isSelected = false, isExpand
             <Link href={href}
             // >
                 // <div
-                    className={`flex ${widthClass} items-center p-2 my-2 transition-colors duration-200 justify-start cursor-pointer ${isExpanded ? "hover:bg-gray-200" : ""} ${itemClasses} hover:text-primary`}
+                    className={`flex items-center p-2 my-2 transition-colors duration-200 justify-start cursor-pointer ${isExpanded ? "hover:bg-gray-200" : ""} ${itemClasses} hover:text-primary`}
                     style={{ 
                         maxWidth: isExpanded ? "100%" : "0",
                     }}

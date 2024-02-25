@@ -61,7 +61,12 @@ const InputField = ({ placeholder, color, input, setinput }) => {
                     },
                 }}
                 placeholder={placeholder}
-                sx={{ mb: 1, width: "20rem" }}
+                sx={{ mb: 1,
+                    '@media (max-width:440px)': {
+                        fontSize: '0.875rem', // smaller font size on sm screens and up
+                        width: '12rem',
+                        flexDirection: 'column',}
+                }}
             />
         </ThemeProvider>
     );
