@@ -9,7 +9,7 @@ module.exports = {
     // darkMode: 'class',
     theme: {
         fontFamily: {
-            poppins: ["Poppins", "sans-serif"],
+            sans: ['var(--font-poppins)']
         },
         extend: {
             scrollbar: ['rounded'],
