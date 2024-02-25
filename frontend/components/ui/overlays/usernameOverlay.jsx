@@ -3,53 +3,14 @@ const fb = require("../../../app/_firebase/firebase");
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-const UsernameOverlay = ({ isOpen, onClose }) =>
+const UsernameOverlay = ({ onClose, hasUserUsername, setHasUserUsername }) =>
 {
 	const [username, setUsername] = useState('');
 	const [error, setError] = useState('');
 	const [user, loading] = fb.useAuthState();
 	const [retrieve, setRetrieve] = useState(false);
 	const [timeoutId, setTimeoutId] = useState(null);
-	const [hasUserUsername, setHasUserUsername] = useState(null);
-	const [isCheckingUsername, setIsCheckingUsername] = useState(true);
 
-	const hasUsername = async () => {
-        const token = await fb.getToken();
-        const uid = fb.getUserID();
-
-        try {
-            const res = await axios.get(`http://localhost:8080/api/users/${uid}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-
-            const user = res.data;
-			
-			console.log("Overlay open: " + isOpen);
-            return user.username ? true : false;
-        } catch (err) {
-            console.log(err);
-            return false;
-        }
-    };
-    useEffect(() => {
-		const checkUsername = async () => {
-			if (user) {
-				setIsCheckingUsername(true);
-				try {
-					const result = await hasUsername();
-					setHasUserUsername(result);
-				} catch (err) {
-					console.log(err);
-				} finally {
-					setIsCheckingUsername(false);
-				}
-			}
-		};
-	
-		checkUsername();
-	}, [user]);
 	const checkUsernameAvailability = async (enteredUsername) =>
 	{
 		if (!/^[a-zA-Z0-9_]{4,}$/.test(enteredUsername))
@@ -63,7 +24,7 @@ const UsernameOverlay = ({ isOpen, onClose }) =>
 
 		try
 		{
-			const response = await axios.get(`http://localhost:8080/api/users/username/${enteredUsername}`);
+			const response = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/users/username/${enteredUsername}`);
 			if (response.status === 200)
 			{
 				setError("Username is available");
@@ -115,26 +76,29 @@ const UsernameOverlay = ({ isOpen, onClose }) =>
 			if (user) {
 				token = await fb.getToken();
 			}
-			const response = await axios.patch('http://localhost:8080/api/users/', { username: username }, {
+			const response = await axios.patch('https://collabrain-backend.cybertech13.eu.org/api/users/', { username: username }, {
 				headers: {
 					authorization: `Bearer ${token}`
 				}
 			});
 	
 			if (response.status === 200) {
+				console.log(response.data);
 				setHasUserUsername(true); // Update this state to indicate the user now has a username
 				onClose(); // Close the overlay
 			} else {
+				console.log("failed to update username")
 				setError("Failed to update username");
 			}
 		} catch (error) {
+			console.error("Error updating username:", error);
 			setError("Error updating username");
 		}
 	};
 
-	if (loading || !user || isCheckingUsername) return;
+	if (loading || !user) return;
 	return (
-		<div className={`fixed top-0 left-0 w-full h-full flex items-center justify-center ${user && !hasUserUsername ? 'block' : 'hidden'} z-50 bg-basicallylight bg-opacity-20 backdrop-blur-sm`}>
+		<div className={`fixed top-0 left-0 w-full h-full flex items-center justify-center z-50 bg-basicallylight bg-opacity-20 backdrop-blur-sm`}>
 		<div className="w-1/4 bg-basicallylight rounded-md shadow-lg">
 				<div className="p-8">
 					<h2 className="text-2xl font-bold mb-4 text-basicallydark">Welcome! Let's Pick a Username</h2>

@@ -20,7 +20,7 @@ import Template from "@/components/ui/template/template";
 import CreateFolderOverlay from "../../components/ui/overlays/CreateFolderOverlay";
 export default function Dashboard()
 {
-	const [isUsernameOverlayOpen, setIsUsernameOverlayOpen] = useState(true);
+	const [isUsernameOverlayOpen, setIsUsernameOverlayOpen] = useState(false);
 	const [user, loading] = fb.useAuthState();
 	const [folders, setFolders] = useState([]);
 	const [projects, setProjects] = useState([]);
@@ -38,6 +38,8 @@ export default function Dashboard()
 	const [isAscending, setIsAscending] = useState(true);
 	const [isCreateFolderOverlayOpen, setIsCreateFolderOverlayOpen] = useState(false);
 	const searchParams = useSearchParams();
+	const [hasUserUsername, setHasUserUsername] = useState(false);
+	const [isCheckingUsername, setIsCheckingUsername] = useState(true);
 	const path = searchParams.get("path") || "/";
 	const toggleCreateFolderOverlay = () =>
 	{
@@ -67,6 +69,55 @@ export default function Dashboard()
 		{ text: "New Document", icon: <DescriptionIcon />, onClick: () => { } },
 	];
 
+
+	const hasUsername = async () => {
+        const token = await fb.getToken();
+        const uid = fb.getUserID();
+
+        try {
+            const res = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/users/${uid}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            const user = res.data;
+			
+			
+            return user.username ? true : false;
+        } catch (err) {
+            console.log(err);
+            return false;
+        }
+    };
+    useEffect(() => {
+		const checkUsername = async () => {
+			if (user) {
+				setIsCheckingUsername(true);
+				try {
+					console.log("Checking username...");
+					const result = await hasUsername();
+					console.log("Result from hasUsername:", result);
+					setHasUserUsername(result === true ? true : false);
+					console.log("hasUserUsername:", hasUserUsername);
+					if (!hasUserUsername) {
+						console.log("User does not have username");
+						setIsUsernameOverlayOpen(true);
+					} else {
+						console.log("User has username");
+						setIsUsernameOverlayOpen(false);
+					}
+				} catch (err) {
+					console.error("Error checking username:", err);
+				} finally {
+					setIsCheckingUsername(false);
+				}
+			}
+		};
+	
+		checkUsername();
+	}, [user, hasUserUsername]);
+
 	const openUsernameOverlay = () =>
 	{
 		setIsUsernameOverlayOpen(true);
@@ -76,6 +127,8 @@ export default function Dashboard()
 	{
 		setIsUsernameOverlayOpen(false);
 	};
+
+	
 	const addNewFolder = (newFolder) =>
 	{
 		setFolders((prevFolders) => [...prevFolders, newFolder]);
@@ -146,7 +199,7 @@ export default function Dashboard()
 
 		try
 		{
-			const res = await axios.post(`http://localhost:8080/api/maps`, {
+			const res = await axios.post(`https://collabrain-backend.cybertech13.eu.org/api/maps`, {
 				name: "New Content Map",
 				data: ""
 			}, {
@@ -209,7 +262,7 @@ export default function Dashboard()
 		console.log(user);
 		if (user)
 		{
-			sock_cli = socket.init("http://localhost:8080");
+			sock_cli = socket.init("https://collabrain-backend.cybertech13.eu.org");
 			//    fetchTeams();
 			//    fetchTeams();
 
@@ -236,7 +289,7 @@ export default function Dashboard()
 					.then(token =>
 					{
 						console.log(token);
-						return axios.get("http://localhost:8080/api/dashboard/files", {
+						return axios.get("https://collabrain-backend.cybertech13.eu.org/api/dashboard/files", {
 							headers: {
 								Authorization: `Bearer ${token}`,
 							},
@@ -281,7 +334,7 @@ export default function Dashboard()
 	//         const token = await fb.getToken();
 	//         // console.log("Token: ", token);
 	//         const response = await axios.get(
-	//             "http://localhost:8080/api/profile/",
+	//             "https://collabrain-backend.cybertech13.eu.org/api/profile/",
 	//             {
 	//                 headers: {
 	//                     Authorization: `Bearer ${token}`,
@@ -293,7 +346,7 @@ export default function Dashboard()
 	//         const token = await fb.getToken();
 	//         // console.log("Token: ", token);
 	//         const response = await axios.get(
-	//             "http://localhost:8080/api/profile/",
+	//             "https://collabrain-backend.cybertech13.eu.org/api/profile/",
 	//             {
 	//                 headers: {
 	//                     Authorization: `Bearer ${token}`,
@@ -341,7 +394,7 @@ export default function Dashboard()
 	//             })
 	//             .then(token => {
 	//                 console.log(token);
-	//                 return axios.get("http://localhost:8080/api/maps", {
+	//                 return axios.get("https://collabrain-backend.cybertech13.eu.org/api/maps", {
 	//                     headers: {
 	//                         Authorization: `Bearer ${token}`,
 	//                     },
@@ -413,7 +466,7 @@ export default function Dashboard()
 				})
 					.then(token =>
 					{
-						return axios.get("http://localhost:8080/api/dashboard/folders", {
+						return axios.get("https://collabrain-backend.cybertech13.eu.org/api/dashboard/folders", {
 							headers: {
 								Authorization: `Bearer ${token}`,
 							},
@@ -455,7 +508,7 @@ export default function Dashboard()
 	};
 
 
-	if (!user)
+	if (!user || isCheckingUsername)
 	{
 
 		return (
@@ -494,7 +547,7 @@ export default function Dashboard()
 		const token = await getToken();
 
 		let res = await axios
-			.post("http://localhost:8080/api/doc/new", {
+			.post("https://collabrain-backend.cybertech13.eu.org/api/doc/new", {
 				token: token,
 			})
 			.catch((err) => console.log(err));
@@ -503,7 +556,7 @@ export default function Dashboard()
 		{
 			currentDoc = res.data.id;
 			res = await axios
-				.post(`http://localhost:8080/api/doc/${currentDoc}`, {
+				.post(`https://collabrain-backend.cybertech13.eu.org/api/doc/${currentDoc}`, {
 					token: token,
 					title: title,
 					content: content,
@@ -517,7 +570,7 @@ export default function Dashboard()
 		console.log(currentDoc);
 		const token = await getToken();
 		let res = await axios
-			.delete(`http://localhost:8080/api/doc/${currentDoc}`, {
+			.delete(`https://collabrain-backend.cybertech13.eu.org/api/doc/${currentDoc}`, {
 				data: {
 					token: token,
 				},
@@ -562,8 +615,9 @@ export default function Dashboard()
 					</p>
 
 					<div className="flex flex-wrap content-start items-start w-full justify-start ml-4 gap-8 ">
-						{isFoldersLoading ? (
-							<div className="loader mb-5">Loading...</div> // Adjust loader class as needed
+					<DashboardNewFolder onNewFolderCreated={addNewFolder} />
+					{isFoldersLoading ? (
+							<div className="loader mb-5"></div> // Adjust loader class as needed
 						) : folders.length > 0 ? (
 							folders.map((folder) => (
 								<DashboardFolder
@@ -577,7 +631,7 @@ export default function Dashboard()
 							))
 						) : null // Do not display any text if there are no folders
 						}
-						<DashboardNewFolder onNewFolderCreated={addNewFolder} />
+						
 					</div>
 				</div> : null}
 				<div>
@@ -585,14 +639,14 @@ export default function Dashboard()
 						Projects
 					</p>
 					<div
-						className="scrollbar-thin scrollbar-thumb-primary h-full  overflow-y-scroll pr-28"
+						className="scrollbar-thin scrollbar-thumb-primary h-full  overflow-y-scroll pr-1"
 						style={{ maxHeight: "500px" }}
 					>
-						<div className="flex flex-wrap gap-y-4 ml-4 justify-start">
+						<div className="flex flex-wrap gap-x-4 ml-4 justify-start">
 							{console.log("Content Maps:", contentMaps)}
 
 							{isProjectsLoading ? (
-								<div className="loader mb-5">Loading...</div>
+								<div className="loader mb-5"></div>
 							) : projects.length > 0 ? (
 								projects.map((project) => (
 									<DashboardProjectButton
@@ -618,7 +672,7 @@ export default function Dashboard()
 
 			{/* uncomment the below for username popup when the server can be used */}
 			{
-				isUsernameOverlayOpen && <UsernameOverlay isOpen={isUsernameOverlayOpen} onClose={closeUsernameOverlay} />
+				isUsernameOverlayOpen && !isCheckingUsername && <UsernameOverlay onClose={closeUsernameOverlay} hasUserUsername = {hasUserUsername} setHasUserUsername = {setHasUserUsername}/>
 			}
 			{isCreateFolderOverlayOpen && (
 				<CreateFolderOverlay

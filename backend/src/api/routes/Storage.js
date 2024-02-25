@@ -88,29 +88,20 @@ router.post("/media", async (req, res) =>
 
 router.get("/media/:mediaId", async (req, res) =>
 {
+	if(!req.headers.authorization || !req.headers.authorization.split(" ")[1])
+	{
+		return res.status(400).json({ code: "GM101", error: "Missing token or mediaID" });
+	}
 
-	const token = req.query.token;
 	const mediaId = req.params.mediaId;
 
-	// Check if the token exists
-	if (!token)
-	{
-		return res.status(400).json({ code: "GM101", error: "Missing token" });
-	}
-
+	
 	//Check if the token is valid
+	const token = req.headers.authorization.split(" ")[1];
 	const user = await verifyUser(token);
-	if (!user)
-	{
-		return res.status(403).json({ code: "GM102", error: "Invalid token" });
-	}
-
-	// Check if the mediaID exists
-	if (!mediaId)
-	{
-		return res.status(400).json({ code: "GM103", error: "Missing mediaID" });
-	}
-
+	if (!user) return res.status(403).json({ code: "GM102", error: "Invalid token" });
+	
+	
 	//ensure mediaid is having the minimum required length
 	if (mediaId.length < 15)
 	{
@@ -126,8 +117,9 @@ router.get("/media/:mediaId", async (req, res) =>
 		return res.status(404).json({ code: "GM105", message: "Data not found" });
 	}
 
-	if (response.opcMeta["opc-meta-userid"] !== user.uid)
+	if (response.opcMeta["opc-meta-userid"] !== user.uid && response.opcMeta["opc-meta-user"] !== user.uid)
 	{
+
 		return res.status(403).json({ code: "GM104", message: "Validation Failed", data: response.data });
 	}
 

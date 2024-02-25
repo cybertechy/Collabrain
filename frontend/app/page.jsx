@@ -71,7 +71,7 @@ export default function Home() {
                     className="w-28"
                     src=".//assets/images/logo_whitebackground.png"
                 />
-                <div className="bg-primary drop-shadow-lg flex flex-col justify-center items-center px-16 py-10 rounded-2xl">
+                <div className="bg-primary drop-shadow-lg flex flex-col justify-center items-center px-4 py-4 xxs:px-16 xxs:py-10 rounded-2xl">
                     <h1 className="text-2xl text-basicallylight font-poppins mb-2">
                         Log into Collabrain
                     </h1>
@@ -89,7 +89,7 @@ export default function Home() {
                         <PasswordInput password={password} setPassword={setpassword} color="primary" />
                      
                         <br />
-                        <p className="text-xs text-basicallylight font-poppins text-left ml-2">
+                        <p className="text-xs text-basicallylight font-poppins text-left ml-2 ">
                             <a href="">Forgot your password?</a>
                         </p>
                         <Button

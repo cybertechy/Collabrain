@@ -44,7 +44,7 @@ async function emailSignUp(e)
 	createUserWithEmailAndPassword(auth, email.value, password.value)
 		.then(result =>
 		{
-			axios.post("http://localhost:8080/api/users", {
+			axios.post("https://collabrainbackend1-latest.onrender.com/api/users", {
 				email: email.value,
 				fname: firstname.value,
 				lname: lastname.value,
@@ -88,7 +88,7 @@ async function serviceSignIn(service)
 	// Add user to database if new user
 	if (userInfo.isNewUser)
 	{
-		axios.post("http://localhost:8080/api/users", {
+		axios.post("https://collabrainbackend1-latest.onrender.com/api/users", {
 			uid: result.user.uid,
 			email: result.user.email,
 			fname: userInfo.profile.given_name,

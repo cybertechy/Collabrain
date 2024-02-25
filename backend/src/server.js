@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const http = require('http');
 const treblle = require('@treblle/express');
 
+
 // Routes
 const chatRoute = require("./api/routes/Chat");
 const teamsRoute = require("./api/routes/Teams");
@@ -15,9 +16,12 @@ const mapRoute = require("./api/routes/ContentMap");
 const reportReport = require("./api/routes/Report");
 const notificationsRoute = require("./api/routes/Notifications");
 const docRoute = require("./api/routes/Doc");
+const storageRoute = require("./api/routes/Storage");
 
 // Helpers
 const sockServer = require("./api/helpers/socket");
+
+// Config
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -31,6 +35,34 @@ app.use(
 	})
 );
 
+// Set headers 
+app.use(function(req, res, next) {
+
+	// allow requests from any origin
+	res.setHeader('Access-Control-Allow-Origin', '*');
+	res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+	res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+	res.setHeader('Access-Control-Allow-Credentials', true);
+
+	// x-rate-limit
+	res.setHeader('X-RateLimit-Limit', 25);
+	res.setHeader('X-RateLimit-Reset', 1000);
+
+	//CSP
+	res.setHeader("Content-Security-Policy", "default-src 'self'");
+	res.setHeader("X-Content-Security-Policy", "default-src 'self'");
+	res.setHeader("X-WebKit-CSP", "default-src 'self'");
+
+	// Content type
+	res.setHeader('Content-Type', 'application/json');
+
+	// // Cache the data
+	// res.setHeader('Cache-Control', 'public, max-age=31557600');
+
+	
+	next();
+});
+
 sockServer.init(server);
 
 app.use(bodyParser.json({ limit: '50mb' }));
@@ -43,6 +75,9 @@ app.use("/api/maps", mapRoute);
 app.use("/api/reports", reportReport);
 app.use("/api/notifications", notificationsRoute);
 app.use("/api/docs", docRoute); 
+app.use("/api/storage", storageRoute);
+
+
 
 app.get("/api/home", (req, res) =>
 {

@@ -92,9 +92,9 @@ router.post("/", async (req, res) =>
 				{
 					ref.collection("messages").add({
 						message: "Welcome to General!",
-						sender: "System",
-						timestamp: new Date().getSeconds(),
-						sentAt: fb.admin.firestore.FieldValue.serverTimestamp()
+						username: "System",
+						timestamp: fb.admin.firestore.FieldValue.serverTimestamp(),
+						sentAt: fb.admin.firestore.FieldValue.serverTimestamp(),
 					});
 				});
 
@@ -117,6 +117,8 @@ router.get("/:team", async (req, res) => {
     let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
     if (!user)
         return res.status(401).json({ error: "Unauthorized" });
+
+	res.setHeader('Cache-Control', 's-max-age=1, stale-while-revalidate')
 
     // Get team data
     let teamData = {};
@@ -186,16 +188,42 @@ router.delete("/:team", async (req, res) =>
 
 	// Check if user is a administator of the team
 	let doc = await fb.db.doc(`teams/${req.params.team}`).get();
+	if(!doc.exists) return res.status(404).json({ error: "Team not found" });
 	if (doc.data().members[user.uid].role != "admin")
 		return res.status(401).json({ error: "Unauthorized" });
 
-	// Delete subcollection of channels
-	fb.deleteCollection(`teams/${req.params.team}/channels`);
+	let teamData = doc.data();
 
+	// remove the team reference from all the users
+	Object.keys(teamData.members).forEach(member => {
+		fb.db.doc(`users/${member}`).update({
+			teams: fb.admin.firestore.FieldValue.arrayRemove(req.params.team)
+		});
+	});
+
+	// delete all collections and subcollections
+	// get all the channels
+	let channels = await fb.db.collection(`teams/${req.params.team}/channels`).get();
+
+
+	// delete all channels
+    let channelRef = await fb.db.collection(`teams/${req.params.team}/channels`).get()
+	channelRef.forEach(async doc => {
+		// delete all messages
+		let messages = await fb.db.collection(`teams/${req.params.team}/channels/${doc.id}/messages`).get();
+		messages.forEach(async message => {
+			fb.db.doc(`teams/${req.params.team}/channels/${doc.id}/messages/${message.id}`).delete();
+		});
+		// delete the channel
+		await fb.db.doc(`teams/${req.params.team}/channels/${doc.id}`).delete();
+	})
+	
 	// Delete team
-	fb.db.doc(`teams/${req.params.team}`).delete()
+	await fb.db.doc(`teams/${req.params.team}`).delete()
 		.then(() => { return res.status(200).json({ message: "Team deleted" }); })
 		.catch(err => { return res.status(500).json({ error: err }); });
+
+	
 });
 
 /* Endpoint for user's teams */
@@ -209,6 +237,9 @@ router.get("/", async (req, res) =>
 	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
 	if (!user)
 		return res.status(401).json({ error: "Unauthorized" });
+
+	res.setHeader('Content-Type', 'application/json');
+	res.setHeader('Cache-Control', 's-max-age=1, stale-while-revalidate');
 
 	// Get user's teams
 	fb.db.doc(`users/${user.uid}`).get()

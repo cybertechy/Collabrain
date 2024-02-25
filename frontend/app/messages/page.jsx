@@ -8,7 +8,8 @@ import { Timestamp } from "firebase/firestore";
 import Sidebar from "../../components/ui/template/sidebar/sidebar";
 import DMSideBar from "./DMsidebar";
 import MessageItem from "../chat/messageItem";
-const { useRouter } = require('next/navigation');
+const { useRouter, useSearchParams } = require('next/navigation');
+
 const axios = require("axios");
 const fb = require("_firebase/firebase");
 const socket = require("_socket/socket");
@@ -22,23 +23,40 @@ export default function Messages() {
     const router = useRouter();
     const [user, loading] = fb.useAuthState();
     const [channelsData, setChannelsData] = useState([]);
-    const [showChat, setShowChat] = useState(false);
+
     const [userInfo, setUserInfo] = useState(null);
     const [text, setText] = useState([]);
-    const sockCli = useRef(null);
+    const [directMessages, setDirectMessages] = useState([]);
+    const params = useSearchParams();
+    const [withUserInfo, setWithUserInfo] = useState(null);
+    const [showChat, setShowChat] = useState(false);
+
+    const withUser = params.get('user');
+    const chatId = params.get('chatID');
+
+    let sockCli = useRef(null);
+
+
     useEffect(() => {
         if (!user) return;
 
-        sockCli.current = socket.init('http://localhost:8080');
-        sockCli.current.on('teamMsg', (data) => {
-            console.log("Received message from server");
+        sockCli.current = socket.init('https://collabrain-backend.cybertech13.eu.org') || {};
+        console.log('Socket initialized', sockCli);
+        sockCli.current.on('directMsg', (data) => {
+            let sentAt = new Date(data.sentAt._seconds * 1000 + data.sentAt._nanoseconds / 1000000);
             setText((prevText) => [
                 ...prevText,
-                <h1 key={prevText.length} className="text-basicallydark">{`${data.sender}: ${data.msg}`}</h1>,
+                <MessageItem
+                    key={prevText.length}
+                    sender={data.sender}
+                    message={data.msg}
+                    timestamp={sentAt.toDateString() + " " + sentAt.toLocaleTimeString()}
+                    reactions={{}}
+                />,
             ]);
         });
 
-        return () => sockCli.current.off('teamMsg');
+        return () => sockCli.current.off('directMsg');
     }, [user]);
 
     useEffect(() => {
@@ -47,7 +65,7 @@ export default function Messages() {
         const fetchUser = async () => {
             try {
                 const token = await fb.getToken();
-                const response = await axios.get(`http://localhost:8080/api/users/${user.uid}`, {
+                const response = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/users/${user.uid}`, {
                     headers: { "Authorization": "Bearer " + token }
                 });
                 setUserInfo({ data: response.data });
@@ -59,122 +77,185 @@ export default function Messages() {
 
         fetchUser();
     }, [user]);
+
+    useEffect(() => {
+        if (!user || !withUser) return;
+
+        const fetchUser = async () => {
+            try {
+                const token = await fb.getToken();
+                const response = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/users/${withUser}`, {
+                    headers: { "Authorization": "Bearer " + token }
+                });
+                setWithUserInfo({ data: response.data });
+
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+                setWithUserInfo({ data: { username: "User" } });
+            }
+        };
+
+        fetchUser();
+    }, [user, withUser]);
+    useEffect(() => {
+        if (!user || !chatId || !userInfo) return;
+
+        const fetchMessages = async () => {
+            try {
+                const token = await fb.getToken();
+                const response = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/chats/${chatId}/messages`, {
+                    headers: { "Authorization": "Bearer " + token }
+                });
+                console.log("Fetched messages:", response.data);
+                const fetchedMessages = response.data.map((messageData, i) => {
+                    let sentAt = new Date(messageData.sentAt._seconds * 1000 +  messageData.sentAt._nanoseconds / 1000000);
+                    return <MessageItem
+                        key={i}
+                        sender={messageData.sender}
+                        timestamp={sentAt.toLocaleDateString()+ " " + sentAt.toLocaleTimeString()}
+                        message={messageData.message}
+                        reactions={messageData.reactions || {}}
+                        userData={userInfo.data}
+                    />
+                    });
+                setText(fetchedMessages);
+            } catch (error) {
+                console.error('Error fetching messages:', error);
+            }
+        };
+
+        // Initial fetch
+        fetchMessages();
+
+        // Set up an interval for refetching messages every 5 seconds
+        // const intervalId = setInterval(fetchMessages, 5000);
+
+        // Clear the interval when the component unmounts or when user or chatId changes
+        //return () => clearInterval(intervalId);
+    }, [user, chatId, userInfo]);
+
+
+
     useEffect(() => {
         if (!user) return;
 
-        fb.getToken().then((token) => {
-            axios.get(`http://localhost:8080/api/team/LoH1iHOGowBzcYDXEqnu/channel/General/messages`, {
-                headers: { "Authorization": "Bearer " + token }
-            }).then((res) => {
-                console.log(res.data);
-                let data = res.data;
-                let msgs = data.map((messageData, i) => (
-                    <MessageItem
-                        key={i}
-                        sender={messageData.sender}
-                        timestamp={fb.fromFbTimestamp(new Timestamp(messageData.sentAt.seconds, messageData.sentAt.nanoseconds)).toLocaleTimeString()}
-                        message={messageData.message}
-                        reactions={{}}
-						userData = {userInfo.data}
-                    />
-                ));
-                setText(msgs);
-            }).catch((err) => console.log(err));
+        // Fetch direct messages using the new function
+        fetchDirectMessages().then((directMessages) => {
+            // Update the state with the fetched direct messages
+            setDirectMessages(directMessages);
         });
     }, [user]);
-	
 
-	const sendPersonalMsg = async (msg) =>
-	{
-		if (!sockCli.current)
-		{
-			console.log('Socket is not initialized yet.');
-			return;
-		}
+    const fetchDirectMessages = async () => {
+        try {
+            const token = await fb.getToken();
+            const response = await axios.get("https://collabrain-backend.cybertech13.eu.org/api/chats/", {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
 
-		let token = await fb.getToken();
-		let userData = await axios.get(`http://localhost:8080/api/users/${user.uid}`,
-			{ headers: { "Authorization": "Bearer " + token } });
-			
-		
-			let sentAt = new Date();
-			const messageData = {
-				senderID: fb.getUserID(),
-				sender: userInfo.data.username,
-			  team: "LoH1iHOGowBzcYDXEqnu",
-			  channel: "General",
-			  msg: msg,
-			  sentAt: fb.toFbTimestamp(sentAt),
-			};
+            // Assuming the response data contains the list of direct messages
+            console.log("Direct messages:", response.data);
+            return response.data;
+        } catch (error) {
+            console.error("Error fetching direct messages:", error);
+            return [];
+        }
+    };
 
-		// Add the message to the real-time socket chat
-		setText((prevText) => [
-			...prevText,
-			<MessageItem 
-			  key={prevText.length} 
-			  sender={messageData.sender}
-			  timestamp={sentAt.toLocaleTimeString()} 
-			  message={messageData.msg} 
-			  reactions={{}} // Add reactions if you have them
-			  userData = {userInfo.data}
-			/>,
-		  ]);
+    const sendPersonalMsg = async (msg) => {
+        if (!sockCli.current) {
+            console.log('Socket is not initialized yet.');
+            return;
+        }
 
-		sockCli.current.emit('teamMsg', messageData); // Send the message to the server
-	};
-	if (loading|| !user )
-    return (
-        <div className="flex flex-col items-center justify-around min-h-screen">
-            <div className="flex flex-col items-center justify-center min-h-screen">
-                <h1 className="text-xl font-bold mb-5 text-primary">Trying to sign in</h1>
-                <div className="loader mb-5"></div>
+        // Assuming you've authenticated and have the user's token
+        let token = await fb.getToken();
+        let userData = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/users/${user.uid}`, {
+            headers: { "Authorization": "Bearer " + token }
+        });
 
-                <p className="text-lg font-bold text-primary mb-5 ">
-                    If you're not signed in, sign in&nbsp;
-                    <span className="underline cursor-pointer" onClick={() => router.push("/")}>
-                        here
-                    </span>
-                </p>
+
+
+
+        let sentAt = new Date();
+        const messageData = {
+            senderID: user.uid, // Ensure this is the correct Firebase user ID
+            sender: userInfo.data.username,
+            chat: chatId, // The chat ID for the direct message
+            msg: msg,
+            sentAt: sentAt, // Convert the date to a Firebase timestamp if necessary
+            reactions: [] // Starting with an empty array for reactions
+        };
+
+        // Add the message to the real-time socket chat
+        setText((prevText) => [
+            ...prevText,
+            <MessageItem
+                key={prevText.length}
+                sender={messageData.sender}
+                timestamp={sentAt.toDateString() + " " + sentAt.toLocaleTimeString()}
+                message={messageData.msg}
+                reactions={{}} // This is where you'd add reactions if you have them
+                userData={userInfo.data}
+            />,
+        ]);
+
+        sockCli.current.emit('directMsg', messageData); // Send the direct message to the server
+    };
+
+    if (loading || !user)
+        return (
+            <div className="flex flex-col items-center justify-around min-h-screen">
+                <div className="flex flex-col items-center justify-center min-h-screen">
+                    <h1 className="text-xl font-bold mb-5 text-primary">Trying to sign in</h1>
+                    <div className="loader mb-5"></div>
+
+                    <p className="text-lg font-bold text-primary mb-5 ">
+                        If you're not signed in, sign in&nbsp;
+                        <span className="underline cursor-pointer" onClick={() => router.push("/")}>
+                            here
+                        </span>
+                    </p>
+                </div>
             </div>
-        </div>
-    );
+        );
 
 
-    const directMessages = [
-        {
-          name: 'Jane Doe',
-          message: 'Hey, how are you?',
-          avatar: 'https://i.pravatar.cc/300?img=1', // This is a placeholder avatar URL
-        },
-        {
-          name: 'John Smith',
-          message: 'Sent a photo',
-          avatar: 'https://i.pravatar.cc/300?img=2',
-        },
-        {
-          name: 'Alice Johnson',
-          message: 'Can we meet tomorrow?',
-          avatar: 'https://i.pravatar.cc/300?img=3',
-        },
-      ];
-    
-      // Handler for the friends button
-      const handleFriendsClick = () => {
+
+
+    // Handler for the friends button
+    const openFriends = () => {
         // Toggles the display between ChatWindow and FriendsWindow
-        setShowChat((prevShowChat) => !prevShowChat);
-      };
-    
-	return (
+        setShowChat(false);
+    };
+    const openChat = (id) => {
+        router.push("/messages?user=" + id);
+
+    }
+
+    return (
         <Template>
             <div className="flex flex-row flex-grow">
-                <DMSideBar userData={userInfo} friendsHandler={handleFriendsClick} directMessages={directMessages} />
-                {showChat ? (
-                    <ChatWindow messages={text} sendPersonalMsg={sendPersonalMsg} userInfo={userInfo} title="General" />
+                <DMSideBar
+                    userData={userInfo}
+                    friendsHandler={() => setShowChat(false)}
+                    directMessages={directMessages}
+                    chatHandler={(id, user) => { router.push(`/messages?chatID=${id}&user=${user}`) }}
+                />
+                {withUser ? (
+                    <ChatWindow
+                        messages={text}
+                        sendPersonalMsg={sendPersonalMsg}
+                        userInfo={userInfo}
+                        withUserInfo={withUserInfo}
+
+                    />
                 ) : (
                     <FriendsWindow />
                 )}
-                {/* <ChatWindow messages={text} sendPersonalMsg={sendPersonalMsg} userInfo={userInfo} /> */}
             </div>
         </Template>
-	);
+    );
 }

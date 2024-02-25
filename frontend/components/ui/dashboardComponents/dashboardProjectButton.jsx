@@ -55,7 +55,7 @@ const DashboardProjectButton = ({ title, project, type, color = "#FFFFFF", onCli
     };
     async function renameContentMap(contentMapId, newName) {
         let token = await fb.getToken();
-        await axios.put("http://localhost:8080/api/maps/" + contentMapId, {
+        await axios.put("https://collabrain-backend.cybertech13.eu.org/api/maps/" + contentMapId, {
             name: newName
         }, {
             headers: {
@@ -73,7 +73,7 @@ const DashboardProjectButton = ({ title, project, type, color = "#FFFFFF", onCli
     }
     async function deleteContentMap(contentMapId) {
         let token = await fb.getToken();
-       await axios.delete("http://localhost:8080/api/maps/" + contentMapId, {
+       await axios.delete("https://collabrain-backend.cybertech13.eu.org/api/maps/" + contentMapId, {
             headers: {
                 "Authorization": `Bearer ${token}` // Replace <UserToken> with actual token
             }
@@ -119,7 +119,7 @@ const DashboardProjectButton = ({ title, project, type, color = "#FFFFFF", onCli
             leaveDelay={200}
           
         >
-            <>   <div className="flex flex-col items-center justify-center bg-aliceBlue text-primary rounded-md hover:bg-columbiablue duration-300 w-32 h-28 pt-3 pl-1"
+            <>   <div className="flex flex-col items-center justify-center bg-aliceBlue text-primary rounded-md hover:bg-columbiablue duration-300 w-32 h-28 pt-3 pl-1 mb-3"
             draggable="true"
             onDragStart={(e) => handleDragStart(e, project.id, type)}>
             <div className="flex flex-col items-center justify-center h-full">
@@ -193,7 +193,7 @@ const DashboardProjectButton = ({ title, project, type, color = "#FFFFFF", onCli
         </Button>
     </DialogActions>
 </Dialog>
-);</>
+</>
      
         </Tooltip>
     );
