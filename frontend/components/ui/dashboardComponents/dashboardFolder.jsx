@@ -12,7 +12,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import fb from '../../../app/_firebase/firebase';
 import axios from 'axios';
 import {useRouter} from 'next/navigation';
-const DashboardFolder = ({ id, title, folder,  onFolderDeleted}) => {
+
+const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, handleProjectDeleted}) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
    const router = useRouter();
@@ -25,7 +26,9 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted}) => {
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
     };
+    
 
+   
     const handleClose = () => {
         setAnchorEl(null);
     };
@@ -64,7 +67,7 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted}) => {
                 }
             );
             if (response.status === 200) {
-                onFolderUpdated(response.data.folder);
+                onFolderDeleted(response.data.folder);
                 setNewFolderName(''); // Clear the new folder name input
                 setRenameOverlayOpen(false); // Close the overlay
             } else {
@@ -110,7 +113,7 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted}) => {
         
     };
     const moveFileToFolder = async (projectId, folderPath, type) => {
-        console.log(projectId, folderPath, type);
+       
         try {
           const token = await fb.getToken(); // Assuming you have a function to get the user's token
           const response = await axios.patch(
@@ -128,8 +131,9 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted}) => {
           );
           if (response.status === 200) {
             // File moved successfully, you can update your UI here if needed
-            onFolderDeleted(response.data.folder);
+            handleProjectDeleted(projectId);
             console.log('File moved successfully');
+            projectUpdate();
           } else {
             // Handle the case where the request was not successful
             console.error('Failed to move file');
@@ -152,7 +156,7 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted}) => {
         e.preventDefault();
         const projectId = e.dataTransfer.getData("projectId");
         const type = e.dataTransfer.getData("type") === "Content Map" ? "contentMap": "documents";
-      
+        console.log("projectId", e.dataTransfer);
 
         moveFileToFolder(projectId, folderPath, type);
         // Now you have the projectId and folderId, you can handle the move action.
@@ -167,7 +171,7 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted}) => {
         color: "#FFFFFF",  // Text color
         backgroundColor: "#30475E",  // Button background color
     };
-    console.log(folder)
+   
     return (
         <Tooltip title={title} enterDelay={1000} leaveDelay={200}>
             <>
