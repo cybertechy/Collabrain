@@ -339,7 +339,10 @@ export default function Dashboard() {
                         </p>
 
                         <div className="flex flex-wrap content-start items-start w-full justify-start ml-4 gap-8 ">
-                            {
+						<DashboardNewFolder
+                                onNewFolderCreated={addNewFolder}
+                            />
+						    {
                                 isFoldersLoading ? (
 									<Lottie animationData={smallLoader} play="true" loop="true" 
 									style={{ width: 100, height: 100 }} />
@@ -359,9 +362,7 @@ export default function Dashboard() {
                                     ))
                                 ) : null // Do not display any text if there are no folders
                             }
-                            <DashboardNewFolder
-                                onNewFolderCreated={addNewFolder}
-                            />
+                           
                         </div>
                     </div>
                

@@ -154,7 +154,7 @@ const DashboardProjectButton = ({
     };
     return (
         <Tooltip title={title} enterDelay={1000} leaveDelay={200}>
-            <>
+            <div>
                 {" "}
                 <div
                     className="flex flex-col items-center justify-center bg-aliceBlue text-primary rounded-md hover:bg-columbiablue duration-300 w-32 h-28 pt-3 pl-1"
@@ -280,7 +280,7 @@ const DashboardProjectButton = ({
                         </Button>
                     </DialogActions>
                 </Dialog>
-            </>
+            </div>
         </Tooltip>
     );
 };
