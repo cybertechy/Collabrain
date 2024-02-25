@@ -508,6 +508,8 @@ function page() {
         }
     }
 
+    const setpublic= (data) => setIntialData({ ...IntialData, public: data });
+
     if (!user) return <div className="flex flex-col justify-center items-center text-basicallydark">
         <h1>You're not signed in</h1>
     </div>

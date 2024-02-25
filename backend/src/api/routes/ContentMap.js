@@ -118,7 +118,58 @@ router.get("/:id", async (req, res) => {
     const contentMapData = contentMap.data();
 
     //check if user has access to the content map
-    if (!contentMapData.Access[user.uid]) return res.status(403).json({ code: "AM109", error: "User does not have access to the content map" });
+    let Access = null;
+    let userAccess = null;
+    if (!contentMapData.Access[user.uid])  {
+
+        // check if the user exists in the team members list
+        for (const [key, value] of Object.entries(contentMapData.Access)) {
+            if(value.type !== "teams") continue;
+            if (value.members.includes(user.uid)) {
+                Access = "team";
+                userAccess = value.role;
+                break;
+            }
+        }
+    } else {
+        Access = "user";
+        userAccess = contentMapData.Access[user.uid].role;
+    }
+
+    if (!Access) return res.status(403).json({ code: "AM109", error: "Access Denied" });
+
+   
+    
+
+
+    // get the data from oracle cloud
+    const getData = await oci.getData("B3", contentMapData.data);
+
+    // Add Here: console.log(getData)
+
+    if (!getData) return res.status(500).json({ code: 500, error: "Getting data failed" });
+
+    contentMapData.data = await oci.generateStringFromStream(getData.value);
+
+    contentMapData.createdAt = contentMapData.createdAt.toDate();
+    contentMapData.updatedAt = contentMapData.updatedAt.toDate();
+
+    return res.status(200).json({ ...contentMapData, userAccess: userAccess});
+});
+
+/* Get a content map of a user , Public Access  */
+router.get("/public/:id", async (req, res) => {
+    const id = req.params.id;
+
+   
+    const db = fb.admin.firestore();
+    const contentMap = await db.collection("contentMaps").doc(id).get();
+    if (!contentMap.exists) return res.status(404).json({ code: "AM108", error: "Content map not found" });
+
+    const contentMapData = contentMap.data();
+
+    //check if Public Access is enabled
+    if (!contentMapData.Access["public"]) return res.status(403).json({ code: "AM109", error: "Access Denied" });
 
     // get the data from oracle cloud
     const getData = await oci.getData("B3", contentMapData.data);
@@ -130,7 +181,7 @@ router.get("/:id", async (req, res) => {
     contentMapData.createdAt = contentMapData.createdAt.toDate();
     contentMapData.updatedAt = contentMapData.updatedAt.toDate();
 
-    return res.status(200).json({ ...contentMapData, userAccess: contentMapData.Access[user.uid]?.role });
+    return res.status(200).json({ ...contentMapData, userAccess: "view" });
 });
 
 /* Update a content map of a user */
@@ -154,11 +205,27 @@ router.put("/:id", async (req, res) => {
 
 
     let contentMapData = contentMap.data();
-    if (!contentMapData.Access[user.uid]) {
-        return res.status(403).json({ code: 403, error: "User does not have access to the content map" });
+    //check if user has access to the content map
+    let Access = null;
+    let userRole = null;
+    if (!contentMapData.Access[user.uid])  {
+
+        // check if the user exists in the team members list
+        for (const [key, value] of Object.entries(contentMapData.Access)) {
+            if(value.type !== "teams") continue;
+            if (value.members.includes(user.uid)) {
+                Access = "team";
+                userRole = value.role;
+                break;
+            }
+        }
+    } else {
+        Access = "user";
+        userRole = contentMapData.Access[user.uid].role;
     }
 
-    let userRole = contentMapData.Access[user.uid].role;
+    if (!Access) return res.status(403).json({ code: "AM109", error: "Access Denied" });
+
     let updatedContentMap = { ...contentMapData };
 
     if (userRole === "read") return res.status(403).json({ code: 403, error: "User does not have access to the operation" });
@@ -185,8 +252,8 @@ router.put("/:id", async (req, res) => {
     
         if (req.body.path) updatedContentMap.path = req.body.path;
 
-        // TODO: Revoke access Incomplete
-        if (req.body.access && req.body.user || req.body.revokeAccess) {
+        // Revoke/grant access
+        if (req.body.access && req.body.user && (req.body.revokeAccess===true || req.body.revokeAccess===false)) {
             updatedContentMap.Access = req.body.access;
 
             if(req.body.revokeAccess) {
@@ -198,6 +265,39 @@ router.put("/:id", async (req, res) => {
                     AccessContentMaps: fb.admin.firestore.FieldValue.arrayUnion(req.params.id)
                 });
             }
+        }
+
+        if( req.body.access  &&req.body.team && (req.body.revokeAccess===true || req.body.revokeAccess===false)) {
+            // Get the members of the team
+            let team = await fb.db.collection("teams").doc(req.body.team).get();
+            let members = Object.keys(team.data().members);
+
+            // Grant access to the team members
+            if(req.body.revokeAccess) {
+                fb.db.collection("teams").doc(req.body.team).update({
+                    teamDocAccess: fb.admin.firestore.FieldValue.arrayRemove({
+                        contentMapId: req.params.id,
+                        contentMapName: contentMapData.name,
+                        type: "contentMap"
+                    })
+                });
+            } else {
+                fb.db.collection("teams").doc(req.body.team).update({
+                    teamDocAccess: fb.admin.firestore.FieldValue.arrayUnion({
+                        contentMapId: req.params.id,
+                        contentMapName: contentMapData.name,
+                        type: "contentMap"
+                    })
+                });
+                req.body.access[req.body.team].members = members;
+            }
+
+            updatedContentMap.Access = req.body.access;
+        }
+
+        // Set public access
+        if(req.body.public){
+            updatedContentMap.public = req.body.public;
         }
     }
 
@@ -294,7 +394,6 @@ router.delete("/:id", async (req, res) => {
 
 
 /* A search API that returns similar matching users or teams */
-
 router.get("/ut/search", async (req, res) => {
 
     const auth = req.headers.authorization;

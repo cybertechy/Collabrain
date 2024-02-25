@@ -7,6 +7,8 @@ admin.initializeApp({
 	databaseURL: "https://collabrain-group-project-default-rtdb.asia-southeast1.firebasedatabase.app"
 });
 
+const db = admin.firestore();
+
 async function verifyUser(token)
 {
 	return admin.auth().verifyIdToken(token).catch((error) => { return null; });
@@ -25,7 +27,6 @@ async function getUser(uid){
 	return admin.auth().getUser(uid).catch((error) => { console.log("Error getting user:", error); });
 }
 
-const db = admin.firestore();
 
 // Functions to manipulate docs in Firestore
 async function createDoc(user)
@@ -117,6 +118,7 @@ async function deleteQueryBatch(query, resolve)
 	});
 }
 
+// Untested after modification
 // Untested after modification
 async function saveTeamMsg(data)
 {
