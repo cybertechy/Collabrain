@@ -25,6 +25,11 @@ router.post("/", async (req, res) =>
 	if(!members) return res.status(400).json({ error: "Missing required data" });
 	if (members?.length < 2) return res.status(400).json({ error: "Not enough members" });
 
+	//Check if chat already exists
+	let chatRef = await fb.db.collection("chats").where("members", "==", members).get();
+	console.log(chatRef.empty);
+	if (!chatRef.empty) return res.status(400).json({ error: "Chat already exists" });
+
 	let ref = await fb.db.collection("chats").add({
 		members,
 	});
@@ -72,7 +77,7 @@ router.get("/", async (req, res) => {
 	
         // get chat members info
         let members = [];
-        Promise.all(chatRef.data().members.map(async member => {
+        await Promise.all(chatRef.data().members.map(async member => {
 			if(member === user.uid) return; // Skip the user themselves
             let memberRef = await fb.db.doc(`users/${member}`).get();
             // Prepend the user themselves to the members list if it's their ID

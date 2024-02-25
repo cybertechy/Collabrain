@@ -47,7 +47,7 @@ function page() {
     const [Delete, setDelete] = useState(false);
     const [Share, setShare] = useState(false);
 
-    const Serverlocation = "https://collabrain-backend.cybertech13.eu.org";
+    const Serverlocation = "http://localhost:8080";
 
 
 
@@ -159,7 +159,8 @@ function page() {
         let appState = ExcalidrawAPI.getAppState();
         // find the index (if exists) of the user in the collaborators array
 
-        let index = appState.collaborators.findIndex((collaborator) => collaborator.id === user.uid);
+        let index = appState?.collaborators?.findIndex((collaborator) => collaborator.id === user.uid);
+        if(index === null) index = -1;
         if (index === -1) index = appState.collaborators.length;
         let mstate = appState.collaborators[index];
         mstate = {

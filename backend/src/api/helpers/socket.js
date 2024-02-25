@@ -15,20 +15,21 @@ function init(server) {
 
 	io = new Server(server, { cors: { origin: "*" } });
 
-	const pubClient = createClient({
-		socket: {
-			host: 'redis-15906.c301.ap-south-1-1.ec2.cloud.redislabs.com',
-			port: 15906
-		},
-		username: "socket",
-		password: "P3(.2=7M$+oa",
-	});
-	const subClient = pubClient.duplicate();
+	try {
+		const pubClient = createClient({
+			url: "rediss://red-cndgdnf109ks738rsaf0:EyChYWWMVnUrrqGRfWA2OOgIAJFBPslf@singapore-redis.render.com:6379"
+		});
+		const subClient = pubClient.duplicate();
 
-	Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
-		console.log("Connected to redis");
-		io.adapter(createAdapter(pubClient, subClient));
-	});
+		Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
+			console.log("Connected to redis");
+			io.adapter(createAdapter(pubClient, subClient));
+		}).catch((error) => {
+			console.log("Error connecting to redis: ", error);
+		});
+	} catch (error) {
+		console.log("Error connecting to redis: ", error);
+	}
 
 
 	// Sync up with the database
