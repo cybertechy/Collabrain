@@ -1,95 +1,29 @@
-# Disabled the workflow
-# name: Build and Push Docker Image
+name: Frontend Build Test
 
-# on:
-#   push:
-#     branches:
-#       - workflow-frontend
-#       - main
+on:
+  push:
+    branches:
+      - main
+      - cm-collab
+  pull_request:
+    branches:
+      - main
 
-# jobs:
-#   build-and-push:
-#     runs-on: ubuntu-latest
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-#     env:
-#       DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-#       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-#       OCI_PEM: ${{ secrets.OCI_PEM }}
-#       OCI_CONFIG: ${{ secrets.OCI_CONFIG }}
-#       WEBSITE_URL: "https://collabrain.cybertech13.eu.org/"
-#       WAIT_TIMEOUT_SECONDS: 300
-      
-#     steps:
-#     - name: Checkout code
-#       uses: actions/checkout@v2
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-#     - name: Use Node.js 18
-#       uses: actions/setup-node@v2
-#       with:
-#         node-version: '18'
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
 
-#     - name: Set up QEMU
-#       uses: docker/setup-qemu-action@v2
+      - name: Install dependencies
+        run: yarn install
 
-#     - name: Set up Docker Buildx
-#       uses: docker/setup-buildx-action@v1
-
-#     - name: Update Timestamp in Deployment File
-#       run: |
-#        TIMESTAMP=$(date +'%Y%m%d-%H%M%S')
-#        sed -i "s/timestamp: .*/timestamp: \"$TIMESTAMP\"/" ./frontend/.kube/deployment.yaml
-
-#     - name: Build and push Docker image
-#       env:
-#         DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-#         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-#       run: |
-#         echo -n "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-
-#         # Buildx command to build for multiple platforms
-#         docker buildx create --use
-#         docker buildx inspect --bootstrap
-
-#         docker buildx build \
-#           --platform linux/amd64,linux/arm64 \
-#           --push \
-#           -t siddh13/collabrainfrontend:latest \
-#           -f ./frontend/dockerfile ./frontend
-          
-#     - name: Set up kubectl
-#       uses: azure/k8s-set-context@v1
-#       with:
-#         method: kubeconfig
-#         kubeconfig: ${{ secrets.KUBE_CONFIG }}
-#         version: 'v1.21.0'
-
-#     - name: Delete existing deployment
-#       run: |
-#         kubectl delete deployment collabrain-frontend-deployment -n collabrain
-
-#     - name: Deploy to Kubernetes
-#       run: |
-#         kubectl apply -f ./frontend/.kube/deployment.yaml
-    
-#     - name: Wait for Deployment to be Ready
-#       run: |
-#         timeout=$((SECONDS+WAIT_TIMEOUT_SECONDS))
-#         while [ $SECONDS -lt $timeout ]; do
-#           if kubectl rollout status deployment collabrain-frontend-deployment -n collabrain; then
-#             echo "Deployment is ready."
-#             break
-#           else
-#             echo "Waiting for deployment to be ready..."
-#             sleep 10
-#           fi
-#         done
-
-#     - name: Verify deployment
-#       run: |
-#         HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" $WEBSITE_URL)
-#         if [ $HTTP_STATUS -eq 200 ]; then
-#           echo "Deployment successful"
-#         else
-#           echo "Deployment failed"
-#           exit 1
-#         fi
+      - name: Build Next.js app
+        run: yarn build
