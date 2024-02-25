@@ -146,7 +146,7 @@ const DocumentOverlay = ({ setOpenModal, switchToContent }) =>
 								<p className="mt-4 ml-10">Document</p></button>
 						</div>
 						<div className="mt-36 flex justify-end">
-							<button className="mr-10 w-44 h-12  text-basicallylight bg-primary hover:bg-primary  font-normal rounded text-lg shadow-xl ">Create Project</button>
+							<button onClick = {()=>{router.push('/document')}}className="mr-10 w-44 h-12  text-basicallylight bg-primary hover:bg-primary  font-normal rounded text-lg shadow-xl ">Create Project</button>
 						</div>
 					</div>
 

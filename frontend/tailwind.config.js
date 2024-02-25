@@ -8,6 +8,10 @@ module.exports = {
     ],
     // darkMode: 'class',
     theme: {
+        screens: {
+            'xxs': '450px', // min-width
+            'xsm': '650px',
+        },
         fontFamily: {
             poppins: ["Poppins", "sans-serif"],
         },

@@ -12,7 +12,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import fb from '../../../app/_firebase/firebase';
 import axios from 'axios';
 import {useRouter} from 'next/navigation';
-const DashboardFolder = ({ title, folder,  onFolderDeleted}) => {
+const DashboardFolder = ({ id, title, folder,  onFolderDeleted}) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
    const router = useRouter();
@@ -167,6 +167,7 @@ const DashboardFolder = ({ title, folder,  onFolderDeleted}) => {
         color: "#FFFFFF",  // Text color
         backgroundColor: "#30475E",  // Button background color
     };
+    console.log(folder)
     return (
         <Tooltip title={title} enterDelay={1000} leaveDelay={200}>
             <>
@@ -174,7 +175,8 @@ const DashboardFolder = ({ title, folder,  onFolderDeleted}) => {
             onDoubleClick={(e) => handleDoubleClick(e)}
             onDragOver={(e) => handleDragOver(e)}
             onDrop={(e) => handleDrop(e, folder.path)}>
-                <FolderIcon className='' fontSize="large" />
+                <FolderIcon sx={{ color: folder?.color }} fontSize="large" />
+
                 <span className='mx-5 w-24 text-lg font-semibold mr-10'>{truncateTitle(title)}</span>
                 <IconButton onClick={handleClick} color="inherit">
                     <MoreVertIcon fontSize="large" />

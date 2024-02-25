@@ -1,16 +1,22 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+const fb = require("_firebase/firebase");
 import AddChannelButton from './addChannelButton';
 import ChannelButton from './channelButton';
 import ProfileBox from './profileBox';
 import TeamChannelOptionsMenu from './teamChannelOptionsMenu';
+import AddChannelOverlay from '../overlays/addChannelOverlay'
 import { useRouter } from 'next/navigation';
-const ChannelBar = ({ user,  teamData,  userUID }) => {
+import axios from 'axios';
+const ChannelBar = ({ user,  teamData,  userUID , onUpdated}) => {
   // State and handlers for channel categories
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAddChannelOverlayOpen, setIsAddChannelOverlayOpen] = useState(false);
+const router  = useRouter();
   console.log(user);
 
   const handleChannelSelect = (channelName) => {
-    // Handle channel selection here
-    console.log('Channel selected:', channelName);
+    router.push(`/chat?teamId=${teamData.teamId}&channelName=${channelName}`);
+   
   };
 
   // Handlers for profile box actions
@@ -26,16 +32,76 @@ const ChannelBar = ({ user,  teamData,  userUID }) => {
     console.log('Settings opened');
   };
 
+
+
   const handleAddChannel = () => {
-    // Handle add channel action here
-    console.log('Add channel clicked');
+    setIsAddChannelOverlayOpen(true); // Open the add channel overlay
+  };
+
+  const handleChannelAdded = (channelName) => {
+    console.log(`${channelName} channel added`);
+    // Here, you would likely want to refresh the list of channels or perform another action
+    setIsAddChannelOverlayOpen(false);
+    onUpdated();
   };
 
   const handleTeamOptionSelect = (option) => {
-    // Handle team option selection here
-    console.log('Team option selected:', option);
-  };
+   if (option === 'invite') {
+      onInvite();
+    }
+   else if (option === 'settings') {
+      onSettings();
+    }
+   else if (option === 'leave') {
+      onLeave();
+    }
+  else  if (option === 'delete') {
+      onDelete();
+    }
 
+  };
+  const onDelete = () => {
+    setIsModalOpen(true); // Open the modal for confirmation
+  };
+  const onDeleteConfirm = async () => {
+    // Assuming you have a function to get the current user's auth token
+    setIsModalOpen(false);
+    const token = await fb.getToken(); // This is a placeholder, adjust based on your auth logic
+
+    // The team ID to delete
+    const teamId = teamData.teamId;
+
+    axios.delete(`http://localhost:8080/api/teams/${teamId}`, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+    .then(response => {
+        // Handle success response
+        console.log('Team deleted successfully', response.data);
+        // Potentially redirect the user or update the UI to reflect the deletion
+        // For example, you might want to navigate back to the dashboard
+        router.push('/dashboard'); // Adjust the URL as needed
+    })
+    .catch(error => {
+        // Handle error response
+        console.error('Error deleting team', error.response || error);
+        // Optionally, display an error message to the user
+    });
+};
+
+  const onLeave = ()=>{
+      
+    }
+    const onSettings = ()=>{
+
+    } 
+    const onInvite = ()=>{
+
+    }
+
+
+  
   return (
     <div className="flex flex-col h-full w-1/6  bg-neutral-50 shadow-2xl">
       <div className="flex flex-col">
@@ -60,8 +126,40 @@ const ChannelBar = ({ user,  teamData,  userUID }) => {
           onSettings={handleSettings}
         />
       </div>
+      <SimpleModal
+  isOpen={isModalOpen}
+  onClose={() => setIsModalOpen(false)}
+  onConfirm={onDeleteConfirm}
+/>
+<AddChannelOverlay
+        isOpen={isAddChannelOverlayOpen}
+        onClose={() => setIsAddChannelOverlayOpen(false)}
+        onChannelAdded={handleChannelAdded}
+        teamData={teamData}
+      />
     </div>
   );
 };
+
+const SimpleModal = ({ isOpen, onClose, onConfirm }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white p-5 rounded-lg shadow-lg flex flex-col items-center">
+        <p className="mb-4">Are you sure you want to delete this team?</p>
+        <div className="flex space-x-4">
+          <button onClick={onConfirm} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+            Yes
+          </button>
+          <button onClick={onClose} className="bg-primary hover:bg-secondary text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+            No
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 
 export default ChannelBar;

@@ -13,6 +13,7 @@ const axios = require("axios");
 const fb = require("_firebase/firebase");
 const socket = require("_socket/socket");
 import ShortTextIcon from '@mui/icons-material/ShortText'; // This can act as a hash
+import { set } from "lodash";
 
 export default function ChatRoom() {
    
@@ -21,12 +22,18 @@ const params = useSearchParams();
     const [user, loading] = fb.useAuthState();
     const [teamData, setTeamData] = useState({}); // This is the team name that will be displayed on the top of the chat
 	const [channelsData, setChannelsData] = useState([]);
+    const [channelBarTeamData, setChannelBarTeamData] = useState({});
 	const [userInfo, setUserInfo] = useState({data:{username: "User"}});
-   const teamId = params.get('teamId');
-
-   const channelName = params.get('channelName');
-
+    const [teamId, setTeamId] = useState(params.get('teamId')); // This is the team name that will be displayed on the top of the chat
+    const [channelName, setChannelName] = useState(params.get('channelName')); // This is the team name that will be displayed on the top of the chat
+const [channelsUpdated, setChannelsUpdated] = useState(0);
    
+const messagesEndRef = useRef(null); // Create a reference to the message container
+
+// Function to scroll to the bottom
+const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+};
     let sockCli = useRef(null);
     useEffect(() => {
         if (!user) return;
@@ -44,7 +51,10 @@ const params = useSearchParams();
     }, [user]);
 
 	
-
+    useEffect(()=>{
+        setTeamId(params.get('teamId'));
+        setChannelName(params.get('channelName'));
+    },[params.get('teamId'),params.get('channelName')]);
     useEffect(() => {
         if (!user) return;
 
@@ -57,11 +67,11 @@ const params = useSearchParams();
                 let msgs = data.map((messageData, i) => (
                     <MessageItem
                         key={i}
-                        sender={messageData.sender}
+                        sender={messageData.username}
                         timestamp={fb.fromFbTimestamp(new Timestamp(messageData.sentAt.seconds, messageData.sentAt.nanoseconds)).toLocaleTimeString()}
                         message={messageData.message}
                         reactions={{}}
-						userData = {userInfo.data}
+						userId = {messageData.senderID}
                     />
                 ));
                 setText(msgs);
@@ -124,9 +134,18 @@ const params = useSearchParams();
     
         // Call the function to fetch team information when the component mounts
         fetchTeamInformation(teamId);
-    }, [user]);
-    
-    
+    }, [user, teamId, channelName, channelsUpdated]);
+   
+    const handleUpdated = () => {
+       setChannelsUpdated(channelsUpdated+1);
+      }
+    useEffect(() => {
+        // Your update logic here, e.g., updating local state or refetching data
+        console.log('Team data or user changed, update component:', teamData);
+        // Update component state or perform actions based on the new props
+        setChannelBarTeamData(teamData);
+      }, [teamData]); // React to changes in these props
+      
     const [text, setText] = useState([]);
 	const sendTeamMsg = async (msg) =>
 	{
@@ -145,11 +164,13 @@ const params = useSearchParams();
 			const messageData = {
 				senderID: fb.getUserID(),
 				sender: userInfo.data.username,
-			  team: "LoH1iHOGowBzcYDXEqnu",
-			  channel: "General",
+			  team: teamId,
+			  channel: channelName,
 			  msg: msg,
 			  sentAt: fb.toFbTimestamp(sentAt),
 			};
+            const sentAtDate = messageData.sentAt.toDate();
+
 
 		// Add the message to the real-time socket chat
 		setText((prevText) => [
@@ -157,7 +178,7 @@ const params = useSearchParams();
 			<MessageItem 
 			  key={prevText.length} 
 			  sender={messageData.sender}
-			  timestamp={sentAt.toLocaleTimeString()} 
+			  timestamp={sentAtDate.toLocaleTimeString()} 
 			  message={messageData.msg} 
 			  reactions={{}} // Add reactions if you have them
 			  userData = {userInfo.data}
@@ -166,6 +187,9 @@ const params = useSearchParams();
 
 		sockCli.current.emit('teamMsg', messageData); // Send the message to the server
 	};
+     useEffect(() => {
+        scrollToBottom();
+    }, [text]); 
 	if (loading|| !user )
     return (
         <div className="flex flex-col items-center justify-around min-h-screen">
@@ -193,23 +217,32 @@ const params = useSearchParams();
 			<ChannelBar
                 user={userInfo}
                 userUID={user.uid}
-                teamData = {teamData}
+                teamData = {channelBarTeamData}
+                onUpdated={handleUpdated}
+                
             />
-			<div className="flex flex-col flex-grow relative">
-                    <div className="flex items-center justify-between bg-gray-100 w-full mb-3 h-min">
+			<div className="flex flex-col w-full  relative">
+                <div className="w-full h-1/6">
+                <div className="flex items-center justify-between bg-gray-100 w-full mb-3 h-min">
                         <Toolbar sx={{ backgroundColor: 'whitesmoke' }}>
-                            <h1 className='text-xl font-semibold text-primary items-center justify-center flex-row'>{<ShortTextIcon style={{ color: '#30475E', opacity: '0.7' }} fontSize="large" />} General</h1>
+                            <h1 className='text-xl font-semibold text-primary items-center justify-center flex-row'>{<ShortTextIcon style={{ color: '#30475E', opacity: '0.7' }} fontSize="large" />}{channelName}</h1>
                         </Toolbar>
                     </div>
-                    <div className="flex">
-                        <div className="p-5 w-full h-full scrollbar-thin scrollbar-thumb-primary text-basicallydark overflow-y-scroll">
+                    <div className="w-full h-1/6">
+                    <div className="">
+                        <div className="p-5 w-full scrollbar-thin scrollbar-thumb-primary text-basicallydark overflow-y-scroll message-container">
                             {text}
+                            <div ref={messagesEndRef} />
                         </div>
 
-                        <div className="absolute z-10 inset-x-0 bottom-5 mx-5 text-white">
+                        
+                    </div>
+                    </div>
+                </div>
+                   
+                    <div className="absolute z-10 inset-x-0 bottom-5 mx-5 text-white bg-baiscallylight">
                             <MessageBox callback={sendTeamMsg} />
                         </div>
-                    </div>
                 </div>
 					
 				</div>
