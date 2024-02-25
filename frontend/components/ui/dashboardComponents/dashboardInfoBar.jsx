@@ -4,7 +4,7 @@ import DropdownDashboard from './dropdownDashboard';
 import { useRouter } from 'next/navigation'; 
 
 const DashboardInfoBar = ({ currentPath, onSort, sortCriteria}) => {
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  // const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const router = useRouter();
 
   // This function is triggered when sort order (ascending/descending) is toggled
@@ -21,14 +21,14 @@ const DashboardInfoBar = ({ currentPath, onSort, sortCriteria}) => {
       }
   };
 
-  useEffect(() => {
-      const handleResize = () => {
-          setWindowWidth(window.innerWidth);
-      };
+  // useEffect(() => {
+  //     const handleResize = () => {
+  //         setWindowWidth(window.innerWidth);
+  //     };
 
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  //     window.addEventListener('resize', handleResize);
+  //     return () => window.removeEventListener('resize', handleResize);
+  // }, []);
 
   const pathParts = currentPath.split('/').filter(part => part);
 
