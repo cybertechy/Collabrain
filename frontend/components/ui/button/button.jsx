@@ -1,14 +1,8 @@
-import PropTypes from "prop-types";
 
-const colorClasses = {
-    primary: "bg-primary",
-    secondary: "bg-secondary",
-    teritary: "bg-teritary",
-};
 
-const Button = ({ text, color, withShadow = false, onClick }) => (
+const Button = ({ text,withShadow = false, onClick }) => (
     <button
-        className={`bg-secondary px-24 py-4 rounded-sm font-poppins text-md my-4 text-primary font-medium ${
+        className={`bg-primary hover:bg-tertiary px-20 py-2 rounded-3xl font-poppins uppercase text-md my-4 w-full text-basicallylight font-bold ${
             withShadow ? "shadow-primary drop-shadow-md" : ""
         }`}
         onClick={onClick}
@@ -17,11 +11,5 @@ const Button = ({ text, color, withShadow = false, onClick }) => (
     </button>
 );
 
-Button.propTypes = {
-    text: PropTypes.string.isRequired,
-    color: PropTypes.string.isRequired,
-    withShadow: PropTypes.bool,
-    onClick: PropTypes.func,
-};
 
 export default Button;

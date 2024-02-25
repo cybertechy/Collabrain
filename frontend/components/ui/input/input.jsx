@@ -1,77 +1,63 @@
-import { createTheme, ThemeProvider, TextField } from "@mui/material";
-import PropTypes from "prop-types";
+import { useState, useEffect } from 'react';
+import Tooltip from '@mui/material/Tooltip';
+import { styled } from '@mui/material/styles';
+import clsx from 'clsx';
 
-const colorClasses = {
-    primary: "bg-primary", // Replace with your primary color
-    secondary: "bg-secondary", // Replace with your secondary color
-    tertiary: "bg-tertiary", // Replace with your tertiary color
-};
-const theme = createTheme({
-    components: {
-        MuiInputBase: {
-            styleOverrides: {
-                input: {
-                    "&::placeholder": {
-                        color: "#30475E", // Change placeholder color here
-                        opacity: 1, // Ensure full opacity
-                    },
-                },
-            },
-        },
-        MuiOutlinedInput: {
-            styleOverrides: {
-                root: {
-                    "& .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "transparent", // Remove default outline
-                        borderWidth: "1px", // Ensure hover/focus border is visible
-                    },
-                    "&:hover .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#30475E", // #30475E border on hover
-                    },
-                    "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                        borderColor: "#30475E", // #FFFFFF border on focus
-                    },
-                },
-            },
-        },
-    },
-});
+const RedTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))(({ theme }) => ({
+  [`& .MuiTooltip-tooltip`]: {
+    backgroundColor: theme.palette.error.main,
+    color: 'white',
+  },
+  [`& .MuiTooltip-arrow`]: {
+    color: theme.palette.error.main,
+  },
+}));
 
-const InputField = ({ placeholder, color, input, setinput }) => {
-    const backgroundColorClass = colorClasses[color] || colorClasses.primary;
+const InputField = ({ placeholder, input, setInput }) => {
+  const [error, setError] = useState(false);
 
-    return (
-        <ThemeProvider theme={theme}>
-            <TextField
-            className = "bg-aliceBlue text-primary rounded-md"
-                variant="outlined"
-                size="small"
-                fullWidth
-                value={input}
-                onChange={(e) => setinput(e.target.value)}
-                InputLabelProps={{ style: { color: "#30475E" } }}
-                InputProps={{
-                    className:  "bg-aliceBlue text-basicallylight rounded-md",
-                    style: {
-                        color: "#30475E",
-                        padding: "10px",
-                        "&:focusVisible": {
-                            outline: "none",
-                        },
-                    },
-                }}
-                placeholder={placeholder}
-                sx={{ mb: 1, width: "20rem" }}
-            />
-        </ThemeProvider>
-    );
-};
+  useEffect(() => {
+    // Your validation logic here
+    // For example, you can check if input meets certain criteria
+    setError(/* Your validation logic */);
+  }, [input]);
 
-InputField.propTypes = {
-    placeholder: PropTypes.string.isRequired,
-    color: PropTypes.oneOf(["primary", "secondary", "tertiary"]),
-    input: PropTypes.string.isRequired,
-    setinput: PropTypes.func.isRequired,
+  const handleChange = (event) => {
+    setInput(event.target.value);
+  };
+
+  // Determine border color dynamically based on error state
+  const borderColor = error ? 'border-red-500' : input ? 'border-green-500' : 'border-primary';
+
+  return (
+    <div className="mt-4 relative">
+      <RedTooltip
+        title={error ? "Your error message here" : ''}
+        placement="top"
+        arrow
+      >
+          <div className="relative flex items-center bg-gray-100">
+        <input
+          type="text"
+          className={clsx(`bg-gray-100 rounded-sm pl-4 pr-10 py-2 w-full focus:outline-none transition-all duration-300 ease-in-out border-l-4`, borderColor, {'shake': error})}
+          placeholder={placeholder}
+          value={input}
+          onChange={handleChange}
+          aria-describedby={error ? "input-error" : undefined}
+        />
+         <div className='w-10 h-10'></div>
+        </div>
+      </RedTooltip>
+      {/* Visually hidden error message for screen readers */}
+      {error && (
+        <span id="input-error" className="sr-only">
+          Your error message here.
+        </span>
+      )}
+    </div>
+  );
 };
 
 export default InputField;
