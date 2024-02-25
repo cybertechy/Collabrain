@@ -24,6 +24,8 @@ jobs:
 
       - name: Install dependencies
         run: yarn install
+        working-directory: frontend
 
       - name: Build Next.js app
         run: yarn build
+        working-directory: frontend
