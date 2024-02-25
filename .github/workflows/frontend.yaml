@@ -2,12 +2,7 @@ name: Frontend Build Test
 
 on:
   push:
-    branches:
-      - main
-      - cm-collab
   pull_request:
-    branches:
-      - main
 
 jobs:
   build:
