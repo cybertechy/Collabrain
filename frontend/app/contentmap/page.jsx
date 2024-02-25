@@ -117,7 +117,13 @@ function page() {
             else setCollabaration(false);
 
             // filter out collabortors that have button up
-            updateInfo.collaborators = updateInfo.collaborators.filter((collaborator) => collaborator.button === "down" && collaborator.id !== user.uid);
+            try{
+            updateInfo.collaborators = updateInfo?.collaborators?.filter((collaborator) => collaborator.button === "down" && collaborator.id !== user.uid);
+            } catch (err) {
+                console.log(err);
+                updateInfo.collaborators = [];
+            }
+           
 
             // abort any ongoing requests
             if(updateInfo?.collaborators?.length > 0){
@@ -157,9 +163,17 @@ function page() {
         if (!Collabaration) return;
 
         let appState = ExcalidrawAPI.getAppState();
+        if(!appState) return;
+        if(!appState.collaborators) return;
         // find the index (if exists) of the user in the collaborators array
+        let index = -1;
 
-        let index = appState?.collaborators?.findIndex((collaborator) => collaborator.id === user.uid);
+        try {
+        index = appState?.collaborators?.findIndex((collaborator) => collaborator.id === user.uid);
+        } catch (err) {
+            console.log(err);
+            return;
+        }
         if(index === null) index = -1;
         if (index === -1) index = appState.collaborators.length;
         let mstate = appState.collaborators[index];
