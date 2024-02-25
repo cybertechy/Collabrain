@@ -6,7 +6,7 @@ const CreateFolderOverlay = ( {isOpen, onClose, onFolderCreated}) => {
     const [folderName, setFolderName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [folderColor, setFolderColor] = useState('#ffffff'); // Default color
+    const [folderColor, setFolderColor] = useState('#30475E'); // Default color
     const searchParams = useSearchParams();
     const handleCancel = () => {
         onClose(); // Function to close/hide the overlay

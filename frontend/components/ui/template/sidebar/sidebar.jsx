@@ -69,8 +69,12 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
     const pathname = usePathname(); 
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     const [userTeams, setUserTeams] = useState(null);
-    
+    const [user, loading] = fb.useAuthState();
     useEffect(() => {
+        if (!user){
+
+            return;
+        }
         const fetchUserTeams = async () => {
             try {
                 // Make a GET request to retrieve user's team IDs
@@ -126,7 +130,7 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
     
         // Call the function to fetch user teams when the component mounts
         fetchUserTeams();
-    }, []);
+    }, [user]);
     
     
      // Empty dependency array to run the effect only once
@@ -291,7 +295,7 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
                         )}
                         isExpanded={isOpen}
                     />
-                      <div className={`max-h-48 scrollbar-thin scrollbar-thumb-primary ${isOpen ? "overflow-y-scroll overflow-x-hidden" : "overflow-hidden"}`}>
+                      <div className={`h-full scrollbar-thin scrollbar-thumb-primary ${isOpen ? "overflow-y-auto overflow-x-hidden" : "overflow-hidden"}`}>
     {userTeams ? userTeams?.map((team, index) => (
         <TeamSidebarItem key={index} team={team} isExpanded={isOpen}  isSelected={pathname === `chat?teamId=${team.teamId}`} />
     )):null}

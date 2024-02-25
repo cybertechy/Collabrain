@@ -173,7 +173,7 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, h
     };
    
     return (
-        <Tooltip title={title} enterDelay={1000} leaveDelay={200}>
+        <Tooltip title={title} enterDelay={1000} leaveDelay={200} >
             <div>
             <div className="bg-aliceBlue shadow-md  text-primary flex items-center justify-center rounded-md w-min pl-3 hover:bg-columbiablue hover:customShadow duration-300"
             onDoubleClick={(e) => handleDoubleClick(e)}
