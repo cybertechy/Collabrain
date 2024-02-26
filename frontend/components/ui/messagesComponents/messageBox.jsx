@@ -62,7 +62,7 @@ export default function MessageBox(props) {
   };
   
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex items-center w-3/4 p-3 rounded-lg bg-[#30475E] relative">
+    <form onSubmit={handleSubmit(onSubmit)} className="flex items-center rounded-lg w-full p-3 mx-5 bg-[#30475E] relative">
      <IconButton ref={emojiButtonRef} onClick={handleEmojiPickerOpen} size="small" className="absolute left-4 z-10 text-white">
   <EmojiEmotionsIcon className='text-basicallylight' />
 </IconButton>

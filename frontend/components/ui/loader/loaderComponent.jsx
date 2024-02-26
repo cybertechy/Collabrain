@@ -10,7 +10,7 @@ const LoaderComponent = ({ isLoading, loadingState }) => {
 
   return (
     <div className="fixed inset-0 bg-white bg-opacity-75 z-50 flex flex-col items-center justify-center">
-      <Lottie animationData={animation} play="true" loop="true" 
+      <Lottie animationData={animation} play="true" loop={true} 
               style={{ width: 200, height: 200 }} />
       <h1 className="text-xl font-bold mb-5 text-primary">{message}</h1>
     </div>

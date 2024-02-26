@@ -21,5 +21,17 @@ const hasUsername = async () => {
     }
 };
 
+const fetchUser = async (uid) => {
+    try {
+        const token = await fb.getToken();
+        const response = await axios.get(`http://localhost:8080/api/users/${uid}`, {
+            headers: { "Authorization": "Bearer " + token }
+        });
+       return response.data;
+    } catch (error) {
+        console.error('Error fetching user data:', error);
+        return null;
+    }
+};
 
-module.exports = { hasUsername };
+module.exports = { hasUsername, fetchUser };
