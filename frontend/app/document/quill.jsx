@@ -1,5 +1,5 @@
-const ReactQuill = require("react-quill");
 import React from "react";
+const ReactQuill = require("react-quill");
 import "react-quill/dist/quill.snow.css";
 const QuillCursors = require('quill-cursors');
 

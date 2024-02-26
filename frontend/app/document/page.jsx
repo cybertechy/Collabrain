@@ -1,7 +1,8 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Template from "@/components/ui/template/template";
-import Quill from "./quill";
+const Quill = dynamic(() => import("./quill"), { ssr: false });
 import axios from 'axios';
 const socket = require("_socket/socket");
 const fb = require("_firebase/firebase");
@@ -112,7 +113,7 @@ export default function Editor()
 				<div className="editor-container bg-[#F3F3F3] overflow-auto">
 					<Quill socket={sockCli} user={userData} quillRef={quillRef}
 						value={value} setValue={setValue} isDisabled={isDisabled}
-						docID={searchParams.get('id')} ociID={ociID}/>
+						docID={searchParams.get('id')} ociID={ociID} />
 				</div>
 			</div>
 		</Template>
