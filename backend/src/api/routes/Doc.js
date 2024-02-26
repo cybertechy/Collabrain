@@ -105,7 +105,7 @@ router.get('/:id', async (req, res) =>
 		const oracleData = await oci.getData("B3", docData.data().data)
 			.catch((error) => { throw error; });
 
-		const contents = await oci.generateStringFromStream(oracleData.value); 
+		const contents = await oci.generateStringFromStream(oracleData.value);
 		res.status(200).json({ ...docData.data(), contents: contents });
 	}
 	catch (err) { res.status(500).json({ error: "Failed to get document" }); }
@@ -143,16 +143,48 @@ router.delete('/:id', async (req, res) =>
 							documents: fb.admin.firestore.FieldValue.arrayRemove(req.params.id)
 						});
 					});
-				});
+				})
+				.catch((error) => { throw error; });
 
 			// Remove doc from oracle cloud
-			oci.deleteFile("B3", doc.data().data);
+			oci.deleteData("B3", doc.data().data)
+				.catch((error) => { throw error; });
+
 			// Delete document
 			docRef.delete()
 				.then(() => { res.status(200).json({ message: "Document deleted" }); })
 				.catch((error) => { throw error; });
 		})
-		.catch((error) => { res.status(500).json({ error: "Failed to delete document" }); });
+		.catch((err) => { res.status(500).json({ error: "Failed to delete document" }); });
+});
+
+// Update document info
+router.patch('/:id', async (req, res) =>
+{
+	// Make sure all required fields are present
+	if (!req.headers.authorization)
+		return res.status(400).json({ error: "Missing required data" });
+
+	// verify token
+	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
+	if (!user)
+		return res.status(401).json({ error: "Unauthorized" });
+
+	// Check if user has is owner of document
+	let docRef = fb.db.doc(`documents/${req.params.id}`);
+	docRef.get()
+		.then((doc) =>
+		{
+			if (doc.data().access[user.uid].role !== roles.owner)
+				return res.status(401).json({ error: "Unauthorized" });
+
+			// Update document
+			docRef.update()
+				.then(() => { res.status(200).json({ message: "Document updated" }); })
+				.catch((error) => { throw error; });
+		})
+		.catch((error) => { res.status(500).json({ error: "Failed to update document" }); });
+
 });
 
 // Share document
