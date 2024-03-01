@@ -29,6 +29,8 @@
     "next": "14.0.3",
     "novel": "^0.1.22",
     "quill-cursors": "^4.0.2",
+    "quill-image-compress": "^1.2.32",
+    "quill-image-drop-module": "^1.0.3",
     "react": "^18",
     "react-dom": "^18",
     "react-firebase-hooks": "^5.1.1",

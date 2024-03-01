@@ -2,7 +2,11 @@ import React from "react";
 const ReactQuill = require("react-quill");
 import "react-quill/dist/quill.snow.css";
 const QuillCursors = require('quill-cursors');
+import ImageCompress from 'quill-image-compress';
+import { ImageDrop } from 'quill-image-drop-module';
 
+ReactQuill.Quill.register('modules/imageDrop', ImageDrop);
+ReactQuill.Quill.register('modules/imageCompress', ImageCompress);
 ReactQuill.Quill.register('modules/cursors', QuillCursors);
 
 export default function Quill(props)
@@ -32,6 +36,12 @@ export default function Quill(props)
 		};
 
 		props.socket.current.emit("send-doc-cursor-changes", { doc: props.docID, data: data });
+
+		// If length is more than 0, show comment button
+		if (range.length > 0)
+			props.setShowCommentButton(true);
+		else
+			props.setShowCommentButton(false);
 	};
 
 	var toolbarOptions = [
@@ -58,7 +68,17 @@ export default function Quill(props)
 		toolbar: toolbarOptions,
 		cursors: {
 			transformOnTextChange: false,
-		}
+		},
+		imageCompress: {
+			quality: 0.7, // default
+			maxWidth: 1000, // default
+			maxHeight: 1000, // default
+			imageType: 'image/jpeg', // default
+			debug: true, // default
+			suppressErrorLogging: false, // default
+			insertIntoEditor: undefined, // default
+		},
+		imageDrop: true,
 	};
 
 	return <ReactQuill ref={props.quillRef} modules={module} theme="snow" value={props.value} readOnly={props.isDisabled} onChange={onChange} onChangeSelection={onChangeSelection} />;

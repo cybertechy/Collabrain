@@ -1,7 +1,8 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import Template from "@/components/ui/template/template";
+const { useRouter } = require("next/navigation");
+import Template from "_components/ui/template/template";
 const Quill = dynamic(() => import("./quill"), { ssr: false });
 import axios from 'axios';
 const socket = require("_socket/socket");
@@ -9,6 +10,8 @@ const fb = require("_firebase/firebase");
 import "./quillStyle.css";
 import { useRef, useState, useEffect } from "react";
 import { useSearchParams } from 'next/navigation';
+import FileToolbar from "_components/ui/FileToolbar/fileToolbar";
+import Comments from "./comments";
 
 export default function Editor()
 {
@@ -18,7 +21,17 @@ export default function Editor()
 	const [value, setValue] = useState("Loading...");
 	const [isDisabled, setIsDisabled] = useState(true);
 	const [ociID, setOciID] = useState("");
+	const [docName, setDocName] = useState("");
+	const [showCommentButton, setShowCommentButton] = useState(false);
 	const quillRef = useRef(null);
+	const router = useRouter();
+
+	if (searchParams.get('id') == null)
+	{
+		// No document selected
+		// Redirect to dashboard
+		router.push("/dashboard");
+	}
 
 	const randomColor = () =>
 	{
@@ -83,9 +96,12 @@ export default function Editor()
 				}
 			}).then(res =>
 			{
+				setDocName(res.data.name);
 				setOciID(res.data.data);
 				setValue(JSON.parse(res.data.contents));
-				setIsDisabled(false);
+
+				if (res.data.access[userData.uid] != "viewer")
+					setIsDisabled(false);
 			});
 		});
 
@@ -93,13 +109,13 @@ export default function Editor()
 		return () => sockCli.current.emit('leave-doc', id);
 	}, [user]);
 
-	if (!user)
+	if (loading)
 	{
 		// Not signed in
 		return (
 			<Template>
 				<div className="bg-[#F3F3F3] h-full">
-					<div className="editor-container bg-[#F3F3F3] overflow-auto">
+					<div className="editor-container bg-[#F3F3F3]">
 						<div className="text-center text-3xl mt-20">Loading...</div>
 					</div>
 				</div>
@@ -109,12 +125,13 @@ export default function Editor()
 
 	return (
 		<Template>
-			<div className="bg-[#F3F3F3] h-full">
-				<div className="editor-container bg-[#F3F3F3] overflow-auto">
-					<Quill socket={sockCli} user={userData} quillRef={quillRef}
-						value={value} setValue={setValue} isDisabled={isDisabled}
-						docID={searchParams.get('id')} ociID={ociID} />
-				</div>
+			<FileToolbar name={docName} />
+			<div className="editor-container bg-[#F3F3F3] overflow-auto">
+				<Quill socket={sockCli} user={userData} quillRef={quillRef}
+					value={value} setValue={setValue} isDisabled={isDisabled}
+					docID={searchParams.get('id')} ociID={ociID}
+					setShowCommentButton={setShowCommentButton} />
+				{/* <Comments /> */}
 			</div>
 		</Template>
 	);
