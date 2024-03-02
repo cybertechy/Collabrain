@@ -6,8 +6,8 @@ const oci = require("../helpers/oracle");
 
 // Make an enum for user roles
 const roles = {
-	viewer: "viewer",
-	editor: "editor",
+	viewer: "view",
+	editor: "edit",
 	owner: "owner"
 };
 
