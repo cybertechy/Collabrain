@@ -44,10 +44,16 @@ export default function Quill(props)
 			props.setShowCommentButton(false);
 	};
 
+	const fontSizeArr = ['8px', '9px', '10px', '12px', '14px', '16px', '20px', '24px', '32px', '42px', '54px', '68px', '84px', '98px'];
+	var Size = ReactQuill.Quill.import('attributors/style/size');
+	Size.whitelist = fontSizeArr;
+	ReactQuill.Quill.register(Size, true);
+	Size.whitelist = fontSizeArr;
+
 	var toolbarOptions = [
 		[{ 'font': [] }],
 		[{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-		[{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+		[{ 'size': fontSizeArr }],
 
 		[{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
 		[{ 'align': [] }],
@@ -81,7 +87,8 @@ export default function Quill(props)
 		imageDrop: true,
 	};
 
-	return <ReactQuill ref={props.quillRef} modules={module} theme="snow" value={props.value} r
-		eadOnly={props.isDisabled}
+	return <ReactQuill className=""
+		ref={props.quillRef} modules={module} theme="snow" value={props.value}
+		readOnly={props.isDisabled}
 		onChange={onChange} onChangeSelection={onChangeSelection} />;
 }
