@@ -38,7 +38,7 @@ export default function Quill(props)
 		props.socket.current.emit("send-doc-cursor-changes", { doc: props.docID, data: data });
 
 		// If length is more than 0, show comment button
-		if (range.length > 0)
+		if (range != null && range.length > 0)
 			props.setShowCommentButton(true);
 		else
 			props.setShowCommentButton(false);
@@ -81,5 +81,7 @@ export default function Quill(props)
 		imageDrop: true,
 	};
 
-	return <ReactQuill ref={props.quillRef} modules={module} theme="snow" value={props.value} readOnly={props.isDisabled} onChange={onChange} onChangeSelection={onChangeSelection} />;
+	return <ReactQuill ref={props.quillRef} modules={module} theme="snow" value={props.value} r
+		eadOnly={props.isDisabled}
+		onChange={onChange} onChangeSelection={onChangeSelection} />;
 }
