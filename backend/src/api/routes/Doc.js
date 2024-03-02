@@ -11,6 +11,10 @@ const roles = {
 	owner: "owner"
 };
 
+/************************************************************/
+/*                    Docs CRUD Operations                  */
+/************************************************************/
+
 // Create new document
 router.post('/', async (req, res) =>
 {
@@ -187,6 +191,10 @@ router.patch('/:id', async (req, res) =>
 
 });
 
+/************************************************************/
+/*                  Sharing CRUD Operations                 */
+/************************************************************/
+
 // Share document
 router.post('/:id/share/:user', async (req, res) =>
 {
@@ -261,6 +269,100 @@ router.delete('/:id/share/:user', async (req, res) =>
 				.catch((error) => { throw error; });
 		})
 		.catch((error) => { res.status(500).json({ error: "Failed to unshare document" }); });
+});
+
+/************************************************************/
+/*                  Comment CRUD Operations                 */
+/************************************************************/
+
+// Add comment
+router.post('/:id/comment', async (req, res) =>
+{
+	// Make sure all required fields are present
+	if (!req.headers.authorization || !req.body.comment)
+		return res.status(400).json({ error: "Missing required data" });
+
+	// verify token
+	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
+	if (!user)
+		return res.status(401).json({ error: "Unauthorized" });
+
+	// Get username
+	const userData = await fb.db.doc(`users/${user.uid}`).get();
+
+	const comment = {
+		username: userData.data().username,
+		comment: req.body.comment,
+		updatedAt: fb.admin.firestore.FieldValue.serverTimestamp()
+	};
+
+	// Add comment to document
+	fb.db.collection(`documents/${req.params.id}/comments`).add(comment)
+		.then((ref) => { res.status(200).json({ id: ref.id, message: "Comment added" }); })
+		.catch((error) => { res.status(500).json({ error: "Failed to add comment" }); });
+});
+
+// Get comments
+router.get('/:id/comments', async (req, res) =>
+{
+	// Make sure all required fields are present
+	if (!req.headers.authorization)
+		return res.status(400).json({ error: "Missing required data" });
+
+	// verify token
+	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
+	if (!user)
+		return res.status(401).json({ error: "Unauthorized" });
+
+	// Get comments of document
+	fb.db.collection(`documents/${req.params.id}/comments`).get()
+		.then((snapshot) =>
+		{
+			let comments = [];
+			snapshot.forEach((doc) => { comments.push({ id: doc.id, ...doc.data() }); });
+			res.status(200).json(comments);
+
+		}).catch((error) => { res.status(500).json({ error: "Failed to get comments" }); });
+});
+
+// Delete comment
+router.delete('/:id/comment/:comment', async (req, res) =>
+{
+	// Make sure all required fields are present
+	if (!req.headers.authorization)
+		return res.status(400).json({ error: "Missing required data" });
+
+	// verify token
+	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
+	if (!user)
+		return res.status(401).json({ error: "Unauthorized" });
+
+	// Delete comment
+	fb.db.doc(`documents/${req.params.id}/comments/${req.params.comment}`).delete()
+		.then(() => { res.status(200).json({ message: "Comment deleted" }); })
+		.catch((error) => { res.status(500).json({ error: "Failed to delete comment" }); });
+});
+
+// Edit comment
+router.patch('/:id/comment/:comment', async (req, res) =>
+{
+	// Make sure all required fields are present
+	if (!req.headers.authorization || !req.body.comment)
+		return res.status(400).json({ error: "Missing required data" });
+
+	// verify token
+	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
+	if (!user)
+		return res.status(401).json({ error: "Unauthorized" });
+
+	// Edit comment
+	fb.db.doc(`documents/${req.params.id}/comments/${req.params.comment}`).update(
+		{
+			comment: req.body.comment,
+			updatedAt: fb.admin.firestore.FieldValue.serverTimestamp()
+		})
+		.then(() => { res.status(200).json({ message: "Comment edited" }); })
+		.catch((error) => { res.status(500).json({ error: "Failed to edit comment" }); });
 });
 
 module.exports = router;	
