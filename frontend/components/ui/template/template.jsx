@@ -3,16 +3,6 @@ import Sidebar from "./sidebar/sidebar";
 import Navbar from "./navbar/navbar";
 
 const Template = ({ children }) => {
-  // const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  
-    // useEffect(() => {
-    //   const handleResize = () => {
-    //     setWindowWidth(window.innerWidth);
-    //   };
-
-    //   window.addEventListener('resize', handleResize);
-    //   return () => window.removeEventListener('resize', handleResize);
-    // }, []);
     
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
