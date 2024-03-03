@@ -36,6 +36,7 @@ export default function Editor()
 
 	const [docName, setDocName] = useState("");
 	const [showCommentButton, setShowCommentButton] = useState(false);
+	const [isSaved, setIsSaved] = useState(true);
 
 	// Redirect to dashboard if no document is specified
 	if (searchParams.get('id') == null)
@@ -130,7 +131,7 @@ export default function Editor()
 		return () => sockCli.current.emit('leave-doc', id);
 	}, [user, userData]);
 
-	// Signing in
+	// Signing in animation
 	if (loading || !user || !userData)
 	{
 		return (
@@ -143,6 +144,7 @@ export default function Editor()
 		);
 	}
 
+	// Failed to load animation
 	if (loadFailed)
 	{
 		return (
@@ -155,6 +157,7 @@ export default function Editor()
 		);
 	}
 
+	// Loading animation
 	if (!fileData || !ociID || !docName)
 	{
 		return (
@@ -172,7 +175,7 @@ export default function Editor()
 		<Template>
 			{user && fileData &&
 				<FileToolbar userID={user.uid} name={docName} commentsEnabled={true} showCommentButton={showCommentButton}
-					fileType="doc" fileID={searchParams.get('id')} fileData={fileData} />
+					fileType="doc" fileID={searchParams.get('id')} fileData={fileData} isSaved={isSaved} />
 			}
 
 			<div className="relative flex overflow-y-auto h-fit">
@@ -180,14 +183,8 @@ export default function Editor()
 					<Quill socket={sockCli} user={userData} quillRef={quillRef}
 						value={value} setValue={setValue} isDisabled={isDisabled}
 						docID={searchParams.get('id')} ociID={ociID}
-						setShowCommentButton={setShowCommentButton} />
+						setShowCommentButton={setShowCommentButton} setIsSaved={setIsSaved}/>
 				</div>
-
-				{/* {showComments &&
-					// <div className="w-1/4 bg-[#F3F3F3] shadow-[0_0_5px_0_rgba(0,0,0,0.5)] z-[1]">
-
-					// </div>
-				} */}
 			</div>
 		</Template>
 	);

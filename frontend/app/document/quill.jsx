@@ -9,11 +9,24 @@ ReactQuill.Quill.register('modules/imageDrop', ImageDrop);
 ReactQuill.Quill.register('modules/imageCompress', ImageCompress);
 ReactQuill.Quill.register('modules/cursors', QuillCursors);
 
+/**
+ * @param props.setValue - The function to set the value of the quill editor
+ * @param props.socket - The socket.io client
+ * @param props.docID - The document ID
+ * @param props.ociID - The OCI ID
+ * @param props.quillRef - The reference to the quill editor
+ * @param props.value - The value of the quill editor
+ * @param props.user - The user object
+ * @param props.setShowCommentButton - The function to set whether the comment button is shown
+ * @param props.isDisabled - Whether the quill editor is disabled
+ * @param props.setIsSaved - The function to set whether the document is saved
+ */
 export default function Quill(props)
 {
 	// Handle input changes
 	const onChange = (content, delta, source, editor) =>
 	{
+		props.setIsSaved(false);
 		props.setValue(content);
 		if (source != "user" || props.socket.current == null)
 			return;
@@ -22,6 +35,7 @@ export default function Quill(props)
 
 		// Save changes to database
 		props.socket.current.emit("save-doc", { ociID: props.ociID, data: props.quillRef.current.getEditor().getContents() });
+		props.setIsSaved(true);
 	};
 
 	// Handle cursor changes
