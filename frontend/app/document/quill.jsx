@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 const ReactQuill = require("react-quill");
 import "react-quill/dist/quill.snow.css";
 const QuillCursors = require('quill-cursors');
 import ImageCompress from 'quill-image-compress';
 import { ImageDrop } from 'quill-image-drop-module';
+import _debounce from 'lodash/debounce';
 
 ReactQuill.Quill.register('modules/imageDrop', ImageDrop);
 ReactQuill.Quill.register('modules/imageCompress', ImageCompress);
@@ -23,19 +24,38 @@ ReactQuill.Quill.register('modules/cursors', QuillCursors);
  */
 export default function Quill(props)
 {
+	const [pendingChanges, setPendingChanges] = useState(null);
+
+	// Debounce the emit and save changes function
+	// Group up changes to reduce the number of requests
+	const saveChanges = _debounce(() =>
+	{
+		if (props.socket.current)
+		{
+			props.socket.current.emit("save-doc", { ociID: props.ociID, data: props.quillRef.current.getEditor().getContents() });
+			props.setIsSaved(true);
+			setPendingChanges(null);
+			console.log("Saved");
+		}
+	}, 1000); // Adjust the debounce delay as needed
+
+	const delayedSaveChanges = _debounce(saveChanges, 1000); // Adjust the debounce delay as needed
+
 	// Handle input changes
 	const onChange = (content, delta, source, editor) =>
 	{
-		props.setIsSaved(false);
 		props.setValue(content);
 		if (source != "user" || props.socket.current == null)
 			return;
 
-		props.socket.current.emit("send-doc-changes", { doc: props.docID, data: delta });
+		props.setIsSaved(false);
 
-		// Save changes to database
-		props.socket.current.emit("save-doc", { ociID: props.ociID, data: props.quillRef.current.getEditor().getContents() });
-		props.setIsSaved(true);
+		if (pendingChanges !== null)
+			clearTimeout(pendingChanges);
+
+		props.socket.current.emit("send-doc-changes", { doc: props.docID, data: delta });
+		const timeoutId = setTimeout(() => { delayedSaveChanges(); }, 1000); // Adjust the idle period as needed
+		setPendingChanges(timeoutId);
 	};
 
 	// Handle cursor changes
