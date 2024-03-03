@@ -1,7 +1,7 @@
 const fb = require("_firebase/firebase");
 const axios = require("axios");
 import MessageItem from "@/app/chat/messageItem";
-const fetchMessages = async (chatId)=>{
+const fetchMessages = async (chatId, userInfo)=>{
     const token = await fb.getToken();
     const response = await axios.get(`http://localhost:8080/api/chats/${chatId}/messages`, {
     headers: { "Authorization": "Bearer " + token }

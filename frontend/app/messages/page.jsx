@@ -108,10 +108,12 @@ export default function Messages() {
         if (!user || !chatId || !userInfo) return;
         
         const fetchAndSetMessages = async () => {
+            if (!user || !chatId || !userInfo) return;
             setIsLoading(true);
             setLoadingState("FETCHING_MESSAGES");
             try {
-                const fetchedMessages = await fetchMessages(chatId);
+                console.log("Fetching messages for chat:",userInfo);
+                const fetchedMessages = await fetchMessages(chatId, userInfo);
                 setText(fetchedMessages);
                 setIsLoading(false);
                 setLoadingState(""); // Or any state indicating success
@@ -158,6 +160,7 @@ export default function Messages() {
             ...prevText,
             <MessageItem
                 key={prevText.length}
+                messageId = {prevText.length}
                 sender={messageData.sender}
                 timestamp={
                     sentAt.toDateString() + " " + sentAt.toLocaleTimeString()
@@ -202,6 +205,7 @@ export default function Messages() {
                 {withUser ? (
                     <ChatWindow
                         messages={text}
+                        setMessages = {setText}
                         sendPersonalMsg={sendPersonalMsg}
                         userInfo={userInfo}
                         withUserInfo={withUserInfo}

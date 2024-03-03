@@ -11,10 +11,13 @@ export default function MessageBox(props) {
   const { handleSubmit, reset, setValue, getValues, watch, register } = useForm({
     defaultValues: {
       message: '',
+      attachments: [],
     },
   });
   const inputMsg = useRef();  
+   const fileInputRef = useRef();
   const message = watch('message');
+   const attachments = watch('attachments');
   const [emojiPickerAnchorEl, setEmojiPickerAnchorEl] = useState(null);
 
   const emojiButtonRef = useRef(null); // Add this line
@@ -31,11 +34,10 @@ export default function MessageBox(props) {
 
   const onSubmit = (data) => {
     if (props.onSendMessage) {
-      props.onSendMessage(data.message);
+      props.onSendMessage(data.message, data.attachments);
     }
-    reset();
+    reset({ message: '', attachments: [] });
   };
-
   const addEmoji = (emoji) => {
     if (inputMsg.current) {
       const cursorPosition = inputMsg.current.selectionStart || 0;
@@ -54,7 +56,11 @@ export default function MessageBox(props) {
       inputMsg.current.setSelectionRange(newCursorPosition, newCursorPosition);
     }
   };
-
+  const handleAttachmentChange = (event) => {
+    const files = Array.from(event.target.files);
+    console.log(files); // Debugging: Log selected files
+    setValue('attachments', files, { shouldValidate: true });
+  };
   const handleSendButtonClick = () => {
     if (inputMsg.current.value.trim() === "") return; // don't send empty message
     props.callback(inputMsg.current.value);
@@ -63,16 +69,23 @@ export default function MessageBox(props) {
   
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex items-center rounded-lg w-full p-3 mx-5 bg-[#30475E] relative">
-     <IconButton ref={emojiButtonRef} onClick={handleEmojiPickerOpen} size="small" className="absolute left-4 z-10 text-white">
-  <EmojiEmotionsIcon className='text-basicallylight' />
-</IconButton>
-      <IconButton size="small" className="absolute left-12 z-10 text-white">
-        <AttachFileIcon className='text-basicallylight' />
-      </IconButton>
+    <IconButton ref={emojiButtonRef} onClick={handleEmojiPickerOpen} size="small" className="absolute left-4 z-10 text-white">
+      <EmojiEmotionsIcon className='text-basicallylight' />
+    </IconButton>
+    <IconButton size="small" className="absolute left-12 z-10 text-white" onClick={() => fileInputRef.current.click()}>
+      <AttachFileIcon className='text-basicallylight' />
+      <input
+        type="file"
+        multiple
+        ref={fileInputRef}
+        onChange={handleAttachmentChange}
+        style={{ display: 'none' }}
+      />
+    </IconButton>
       <input
         {...register('message')}
         ref={inputMsg}
-        className="flex-1 bg-transparent p-4 pl-20 text-white placeholder-white outline-none border-none"
+        className="flex-1 bg-transparent p-4 pl-20 pr-40 text-white placeholder-white outline-none border-none"
         placeholder="Enter a Message..."
         onKeyDown={(e) => {
           if (e.key === 'Enter' && !e.shiftKey) {
@@ -81,6 +94,11 @@ export default function MessageBox(props) {
           }
         }}
       />
+      {attachments.length > 0 && (
+        <span className="absolute right-20 z-10 text-white text-sm">
+          {attachments.length} file(s) attached
+        </span>
+      )}
       <IconButton type="submit" onClick={handleSendButtonClick} size="small" className="absolute right-4 z-10 text-white">
         <SendIcon className='text-basicallylight'/>
       </IconButton>

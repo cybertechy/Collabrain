@@ -104,37 +104,38 @@ body {
 .dropdown-enter {
   animation: slideDown 0.3s ease-out forwards;
 }
-/* styles/globals.css */
-/* Custom scrollbar for Webkit browsers */
-/* WebKit styles */
 ::-webkit-scrollbar {
-  width: 2px; /* width of the entire scrollbar */
-  border-radius: 100px;
+  height: 1rem;
+  width: .5rem;
 }
 
 ::-webkit-scrollbar-track {
-  background: #81c3d7; /* color of the tracking area */
-  border-radius: 100px; /* rounded corners for the track */
+  background-color: transparent;
+  border-radius: 9999px;
 }
 
-:-webkit-scrollbar-thumb {
-  background: #81c3d7; /* color of the scroll thumb */
-  border-radius: 100px; /* rounded corners for the thumb */
+::-webkit-scrollbar-thumb {
+  background-color: hsla(0, 0%, 100%, .1);
+}
+::-webkit-scrollbar-thumb {
+    --tw-border-opacity: 1;
+    background-color: hsla(0, 0%, 89%, .8);
+    border-color: rgba(255,255,255, var(--tw-border-opacity));
+    border-radius: 9999px;
+    border-width: 1px;
 }
 
-/* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #555; /* color of the scroll thumb when hovered */
-}
-
-/* Firefox styles */
-* {
-  scrollbar-width: thin; /* "auto" or "thin" */
-  scrollbar-color: #81c3d7 #81c3d7; /* thumb and track color */
+  background-color: var(--tertiary);
 }
 .message-container {
   max-height: 700px; /* Adjust based on your layout */
  
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--secondary) var(--primary);
 }
 @keyframes shake {
   10%, 90% {
