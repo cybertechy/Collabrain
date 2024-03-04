@@ -47,7 +47,7 @@ function page() {
     const [Delete, setDelete] = useState(false);
     const [Share, setShare] = useState(false);
 
-    const Serverlocation = "https://collabrain-backend.cybertech13.eu.org";
+    const Serverlocation = "http://localhost:8080";
 
 
 
@@ -441,6 +441,7 @@ function page() {
     };
 
     const updatecontent = async (data) => {
+        console.log(data);
         try {
             let res = await axios.put(`${Serverlocation}/api/maps/${id}`, data, {
                 headers: {
@@ -598,7 +599,7 @@ function page() {
                         }
                         <button disabled={!(id && IntialData && Excalidraw)} id="share" onClick={() => setShare(Share => !Share)} className="rounded-lg text-basicallylight">Share</button>
                         {Share && <div className="absolute z-10 top-[13%] lg:left-[200px] left-[10px] md:left-[100px] bg-basicallylight rounded-md shadow-md p-2 flex flex-col gap-2 border border-primary">
-                            <ShareComponent getdata={getdata} updatecontent={updatecontent} contentMapName={IntialData?.name} setShare={setShare} sData={IntialData?.Access} isOwner={isOwner} />
+                            <ShareComponent getdata={getdata} updatecontent={updatecontent} contentMapName={IntialData?.name} setShare={setShare} sData={IntialData?.Access} isOwner={isOwner} publicData={IntialData?.public} setpublicData={setpublic} />
                         </div>}
 
                         {(IntialData?.userAccess === "edit" || IntialData?.userAccess === "owner") && <div id="save" className="flex items-center gap-2 bg-basicallylight text-primary rounded-md  px-2 py-1 ">
