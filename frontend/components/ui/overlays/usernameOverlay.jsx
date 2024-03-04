@@ -24,7 +24,7 @@ const UsernameOverlay = ({ onClose, hasUserUsername, setHasUserUsername }) =>
 
 		try
 		{
-			const response = await axios.get(`http://localhost:8080/api/users/username/${enteredUsername}`);
+			const response = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/users/username/${enteredUsername}`);
 			if (response.status === 200)
 			{
 				setError("Username is available");
@@ -76,7 +76,7 @@ const UsernameOverlay = ({ onClose, hasUserUsername, setHasUserUsername }) =>
 			if (user) {
 				token = await fb.getToken();
 			}
-			const response = await axios.patch('http://localhost:8080/api/users/', { username: username }, {
+			const response = await axios.patch('https://collabrain-backend.cybertech13.eu.org/api/users/', { username: username }, {
 				headers: {
 					authorization: `Bearer ${token}`
 				}

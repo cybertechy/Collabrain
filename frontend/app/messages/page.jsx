@@ -40,7 +40,7 @@ export default function Messages() {
     useEffect(() => {
         if (!user) return;
 
-        sockCli.current = socket.init('http://localhost:8080') || {};
+        sockCli.current = socket.init('https://collabrain-backend.cybertech13.eu.org') || {};
         console.log('Socket initialized', sockCli);
         sockCli.current.on('directMsg', (data) => {
             let sentAt = new Date(data.sentAt._seconds * 1000 + data.sentAt._nanoseconds / 1000000);
@@ -65,7 +65,7 @@ export default function Messages() {
         const fetchUser = async () => {
             try {
                 const token = await fb.getToken();
-                const response = await axios.get(`http://localhost:8080/api/users/${user.uid}`, {
+                const response = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/users/${user.uid}`, {
                     headers: { "Authorization": "Bearer " + token }
                 });
                 setUserInfo({ data: response.data });
@@ -84,7 +84,7 @@ export default function Messages() {
         const fetchUser = async () => {
             try {
                 const token = await fb.getToken();
-                const response = await axios.get(`http://localhost:8080/api/users/${withUser}`, {
+                const response = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/users/${withUser}`, {
                     headers: { "Authorization": "Bearer " + token }
                 });
                 setWithUserInfo({ data: response.data });
@@ -103,7 +103,7 @@ export default function Messages() {
         const fetchMessages = async () => {
             try {
                 const token = await fb.getToken();
-                const response = await axios.get(`http://localhost:8080/api/chats/${chatId}/messages`, {
+                const response = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/chats/${chatId}/messages`, {
                     headers: { "Authorization": "Bearer " + token }
                 });
                 console.log("Fetched messages:", response.data);
@@ -149,7 +149,7 @@ export default function Messages() {
     const fetchDirectMessages = async () => {
         try {
             const token = await fb.getToken();
-            const response = await axios.get("http://localhost:8080/api/chats/", {
+            const response = await axios.get("https://collabrain-backend.cybertech13.eu.org/api/chats/", {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -172,7 +172,7 @@ export default function Messages() {
 
         // Assuming you've authenticated and have the user's token
         let token = await fb.getToken();
-        let userData = await axios.get(`http://localhost:8080/api/users/${user.uid}`, {
+        let userData = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/users/${user.uid}`, {
             headers: { "Authorization": "Bearer " + token }
         });
 

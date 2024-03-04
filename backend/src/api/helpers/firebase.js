@@ -4,15 +4,29 @@ const serviceAccount = require("./ServiceAccountKey.json");
 // Initialize Firebase admin
 admin.initializeApp({
 	credential: admin.credential.cert(serviceAccount),
-
+	databaseURL: "https://collabrain-group-project-default-rtdb.asia-southeast1.firebasedatabase.app"
 });
 
-function verifyUser(token)
+const db = admin.firestore();
+
+async function verifyUser(token)
 {
 	return admin.auth().verifyIdToken(token).catch((error) => { return null; });
 }
 
-const db = admin.firestore();
+async function deleteUser(uid){
+	return admin.auth().deleteUser(uid).catch((error) => { console.log("Error deleting user:", error); });
+
+}
+
+async function updateUser(uid, data){
+	return admin.auth().updateUser(uid, data).catch((error) => { console.log("Error updating user:", error); });
+}
+
+async function getUser(uid){
+	return admin.auth().getUser(uid).catch((error) => { console.log("Error getting user:", error); });
+}
+
 
 // Functions to manipulate docs in Firestore
 async function createDoc(user)
@@ -105,6 +119,7 @@ async function deleteQueryBatch(query, resolve)
 }
 
 // Untested after modification
+// Untested after modification
 async function saveTeamMsg(data)
 {
 	let channels = (await db.collection(`teams/${data.team}/channels/`).where("name", "==", data.channel).get());
@@ -161,6 +176,40 @@ async function saveDirectMsg(data)
 	// }).catch(err => console.log(err));
 }
 
+const realtimeDB = admin.database();
+
+
+// add object to realtime database
+async function addObjectToRealtimeDB(path, object)
+{
+	return realtimeDB.ref(path).set(object);
+}
+
+// get object from realtime database
+async function getObjectFromRealtimeDB(path)
+{
+	return realtimeDB.ref(path).once("value");
+}
+
+// update object in realtime database
+async function updateObjectInRealtimeDB(path, object)
+{
+	return realtimeDB.ref(path).update(object);
+}
+
+// remove object from realtime database
+async function removeObjectFromRealtimeDB(path)
+{
+	return realtimeDB.ref(path).remove();
+}
+
+// Database event listeners
+async function listenToRealtimeDB(path, callback)
+{
+	realtimeDB.ref(path).on("value", (snapshot) => callback(snapshot.val()));
+}
+
+
 module.exports = {
 	db,
 	admin,
@@ -172,5 +221,13 @@ module.exports = {
 	getChatMembers,
 	deleteCollection,
 	saveTeamMsg,
-	saveDirectMsg
+	saveDirectMsg,
+	deleteUser,
+	updateUser,
+	getUser,
+	addObjectToRealtimeDB,
+	getObjectFromRealtimeDB,
+	updateObjectInRealtimeDB,
+	removeObjectFromRealtimeDB,
+	listenToRealtimeDB
 };

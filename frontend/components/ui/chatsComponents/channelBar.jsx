@@ -71,7 +71,7 @@ const router  = useRouter();
     // The team ID to delete
     const teamId = teamData.teamId;
 
-    axios.delete(`http://localhost:8080/api/teams/${teamId}`, {
+    axios.delete(`https://collabrain-backend.cybertech13.eu.org/api/teams/${teamId}`, {
         headers: {
             'Authorization': `Bearer ${token}`
         }

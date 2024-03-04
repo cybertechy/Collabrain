@@ -75,7 +75,7 @@ export default function Dashboard()
         const uid = fb.getUserID();
 
         try {
-            const res = await axios.get(`http://localhost:8080/api/users/${uid}`, {
+            const res = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/users/${uid}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -199,7 +199,7 @@ export default function Dashboard()
 
 		try
 		{
-			const res = await axios.post(`http://localhost:8080/api/maps`, {
+			const res = await axios.post(`https://collabrain-backend.cybertech13.eu.org/api/maps`, {
 				name: "New Content Map",
 				data: ""
 			}, {
@@ -262,7 +262,7 @@ export default function Dashboard()
 		console.log(user);
 		if (user)
 		{
-			sock_cli = socket.init("http://localhost:8080");
+			sock_cli = socket.init("https://collabrain-backend.cybertech13.eu.org");
 			//    fetchTeams();
 			//    fetchTeams();
 
@@ -289,7 +289,7 @@ export default function Dashboard()
 					.then(token =>
 					{
 						console.log(token);
-						return axios.get("http://localhost:8080/api/dashboard/files", {
+						return axios.get("https://collabrain-backend.cybertech13.eu.org/api/dashboard/files", {
 							headers: {
 								Authorization: `Bearer ${token}`,
 							},
@@ -334,7 +334,7 @@ export default function Dashboard()
 	//         const token = await fb.getToken();
 	//         // console.log("Token: ", token);
 	//         const response = await axios.get(
-	//             "http://localhost:8080/api/profile/",
+	//             "https://collabrain-backend.cybertech13.eu.org/api/profile/",
 	//             {
 	//                 headers: {
 	//                     Authorization: `Bearer ${token}`,
@@ -346,7 +346,7 @@ export default function Dashboard()
 	//         const token = await fb.getToken();
 	//         // console.log("Token: ", token);
 	//         const response = await axios.get(
-	//             "http://localhost:8080/api/profile/",
+	//             "https://collabrain-backend.cybertech13.eu.org/api/profile/",
 	//             {
 	//                 headers: {
 	//                     Authorization: `Bearer ${token}`,
@@ -394,7 +394,7 @@ export default function Dashboard()
 	//             })
 	//             .then(token => {
 	//                 console.log(token);
-	//                 return axios.get("http://localhost:8080/api/maps", {
+	//                 return axios.get("https://collabrain-backend.cybertech13.eu.org/api/maps", {
 	//                     headers: {
 	//                         Authorization: `Bearer ${token}`,
 	//                     },
@@ -466,7 +466,7 @@ export default function Dashboard()
 				})
 					.then(token =>
 					{
-						return axios.get("http://localhost:8080/api/dashboard/folders", {
+						return axios.get("https://collabrain-backend.cybertech13.eu.org/api/dashboard/folders", {
 							headers: {
 								Authorization: `Bearer ${token}`,
 							},
@@ -547,7 +547,7 @@ export default function Dashboard()
 		const token = await getToken();
 
 		let res = await axios
-			.post("http://localhost:8080/api/doc/new", {
+			.post("https://collabrain-backend.cybertech13.eu.org/api/doc/new", {
 				token: token,
 			})
 			.catch((err) => console.log(err));
@@ -556,7 +556,7 @@ export default function Dashboard()
 		{
 			currentDoc = res.data.id;
 			res = await axios
-				.post(`http://localhost:8080/api/doc/${currentDoc}`, {
+				.post(`https://collabrain-backend.cybertech13.eu.org/api/doc/${currentDoc}`, {
 					token: token,
 					title: title,
 					content: content,
@@ -570,7 +570,7 @@ export default function Dashboard()
 		console.log(currentDoc);
 		const token = await getToken();
 		let res = await axios
-			.delete(`http://localhost:8080/api/doc/${currentDoc}`, {
+			.delete(`https://collabrain-backend.cybertech13.eu.org/api/doc/${currentDoc}`, {
 				data: {
 					token: token,
 				},

@@ -68,6 +68,32 @@ router.get("/", async (req, res) =>
 	return res.status(200).json(reports);
 });
 
+/* Get all reports of an user */
+router.get("/:user", async (req, res) =>
+{
+	// Make sure all required fields are present
+	if (!req.headers.authorization)
+		return res.status(400).json({ error: "Missing required data" });
+
+	// verify token
+	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
+	if (!user)
+		return res.status(401).json({ error: "Unauthorized" });
+
+	// Check if user is admin
+	let userRef = await fb.db.doc(`users/${user.uid}`).get();
+	let userRole = userRef.data().role;
+	if (!(userRole=== "content moderator")) {
+		return res.status(401).json({ error: "Unauthorized" });
+	}
+
+	// Get reports
+	let reports = [];
+	let snapshot = await fb.db.collection("reports").where("sender", "==", req.params.user).get();
+	snapshot.forEach(doc => reports.push(doc.data()));
+	return res.status(200).json(reports);
+});
+
 
 
 module.exports = router;
