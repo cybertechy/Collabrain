@@ -6,24 +6,11 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CustomAvatar from "@/components/ui/messagesComponents/avatar";
 import MessageItem from "./MessageItem";
 
-export default function ChatWindow({ messages, setMessages, sendPersonalMsg, withUserInfo, switchToFriends }) {
+export default function ChatWindow({ messages, setMessages, sendPersonalMsg, withUserInfo, switchToFriends ,onReact, onReply, replyTo }) {
   const [title, setTitle] = useState(withUserInfo?.username || 'User');
   const messagesEndRef = useRef(null); // Create a ref for the scrolling target
-  const handleReact = (messageId, emoji) => {
-    // Assuming messages is an array of message objects in the parent component
-    setMessages(messages => messages.map(message => {
-      if (message.id === messageId) {
-        const newReactions = { ...message.reactions };
-        if (newReactions[emoji]) {
-          newReactions[emoji] += 1;
-        } else {
-          newReactions[emoji] = 1;
-        }
-        return { ...message, reactions: newReactions };
-      }
-      return message;
-    }));
-  };
+
+
   useEffect(() => {
     if (withUserInfo) {
       setTitle(withUserInfo?.data?.username || 'User');
@@ -48,14 +35,15 @@ export default function ChatWindow({ messages, setMessages, sendPersonalMsg, wit
           <span className="ml-2">{title}</span>
         </Toolbar>
       </div>
-      <div className="flex-auto overflow-y-scroll p-5 mb-[76px] max-h-[calc(100vh-160px)] sm:max-h-[calc(100vh-180px)] md:max-h-[calc(100vh-200px)] lg:max-h-[calc(100vh-220px)] xl:max-h-[calc(100vh-240px)]">
+      <div className="flex-auto overflow-y-scroll p-5 mb-[76px]  max-h-[calc(100vh-160px)] sm:max-h-[calc(100vh-180px)] md:max-h-[calc(100vh-200px)] lg:max-h-[calc(100vh-220px)] xl:max-h-[calc(100vh-240px)]">
+       <div className="mt-10"></div>
         {messages?.map((message, index) => (
-          <MessageItem key={index} {...message.props} onReact = {handleReact}/>
+          <MessageItem key={index} {...message.props} onReact = {onReact} onReply ={onReply}  messageId = {index}/>
         ))}
         <div ref={messagesEndRef} /> {/* Invisible element at the end of messages */}
       </div>
       <div className="absolute bottom-0 left-0 right-0 p-3  bg-white" style={{ paddingLeft: '2rem', paddingRight: '2rem' }}>
-        <MessageBox callback={sendPersonalMsg} />
+        <MessageBox onSendMessage={sendPersonalMsg} replyTo = {replyTo} onReply = {onReply}/>
       </div>
     </div>
   );

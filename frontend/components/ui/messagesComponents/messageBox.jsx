@@ -6,8 +6,11 @@ import AttachFileIcon from '@mui/icons-material/AttachFile';
 import SendIcon from '@mui/icons-material/Send';
 import EmojiPicker from '@/components/ui/messagesComponents/EmojiPicker';
 import Popover from '@mui/material/Popover';
-
-export default function MessageBox(props) {
+import CloseIcon from '@mui/icons-material/Close';
+export default function MessageBox({onSendMessage, replyTo, onReply}) {
+  if(replyTo){
+    console.log("Reply to is ",replyTo);
+  }
   const { handleSubmit, reset, setValue, getValues, watch, register } = useForm({
     defaultValues: {
       message: '',
@@ -19,7 +22,7 @@ export default function MessageBox(props) {
   const message = watch('message');
    const attachments = watch('attachments');
   const [emojiPickerAnchorEl, setEmojiPickerAnchorEl] = useState(null);
-
+  
   const emojiButtonRef = useRef(null); // Add this line
 
   // Modify handleEmojiPickerOpen to use the ref
@@ -33,10 +36,16 @@ export default function MessageBox(props) {
   const isEmojiPickerOpen = Boolean(emojiPickerAnchorEl);
 
   const onSubmit = (data) => {
-    if (props.onSendMessage) {
-      props.onSendMessage(data.message, data.attachments);
+    console.log("In message box, data is",data); // Debug to check the structure of 'data'
+    if (onSendMessage) {
+        onSendMessage(data.message, data.attachments, replyTo);
     }
     reset({ message: '', attachments: [] });
+    onReply(null); 
+};
+
+  const handleCancelReply = () => {
+    onReply(null); // Clear the replyTo state
   };
   const addEmoji = (emoji) => {
     if (inputMsg.current) {
@@ -61,14 +70,38 @@ export default function MessageBox(props) {
     console.log(files); // Debugging: Log selected files
     setValue('attachments', files, { shouldValidate: true });
   };
+  const renderReplyToSnippet = (replyTo) => {
+    if (!replyTo) return null;
+    
+    // Extract the first 20 characters of the replyTo message
+    const snippet = replyTo.message.length > 20 
+      ? replyTo.message.substring(0, 20) + "..."
+      : replyTo.message;
+  
+    return (
+      <div className=" p-2 rounded-lg">
+        <span className="font-bold text-md">{replyTo.sender}: </span>
+        <span className="text-md">{snippet}</span>
+      </div>
+    );
+  };
   const handleSendButtonClick = () => {
     if (inputMsg.current.value.trim() === "") return; // don't send empty message
-    props.callback(inputMsg.current.value);
+    onSendMessage(inputMsg.current.value);
     inputMsg.current.value = ""; // clear input
   };
   
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex items-center rounded-lg w-full p-3 mx-5 bg-[#30475E] relative">
+    
+    {replyTo && (
+        <div className="flex items-center justify-between p-2  rounded-lg bg-[#406882] text-white">
+          {renderReplyToSnippet(replyTo)}
+          <IconButton onClick={handleCancelReply} size="small" className="text-white">
+            <CloseIcon className='text-white' />
+          </IconButton>
+        </div>
+      )}
     <IconButton ref={emojiButtonRef} onClick={handleEmojiPickerOpen} size="small" className="absolute left-4 z-10 text-white">
       <EmojiEmotionsIcon className='text-basicallylight' />
     </IconButton>

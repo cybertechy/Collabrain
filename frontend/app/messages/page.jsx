@@ -21,11 +21,12 @@ export default function Messages() {
     const [isLoading, setIsLoading] = useState(false);
     const [loadingState, setLoadingState] = useState("");
     const [userInfo, setUserInfo] = useState(null);
-    const [text, setText] = useState([]);
+    const [message, setMessages] = useState([]);
     const [directMessages, setDirectMessages] = useState([]);
     const params = useSearchParams();
     const [withUserInfo, setWithUserInfo] = useState(null);
     const [showChat, setShowChat] = useState(false);
+    const [replyTo, setReplyTo] = useState(null);
 
     const withUser = params.get("user");
     const chatId = params.get("chatID");
@@ -42,10 +43,10 @@ export default function Messages() {
             let sentAt = new Date(
                 data.sentAt._seconds * 1000 + data.sentAt._nanoseconds / 1000000
             );
-            setText((prevText) => [
-                ...prevText,
+            setMessages((prevMessage) => [
+                ...prevMessage,
                 <MessageItem
-                    key={prevText.length}
+                    key={prevMessage.length}
                     sender={data.sender}
                     message={data.msg}
                     timestamp={
@@ -54,6 +55,10 @@ export default function Messages() {
                         sentAt.toLocaleTimeString()
                     }
                     reactions={{}}
+                    onReact = {handleReact}
+                    onReply={setReplyTo}
+                    attachments = {data.attachments}
+                    replyTo = {data.replyTo}
                 />,
             ]);
         });
@@ -114,7 +119,7 @@ export default function Messages() {
             try {
                 console.log("Fetching messages for chat:",userInfo);
                 const fetchedMessages = await fetchMessages(chatId, userInfo);
-                setText(fetchedMessages);
+                setMessages(fetchedMessages);
                 setIsLoading(false);
                 setLoadingState(""); // Or any state indicating success
             } catch (error) {
@@ -129,21 +134,23 @@ export default function Messages() {
 
 
 
-
-    const sendPersonalMsg = async (msg) => {
+    const uploadAttachments = async (attachments) => {
+        // This function should handle the upload logic
+        // For each attachment, upload it to your server or storage service
+        // Return an array of URLs or references to the uploaded files
+      };
+    const sendPersonalMsg = async (msg, attachments, replyToMsg, reactions) => {
         if (!sockCli.current) {
             console.log("Socket is not initialized yet.");
             return;
         }
+        console.log("Sending Personal Message attributes are:",msg, attachments); // Debug to check the values
 
-        // Assuming you've authenticated and have the user's token
-        let token = await fb.getToken();
-        let userData = await axios.get(
-            `http://localhost:8080/api/users/${user.uid}`,
-            {
-                headers: { Authorization: "Bearer " + token },
-            }
-        );
+        let attachmentUrls = [];
+        if (attachments?.length > 0) {
+          attachmentUrls = await uploadAttachments(attachments);
+          // Handle errors or failures in upload
+        }
 
         let sentAt = new Date();
         const messageData = {
@@ -152,28 +159,69 @@ export default function Messages() {
             chat: chatId, // The chat ID for the direct message
             msg: msg,
             sentAt: sentAt, // Convert the date to a Firebase timestamp if necessary
-            reactions: [], // Starting with an empty array for reactions
+            reactions: reactions, // Starting with an empty array for reactions
+            attachments: attachmentUrls
         };
 
         // Add the message to the real-time socket chat
-        setText((prevText) => [
-            ...prevText,
+        setMessages((prevMessage) => [
+            ...prevMessage,
             <MessageItem
-                key={prevText.length}
-                messageId = {prevText.length}
+                key={prevMessage.length}
+                messageId = {prevMessage.length}
                 sender={messageData.sender}
                 timestamp={
                     sentAt.toDateString() + " " + sentAt.toLocaleTimeString()
                 }
                 message={messageData.msg}
-                reactions={{}} // This is where you'd add reactions if you have them
+                reactions={reactions} // This is where you'd add reactions if you have them
                 userData={userInfo.data}
+                onReact = {handleReact}
+                onReply={setReplyTo}
+                attachments = {attachments}
+                replyTo = {replyToMsg}
             />,
         ]);
 
         sockCli.current.emit("directMsg", messageData); // Send the direct message to the server
+        setReplyTo(null); // Reset replyTo state after sending a messagez
     };
-
+    const handleReact = (messageId, emoji) => {
+        setMessages((currentMessages) => {
+            return currentMessages.map((message, index) => {
+                if (index === messageId) {
+                    // Clone the reactions object or initialize if undefined
+                    let newReactions = { ...message.props.reactions };
+                    // If the emoji already exists in reactions
+                    if (newReactions[emoji]) {
+                        // If it's exactly 1, remove the reaction entirely (toggle off)
+                        if (newReactions[emoji] === 1) {
+                            delete newReactions[emoji];
+                        } else {
+                            // Decrement if more than 1 (this handles the case of multiple users reacting with the same emoji)
+                            newReactions[emoji] -= 1;
+                        }
+                    } else {
+                        // If the emoji doesn't exist, initialize it with 1
+                        newReactions[emoji] = 1;
+                    }
+                    // Return the updated message with new reactions
+                    return {
+                        ...message,
+                        props: {
+                            ...message.props,
+                            reactions: newReactions,
+                        },
+                    };
+                }
+                return message;
+            });
+        });
+    };
+    
+      
+      
+    
     // Handler for the friends button
     const openFriends = () => {
         // Toggles the display between ChatWindow and FriendsWindow
@@ -204,12 +252,15 @@ export default function Messages() {
                 />
                 {withUser ? (
                     <ChatWindow
-                        messages={text}
-                        setMessages = {setText}
+                        messages={message}
+                        setMessagess = {setMessages}
                         sendPersonalMsg={sendPersonalMsg}
                         userInfo={userInfo}
                         withUserInfo={withUserInfo}
                         switchToFriends = {openFriends}
+                        onReact={handleReact}
+                        onReply={setReplyTo}
+                        replyTo={replyTo}
                     />
                 ) : (
                     <FriendsWindow />
