@@ -183,7 +183,7 @@ export default function Editor()
 					<Quill socket={sockCli} user={userData} quillRef={quillRef}
 						value={value} setValue={setValue} isDisabled={isDisabled}
 						docID={searchParams.get('id')} ociID={ociID}
-						setShowCommentButton={setShowCommentButton} setIsSaved={setIsSaved}/>
+						setShowCommentButton={setShowCommentButton} setIsSaved={setIsSaved} />
 				</div>
 			</div>
 		</Template>
