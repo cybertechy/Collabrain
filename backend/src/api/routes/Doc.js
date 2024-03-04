@@ -37,20 +37,30 @@ router.post('/', async (req, res) =>
 	if (!uploadData.eTag)
 		return res.status(500).json({ error: "Failed to create document" });
 
+	const userRef = fb.db.doc(`users/${user.uid}`);
+	let userData = (await userRef.get()).data();
+
 	const doc = {
 		name: req.body.name,
 		data: dataId,
 		createdAt: fb.admin.firestore.FieldValue.serverTimestamp(),
 		updatedAt: fb.admin.firestore.FieldValue.serverTimestamp(),
-		access: { [user.uid]: { role: roles.owner } },
+		access: {
+			[user.uid]: {
+				role: roles.owner,
+				type: "users",
+				email: userData.email,
+				name: userData.username
+			}
+		},
 		path: (req.body.path) ? req.body.path : "/"
 	};
 
 	// Add document collection
 	fb.db.collection(`documents`).add(doc)
-		.then((docRef) =>
+		.then(docRef =>
 		{
-			fb.db.doc(`users/${user.uid}`).update({
+			userRef.update({
 				documents: fb.admin.firestore.FieldValue.arrayUnion(docRef.id)
 			})
 				.then(() => { res.status(200).json({ message: "Document created", id: docRef.id }); })
@@ -209,21 +219,29 @@ router.post('/:id/share/:user', async (req, res) =>
 
 	let docRef = fb.db.doc(`documents/${req.params.id}`);
 	docRef.get()
-		.then((doc) =>
+		.then(async (doc) =>
 		{
 			// Check if user is owner of document
 			if (doc.data().access[user.uid].role !== roles.owner)
 				return res.status(401).json({ error: "Unauthorized" });
 
+			let userRef = fb.db.doc(`users/${req.params.user}`)
+			let userData = (await userRef.get()).data();
+
 			// Add document to user
-			fb.db.doc(`users/${req.params.user}`).update({
+			userRef.update({
 				documents: fb.admin.firestore.FieldValue.arrayUnion(req.params.id)
 			})
 				.then(() =>
-				{
+				{ 
 					// Add user to document
 					docRef.update({
-						[`access.${req.params.user}`]: { role: req.body.role }
+						[`access.${req.params.user}`]: {
+							role: req.body.role,
+							type: "users",
+							email: userData.email,
+							name: userData.username
+						}
 					})
 						.then(() => { res.status(200).json({ message: "Document shared" }); })
 						.catch((error) => { throw error; });
