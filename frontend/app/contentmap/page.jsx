@@ -131,6 +131,8 @@ function page() {
                 setConcurrencyStop(true);
             }
 
+            if(updateInfo?.BroadcasterID === user.uid) return;
+
 
             let appElements = ExcalidrawAPI.getSceneElements();
             let mergeElements = []
@@ -149,6 +151,7 @@ function page() {
                 mergeElements = mergeElements.map((element) => {
                     if (updateInfo?.unLockElement?.includes(element.id)) {
                         element.isLocked = false;
+                        element.locked = false;
                     }
                     return element;
                 });
@@ -159,6 +162,7 @@ function page() {
                 mergeElements = mergeElements.map((element) => {
                     if (updateInfo?.selectedElementIds?.includes(element.id)) {
                         element.isLocked = true;
+                        element.locked = true;
                     }
                     return element;
                 });
@@ -189,7 +193,8 @@ function page() {
                 elements: ExcalidrawAPI.getSceneElements(),
                 appState: appState,
                 files: ExcalidrawAPI.getFiles(),
-                collaborators: { ...appState.collaborators }
+                collaborators: { ...appState.collaborators },
+                BroadcasterID: user.uid
             }
 
             sockCli.current.emit('collabData', { id: id, user: user.uid, data: appdata });
@@ -227,20 +232,17 @@ function page() {
             id: user.uid,
             selectedElementIds: appState.selectedElementIds,
         }
-
-
-
         let ShareData = {
             id: id,
             user: user.uid,
-            data: { collaborators: [...appState.collaborators.slice(0, index), mstate, ...appState.collaborators.slice(index + 1)] },
-            timestamp: Date.now()
+            data: {  collaborators: [...appState.collaborators.slice(0, index), mstate, ...appState.collaborators.slice(index + 1)] },
+            BroadcasterID: user.uid
         }
 
         // TEMP : send the current user mstate to the room
         if (POINTER_DEBUG) {
-            console.log("Sending mstate");
-            console.log(ShareData);
+            console.log("Sending Ponter State: ",ShareData);
+            console.log("AppState: ",appState);
         }
 
         if (sockCli.current && mstate.button === "down") sockCli.current.emit('collabData', ShareData);
@@ -491,7 +493,6 @@ function page() {
     };
 
     const updatecontent = async (data) => {
-        console.log(data);
         try {
             let res = await axios.put(`${Serverlocation}/api/maps/${id}`, data, {
                 headers: {
@@ -526,7 +527,7 @@ function page() {
         }
 
         let appState = ExcalidrawAPI.getAppState();
-        console.log("AppState: ", appState);
+        
         let appdata = {
             elements: ExcalidrawAPI.getSceneElements(),
             appState: {
@@ -539,6 +540,7 @@ function page() {
             files: ExcalidrawAPI.getFiles(),
             collaborators: appState.collaborators,
             unLockElement: Object.keys(appState.selectedElementIds).filter((id) => appState.selectedElementIds[id]),
+            BroadcasterID: user.uid
         }
 
         if (SOCKET_DEBUG) {

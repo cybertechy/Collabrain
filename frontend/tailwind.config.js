@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  mode: 'jit',
+    mode: 'jit',
     content: [
         "./pages/**/*.{js,ts,jsx,tsx,mdx}",
         "./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -8,9 +8,11 @@ module.exports = {
     ],
     // darkMode: 'class',
     theme: {
-        screens: {
-            'xxs': '450px', // min-width
-            'xsm': '650px',
+        extend: {
+            screens: {
+                'xxs': '450px', // min-width
+                'xsm': '650px',
+            },
         },
         fontFamily: {
             poppins: ["Poppins", "sans-serif"],
@@ -19,7 +21,7 @@ module.exports = {
             scrollbar: ['rounded'],
             height: {
                 '13': '3.25rem', // 52px if 1rem = 16px
-              },
+            },
             boxShadow: {
                 custom: "0px 0px 9px 0 rgba(197, 138, 255, 1)",
             },
@@ -49,8 +51,8 @@ module.exports = {
         },
     },
     plugins: [
-       
-    require('tailwind-scrollbar')
-  
+
+        require('tailwind-scrollbar')
+
     ],
 };
