@@ -11,6 +11,8 @@ let io;
 let currLinks = {};
 let rooms = {};
 
+let connectionTimes = {};
+
 function init(server) {
 
 	io = new Server(server, { cors: { origin: "*" } });
@@ -40,6 +42,10 @@ function init(server) {
 		rooms = data.val() || {};
 	});
 
+	fb.getObjectFromRealtimeDB("connectionTimes").then((data) => {
+		connectionTimes = data.val() || {};
+	});
+
 	// Listen for connections
 	fb.listenToRealtimeDB("currLinks", (data) => {
 		currLinks = data || {};
@@ -50,21 +56,42 @@ function init(server) {
 		rooms = data || {};
 	});
 
+	fb.listenToRealtimeDB("connectionTimes", (data) => {
+		connectionTimes = data || {};
+	});
+
 
 
 	io.on('connection', (socket) => {
 		socket.on('user', (msg) => {
 			console.log(`user ${msg.id} connected`);
 			currLinks[msg.id] = socket.id;
+			// FSR1 - Difference between user connecting and disconnecting
+			connectionTimes[msg.id] = Date.now();
 
 			// Save the user to the database
 			fb.addObjectToRealtimeDB("currLinks", currLinks);
 		});
 
-		socket.on('disconnect', () => {
-			// Find the user and delete it
-			let ref = Object.keys(currLinks).find((key) => currLinks[key] === socket.id);
-			delete currLinks[ref];
+		
+
+		socket.on('disconnect', async () => {
+    		let ref = Object.keys(currLinks).find((key) => currLinks[key] === socket.id);
+    		if (ref) {
+        		let disconnectTime = Date.now();
+        		let connectTime = connectionTimes[ref];
+        		if (connectTime) {
+            		let timeSpent = disconnectTime - connectTime; // Time spent in milliseconds
+
+            		// Update the timeSpent for the user in Firebase
+            		//await fb.firestore().collection('users').doc(ref).update({
+                	//	timeSpent: fb.admin.firestore.FieldValue.increment(timeSpent)
+            		//});
+
+            		// Cleanup
+            	delete currLinks[ref];
+				delete connectionTimes[ref]; // Ensure to remove the user from here as well
+            	console.log(`user disconnected, time spent: ${timeSpent}ms`);
 
 			// Remove the user from all rooms
 			Object.keys(rooms).forEach((room) => {
@@ -79,8 +106,11 @@ function init(server) {
 			// Save the user to the database
 			fb.addObjectToRealtimeDB("currLinks", currLinks);
 			fb.addObjectToRealtimeDB("rooms", rooms);
+			fb.addObjectToRealtimeDB("connectionTimes", connectionTimes);
 
-			console.log('user disconnected');
+            		
+        		}
+    		}
 		});
 
 		socket.on('teamMsg', (data) => broadcastMessage(data));
