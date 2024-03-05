@@ -71,46 +71,47 @@ function init(server) {
 
 			// Save the user to the database
 			fb.addObjectToRealtimeDB("currLinks", currLinks);
+			fb.addObjectToRealtimeDB("connectionTimes", connectionTimes);
 		});
 
-		
+
 
 		socket.on('disconnect', async () => {
-    		let ref = Object.keys(currLinks).find((key) => currLinks[key] === socket.id);
-    		if (ref) {
-        		let disconnectTime = Date.now();
-        		let connectTime = connectionTimes[ref];
-        		if (connectTime) {
-            		let timeSpent = disconnectTime - connectTime; // Time spent in milliseconds
+			let ref = Object.keys(currLinks).find((key) => currLinks[key] === socket.id);
+			if (ref) {
+				let disconnectTime = Date.now();
+				let connectTime = connectionTimes[ref];
+				console.log(`Connection time: ${connectTime}, Disconnect time: ${disconnectTime}`);
+				if (connectTime) {
+					let timeSpent = disconnectTime - connectTime; // Time spent in milliseconds
 
-            		// Update the timeSpent for the user in Firebase
-            		//await fb.firestore().collection('users').doc(ref).update({
-                	//	timeSpent: fb.admin.firestore.FieldValue.increment(timeSpent)
-            		//});
+					// Update the timeSpent for the user in Firebase
+					await fb.db.collection('users').doc(ref).update({
+						timeSpent: fb.admin.firestore.FieldValue.increment(timeSpent)
+					});
 
-            		// Cleanup
-            	delete currLinks[ref];
-				delete connectionTimes[ref]; // Ensure to remove the user from here as well
-            	console.log(`user disconnected, time spent: ${timeSpent}ms`);
-
-			// Remove the user from all rooms
-			Object.keys(rooms).forEach((room) => {
-				if (rooms[room].members[ref]) {
-					delete rooms[room].members[ref];
-					if (Object.keys(rooms[room].members).length == 0) delete rooms[room];
-
+					// Cleanup
+					delete connectionTimes[ref]; // Ensure to remove the user from here as well
+					console.log(`user disconnected, time spent: ${timeSpent}ms`);
 				}
-				console.log(`user ${ref} left room ${room}`)
-			});
 
-			// Save the user to the database
-			fb.addObjectToRealtimeDB("currLinks", currLinks);
-			fb.addObjectToRealtimeDB("rooms", rooms);
-			fb.addObjectToRealtimeDB("connectionTimes", connectionTimes);
+				delete currLinks[ref];
 
-            		
-        		}
-    		}
+				// Remove the user from all rooms
+				Object.keys(rooms).forEach((room) => {
+					if (rooms[room].members[ref]) {
+						delete rooms[room].members[ref];
+						if (Object.keys(rooms[room].members).length == 0) delete rooms[room];
+
+					}
+					console.log(`user ${ref} left room ${room}`)
+				});
+
+				// Save the user to the database
+				fb.addObjectToRealtimeDB("currLinks", currLinks);
+				fb.addObjectToRealtimeDB("rooms", rooms);
+				fb.addObjectToRealtimeDB("connectionTimes", connectionTimes);
+			}
 		});
 
 		socket.on('teamMsg', (data) => broadcastMessage(data));
