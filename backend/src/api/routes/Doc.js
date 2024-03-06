@@ -230,7 +230,7 @@ router.post('/:id/share/:user', async (req, res) =>
 
 			// Add document to user
 			userRef.update({
-				documents: fb.admin.firestore.FieldValue.arrayUnion(req.params.id)
+				AccessDocuments: fb.admin.firestore.FieldValue.arrayUnion(req.params.id)
 			})
 				.then(() =>
 				{ 
@@ -273,7 +273,7 @@ router.delete('/:id/share/:user', async (req, res) =>
 
 			// Remove document from user
 			fb.db.doc(`users/${req.params.user}`).update({
-				documents: fb.admin.firestore.FieldValue.arrayRemove(req.params.id)
+				AccessDocuments: fb.admin.firestore.FieldValue.arrayRemove(req.params.id)
 			})
 				.then(() =>
 				{
