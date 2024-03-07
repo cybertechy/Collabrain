@@ -209,17 +209,19 @@ async function saveDirectMsg(data)
 		.add({
 			"message": data.msg,
 			"sender": data.sender,
+			"senderId": data.senderID,
 			"sentAt": sentAt,
+			"attachments": (data.attachments) ? data.attachments : null,
 			"reactions": (data.reactions) ? data.reactions : []
 		});
 	
 	// This part is for Points (Check no.of messages)
-	let userData = (await db.doc(`users/${data.sender}`).get()).data();
+	let userData = (await db.doc(`users/${data.senderID}`).get()).data();
 
 	// Increase user score
 	let score = userData.score+=1;
 
-	db.doc(`users/${data.sender}`).update({
+	db.doc(`users/${data.senderID}`).update({
 		score
 	}).catch(err => console.log(err));
 

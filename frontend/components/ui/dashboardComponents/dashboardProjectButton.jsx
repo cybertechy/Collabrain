@@ -44,7 +44,7 @@ const DashboardProjectButton = ({
     const handleClose = () => {
         setAnchorEl(null);
     };
-    const truncateTitle = (title, maxLength = 10) => {
+    const truncateTitle = (title, maxLength = 9) => {
         if (title.length > maxLength) {
             return title.substring(0, maxLength - 3) + "..";
         }
