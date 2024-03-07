@@ -56,7 +56,7 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, h
         try {
             const token = await fb.getToken();
             const response = await axios.patch(
-                `http://localhost:8080/api/dashboard/folder/${folder.id}`,
+                `https://collabrain-backend.cybertech13.eu.org/api/dashboard/folder/${folder.id}`,
                 {
                     name: newFolderName,
                 },
@@ -91,7 +91,7 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, h
             try {
                 const token = await fb.getToken();
                 const response = await axios.delete(
-                    `http://localhost:8080/api/dashboard/folder/${folder.id}`,
+                    `https://collabrain-backend.cybertech13.eu.org/api/dashboard/folder/${folder.id}`,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`,
@@ -117,7 +117,7 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, h
         try {
           const token = await fb.getToken(); // Assuming you have a function to get the user's token
           const response = await axios.patch(
-            `http://localhost:8080/api/dashboard/moveFile/${projectId}`, // Adjust the endpoint URL
+            `https://collabrain-backend.cybertech13.eu.org/api/dashboard/moveFile/${projectId}`, // Adjust the endpoint URL
             {
               to: folderPath, // Specify the folder path you want to move the file to
               fileType: type, // Specify the file type ('contentMap' or 'document')

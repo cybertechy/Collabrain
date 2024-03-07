@@ -98,7 +98,11 @@ const PasswordInput = ({ isConfirm, color, password, setPassword }) => {
     return (
         <ThemeProvider theme={theme}>
             <FormControl
-                sx={{ mb: 1,  }}
+                sx={{ mb: 1, 
+                    '@media (max-width:440px)': {
+                        fontSize: '0.875rem', // smaller font size on sm screens and up
+                        width: '12rem'}
+                }}
                 fullWidth
                 variant="outlined"
                 className={"bg-aliceBlue text-primary rounded-md"}

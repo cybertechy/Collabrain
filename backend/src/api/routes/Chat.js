@@ -25,6 +25,11 @@ router.post("/", async (req, res) =>
 	if(!members) return res.status(400).json({ error: "Missing required data" });
 	if (members?.length < 2) return res.status(400).json({ error: "Not enough members" });
 
+	//Check if chat already exists
+	let chatRef = await fb.db.collection("chats").where("members", "==", members).get();
+	console.log(chatRef.empty);
+	if (!chatRef.empty) return res.status(400).json({ error: "Chat already exists" });
+
 	let ref = await fb.db.collection("chats").add({
 		members,
 	});

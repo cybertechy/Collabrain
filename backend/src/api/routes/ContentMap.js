@@ -169,7 +169,7 @@ router.get("/public/:id", async (req, res) => {
     const contentMapData = contentMap.data();
 
     //check if Public Access is enabled
-    if (!contentMapData.Access["public"]) return res.status(403).json({ code: "AM109", error: "Access Denied" });
+    if (!contentMapData.public) return res.status(403).json({ code: "AM109", error: "Access Denied" });
 
     // get the data from oracle cloud
     const getData = await oci.getData("B3", contentMapData.data);
@@ -296,7 +296,7 @@ router.put("/:id", async (req, res) => {
         }
 
         // Set public access
-        if(req.body.public){
+        if("public" in req.body){
             updatedContentMap.public = req.body.public;
         }
     }

@@ -55,7 +55,7 @@ export default function SharedWithMe() {
     const uid = fb.getUserID();
 
     try {
-        const res = await axios.get(`http://localhost:8080/api/users/${uid}`, {
+        const res = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/users/${uid}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -141,7 +141,7 @@ useEffect(() => {
     if (!token) return null;
 
     try {
-      const res = await axios.post(`http://localhost:8080/api/maps`, {
+      const res = await axios.post(`https://collabrain-backend.cybertech13.eu.org/api/maps`, {
         name: "New Content Map",
         data: ""
       }, {
@@ -193,7 +193,7 @@ useEffect(() => {
     console.log(loading);
     console.log(user);
     if (user) {
-      sock_cli = socket.init("http://localhost:8080");
+      sock_cli = socket.init("https://collabrain-backend.cybertech13.eu.org");
     }
   }, [user]);
 
@@ -211,7 +211,7 @@ useEffect(() => {
           const contentMapsData = await Promise.all(
             contentMapIds.map(async (contentMapId) => {
               console.log("Fetching content map with ID:", contentMapId);
-              const response = await axios.get(`http://localhost:8080/api/maps/${contentMapId}`, {
+              const response = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/maps/${contentMapId}`, {
                 headers: {
                   Authorization: `Bearer ${token}`,
                 },

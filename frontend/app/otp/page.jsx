@@ -15,7 +15,7 @@ export default function OTP()
 	useEffect(() =>
 	{
 		if (user)
-			sock_cli = socket.init('http://localhost:8080');
+			sock_cli = socket.init('https://collabrain-backend.cybertech13.eu.org');
 	}, [user]);
 	useEffect(() =>
 	{

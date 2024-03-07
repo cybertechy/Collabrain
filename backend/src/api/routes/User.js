@@ -74,15 +74,15 @@ router.get("/:user", async (req, res) => {
 	if (!req.headers.authorization)
 		return res.status(400).json({ error: "Missing required data" });
 
+	
+
 	// Verify token
 	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
 	if (!user)
 		return res.status(401).json({ error: "Unauthorized" });
 
 	fb.db.doc(`users/${req.params.user}`).get()
-		.then(doc => { 
-			res.json(doc.data()); 
-		})
+		.then(doc => { res.json(doc.data())})
 		.catch(err => { return res.status(500).json({ error: err }); });
 
 });
