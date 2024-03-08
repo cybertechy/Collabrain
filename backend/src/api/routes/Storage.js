@@ -11,27 +11,26 @@ const ociOjectStorage = require("../helpers/oracle");
 	* @route POST 
 	* @desc Add media to the bucket
 	* @access Private
-	* @body token, MIMEtype, data
+	* @body MIMEtype, data
 	* @return mediaId
 	* @errors AM101, AM103, AM104, AM106, AM107
 
-*/
-router.post("/media", async (req, res) =>
-{
-	const { token, MIMEtype, data } = req.body;
+	* Note: Limit the data to 10MB
 
-	// Check if the token exists
-	if (!token)
+*/
+router.post("/media/", async (req, res) =>
+{
+	if(!req.headers.authorization || !req.headers.authorization.split(" ")[1])
 	{
 		return res.status(400).json({ code: "AM101", error: "Missing token" });
 	}
 
-	//TODO: Check if the token is valid
+	const token = req.headers.authorization.split(" ")[1];
 	const user = await verifyUser(token);
-	if (!user)
-	{
-		return res.status(403).json({ code: "AM102", error: "Invalid token" });
-	}
+
+	if (!user) return res.status(403).json({ code: "AM102", error: "Invalid token" });
+
+	const { MIMEtype, data } = req.body;
 
 	// Check if the datatype eixsts and is of image/png or image/jpeg or image/gif
 	if (!MIMEtype || (MIMEtype !== "image/png" && MIMEtype !== "image/jpeg" && MIMEtype !== "image/gif"))
@@ -40,41 +39,28 @@ router.post("/media", async (req, res) =>
 	}
 
 	// Check if the request has the required data
-	if (!data)
-	{
-		return res.status(400).json({ code: "AM104", error: "Missing data" });
-	}
+	if (!data) return res.status(400).json({ code: "AM104", error: "Missing data" });
 
 	// Ensure data is in base64 format
 	const base64Regex = /^data:([A-Za-z-+\/]+);base64,(.+)$/;
-	if (!base64Regex.test(data))
-	{
-		return res.status(400).json({ AM: "AM105", error: "Data is not in base64 format" });
-	}
+	if (!base64Regex.test(data)) return res.status(400).json({ AM: "AM105", error: "Data is not in base64 format" });
+
 
 	// Ensure data is less than 10MB
 	const dataInBytes = Buffer.byteLength(data, 'base64');
-	if (dataInBytes > 10485760)
-	{
-		return res.status(400).json({ code: "AM106", error: "Data is too large" });
-	}
+	if (dataInBytes > 10485760) return res.status(400).json({ code: "AM106", error: "Data is too large" });
+
 
 	const bucketName = "B1";
 
 	// Generate a random filename for the media uuid
 	const fileName = uuid.v4();
-
 	const userid = user.uid;
+	const response = await ociOjectStorage.addData(bucketName, fileName, MIMEtype, data, { userid });
 
-	const response = await ociOjectStorage.AddData(bucketName, fileName, MIMEtype, data, { userid });
+	if (response.versionId) return res.json({ code: "AM200", message: "Success", mediaId: fileName });
+	else return res.status(503).json({ code: "AM107", message: "Failed to add data" });
 
-	if (response.versionId)
-	{
-		return res.json({ code: "AM200", message: "Success", mediaId: fileName });
-	} else
-	{
-		return res.status(503).json({ code: "AM107", message: "Failed to add data" });
-	}
 });
 
 /*
