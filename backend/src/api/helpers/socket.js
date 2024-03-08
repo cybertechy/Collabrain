@@ -184,6 +184,8 @@ async function broadcastMessage(data, type = "team") {
 			io.to(currLinks[member]).emit((type == "team") ? "teamMsg" : "directMsg", { ...data, id: msgID });
 	});
 
+	// send the message to the sender
+	io.to(currLinks[data.senderID]).emit("updateID", { ... data, id: msgID });
 
 
 	// Restore the sentAt field
