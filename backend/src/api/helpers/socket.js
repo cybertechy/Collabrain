@@ -10,30 +10,17 @@ let io;
 // Current connections
 let currLinks = {};
 let rooms = {};
-
 let connectionTimes = {};
+
+// DEBUG controller
+const DEBUG = false;
 
 function init(server) {
 
 	io = new Server(server, { cors: { origin: "*" } });
 
-	try {
-		const pubClient = createClient({
-			url: "rediss://red-cndgdnf109ks738rsaf0:EyChYWWMVnUrrqGRfWA2OOgIAJFBPslf@singapore-redis.render.com:6379"
-		});
-		const subClient = pubClient.duplicate();
-
-		Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
-			console.log("Connected to redis");
-			io.adapter(createAdapter(pubClient, subClient));
-		}).catch((error) => {
-			console.log("Error connecting to redis: ", error);
-		});
-	} catch (error) {
-		console.log("Error connecting to redis: ", error);
-	}
-
-
+	connectToRedis(io);
+	
 	// Sync up with the database
 	fb.getObjectFromRealtimeDB("currLinks").then((data) => {
 		currLinks = data.val() || {};
@@ -49,7 +36,7 @@ function init(server) {
 	// Listen for connections
 	fb.listenToRealtimeDB("currLinks", (data) => {
 		currLinks = data || {};
-		console.log("Listen currLinks: ", currLinks);
+		if(DEBUG) console.log("Listen currLinks: ", currLinks);
 	});
 
 	fb.listenToRealtimeDB("rooms", (data) => {
@@ -64,7 +51,7 @@ function init(server) {
 
 	io.on('connection', (socket) => {
 		socket.on('user', (msg) => {
-			console.log(`user ${msg.id} connected`);
+			if(DEBUG) console.log(`user ${msg.id} connected`);
 			currLinks[msg.id] = socket.id;
 			// FSR1 - Difference between user connecting and disconnecting
 			connectionTimes[msg.id] = Date.now();
@@ -81,7 +68,7 @@ function init(server) {
 			if (ref) {
 				let disconnectTime = Date.now();
 				let connectTime = connectionTimes[ref];
-				console.log(`Connection time: ${connectTime}, Disconnect time: ${disconnectTime}`);
+				if(DEBUG) console.log(`Connection time: ${connectTime}, Disconnect time: ${disconnectTime}`);
 				if (connectTime) {
 					let timeSpent = disconnectTime - connectTime; // Time spent in milliseconds
 
@@ -92,7 +79,7 @@ function init(server) {
 
 					// Cleanup
 					delete connectionTimes[ref]; // Ensure to remove the user from here as well
-					console.log(`user disconnected, time spent: ${timeSpent}ms`);
+					if(DEBUG) console.log(`user disconnected, time spent: ${timeSpent}ms`);
 				}
 
 				delete currLinks[ref];
@@ -104,7 +91,7 @@ function init(server) {
 						if (Object.keys(rooms[room].members).length == 0) delete rooms[room];
 
 					}
-					console.log(`user ${ref} left room ${room}`)
+					if(DEBUG) console.log(`user ${ref} left room ${room}`)
 				});
 
 				// Save the user to the database
@@ -132,7 +119,7 @@ function init(server) {
 
 
 			socket.join(data.id);
-			console.log(`user ${data.user.id} joined room ${data.id}`)
+			if(DEBUG) console.log(`user ${data.user.id} joined room ${data.id}`)
 
 			// Sync up with the database
 			fb.addObjectToRealtimeDB("rooms", rooms);
@@ -147,7 +134,7 @@ function init(server) {
 					if (Object.keys(rooms[room].members).length == 0) delete rooms[room];
 
 				}
-				console.log(`user ${data.user.id} left room ${room}`)
+				if(DEBUG) console.log(`user ${data.user.id} left room ${room}`)
 			});
 
 			fb.addObjectToRealtimeDB("rooms", rooms);
@@ -190,6 +177,25 @@ async function broadcastMessage(data, type = "team") {
 	// Restore the sentAt field
 	data.sentAt = DateBackup;
 	(type == "team") ? fb.saveTeamMsg(data) : fb.saveDirectMsg(data);
+}
+
+function connectToRedis(io) {
+    const pubClient = createClient({
+        url: "rediss://red-cndgdnf109ks738rsaf0:EyChYWWMVnUrrqGRfWA2OOgIAJFBPslf@singapore-redis.render.com:6379"
+    });
+    const subClient = pubClient.duplicate();
+
+    Promise.all([pubClient.connect(), subClient.connect()])
+        .then(() => {
+            console.log("BAPS: Enabled");
+            io.adapter(createAdapter(pubClient, subClient));
+        })
+        .catch((error) => {
+			console.log("BAPS: Disabled");
+            console.log("Error connecting to Redis: ", error);
+            // Retry after 5 seconds
+            setTimeout(connectToRedis, 5000);
+        });
 }
 
 module.exports = {
