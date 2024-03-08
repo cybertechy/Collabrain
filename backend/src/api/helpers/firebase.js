@@ -144,7 +144,8 @@ async function saveTeamMsg(data)
 	let channels = (await db.collection(`teams/${data.team}/channels/`).where("name", "==", data.channel).get());
 	let channelID = channels.docs[0].id;
 	db.collection(`teams/${data.team}/channels/${channelID}/messages`)
-		.add({
+	    .doc(data.msgID)
+		.set({
 			"message": data.msg,
 			"sender": data.senderID,
 			"username": data.sender,
@@ -206,7 +207,8 @@ async function saveDirectMsg(data)
 
 	// Save message to chat
 	db.collection(`chats/${data.chat}/messages`)
-		.add({
+	    .doc(data.msgID)
+		.set({
 			"message": data.msg,
 			"sender": data.sender,
 			"senderId": data.senderID,

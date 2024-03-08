@@ -174,6 +174,10 @@ async function broadcastMessage(data, type = "team") {
 	if (index > -1) // only splice array when item is found
 		membersList.splice(index, 1); // 2nd parameter means remove one item only
 
+	// Generate a unique id for the message
+	let msgID = uuid.v4();
+	data.msgID = msgID;
+	
 	// Send to all online members
 	membersList.forEach((member) => {
 		if (Object.keys(currLinks).includes(member))
