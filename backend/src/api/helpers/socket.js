@@ -15,6 +15,12 @@ let connectionTimes = {};
 // DEBUG controller
 const DEBUG = false;
 
+// Redis controller
+let BAPS_ERROR = false;
+let BAPS_ERROR_ID = null;
+let BAPS_ERROR_CONTROLLER = null;
+
+// Initialize the socket server
 function init(server) {
 
 	io = new Server(server, { cors: { origin: "*" } });
@@ -179,23 +185,60 @@ async function broadcastMessage(data, type = "team") {
 	(type == "team") ? fb.saveTeamMsg(data) : fb.saveDirectMsg(data);
 }
 
+
+
 function connectToRedis(io) {
+	
+	let reconnectToRedis = () =>  connectToRedis(io)
+	
+	if(!io) return null;
+
     const pubClient = createClient({
         url: "rediss://red-cndgdnf109ks738rsaf0:EyChYWWMVnUrrqGRfWA2OOgIAJFBPslf@singapore-redis.render.com:6379"
     });
     const subClient = pubClient.duplicate();
 
+	
+
     Promise.all([pubClient.connect(), subClient.connect()])
         .then(() => {
             console.log("BAPS: Enabled");
-            io.adapter(createAdapter(pubClient, subClient));
+			if (io) io.adapter(createAdapter(pubClient, subClient));
+
+			if(BAPS_ERROR){ 
+				BAPS_ERROR = false; 
+
+				// turn off the interval
+				clearInterval(BAPS_ERROR_ID);
+				BAPS_ERROR_ID = null;
+			}
         })
         .catch((error) => {
 			console.log("BAPS: Disabled");
             console.log("Error connecting to Redis: ", error);
             // Retry after 5 seconds
-            setTimeout(connectToRedis, 5000);
+			if(!BAPS_ERROR)  {
+				BAPS_ERROR = true;
+				BAPS_ERROR_ID = setInterval(reconnectToRedis, 5000);
+			}
         });
+
+		pubClient.on("error", (error) => {
+			if(!BAPS_ERROR) {
+				console.log("BAPS: Disabled");
+				BAPS_ERROR = true;
+				BAPS_ERROR_ID = setInterval(reconnectToRedis, 5000);
+			}
+			
+		});
+		
+		subClient.on("error", (error) => {
+			if(!BAPS_ERROR) {
+				console.log("BAPS: Disabled");
+				BAPS_ERROR = true;
+				BAPS_ERROR_ID = setInterval(reconnectToRedis, 5000);
+			}
+		});	  
 }
 
 module.exports = {
