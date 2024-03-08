@@ -177,7 +177,6 @@ router.get("/folders", async (req, res) => {
 
 	} else {
 		// get the folders that have the same leading path , so like get all folder having path req.query.path/folder/
-		console.log(req.query.path + "/")
 		folders = await fb.db.collection(`users/${user.uid}/folders`).where("path", ">=", req.query.path+"/").get();
 		if (!folders)
 			return res.status(400).json({ error: "Folders not found" });
