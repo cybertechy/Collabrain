@@ -18,7 +18,6 @@ const DEBUG = false;
 // Redis controller
 let BAPS_ERROR = false;
 let BAPS_ERROR_ID = null;
-let BAPS_ERROR_CONTROLLER = null;
 
 // Initialize the socket server
 function init(server) {
@@ -53,6 +52,7 @@ function init(server) {
 		connectionTimes = data || {};
 	});
 
+	
 
 
 	io.on('connection', (socket) => {
@@ -79,7 +79,7 @@ function init(server) {
 					let timeSpent = disconnectTime - connectTime; // Time spent in milliseconds
 
 					// Update the timeSpent for the user in Firebase
-					await fb.db.collection('users').doc(ref).update({
+					fb.db.collection('users').doc(ref).update({
 						timeSpent: fb.admin.firestore.FieldValue.increment(timeSpent)
 					});
 
@@ -99,12 +99,12 @@ function init(server) {
 					}
 					if (DEBUG) console.log(`user ${ref} left room ${room}`)
 				});
-
-				// Save the user to the database
-				fb.addObjectToRealtimeDB("currLinks", currLinks);
-				fb.addObjectToRealtimeDB("rooms", rooms);
-				fb.addObjectToRealtimeDB("connectionTimes", connectionTimes);
 			}
+
+			// Save the user to the database
+			fb.addObjectToRealtimeDB("currLinks", currLinks);
+			fb.addObjectToRealtimeDB("rooms", rooms);
+			fb.addObjectToRealtimeDB("connectionTimes", connectionTimes);
 		});
 
 		socket.on('teamMsg', (data) => broadcastMessage(data));
