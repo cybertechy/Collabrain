@@ -138,7 +138,7 @@ const DMSideBar = ({
                                     message={
                                         dm.lastMessage
                                             ? dm.lastMessage.message
-                                            : "Enter your first message!"
+                                            : "Start Chat !"
                                     } // Display the last message if available
                                     avatar={dm.members[1].id} // You can use the member ID or another identifier for the avatar
                                     openChat={chatHandler}
