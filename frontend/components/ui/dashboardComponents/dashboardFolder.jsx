@@ -191,8 +191,7 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, h
                 onClose={handleClose}
                 MenuListProps={{
                     'aria-labelledby': 'folder-menu-button',
-                }}
-            >
+                }}>
                 <MenuItem onClick={() => {
                     handleClose();
                     setRenameOverlayOpen(true);
