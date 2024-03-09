@@ -3,16 +3,6 @@ import Sidebar from "./sidebar/sidebar";
 import Navbar from "./navbar/navbar";
 
 const Template = ({ children }) => {
-  // const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  
-    // useEffect(() => {
-    //   const handleResize = () => {
-    //     setWindowWidth(window.innerWidth);
-    //   };
-
-    //   window.addEventListener('resize', handleResize);
-    //   return () => window.removeEventListener('resize', handleResize);
-    // }, []);
     
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -33,7 +23,7 @@ const Template = ({ children }) => {
           </div>
         </div> */}
       
-      <div className={`flex flex-col flex-grow overflow-hidden  ${isSidebarOpen ? "max-xsm:hidden": ""}`}>
+      <div className={`flex flex-col flex-grow overflow-hidden  ${isSidebarOpen ? "max-sm:hidden": ""}`}>
         <Navbar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
         {/* <div id="content" className="flex-grow flex flex-col items-center justify-center"> */}
           {children}

@@ -55,7 +55,7 @@ const DashboardProjectButton = ({
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
-            className="w-16 h-16"
+            className="w-10 h-10 sm:w-16 sm:h-16"
         >
             <path
                 fillRule="evenodd"
@@ -70,7 +70,7 @@ const DashboardProjectButton = ({
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
-            className="w-16 h-16"
+            className="w-10 h-10 sm:w-16 sm:h-16"
         >
             <path
                 fillRule="evenodd"
@@ -157,7 +157,7 @@ const DashboardProjectButton = ({
             <div>
                 {" "}
                 <div
-                    className="flex flex-col items-center justify-center bg-aliceBlue text-primary rounded-md hover:bg-columbiablue duration-300 w-32 h-28 pt-3 pl-1"
+                    className="flex flex-col items-center justify-center bg-aliceBlue text-primary rounded-md hover:bg-columbiablue duration-300 h-22 w-32 sm:h-28 shadow-md pt-3 pl-1"
                     draggable="true"
                     onDragStart={(e) => handleDragStart(e, project.id, type)}
                 >
@@ -172,7 +172,7 @@ const DashboardProjectButton = ({
                             <IconButton
                                 color="inherit"
                                 onClick={handleClick}
-                                className="ml-2"
+                                className="sm:ml-2"
                             >
                                 <MoreVertIcon fontSize="small" />
                             </IconButton>
@@ -198,14 +198,14 @@ const DashboardProjectButton = ({
                                 <MenuItem onClick={handleClose}>
                                     <ShareIcon
                                         fontSize="small text-tertiary"
-                                        className="mr-2  text-tertiary flex justify-between gap-5"
+                                        className="mr-2 text-tertiary flex justify-between gap-5"
                                     />
                                     <span className="text-tertiary">Share</span>
                                 </MenuItem>
                                 <MenuItem onClick={handleClose}>
                                     <SortIcon
                                         fontSize="small text-tertiary"
-                                        className="mr-2  text-tertiary flex justify-between gap-5"
+                                        className="mr-2 text-tertiary flex justify-between gap-5"
                                     />
                                     <span className="text-tertiary">
                                         Organize
@@ -219,7 +219,7 @@ const DashboardProjectButton = ({
                                 >
                                     <DeleteIcon
                                         fontSize="small text-tertiary"
-                                        className="mr-2  text-tertiary flex justify-between gap-5"
+                                        className="mr-2 text-tertiary flex justify-between gap-5"
                                     />
                                     <span className="text-tertiary">
                                         Delete

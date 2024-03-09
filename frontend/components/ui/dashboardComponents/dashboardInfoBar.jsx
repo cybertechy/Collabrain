@@ -21,15 +21,6 @@ const DashboardInfoBar = ({ currentPath, onSort, sortCriteria}) => {
       }
   };
 
-  // useEffect(() => {
-  //     const handleResize = () => {
-  //         setWindowWidth(window.innerWidth);
-  //     };
-
-  //     window.addEventListener('resize', handleResize);
-  //     return () => window.removeEventListener('resize', handleResize);
-  // }, []);
-
   const pathParts = currentPath.split('/').filter(part => part);
 
 
@@ -41,7 +32,7 @@ const DashboardInfoBar = ({ currentPath, onSort, sortCriteria}) => {
   <React.Fragment key={index}>
     {index === 0 ? (
       <p
-        className='text-xl font-bold font-poppins text-primary cursor-pointer underline'
+        className='text-sm xs:text-xl font-bold font-poppins text-primary cursor-pointer underline'
         onClick={() => router.push('/dashboard')}
       >
         {part}
