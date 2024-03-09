@@ -165,6 +165,13 @@ function init(server)
 			io.to(id).emit('updateCollabData', data);
 		});
 
+		socket.on('join-call', (room, id) => 
+		{
+			console.log(`### user ${id} joined call ${room} ###`);
+			socket.join(room);
+			socket.to(room).emit('user-joined-call', id);
+			socket.on('disconnect', () => socket.to(room).emit('user-left-call', id));
+		});
 	});
 }
 
