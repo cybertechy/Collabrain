@@ -40,7 +40,8 @@ function page() {
     const [isOwner, setisOwner] = useState(false);
     const [user, loading] = useAuthState();
     const [OverrideMessage, setOverrideMessage] = useState("");
-    
+    const [showSignInModal, setShowSignInModal] = useState(false);
+
     /* UI states */
     const [New, setNew] = useState(false);
     const [Delete, setDelete] = useState(false);
@@ -82,6 +83,7 @@ function page() {
         console.log("Fetch data");
         getInitialData().then((res) => {
             setIntialData(res);
+            console.log(res);
         });
 
     }, []);
@@ -107,13 +109,16 @@ function page() {
     const getInitialData = async () => {
         console.log("Fetching data");
         let id = searchParms.get("id");
+        console.log(id);
         if (!id) return null;
 
         setid(id);
+        // console.log("Fetchingg data");
 
         try {
             const res = await axios.get(`http://localhost:8080/api/maps/public/${id}`, {
             });
+            console.log("res");
             if (res.status !== 200) {
                 return null;
             }
@@ -123,7 +128,8 @@ function page() {
             return res.data;
         }
         catch (err) {
-            // If there is an axios error, set the error state    
+            // If there is an axios error, set the error state  
+            console.log("err");  
             if (err?.response?.data) setError(err.response.data);
             else if (err.message) setError({ error: err.message });
             return null;
@@ -161,9 +167,9 @@ function page() {
     //     <h1>You're not signed in</h1>
     // </div>
 
-    // if (loading) return <div className="flex flex-col justify-center items-center text-basicallydark">
-    //     <h1>Loading...</h1>
-    // </div>
+    if (loading) return <div className="flex flex-col justify-center items-center text-basicallydark">
+        <h1>Loading...</h1>
+    </div>
 
 
     return <div className="flex justify-center items-center flex-col h-screen w-screen">
@@ -210,6 +216,34 @@ function page() {
                     </div>
 
                     {/* Lower part of navbar removed*/}
+                    <div className="flex items-center gap-4 p-0 h-[50%]">
+                    
+                        <button
+                onClick={() => setShowSignInModal(true)}
+                className="text-basicallylight rounded-md"
+            >
+                Sign up
+            </button>
+            {showSignInModal && (
+                <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-72 bg-basicallylight rounded-md shadow-md py-2 px-4 flex flex-col gap-2 border border-primary z-30">
+                    <h1 className="text-xl text-primary">
+                        Discover Collabrain and become a user to access exciting features apart from viewing and collaborate with your friends!
+                    </h1>
+                    <hr className="border-primary" />
+                    <div className="flex gap-8">
+                        <button onClick={() => window.location.href="/register"} className="text-basicallylight bg-primary rounded-lg px-3 py-1">
+                        Discover Collabrain
+                        </button>
+                        <button onClick={() => setShowSignInModal(false)} className="text-primary rounded-lg border-2 border-primary px-1 py-1">
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            )}       
+
+                        
+                    </div>
+
                     {/* sign in/become a user/ redict to sign up */}
                 </div>
             </div>
