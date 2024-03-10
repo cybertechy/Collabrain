@@ -15,7 +15,7 @@ const DashboardNewFolder = ({ onNewFolderCreated }) => {
     // TODO: onClick(folder);
     return (
         <Tooltip title={"New Folder"} enterDelay={1000} leaveDelay={200}>
-        <>
+        <div>
           {isCreateFolderOverlayOpen && (
             <CreateFolderOverlay
               isOpen={isCreateFolderOverlayOpen}
@@ -30,7 +30,7 @@ const DashboardNewFolder = ({ onNewFolderCreated }) => {
               <AddCircleIcon fontSize="large" sx={{ color: '#30475E' }} />
             </IconButton>
           </div>
-        </>
+        </div>
       </Tooltip>
       
     );

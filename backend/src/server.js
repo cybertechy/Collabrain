@@ -17,6 +17,8 @@ const reportReport = require("./api/routes/Report");
 const notificationsRoute = require("./api/routes/Notifications");
 const docRoute = require("./api/routes/Doc");
 const storageRoute = require("./api/routes/Storage");
+const aiRoute = require("./api/routes/AI");
+const statsRoute = require("./api/routes/Stats");
 
 // Helpers
 const sockServer = require("./api/helpers/socket");
@@ -76,6 +78,8 @@ app.use("/api/reports", reportReport);
 app.use("/api/notifications", notificationsRoute);
 app.use("/api/docs", docRoute); 
 app.use("/api/storage", storageRoute);
+app.use("/api/stats", statsRoute);
+app.use("/api/ai", aiRoute);
 
 
 

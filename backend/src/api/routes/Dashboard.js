@@ -177,7 +177,6 @@ router.get("/folders", async (req, res) => {
 
 	} else {
 		// get the folders that have the same leading path , so like get all folder having path req.query.path/folder/
-		console.log(req.query.path + "/")
 		folders = await fb.db.collection(`users/${user.uid}/folders`).where("path", ">=", req.query.path+"/").get();
 		if (!folders)
 			return res.status(400).json({ error: "Folders not found" });
@@ -241,7 +240,6 @@ router.get("/:folder/files", async (req, res) => {
 
 		file = file.data();
 
-		console.log(file);
 		files.push({
 			id: folder.contentMaps[i],
 			name: file.name,
@@ -306,6 +304,8 @@ router.get("/files", async (req, res) => {
 			files.push({
 				id: contentMapsIds[i],
 				name: file.name,
+				updatedAt: file.updatedAt.toDate(),
+				createdAt: file.createdAt.toDate(),
 				type: "contentmap",
 				path: "/"
 			});
@@ -337,11 +337,10 @@ router.get("/files", async (req, res) => {
 			return res.status(400).json({ error: "Folder not found" });
 
 		folder = folder.data();
-
+		
 		// For each file id, fetch the corresponding type data, such name and updateAt
 
 		for (let i = 0; i < folder.contentMaps?.length; i++) {
-			console.log(folder.contentMaps[i]);
 			let file = await fb.db.doc(`contentMaps/${folder.contentMaps[i]}`).get();
 			if (!file)
 				return res.status(400).json({ error: "File not found" });
@@ -353,6 +352,8 @@ router.get("/files", async (req, res) => {
 			files.push({
 				id: folder.contentMaps[i],
 				name: file.name,
+				updatedAt: file.updatedAt.toDate(),
+				createdAt: file.createdAt.toDate(),
 				type: "contentmap",
 				path: folder.path
 			});

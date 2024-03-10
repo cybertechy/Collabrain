@@ -21,7 +21,7 @@ import WorkingJSON from "../../public/assets/json/Working.json";
 import Lottie from "lottie-react";
 
 const SOCKET_DEBUG = false;
-const POINTER_DEBUG = true;
+const POINTER_DEBUG = false;
 
 function page() {
     const [token, setToken] = useState(null);
@@ -40,14 +40,14 @@ function page() {
     const [user, loading] = useAuthState();
     const [OverrideMessage, setOverrideMessage] = useState("");
     const [ConcurrencyStop, setConcurrencyStop] = useState(false);
-    
+
 
     /* UI states */
     const [New, setNew] = useState(false);
     const [Delete, setDelete] = useState(false);
     const [Share, setShare] = useState(false);
 
-    const Serverlocation = "https://collabrain-backend.cybertech13.eu.org";
+    const Serverlocation = "http://localhost:8080";
 
 
 
@@ -117,25 +117,69 @@ function page() {
             else setCollabaration(false);
 
             // filter out collabortors that have button up
-            try{
-            updateInfo.collaborators = updateInfo?.collaborators?.filter((collaborator) => collaborator.button === "down" && collaborator.id !== user.uid);
+            try {
+                updateInfo.collaborators = updateInfo?.collaborators?.filter((collaborator) => collaborator.button === "down" && collaborator.id !== user.uid);
             } catch (err) {
                 console.log(err);
                 updateInfo.collaborators = [];
             }
-           
+
 
             // abort any ongoing requests
-            if(updateInfo?.collaborators?.length > 0){
+            if (updateInfo?.collaborators?.length > 0) {
                 abortController.abort();
                 setConcurrencyStop(true);
             }
-           
 
-            ExcalidrawAPI.updateScene({ elements: updateInfo.elements, collaborators: updateInfo.collaborators, appState: { files: updateInfo.files } });
+            if(updateInfo?.BroadcasterID === user.uid) return;
+
+
+            let appElements = ExcalidrawAPI.getSceneElements();
+            let mergeElements = []
+            if (updateInfo?.elements) {
+                mergeElements = updateInfo?.elements?.map((element) => {
+                    let index = appElements.findIndex((appElement) => appElement.id === element.id);
+                    if (index === -1) return element;
+                    return { ...appElements[index], ...element };
+                });
+            } else {
+                mergeElements = appElements;
+            }
+
+            // unlock the elements
+            if (updateInfo?.unLockElement?.length > 0) {
+                mergeElements = mergeElements.map((element) => {
+                    if (updateInfo?.unLockElement?.includes(element.id)) {
+                        element.isLocked = false;
+                        element.locked = false;
+                    }
+                    return element;
+                });
+            }
+
+            // Lock the selected elements
+            if (updateInfo?.selectedElementIds?.length > 0) {
+                mergeElements = mergeElements.map((element) => {
+                    if (updateInfo?.selectedElementIds?.includes(element.id)) {
+                        element.isLocked = true;
+                        element.locked = true;
+                    }
+                    return element;
+                });
+            }
+
+
+            let updateData = {
+                elements: mergeElements,
+                appState: { ...ExcalidrawAPI.getAppState(), ...updateInfo.appState },
+                collaborators: updateInfo.collaborators
+            }
+
+
+            ExcalidrawAPI.updateScene(updateData);
 
             //timeout to prevent concurrency
-            if(updateInfo?.collaborators?.length > 0) setTimeout(() => {
+            if (updateInfo?.collaborators?.length > 0) setTimeout(() => {
                 setConcurrencyStop(false);
             }, 1000);
         });
@@ -149,7 +193,8 @@ function page() {
                 elements: ExcalidrawAPI.getSceneElements(),
                 appState: appState,
                 files: ExcalidrawAPI.getFiles(),
-                collaborators: { ...appState.collaborators }
+                collaborators: { ...appState.collaborators },
+                BroadcasterID: user.uid
             }
 
             sockCli.current.emit('collabData', { id: id, user: user.uid, data: appdata });
@@ -163,18 +208,18 @@ function page() {
         if (!Collabaration) return;
 
         let appState = ExcalidrawAPI.getAppState();
-        if(!appState) return;
-        if(!appState.collaborators) return;
+        if (!appState) return;
+        if (!appState.collaborators) return;
         // find the index (if exists) of the user in the collaborators array
         let index = -1;
 
         try {
-        index = appState?.collaborators?.findIndex((collaborator) => collaborator.id === user.uid);
+            index = appState?.collaborators?.findIndex((collaborator) => collaborator.id === user.uid);
         } catch (err) {
             console.log(err);
             return;
         }
-        if(index === null) index = -1;
+        if (index === null) index = -1;
         if (index === -1) index = appState.collaborators.length;
         let mstate = appState.collaborators[index];
         mstate = {
@@ -187,13 +232,20 @@ function page() {
             id: user.uid,
             selectedElementIds: appState.selectedElementIds,
         }
+        let ShareData = {
+            id: id,
+            user: user.uid,
+            data: {  collaborators: [...appState.collaborators.slice(0, index), mstate, ...appState.collaborators.slice(index + 1)] },
+            BroadcasterID: user.uid
+        }
 
         // TEMP : send the current user mstate to the room
-        if(POINTER_DEBUG) {
-            console.log("Sending mstate");
-            console.log({ id: id, user: user.uid, data: { collaborators: [...appState.collaborators.slice(0, index), mstate, ...appState.collaborators.slice(index + 1)] } });
+        if (POINTER_DEBUG) {
+            console.log("Sending Ponter State: ",ShareData);
+            console.log("AppState: ",appState);
         }
-        if (sockCli.current && mstate.button==="down" ) sockCli.current.emit('collabData', { id: id, user: user.uid, data: { collaborators: [...appState.collaborators.slice(0, index), mstate, ...appState.collaborators.slice(index + 1)] } });
+
+        if (sockCli.current && mstate.button === "down") sockCli.current.emit('collabData', ShareData);
 
 
     }, [pointerState, ExcalidrawAPI, Collabaration]);
@@ -464,7 +516,7 @@ function page() {
             return;
         }
 
-        
+
 
         setPointerState(data);
         setisSaved(false);
@@ -475,6 +527,7 @@ function page() {
         }
 
         let appState = ExcalidrawAPI.getAppState();
+        
         let appdata = {
             elements: ExcalidrawAPI.getSceneElements(),
             appState: {
@@ -482,10 +535,12 @@ function page() {
                 penMode: appState.penMode,
                 ViewModeEnabled: appState.ViewModeEnabled,
                 viewBackgroundColor: appState.viewBackgroundColor,
-                zoom: appState.zoom,
+
             },
             files: ExcalidrawAPI.getFiles(),
-            collaborators: appState.collaborators
+            collaborators: appState.collaborators,
+            unLockElement: Object.keys(appState.selectedElementIds).filter((id) => appState.selectedElementIds[id]),
+            BroadcasterID: user.uid
         }
 
         if (SOCKET_DEBUG) {
@@ -496,9 +551,9 @@ function page() {
 
         appdata.appState.collaborators = [];
 
-        if(ConcurrencyStop) {
+        if (ConcurrencyStop) {
             setisSaved(false);
-            
+
             return;
         }
 
@@ -522,7 +577,7 @@ function page() {
         }
     }
 
-    const setpublic= (data) => setIntialData({ ...IntialData, public: data });
+    const setpublic = (data) => setIntialData({ ...IntialData, public: data });
 
     if (!user) return <div className="flex flex-col justify-center items-center text-basicallydark">
         <h1>You're not signed in</h1>
@@ -598,7 +653,7 @@ function page() {
                         }
                         <button disabled={!(id && IntialData && Excalidraw)} id="share" onClick={() => setShare(Share => !Share)} className="rounded-lg text-basicallylight">Share</button>
                         {Share && <div className="absolute z-10 top-[13%] lg:left-[200px] left-[10px] md:left-[100px] bg-basicallylight rounded-md shadow-md p-2 flex flex-col gap-2 border border-primary">
-                            <ShareComponent getdata={getdata} updatecontent={updatecontent} contentMapName={IntialData?.name} setShare={setShare} sData={IntialData?.Access} isOwner={isOwner} />
+                            <ShareComponent getdata={getdata} updatecontent={updatecontent} contentMapName={IntialData?.name} setShare={setShare} sData={IntialData?.Access} isOwner={isOwner} publicData={IntialData?.public} setpublicData={setpublic} />
                         </div>}
 
                         {(IntialData?.userAccess === "edit" || IntialData?.userAccess === "owner") && <div id="save" className="flex items-center gap-2 bg-basicallylight text-primary rounded-md  px-2 py-1 ">

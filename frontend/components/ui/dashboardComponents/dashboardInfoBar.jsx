@@ -3,33 +3,35 @@ import { ArrowCircleUp, ArrowCircleDown, ChevronRight } from '@mui/icons-materia
 import DropdownDashboard from './dropdownDashboard';
 import { useRouter } from 'next/navigation'; 
 
-const DashboardInfoBar = ({ sortName, setSortName, sortDate, setSortDate, isAscending, setIsAscending, currentPath }) => {
+const DashboardInfoBar = ({ currentPath, onSort, sortCriteria}) => {
   // const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const router = useRouter(); // Initialize useRouter
+  const router = useRouter();
 
-  // useEffect(() => {
-  //   const handleResize = () => {
-  //     setWindowWidth(window.innerWidth);
-  //   };
-
-  //   window.addEventListener('resize', handleResize);
-  //   return () => window.removeEventListener('resize', handleResize);
-  // }, []);
-
-  const toggleSortOrder = (sortBy) => {
-    setIsAscending(!isAscending);
-
-    if (sortBy === 'name') {
-      setSortName(isAscending);
-      setSortDate(false);
-    } else if (sortBy === 'date') {
-      setSortDate(isAscending);
-      setSortName(false);
-    }
+  // This function is triggered when sort order (ascending/descending) is toggled
+  const toggleAscending = () => {
+      onSort({ ...sortCriteria, isAscending: !sortCriteria.isAscending });
   };
 
-  // Split the currentPath by '/' and map each part with chevron icons and links
-  const pathParts = currentPath.split('/');
+  // Toggle sort criteria between name and date
+  const toggleSortOrder = (criteria) => {
+      if (criteria === 'name') {
+          onSort({ sortName: true, sortDate: false, isAscending: sortCriteria.isAscending });
+      } else if (criteria === 'date') {
+          onSort({ sortName: false, sortDate: true, isAscending: sortCriteria.isAscending });
+      }
+  };
+
+  // useEffect(() => {
+  //     const handleResize = () => {
+  //         setWindowWidth(window.innerWidth);
+  //     };
+
+  //     window.addEventListener('resize', handleResize);
+  //     return () => window.removeEventListener('resize', handleResize);
+  // }, []);
+
+  const pathParts = currentPath.split('/').filter(part => part);
+
 
   return (
     <div className="flex items-center justify-between bg-aliceBlue p-4 w-full drop-shadow-md mb-3">
@@ -58,38 +60,26 @@ const DashboardInfoBar = ({ sortName, setSortName, sortDate, setSortDate, isAsce
 ))}
       </div>
       <div className="flex items-center">
-        <DropdownDashboard
-          title="Sort By"
-          items={[
-            {
-              name: "Name",
-              onClick: () => {
-                toggleSortOrder('name');
-              },
-            },
-            {
-              name: "Date Modified",
-              onClick: () => {
-                toggleSortOrder('date');
-              },
-            },
-          ]}
-        />
-        {isAscending ? (
-          <ArrowCircleUp
-            className="text-primary cursor-pointer"
-            fontSize="large"
-            onClick={() => toggleSortOrder('name')} // You can set a default sortBy value here
-          />
-        ) : (
-          <ArrowCircleDown
-            className="text-primary cursor-pointer"
-            fontSize="large"
-            onClick={() => toggleSortOrder('name')} // You can set a default sortBy value here
-          />
-        )}
-      </div>
-    </div>
+                <DropdownDashboard
+                    title={sortCriteria? sortCriteria.sortName ? "Name" : "Date Modified" : "Sort By"}
+                    items={[
+                        {
+                            name: "Name",
+                            onClick: () => toggleSortOrder('name'),
+                        },
+                        {
+                            name: "Date Modified",
+                            onClick: () => toggleSortOrder('date'),
+                        },
+                    ]}
+                />
+                {sortCriteria.isAscending ? (
+                    <ArrowCircleUp className="text-primary cursor-pointer" fontSize="large" onClick={toggleAscending} />
+                ) : (
+                    <ArrowCircleDown className="text-primary cursor-pointer" fontSize="large" onClick={toggleAscending} />
+                )}
+            </div>
+        </div>
   );
 };
 

@@ -8,6 +8,11 @@ import FriendTile from './friendTile';
 import Typography from '@mui/material/Typography'; 
 import axios from 'axios';
 const fb = require("_firebase/firebase");
+import addFriendLottie from "@/public/assets/json/addFriendLottie.json";
+import allFriendsLottie from "@/public/assets/json/allFriendsLottie.json";
+import blockedLottie from "@/public/assets/json/blockedLottie.json";
+import recievedRequestsLottie from "@/public/assets/json/recievedRequestsLottie.json";
+import Lottie from "lottie-react";
 
 const FriendsWindow = () => {
   const [activeTab, setActiveTab] = useState('all');
@@ -73,6 +78,9 @@ const FriendsWindow = () => {
   const getFriends = async () => {
     try {
       const token = await fb.getToken();
+      if (!token) {
+        return;
+      }
       const response = await axios.get("https://collabrain-backend.cybertech13.eu.org/api/users/f/friends", {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -147,37 +155,36 @@ const FriendsWindow = () => {
     } else if (activeTab === 'Recieved') {
       getFriendRequests();
     }
-  }, [activeTab]);
+  }, [activeTab, user]);
 
+  
   useEffect(() => {
     let list = [];
     switch (activeTab) {
       case 'all':
-        list = Array.isArray(friendsList) ? friendsList : [];
+        list = friendsList;
         break;
       case 'Recieved':
-        list = Array.isArray(RecievedFriends) ? RecievedFriends : [];
+        list = RecievedFriends;
         break;
       case 'blocked':
-        list = Array.isArray(blockedUsers) ? blockedUsers : [];
+        list = blockedUsers;
         break;
       case 'addFriend':
-        // Only use searchResults if they are an array and not empty, otherwise default to an empty array
-        list = Array.isArray(searchResults) && searchResults.length > 0 ? searchResults : [];
+        list = searchResults;
         break;
       default:
-        list = [];
+        break;
     }
   
     if (searchQuery && activeTab !== 'addFriend') {
-      // Ensure list is an array before attempting to filter, to prevent "filter is not a function" errors
-      if (Array.isArray(list)) {
-        list = list.filter(friend => friend.name?.toLowerCase().includes(searchQuery.toLowerCase()));
-      }
+      list = list.filter(friend => friend.name?.toLowerCase().includes(searchQuery.toLowerCase()));
     }
   
     setVisibleList(list);
   }, [activeTab, friendsList, RecievedFriends, blockedUsers, searchResults, searchQuery]);
+  
+  
   
   const handleTabChange = (tab) => {
     setActiveTab(tab);
@@ -217,7 +224,44 @@ const FriendsWindow = () => {
     }
   };
 
+  const renderEmptyState = () => {
+    let animationData;
+    let message;
   
+    switch (activeTab) {
+      case 'all':
+        animationData = allFriendsLottie;
+        message = "This is where your friends can be found.";
+        break;
+      case 'Recieved':
+        animationData = recievedRequestsLottie;
+        message = "You will find your received friend requests here.";
+        break;
+      case 'blocked':
+        animationData = blockedLottie;
+        message = "You will find your blocked users here.";
+        break;
+      case 'addFriend':
+      default:
+        animationData = addFriendLottie;
+        message = "Start typing to search for friends to add.";
+        break;
+    }
+  
+    return (
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 4 }}>
+        <Lottie animationData={animationData} style={{ width: 400, height: 400 }} />
+       <p className='font-sans text-xl font-light'>{message}</p>
+      </Box>
+    );
+  };
+  
+  // Inside the return statement of the FriendsWindow component, replace the old "No friends found" messages with:
+  {visibleList.length > 0 ? (
+    visibleList.map((friend, index) => (
+      <FriendTile key={index} id={friend.id} friendData={friend} onMoreOptions={handleMoreOptions} />
+    ))
+  ) : renderEmptyState()}
     return (
       <Box sx={{ width: '100%' }}>
       <TopBar activeTab={activeTab} onTabChange={handleTabChange} />
@@ -229,7 +273,7 @@ const FriendsWindow = () => {
           ))
         ) : (
           <Typography variant="body1" sx={{ p: 2 }}>
-            {activeTab === 'addFriend' ? 'Start typing to search for friends to add.' : 'No friends found.'}
+          {renderEmptyState()}
           </Typography>
         )}
       </List>

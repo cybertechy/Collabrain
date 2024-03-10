@@ -93,8 +93,10 @@ router.get("/", async (req, res) => {
 	
         // also get the last message
         let lastMessage = await fb.db.collection(`chats/${chatId}/messages`).orderBy("sentAt", "desc").limit(1).get();	
-        if (lastMessage.size > 0)
-            result[result.length-1].lastMessage = lastMessage.docs[0].data();
+        if (lastMessage.size > 0) {
+            result[result.length-1].lastMessage =  lastMessage.docs[0].data();
+			result[result.length-1].lastMessage.id = lastMessage.docs[0].id;
+		}
         else
             result[result.length-1].lastMessage = {};	
     }
@@ -199,7 +201,7 @@ router.get("/:chat/messages", async (req, res) =>
 		.then(snapshot =>
 		{
 			let messages = [];
-			snapshot.forEach(doc => messages.push(doc.data()));
+			snapshot.forEach(doc => messages.push({... doc.data(), id: doc.id}));
 			return res.status(200).json(messages);
 		})
 		.catch(err => { return res.status(500).json({ error: err }); });

@@ -1,56 +1,38 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import axios from 'axios';
-import fb from '../../../app/_firebase/firebase';
-const CreateFolderOverlay = ({ isOpen, onClose, onFolderCreated }) => {
+import {createFolder} from '../../../app/utils/filesAndFolders';
+import { useSearchParams } from 'next/navigation'
+const CreateFolderOverlay = ( {isOpen, onClose, onFolderCreated}) => {
     const [folderName, setFolderName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [folderColor, setFolderColor] = useState('#ffffff'); // Default color
-
+    const [folderColor, setFolderColor] = useState('#30475E'); // Default color
+    const searchParams = useSearchParams();
     const handleCancel = () => {
         onClose(); // Function to close/hide the overlay
     };
+    console.log(searchParams.get("path"));
 
     const handleCreate = async () => {
         setIsLoading(true);
         setError(null);
-    
-        try {
-            
-            const token = await fb.getToken();
-            console.log('Token:', token);
-            console.log('Folder Name:', folderName); 
-            console.log('Folder Color:', folderColor)
-            const response = await axios.post(
-                'https://collabrain-backend.cybertech13.eu.org/api/dashboard/folder',
-                {
-                    name: folderName,
-                    color: folderColor, // Add folderColor here
-                    path: `/`,
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
+        const path = searchParams.get("path") || "/";
+        const newPath = path === "/" ? `${path}${folderName}` : `${path}/${folderName}`;
 
-            console.log('Response:', response); // Add this line
-           if (response.status === 200) {
-    onFolderCreated(response.data.folder);
-                onClose(); // Close the overlay
-            } else {
-                setError('Failed to create folder');
-            }
-        } catch (error) {
-            setError('Error creating folder');
-            console.error('Error:', error);
-        } finally {
-            console.log('Folder creation completed.'); 
-            setIsLoading(false);
+        const { success, folder, error } = await createFolder(folderName, folderColor, newPath);
+    
+        if (success) {
+            console.log("createdFolder is", folder);
+            onFolderCreated(folder); // Update the UI with the server-confirmed folder
+            onClose(); // Close the overlay upon successful creation
+        } else {
+            setError(error);
         }
+    
+        setIsLoading(false);
     };
+    
+    
 
     return (
         <div className={`fixed top-0 left-0 w-full h-full flex items-center justify-center ${isOpen ? 'block' : 'hidden'} z-50 bg-basicallydark bg-opacity-50 backdrop-blur-sm`}>
@@ -97,7 +79,7 @@ const CreateFolderOverlay = ({ isOpen, onClose, onFolderCreated }) => {
 CreateFolderOverlay.propTypes = {
     isOpen: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
-    onFolderCreated: PropTypes.func.isRequired, // Callback function to handle folder creation
+    onFolderCreated: PropTypes.func.isRequired,
+  
 };
-
 export default CreateFolderOverlay;

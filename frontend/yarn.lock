@@ -4301,6 +4301,11 @@ elementtree@^0.1.7:
   dependencies:
     sax "1.1.4"
 
+emoji-mart@^5.5.2:
+  version "5.5.2"
+  resolved "https://registry.yarnpkg.com/emoji-mart/-/emoji-mart-5.5.2.tgz#3ddbaf053139cf4aa217650078bc1c50ca8381af"
+  integrity sha512-Sqc/nso4cjxhOwWJsp9xkVm8OF5c+mJLZJFoFfzRuKO+yWiN7K8c96xmtughYb0d/fZ8UC6cLIQ/p4BR6Pv3/A==
+
 emoji-regex@^8.0.0:
   version "8.0.0"
   resolved "https://registry.yarnpkg.com/emoji-regex/-/emoji-regex-8.0.0.tgz#e818fd69ce5ccfcb404594f842963bf53164cc37"
@@ -6002,6 +6007,13 @@ lines-and-columns@^1.1.6:
   resolved "https://registry.yarnpkg.com/lines-and-columns/-/lines-and-columns-1.2.4.tgz#eca284f75d2965079309dc0ad9255abb2ebc1632"
   integrity sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==
 
+linkify-it@^2.0.3:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/linkify-it/-/linkify-it-2.2.0.tgz#e3b54697e78bf915c70a38acd78fd09e0058b1cf"
+  integrity sha512-GnAl/knGn+i1U/wjBz3akz2stz+HrHLsxMwHQGofCDfPvlf+gDKN58UtfmUquTY4/MXeE2x7k19KQmeoZi94Iw==
+  dependencies:
+    uc.micro "^1.0.1"
+
 linkify-it@^4.0.1:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/linkify-it/-/linkify-it-4.0.1.tgz#01f1d5e508190d06669982ba31a7d9f56a5751ec"
@@ -7413,6 +7425,11 @@ react-firebase-hooks@^5.1.1:
   resolved "https://registry.yarnpkg.com/react-firebase-hooks/-/react-firebase-hooks-5.1.1.tgz#fc92bb4b860c6753c806583f64d7f069b6ee6785"
   integrity sha512-y2UpWs82xs+39q5Rc/wq316ca52QsC0n8m801V+yM4IC4hbfOL4yQPVSh7w+ydstdvjN9F+lvs1WrO2VYxpmdA==
 
+react-hook-form@^7.50.1:
+  version "7.50.1"
+  resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-7.50.1.tgz#f6aeb17a863327e5a0252de8b35b4fc8990377ed"
+  integrity sha512-3PCY82oE0WgeOgUtIr3nYNNtNvqtJ7BZjsbxh6TnYNbXButaD5WpjOmTjdxZfheuHKR68qfeFnEDVYoSSFPMTQ==
+
 react-is@^16.13.1, react-is@^16.7.0:
   version "16.13.1"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
@@ -7422,6 +7439,14 @@ react-is@^18.0.0, react-is@^18.2.0:
   version "18.2.0"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-18.2.0.tgz#199431eeaaa2e09f86427efbb4f1473edb47609b"
   integrity sha512-xWGDIW6x921xtzPkhiULtthJHoJvBbF3q26fzloPCK0hsvxtPVelvftw3zjbHWSkR2km9Z+4uxbDDK/6Zw9B8w==
+
+react-linkify@^1.0.0-alpha:
+  version "1.0.0-alpha"
+  resolved "https://registry.yarnpkg.com/react-linkify/-/react-linkify-1.0.0-alpha.tgz#b391c7b88e3443752fafe76a95ca4434e82e70d5"
+  integrity sha512-7gcIUvJkAXXttt1fmBK9cwn+1jTa4hbKLGCZ9J1U6EOkyb2/+LKL1Z28d9rtDLMnpvImlNlLPdTPooorl5cpmg==
+  dependencies:
+    linkify-it "^2.0.3"
+    tlds "^1.199.0"
 
 react-markdown@^8.0.7:
   version "8.0.7"
@@ -8274,6 +8299,11 @@ tiptap-markdown@^0.8.2:
     markdown-it "^13.0.1"
     markdown-it-task-lists "^2.1.1"
     prosemirror-markdown "^1.11.1"
+
+tlds@^1.199.0:
+  version "1.250.0"
+  resolved "https://registry.yarnpkg.com/tlds/-/tlds-1.250.0.tgz#6e387c4d789a21c5429c1781137fe3dbaa514f55"
+  integrity sha512-rWsBfFCWKrjM/o2Q1TTUeYQv6tHSd/umUutDjVs6taTuEgRDIreVYIBgWRWW4ot7jp6n0UVUuxhTLWBtUmPu/w==
 
 to-fast-properties@^2.0.0:
   version "2.0.0"
