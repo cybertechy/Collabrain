@@ -44,12 +44,15 @@ const DashboardProjectButton = ({
     const handleClose = () => {
         setAnchorEl(null);
     };
-    const truncateTitle = (title, maxLength = 14) => {
+    const truncateTitle = (title, maxLength = 14, fixedWidthChar = "\u00A0") => {
+        let truncatedTitle = title;
         if (title.length > maxLength) {
-            return title.substring(0, maxLength - 3) + "..";
+          truncatedTitle = title.substring(0, maxLength - 2) + "..";
+        } else {
+          truncatedTitle += fixedWidthChar.repeat(maxLength*2 - title.length); // Pad with non-breaking spaces
         }
-        return title;
-    };
+        return truncatedTitle;
+      };
     const map = () => (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -172,7 +175,7 @@ const DashboardProjectButton = ({
                             </div>
                         </div>
                         <div className="flex flex-row justify-between items-center w-full"> 
-                            <span className="text-md font-semibold text-ellipsis overflow-hidden whitespace-nowrap">
+                            <span className="text-md font-semibold overflow-hidden whitespace-nowrap">
                                 {truncateTitle(title)}
                             </span>
                             <IconButton
