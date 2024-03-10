@@ -93,7 +93,7 @@ const DashboardProjectButton = ({
         let token = await fb.getToken();
         await axios
             .put(
-                "http://localhost:8080/api/maps/" + contentMapId,
+                "https://0h32zx14-8080.asse.devtunnels.ms/api/maps/" + contentMapId,
                 {
                     name: newName,
                 },
@@ -115,7 +115,7 @@ const DashboardProjectButton = ({
     async function deleteContentMap(contentMapId) {
         let token = await fb.getToken();
         await axios
-            .delete("http://localhost:8080/api/maps/" + contentMapId, {
+            .delete("https://0h32zx14-8080.asse.devtunnels.ms/api/maps/" + contentMapId, {
                 headers: {
                     Authorization: `Bearer ${token}`, // Replace <UserToken> with actual token
                 },

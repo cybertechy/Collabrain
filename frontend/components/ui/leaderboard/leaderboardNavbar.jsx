@@ -23,7 +23,7 @@ const LeaderboardNavbar = ({ user }) => {
         const token = await fb.getToken(); // Make sure this function properly retrieves the auth token
 
         try {
-            const res = await axios.get(`http://localhost:8080/api/teams/search?page=0`, {
+            const res = await axios.get(`https://0h32zx14-8080.asse.devtunnels.ms/api/teams/search?page=0`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

@@ -14,6 +14,7 @@ export default function Call()
 		console.log(`### Calling user... ###`);
 		const call = myPeer.current.call(userId, stream);
 		const video = document.createElement('video');
+		video.id = userId;
 		call.on('stream', userVideoStream => { addVideoStream(video, userVideoStream); });
 		call.on('close', () => { video.remove(); });
 		setPeers({ ...peers, [userId]: call });
@@ -29,16 +30,13 @@ export default function Call()
 	useEffect(() =>
 	{
 		// Setup socket
-		sockCli.current = socket.init('http://localhost:8080');
+		sockCli.current = socket.init('https://0h32zx14-8080.asse.devtunnels.ms/');
 
 		// Setup peer
 		if (myPeer.current)
 			return;
 
-		myPeer.current = new Peer(undefined, {
-			host: '/',
-			port: '3001'
-		});
+		myPeer.current = new Peer();
 
 		// Add video stream
 		const myVideo = document.createElement('video');
@@ -54,13 +52,15 @@ export default function Call()
 					console.log(`### Answering call... ###`);
 					call.answer(stream);
 					const video = document.createElement('video');
+					video.playsInline = true;
+					video.id = call.peer;
 					call.on('stream', userVideoStream => { addVideoStream(video, userVideoStream); });
 				});
 
-				sockCli.current.on('user-joined-call', userId => { 
+				sockCli.current.on('user-joined-call', userId =>
+				{
 					console.log(`### user ${userId} joined call ###`);
-					// connectToNewUser(userId, stream); });
-					setTimeout(connectToNewUser,1000,userId,stream)
+					setTimeout(connectToNewUser, 1000, userId, stream);
 				});
 			});
 
@@ -68,9 +68,16 @@ export default function Call()
 		{
 			if (peers[userId])
 				peers[userId].close();
+
+			// Remove video
+			document.getElementById(userId).remove();
 		});
 
-		myPeer.current.on('open', id => { sockCli.current.emit('join-call', "room1", id); });
+		myPeer.current.on('open', id =>
+		{
+			console.log(`### user id: ${id} ###`);
+			sockCli.current.emit('join-call', "room1", id);
+		});
 	}, []);
 
 	return (

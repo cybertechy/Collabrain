@@ -79,7 +79,7 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
             try {
                 // Make a GET request to retrieve user's team IDs
                 const token = await fb.getToken();
-                const response = await axios.get('http://localhost:8080/api/teams', {
+                const response = await axios.get('https://0h32zx14-8080.asse.devtunnels.ms/api/teams', {
                     headers: {
                         Authorization: `Bearer ${token}`, // Replace with the actual auth token
                     },
@@ -91,7 +91,7 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
     
                     // Create an array of promises to fetch team information
                     const teamPromises = teamIds.map(async (teamId) => {
-                        const teamResponse = await axios.get(`http://localhost:8080/api/teams/${teamId}`, {
+                        const teamResponse = await axios.get(`https://0h32zx14-8080.asse.devtunnels.ms/api/teams/${teamId}`, {
                             headers: {
                                 Authorization: `Bearer ${token}`, // Replace with the actual auth token
                             },

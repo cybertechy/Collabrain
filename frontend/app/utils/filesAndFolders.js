@@ -16,7 +16,7 @@ const fetchFolders = async (path='/') => {
       }
     })
     .then(token => {
-      return axios.get("http://localhost:8080/api/dashboard/folders", {
+      return axios.get("https://0h32zx14-8080.asse.devtunnels.ms/api/dashboard/folders", {
         headers: {
           Authorization: `Bearer ${token}`, 
         },
@@ -49,7 +49,7 @@ const fetchFolders = async (path='/') => {
       }
      
   
-      const response = await axios.get("http://localhost:8080/api/dashboard/files", {
+      const response = await axios.get("https://0h32zx14-8080.asse.devtunnels.ms/api/dashboard/files", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -76,7 +76,7 @@ const fetchFolders = async (path='/') => {
     if (!token) return null;
 
     try {
-        const res = await axios.post(`http://localhost:8080/api/maps`, {
+        const res = await axios.post(`https://0h32zx14-8080.asse.devtunnels.ms/api/maps`, {
             name: "New Content Map",
             data: "",
             path: path
@@ -107,7 +107,7 @@ const createFolder = async (folderName, folderColor, path = '/') => {
     try {
         const token = await fb.getToken();
         const response = await axios.post(
-            'http://localhost:8080/api/dashboard/folder',
+            'https://0h32zx14-8080.asse.devtunnels.ms/api/dashboard/folder',
             { name: folderName, color: folderColor, path: path }, // Assuming path is always `/` for simplicity
             { headers: { Authorization: `Bearer ${token}` } }
         );
