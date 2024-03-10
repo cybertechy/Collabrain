@@ -144,7 +144,7 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
                                 </p>
                                 </div>
                                 <CloseIcon
-                                    className="text-lg ml-16 text-primary transition-all duration-1000 ease-in-out cursor-pointer"
+                                    className="text-xl ml-16 text-primary transition-all duration-1000 ease-in-out cursor-pointer"
                                     onClick={toggleSidebar}
                                     fontSize="large"
                                 />
