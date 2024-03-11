@@ -10,6 +10,9 @@
     import { useEffect, useState } from 'react';
     import { ToastContainer, toast } from 'react-toastify'
     import { hasUsername } from "../utils/user";
+    import "../../i18n"
+    import { useTranslation } from 'react-i18next';
+
     export default function Register() {
         const router = useRouter();
         const [backgroundLoaded, setBackgroundLoaded] = useState(false);
@@ -20,13 +23,14 @@
         const [isError, setIsError] = useState(false);
         const [firstname, setfirstname] = useState("");
         const [lastname, setlastname] = useState("");
+        const { t } = useTranslation('login_signup');
     
         let sock_cli;
        
         const confirmPasswordSame = () => {
             if (password !== confirmPassword) {
                 setIsError(true); // Set isError to true when passwords don't match
-                toast.error("Passwords do not match");
+                toast.error(t('pass_mismatch'));
                 return false;
             } else {
                 setIsError(false); // Set isError to false when passwords match
@@ -138,32 +142,32 @@
                     />
                     <div className="bg-basicallylight drop-shadow-lg sm:p-10 rounded-2xl sm:mt-4 items-center justify-center">
                         <h1 className="text-2xl text-primary font-sans mb-6 text-center">
-                            Create Your Collabrain Account
+                            {t('reg_top')}
                         </h1>
     
                         <form onSubmit={handleFormSubmit} className="flex flex-col gap-4 max-w-md">
                             <div className="flex max-sm:flex-col sm:gap-4 items-center justify-center">
-                            <InputField name = "firstname" value = {firstname} input={firstname} setInput={setfirstname} placeholder="First Name" color="primary"/>
-                            <InputField name="lastname" value = {firstname} input={lastname} setInput={setlastname} placeholder="Last Name"  color="primary"/>
+                            <InputField name = "firstname" value = {firstname} input={firstname} setInput={setfirstname} placeholder={t('fname')} color="primary"/>
+                            <InputField name="lastname" value = {firstname} input={lastname} setInput={setlastname} placeholder={t('lname')}  color="primary"/>
                             </div>
                             <div className="flex w-full max-sm:pr-4 items-center justify-center">
-                                <EmailInputField name="email" value = {email} email={email} setEmail={setemail} placeholder="Email Address" color = "primary" />
+                                <EmailInputField name="email" value = {email} email={email} setEmail={setemail} placeholder={t('email')} color = "primary" />
                             </div>
                             <div className="flex max-sm:pr-4 max-sm:flex-col sm:gap-4 items-center justify-center">
-                            <PasswordInput name="password" value = {password} password={password} setPassword={setpassword} placeholder="Password" color = "primary" />
+                            <PasswordInput name="password" value = {password} password={password} setPassword={setpassword} placeholder={t('password')} color = "primary" />
                            </div>
                            <div className="flex w-full max-sm:pr-4 items-center justify-center">
-                           <PasswordInput  password={confirmPassword} setPassword={setconfirmPassword} isConfirm={true} placeholder="Confirm Password" color = "primary" isError = {isError}/>
+                           <PasswordInput  password={confirmPassword} setPassword={setconfirmPassword} isConfirm={true} placeholder={t('confirm_pass')} color = "primary" isError = {isError}/>
                            </div>
                             <p className="text-xs text-primary text-left font-sans font-extralight ml-2">
-                                Already have an account?
+                                {t('have_acc_q')}
                                 <a href="/" className="underline">
                                     {" "}
-                                    Log In
+                                    {t('login_button')}
                                 </a>
                             </p>
                             <Button
-                                text="Create Account"
+                                text={t('create_acc')}
                                 color="primary"
                                 type = "submit"
                                 className="mt-4"

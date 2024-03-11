@@ -100,7 +100,7 @@ export default function Home() {
                         {t('login_top')}
                     </h1>
             <p className = "whitespace-normal break-words text-xs font-sans text-center font-thin">
-            You are now one step away from accessing the world of collaboration and productivity.
+            {t('login_desc')}
 
             </p>
                    
@@ -110,22 +110,22 @@ export default function Home() {
                        onSubmit={handleFormSubmit}
                         style={{ textAlign: "center" }}
                     >
-                        <EmailInput email={email} setEmail={setemail} placeholder="Email ID"/>
+                        <EmailInput email={email} setEmail={setemail} placeholder={t('email')}/>
                         <br />
-                        <PasswordInput placeholder= "Password" password={password} setPassword={setpassword} />
+                        <PasswordInput placeholder= {t('password')} password={password} setPassword={setpassword} />
                      
                         
                         <p className="text-sm text-primary font-sans font-light text-left mt-2">
                             <a href="">{t('forgot_password')}</a>
                         </p>
                         <Button
-                            text="Log In"
+                            text={t('login_button')}
                             color="primary"
                             type = "submit"
                         />
                       <div className="line-with-text">
   <span className="linesep"></span>
-  <span className="textsep font-bold">OR</span>
+  <span className="textsep font-bold">{t('or')}</span>
   <span className="linesep"></span>
 </div>
                     </form>
@@ -146,7 +146,7 @@ export default function Home() {
                       
                     </span>
                     <p className="text-xs text-primary font-sans font-light text-left ml-2">
-                        Need an account?
+                        {t('make_acc_q')}
                         <a href="/register" className="underline">
                             {" "}
                             {t('sign_up')}

@@ -8,6 +8,8 @@ import axios from "axios";
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import jsPDF from 'jspdf';
+import "../../../i18n"
+import { useTranslation } from 'react-i18next';
 
 const fb = require("_firebase/firebase");
 
@@ -116,6 +118,7 @@ const ToggleButtonExample = () => {
 };
 const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
    
+    const { t } = useTranslation('settings');
   
     const handleButtonClick = (screen) => {
       setCurrentScreen(screen);
@@ -125,7 +128,7 @@ const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
         return (
             <div className=" h-full w-1/4 bg-basicallylight shadow-md rounded-bl-xl rounded-tl-xl z-50">
              <div className="p-4">
-          <h2 className="text-2xl font-bold">Settings</h2>
+          <h2 className="text-2xl font-bold">{t('settings_top')}</h2>
           <ul className="mt-4">
             <li>
               <button
@@ -134,7 +137,7 @@ const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
                 }`}
                 onClick={() => handleButtonClick("profile")}
               >
-                Profile
+                {t('profile_side')}
               </button>
             </li>
             <li>
@@ -144,7 +147,7 @@ const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
                 }`}
                 onClick={() => handleButtonClick("general")}
               >
-                General
+                {t('general_side')}
               </button>
             </li>
             <li>
@@ -154,7 +157,7 @@ const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
                 }`}
                 onClick={() => handleButtonClick("sound")}
               >
-                Sound
+                {t('sound_side')}
               </button>
             </li>
             <li>
@@ -164,7 +167,7 @@ const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
                 }`}
                 onClick={() => handleButtonClick("privacy")}
               >
-                Privacy
+                {t('privacy_side')}
               </button>
             </li>
             <li>
@@ -176,7 +179,7 @@ const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
                 }`}
                 onClick={() => handleButtonClick("notifications")}
               >
-                Notifications
+                {t('notif_side')}
               </button>
             </li>
             <li>
@@ -188,7 +191,7 @@ const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
                 }`}
                 onClick={() => handleButtonClick("accessibility")}
               >
-                Accessibility
+                {t('access_side')}
               </button>
             </li>
           </ul>
@@ -256,6 +259,7 @@ const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
   };
 //  PROFILE SETTINGS PAGE
 const ProfileOverlay = ({ user }) => {
+    const { t } = useTranslation('profile_overlay');
     const [name, setName] = useState("");
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
@@ -339,64 +343,61 @@ const router = useRouter();
                                         
                                         <button className="justify-center w-full font-semibold inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 rounded-full"
                                         onClick= {() => router.push('/profile')}>
-                                            View your Profile
+                                            {t('view_profile')}
                                         </button>
                                     </div>
                                     <div className="mt-8 mb-4">
                                         <p className="mb-2 text-xl  text-basicallydark ">
-                                            Password and Authentication
+                                            {t('pass_auth')}
                                         </p>
                                         <button className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 ">
-                                            Change Password
+                                            {t('change_pass')}
                                         </button>
                                     </div>
                                     <div className="mb-6 ">
                                         <p className="mb-2 text-xl text-basicallydark ">
-                                            Two-factor Authentication
+                                            {t('2fa')}
                                         </p>
                                         <p className="mb-2 text-base text-basicallydark ">
-                                            Protect your Collabrain account with
-                                            an extra layer of security.
+                                            {t('2fa_desc')}
                                         </p>
                                         <button className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 ">
-                                            Enable
+                                            {t('2fa_button')}
                                         </button>
                                     </div>
                                 </div>
                                 <div className="  w-11/12 h-48  bg-basicallylight rounded-md">
                                     <div className="mb-6 ">
                                         <p className="mb-2 text-xl text-basicallydark   ">
-                                            Account Removal
+                                            {t('remove_acc')}
                                         </p>
                                         <p className="mb-2 text-basicallydark  ">
-                                            Disabling your account means you can
-                                            recover it at any time after taking
-                                            this action
+                                            {t('remove_acc_desc')}
                                         </p>
                                         <div className="flex space-x-5">
                                         <button className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 " onClick={handleClickOpen}>
-                Delete
+                {t('delete_button')}
             </button>
             {/* Dialog for confirmation */}
             <Dialog open={openDialog} onClose={handleClose}>
-                <DialogTitle>{"Confirm Account Deletion"}</DialogTitle>
+                <DialogTitle>{t('dlt_confirm_msg')}</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Are you sure you want to delete your account? This action cannot be undone.
+                        {t('delete_msg')}
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose}>Cancel</Button>
+                    <Button onClick={handleClose}>{t('cancel')}</Button>
                     <Button onClick={() => {
                         handleDeleteUser();
                         handleClose();
                     }} autoFocus>
-                        Confirm
+                        {t('confirm_button')}
                     </Button>
                 </DialogActions>
             </Dialog>
                                             <button  onClick  = {fb.signOut} className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 ">
-                                                Sign Out
+                                                {t('signout')}
                                             </button>
                                         </div>
                                     </div>
@@ -411,7 +412,8 @@ const router = useRouter();
 };
 //  GENERAL SETTINGS PAGE
 const GeneralOverlay = () => {
-    const [selectedLangLabel, setSelectedLangLabel] = useState("Select your language");
+    const { t } = useTranslation('general_overlay');
+    const [selectedLangLabel, setSelectedLangLabel] = useState(t('lang_menu'));
     const [selectedAppearance, setSelectedAppearance] = useState(null);
     const [badBehaviorStrikes, setBadBehaviorStrikes] = useState(3);
   
@@ -445,8 +447,9 @@ const GeneralOverlay = () => {
       ];
   
     const dropdownItems4 = [
-      { label: "Arabic", link: "/option1" },
-      { label: "English (US)", link: "/option2" },
+      { label: t('arabic'), link: "/option1" },
+      { label: t('english_us'), link: "/option2" },
+      { label: t('russian'), link: "/option3" }
     ];
   
     return (
@@ -455,7 +458,7 @@ const GeneralOverlay = () => {
           <div className="bg-basicallylight  rounded-md flex w-full p-5 overflow-y-auto scrollbar-thin scrollbar-thumb-primary">
             <div className="flex flex-col w-full">
               <p className="mb-2 text-2xl text-left text-basicallydark md:text-lg sm:text-sm lg:text-2xl">
-                Change Appearance
+                {t('appearance')}
               </p>
               <div className="flex flex-wrap sm:flex-nowrap space-y-2 sm:space-x-5 sm:space-y-0 mb-4">
               {appearanceOptions.map((option, index) => (
@@ -492,7 +495,7 @@ const GeneralOverlay = () => {
             </div>
               <div className="mb-4">
                 <p className="mb-2 text-2xl text-left text-basicallydark md:text-lg sm:text-sm lg:text-2xl">
-                  Language
+                  {t('lang')}
                 </p>
                 <Dropdown
                   buttonLabel={selectedLangLabel}
@@ -502,7 +505,7 @@ const GeneralOverlay = () => {
               </div>
               <div className="mb-4">
                 <p className="text-2xl pb-2 text-left text-basicallydark md:text-lg sm:text-sm lg:text-2xl">
-                  Bad behavior strikes
+                  {t('strikes')}
                 </p>
                 <div className="flex flex-row justify-start items-center">
                   <BadBehaviorStrikes strikes={badBehaviorStrikes} onChange={handleStrikeChange} />
@@ -517,8 +520,9 @@ const GeneralOverlay = () => {
   
 //  SOUND SETTINGS PAGE
 const SoundOverlay = () => {
-    const [selectedSpeakerLabel, setSelectedSpeakerLabel] = useState("Default Speaker");
-    const [selectedMicrophoneLabel, setSelectedMicrophoneLabel] = useState("Default Microphone");
+    const { t } = useTranslation('sound_overlay');
+    const [selectedSpeakerLabel, setSelectedSpeakerLabel] = useState(t('speaker_menu'));
+    const [selectedMicrophoneLabel, setSelectedMicrophoneLabel] = useState(t('mic_menu'));
 
     const handleSpeakerSelect = (label) => {
         setSelectedSpeakerLabel(label);
@@ -529,13 +533,13 @@ const SoundOverlay = () => {
     };
 
     const dropdownOutputItems = [
-        { label: "External Speakers", link: "/option1" },
-        { label: "Choose other Option", link: "/option2" },
+        { label: t('speaker_ext'), link: "/option1" },
+        { label: t('speaker_other'), link: "/option2" },
     ];
 
     const dropdownInputItems = [
-        { label: "Built-in Microphone", link: "/option1" },
-        { label: "Choose other Option", link: "/option2" },
+        { label: t('mic_built_in'), link: "/option1" },
+        { label: t('mic_other'), link: "/option2" },
     ];
 
     return (
@@ -544,7 +548,7 @@ const SoundOverlay = () => {
                 <div className="flex flex-col w-full">
                     <div className="mb-4">
                         <p className="text-2xl text-left text-basicallydark mb-2">
-                            Speaker Device
+                            {t('speaker_header')}
                         </p>
                         <Dropdown
                             buttonLabel={selectedSpeakerLabel}
@@ -554,7 +558,7 @@ const SoundOverlay = () => {
                     </div>
                     <div className="mb-4">
                         <p className="text-2xl text-left text-basicallydark mb-2">
-                            Microphone
+                            {t('mic_header')}
                         </p>
                         <Dropdown
                             buttonLabel={selectedMicrophoneLabel}
@@ -570,6 +574,7 @@ const SoundOverlay = () => {
 
 // PRIVACY SETTINGS PAGE
 const PrivacyOverlay = (user) => {
+    const { t } = useTranslation('privacy_overlay');
     const [isDndToggled, setIsDndToggled] = useState(false);
     const [userInfo, setUserInfo] = useState(null);
     const handleDndToggle = () => {
@@ -669,7 +674,7 @@ const PrivacyOverlay = (user) => {
                 <div className="flex flex-col w-full space-y-5">
                     <div className="mb-4 flex justify-between">
                         <p className="text-2xl text-basicallydark">
-                            Do not disturb
+                            {t('dnd')}
                         </p>
                         <ToggleButtonExample
                             isToggled={isDndToggled}
@@ -678,25 +683,25 @@ const PrivacyOverlay = (user) => {
                     </div>
                     <div className="mb-4 flex justify-between">
                         <p className="text-2xl text-basicallydark">
-                            Export my data
+                            {t('export_data')}
                         </p>
                         <button 
                             className="text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3"
                             onClick={handleExportData}
                         >
-                           &nbsp;&nbsp;Export&nbsp;
+                           &nbsp;&nbsp;{t('export_button')}&nbsp;
                         </button>
                     </div>
                     
                     <div className="mb-4 flex justify-between">
                         <p className="text-2xl text-basicallydark">
-                            Delete my data
+                            {t('delete_data')}
                         </p>
                         <button 
                             className="text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-9 py-3"
                             onClick={handleDeleteData}
                         >
-                            Delete
+                            {t('delete_button')}
                         </button>
                     </div>
                 </div>
@@ -706,7 +711,8 @@ const PrivacyOverlay = (user) => {
 };
 //  NOTIFICATIONS SETTINGS PAGE
 const NotificationsOverlay = () => {
-    const [selectedNotiLabel, setSelectedNotiLabel] = useState("Select an option");
+    const { t } = useTranslation('notif_overlay');
+    const [selectedNotiLabel, setSelectedNotiLabel] = useState(t('notif_type'));
     const [isNotiSoundToggled, setIsNotiSoundToggled] = useState(false);
 
     const handleNotiSelect = (label) => {
@@ -724,8 +730,8 @@ const NotificationsOverlay = () => {
     };
 
     const dropdownItems3 = [
-        { label: "Everywhere", value: "everywhere" },
-        { label: "Choose other Option", value: "other" },
+        { label: t('notif_everywhere'), value: "everywhere" },
+        { label: t('notif_other'), value: "other" },
     ];
 
     return (
@@ -735,7 +741,7 @@ const NotificationsOverlay = () => {
                 <div className="  w-full h-full space-y-5">
                     <div className="mb-4">
                         <p className="mb-2 text-2xl text-basicallydark">
-                            Receive Notifications from
+                            {t('notif_source')}
                         </p>
                         <Dropdown
                             buttonLabel={selectedNotiLabel}
@@ -745,7 +751,7 @@ const NotificationsOverlay = () => {
                     </div>
                     <div className="mb-4 flex justify-between">
                         <p className="text-2xl text-basicallydark">
-                            Notification Sound
+                            {t('sound_toggle')}
                         </p>
                         <ToggleButtonExample
                             isToggled={isNotiSoundToggled}
@@ -754,13 +760,13 @@ const NotificationsOverlay = () => {
                     </div>
                     <div className="mb-4 flex justify-between">
                         <p className="text-2xl text-basicallydark">
-                            Choose Notification Sound
+                            {t('sound_type')}
                         </p>
                         <button 
                             className="text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3"
                             onClick={handleConfigureNotificationSound}
                         >
-                            Configure
+                            {t('config')}
                         </button>
                     </div>
                 </div>
@@ -770,6 +776,8 @@ const NotificationsOverlay = () => {
 };
 // ACCESSIBILITY SETTINGS PAGE
 const AccessibilityOverlay = () => {
+    const { t } = useTranslation('access_overlay');
+
     // Functions to handle configuration can be added here
     // For example:
     const handleConfigureTTS = () => {
@@ -791,35 +799,35 @@ const AccessibilityOverlay = () => {
                 <div className="  w-full overflow-auto ">
                     <div className="mb-4 flex justify-between">
                         <p className="text-2xl text-basicallydark">
-                            Text-to-speech (TTS)
+                            {t('tts')}
                         </p>
                         <button 
                             className="text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3"
                             onClick={handleConfigureTTS}
                         >
-                            Configure
+                            {t('config')}
                         </button>
                     </div>
                     <div className="mb-4 flex justify-between">
                         <p className="text-2xl text-basicallydark">
-                            Font-size
+                            {t('font_size')}
                         </p>
                         <button 
                             className="text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3"
                             onClick={handleConfigureFontSize}
                         >
-                            Configure
+                            {t('config')}
                         </button>
                     </div>
                     <div className="mb-4 flex justify-between">
                         <p className="text-2xl text-basicallydark">
-                            Colorblind Filters
+                            {t('colorblind')}
                         </p>
                         <button 
                             className="text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3"
                             onClick={handleConfigureColorblindFilters}
                         >
-                            Configure
+                            {t('config')}
                         </button>
                     </div>
                 </div>

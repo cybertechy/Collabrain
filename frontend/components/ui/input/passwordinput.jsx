@@ -11,6 +11,8 @@ import {
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import PropTypes from "prop-types";
+import "../../../i18n"
+import { useTranslation } from 'react-i18next';
 
 const colorClasses = {
     primary: "bg-primary", // Tailwind class for primary background
@@ -68,6 +70,7 @@ const theme = createTheme({
 });
 
 const PasswordInput = ({ isConfirm, color, password, setPassword }) => {
+    const { t } = useTranslation('login_signup');
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState(false);
     const backgroundColorClass = colorClasses[color] || colorClasses.primary;
@@ -108,7 +111,7 @@ const PasswordInput = ({ isConfirm, color, password, setPassword }) => {
                 className={"bg-aliceBlue text-primary rounded-md"}
             >
                 <InputLabel htmlFor="outlined-adornment-password">
-                    {isConfirm ? "Confirm Password" : "Password"}
+                    {isConfirm ? t('confirm_pass') : t('password')}
                 </InputLabel>
                 <OutlinedInput
                     id="outlined-adornment-password"
@@ -131,7 +134,7 @@ const PasswordInput = ({ isConfirm, color, password, setPassword }) => {
                             </IconButton>
                         </InputAdornment>
                     }
-                    label={isConfirm ? "Confirm Password" : "Password"}
+                    label={isConfirm ? t('confirm_pass') : t('password')}
                     sx={{
                         color: "#30475E",
                         WebkitTextSecurity: showPassword ? "none" : "disc",
@@ -143,8 +146,7 @@ const PasswordInput = ({ isConfirm, color, password, setPassword }) => {
                 {error && (
                     <div className="sm:w-60 max-sm:w-80">
                     <FormHelperText error className="text-center">
-                        Password must contain at least 8 characters including
-                        uppercase letters, lowercase letters, and numbers.
+                        {t('pass_req')}
                     </FormHelperText>
                     </div>
                 )}

@@ -10,13 +10,15 @@ i18n
       en: {
         login_signup: {
           "login_top": "Log into Collabrain",
+          "login_desc": "You are now one step away from accessing the world of collaboration and productivity.",
           "reg_top": "Create Your Collabrain Account",
           "forgot_password": "Forgot your password?",
           "login_button": "Log In",
+          "or": "OR",
           "make_acc_q": "Need an account?",
           "have_acc_q": "Already have an account?",
           "sign_up": "SIGN UP",
-          "email": "Email Address",
+          "email": "Email ID",
           "password": "Password",
           "fname": "First Name",
           "lname": "Last Name",
@@ -59,6 +61,9 @@ i18n
           "privacy_side": "Privacy",
           "notif_side": "Notifications",
           "access_side": "Accessibility",
+        },
+
+        profile_overlay: {
           "view_profile": "View your Profile",
           "pass_auth": "Password and Authentication",
           "change_pass": "Change Password",
@@ -68,15 +73,67 @@ i18n
           "remove_acc": "Account Removal",
           "remove_acc_desc": "Disabling your account means you can recover it at any time after taking this action",
           "delete_button": "Delete",
-          "signout_button": "Sign Out"
+          "delete_msg": "Are you sure you want to delete your account? This action cannot be undone.",
+          "confirm_button": "Confirm",
+          "signout": "Sign Out",
+          "cancel": "Cancel"
+        },
+
+        general_overlay: {
+          "appearance": "Change Appearance",
+          "lang": "Language",
+          "lang_menu": "Select your language",
+          "strikes": "Bad behavior strikes",
+          "strike_num": "out of 3",
+          "arabic": "Arabic",
+          "english_us": "English (US)",
+          "russian": "Russian"
+        },
+
+        sound_overlay: {
+          "speaker_header": "Speaker Device",
+          "mic_header": "Microphone",
+          "speaker_menu": "Default Speaker",
+          "mic_menu": "Default Microphone",
+          "speaker_ext": "External Speakers",
+          "speaker_other": "Choose other option",
+          "mic_built_in": "Built-in Microphone",
+          "mic_other": "Choose other option",
+        },
+
+        privacy_overlay: {
+          "dnd": "Do not disturb",
+          "export_data": "Export my data",
+          "export_button": "Export",
+          "delete_data": "Delete my data",
+          "delete_button": "Delete"
+        },
+        
+        notif_overlay: {
+          "notif_source": "Receive Notifications from",
+          "sound_toggle": "Notification Sound",
+          "sound_type": "Choose Notification Sound",
+          "config_button": "Configure",
+          "notif_type": "Select an option",
+          "notif_everywhere": "Everywhere",
+          "notif_other": "Choose other Option"
+        },
+
+        access_overlay: {
+          "tts": "Text-to-speech (TTS)",
+          "font_size": "Font-size",
+          "colorblind": "Colorblind Filters",
+          "config": "Configure"
         }
       },
       ru: {
         login_signup: {
           "login_top": "Вход в Collabrain",
+          "login_desc": "Вы находитесь в одном шаге от доступа к миру совместной работы и продуктивности.",
           "reg_top": "Создайте Аккаунт в Collabrain",
           "forgot_password": "Забыли пароль?",
           "login_button": "Вход",
+          "or": "ИЛИ",
           "make_acc_q": "У вас еще нет аккаунта?",
           "have_acc_q": "У вас уже есть аккаунт?",
           "sign_up": "РЕГИСТРАЦИЯ",
@@ -84,11 +141,12 @@ i18n
           "password": "Пароль",
           "fname": "Имя",
           "lname": "Фамилия",
-          "confirm_pass": "Подтвердите пароль",
+          "confirm_pass": "Подтверд. пароль",
           "create_acc": "Создать Аккаунт",
           "email_invalid": "Неверный адрес эл. почты",
-          "pass_mismatch": "Введенные пароли не совпадают друг с другом",
+          "pass_mismatch": "Введенные пароли не совпадают друг с другом.",
           "pass_req": "Пароль должен состоять из минимум 8 символов, включая заглавные и прописные буквы, а также цифры."
+
         },
 
         dashboard: {
@@ -117,16 +175,76 @@ i18n
 
         settings: {
           "settings_top": "Настройки",
-          "view_profile": "Ваш Профиль",
-          "pass_auth": "Пароль и Вход",
-          "change_pass": "Поменять Пароль",
-          "2fa": "Двухфакторная Аутентификация",
-          "2fa_desc": "Защитите ваш аккаунт Collabrain с дополнительным слоем защиты",
+          "profile_side": "Профиль",
+          "general_side": "Основные",
+          "sound_side": "Звук",
+          "privacy_side": "Конфиденц.",
+          "notif_side": "Уведомления",
+          "access_side": "Специальные Возможности",
+        },
+
+        profile_overlay: {
+          "view_profile": "Мой Профиль",
+          "pass_auth": "Пароль и Настройки Входа",
+          "change_pass": "Смена Пароля",
+          "2fa": "Двухэтапная Аутентификация",
+          "2fa_desc": "Защитите свой аккаунт Collabrain дополнительным слоем защиты.",
           "2fa_button": "Включить",
-          "remove_acc": "Удаление аккаунта",
-          "remove_acc_desc": "Выключив свой аккаунт, вы сможете снова включить его в будущем",
+          "remove_acc": "Удаление Аккаунта",
+          "remove_acc_desc": "После удаления аккаунта, вы сможете восстановить его в будущем.",
           "delete_button": "Удалить",
-          "signout_button": "Выйти"
+          "delete_msg": "Вы уверены, что хотите удалить свой аккаунт?",
+          "confirm_button": "Да",
+          "signout": "Выйти",
+          "cancel": "Отмена",
+          "dlt_confirm_msg": "Удаление Аккаунта"
+        },
+
+        general_overlay: {
+          "appearance": "Изменить Внешний Вид",
+          "lang": "Язык",
+          "lang_menu": "Выберите язык",
+          "strikes": "Баллы плохого поведения",
+          "strike_num": "из 3",
+          "arabic": "Арабский",
+          "english_us": "Английский(США)",
+          "russian": "Русский"
+        },
+
+        sound_overlay: {
+          "speaker_header": "Выбор Динамиков",
+          "mic_header": "Выбор Микрофона",
+          "speaker_menu": "Устр. по-умолчанию",
+          "mic_menu": "Устр. по-умолчанию",
+          "speaker_ext": "Внешние Динамики",
+          "speaker_other": "Выбрать др. устройство",
+          "mic_built_in": "Встр. Микрофон",
+          "mic_other": "Выбрать др. устройство"
+        },
+
+        privacy_overlay: {
+          "dnd": "Не беспокоить",
+          "export_data": "Скачать мои данные",
+          "export_button": "Скачать",
+          "delete_data": "Удалить мои данные",
+          "delete_button": "Удалить"
+        },
+        
+        notif_overlay: {
+          "notif_source": "Получать уведомления",
+          "sound_toggle": "Звук Уведомлений",
+          "sound_type": "Выберите Звук Уведомлений",
+          "config": "Настроить",
+          "notif_type": "Выберите вариант",
+          "notif_everywhere": "Везде",
+          "notif_other": "Другие варианты"
+        },
+
+        access_overlay: {
+          "tts": "Озвучивание текста",
+          "font_size": "Размер шрифта",
+          "colorblind": "Фильтры для дальтоников",
+          "config": "Настроить"
         }
       },
       // Add more languages here

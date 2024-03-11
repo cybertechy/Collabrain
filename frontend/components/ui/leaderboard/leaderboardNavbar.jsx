@@ -3,10 +3,13 @@ import axios from 'axios';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
 import QueryBuilderIcon from '@mui/icons-material/QueryBuilder';
 import { IconButton, Button } from '@mui/material';
+import "../../../i18n"
+import { useTranslation } from 'react-i18next';
 
 const fb = require('_firebase/firebase');
 
 const LeaderboardNavbar = ({ user }) => {
+    const { t } = useTranslation('leaderboard');
     const [showAnimation, setShowAnimation] = useState(false);
     const [leaderboardData, setLeaderboardData] = useState({
         remainingDays: 2,
@@ -54,7 +57,7 @@ const LeaderboardNavbar = ({ user }) => {
             }`}
             style={{ transformOrigin: 'top' }}
         >
-            <div className="text-xl text-center mb-4 font-poppins">League Leaderboard</div>
+            <div className="text-xl text-center mb-4 font-poppins">{t('leaderboard')}</div>
 
             {/* Rest of the component remains unchanged */}
 
@@ -74,7 +77,7 @@ const LeaderboardNavbar = ({ user }) => {
                 {leaderboardData.teams.length > 3 && ( // Only show if there are more than 3 teams
                     <div className="text-center mt-4">
                         <Button sx={{color:'white'}} variant="text" onClick={handleViewMore}>
-                            {showMore ? 'View Less' : 'View More'}
+                            {showMore ? t('view_less') : t('view_more')}
                         </Button>
                     </div>
                 )}
