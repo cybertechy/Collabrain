@@ -13,7 +13,7 @@ const fetchedMessages = response.data.map((messageData, i) => {
     return <MessageItem
         key={i}
         sender={messageData.sender}
-        timestamp={sentAt.toLocaleDateString()+ " " + sentAt.toLocaleTimeString()}
+        timestamp={sentAt.toLocaleDateString()+ ", " + sentAt.toLocaleTimeString()}
         message={messageData.message}
         reactions={messageData.reactions || {}}
         userData={userInfo.data}
