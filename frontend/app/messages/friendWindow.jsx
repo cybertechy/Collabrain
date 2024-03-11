@@ -78,6 +78,9 @@ const FriendsWindow = () => {
   const getFriends = async () => {
     try {
       const token = await fb.getToken();
+      if (!token) {
+        return;
+      }
       const response = await axios.get("https://collabrain-backend.cybertech13.eu.org/api/users/f/friends", {
         headers: {
           Authorization: `Bearer ${token}`,

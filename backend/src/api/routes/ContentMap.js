@@ -11,7 +11,7 @@ const router = Router();
 // @RequestBody: { name: string, data: any, path: string }
 router.post("/", async (req, res) => {
 
-    if (!req.headers.authorization || !req.body.name) return res.status(400).json({ code: 400, error: "Missing token or name" });
+    if (!req.headers.authorization || !req.body.name || !req.body.path) return res.status(400).json({ code: 400, error: "Missing token or name" });
 
     //verify user
     const token = req.headers.authorization.split(' ')[1];
@@ -38,9 +38,7 @@ router.post("/", async (req, res) => {
             if (doc.exists) {
                 user.name = doc.data().fname + " " + doc.data().lname;
             }
-        })
-
-        console.log(user.name);
+        });
     }
     // create a new content map as collection inside user's doc
     const contentMap = {
@@ -56,9 +54,25 @@ router.post("/", async (req, res) => {
     const contentMapId = contentMapRef.id;
 
     // add the content map to users content maps array
-    await userRef.update({
+    if(req.body.path==="/") await userRef.update({
         contentMaps: fb.admin.firestore.FieldValue.arrayUnion(contentMapId)
-    });
+    })
+
+    else {
+        let folderRef = await userRef.collection("folders").where("path", "==", req.body.path).get();
+        if (!folderRef) return res.status(404).json({ code: 404, error: "Folder not found" });
+
+        let folder = folderRef?.docs[0]?.data();
+        if(!folder?.contentMaps) return res.status(500).json({ code: 500, error: "Critical Server Error" });
+
+        let contentMaps = folder.contentMaps;
+        contentMaps.push(contentMapId);
+        let updateStatus = await fb.db.doc(`users/${user.uid}/folders/${folderRef.docs[0].id}`).update({
+            contentMaps: contentMaps
+        });
+
+        if (!updateStatus) return res.status(500).json({ code: 500, error: "Critical Server Error" });
+    }
 
     return res.status(200).json({ id: contentMapId });
 });

@@ -4,7 +4,9 @@ import { useState, useEffect, useRef } from "react";
 import DMSideBar from "@/components/ui/messagesComponents/DMSidebar";
 import MessageItem from "../chat/messageItem";
 const { useRouter, useSearchParams } = require("next/navigation");
-
+import AES from "crypto-js/aes";
+import { maskProfanity , containsProfanity } from "../utils/textmoderator";
+import enc from "crypto-js/enc-utf8";
 const axios = require("axios");
 const fb = require("_firebase/firebase");
 const socket = require("_socket/socket");
@@ -36,13 +38,16 @@ export default function Messages() {
     useEffect(() => {
         if (!user) return;
         setIsLoading(true);
-        
+
         sockCli.current = socket.init("http://localhost:8080") || {};
         console.log("Socket initialized", sockCli);
         sockCli.current.on("directMsg", (data) => {
             let sentAt = new Date(
                 data.sentAt._seconds * 1000 + data.sentAt._nanoseconds / 1000000
             );
+
+            data.msg = AES.decrypt(data.msg, chatId).toString(enc);
+
             setMessages((prevMessage) => [
                 ...prevMessage,
                 <MessageItem
@@ -55,10 +60,10 @@ export default function Messages() {
                         sentAt.toLocaleTimeString()
                     }
                     reactions={{}}
-                    onReact = {handleReact}
+                    onReact={handleReact}
                     onReply={setReplyTo}
-                    attachments = {data.attachments}
-                    replyTo = {data.replyTo}
+                    attachments={data.attachments}
+                    replyTo={data.replyTo}
                 />,
             ]);
         });
@@ -77,6 +82,20 @@ export default function Messages() {
                 setUserInfo({ data: fetchedUser });
                 setLoadingState("FETCHING_MESSAGES");
                 const directMessagesData = await fetchDirectMessages(); // Assuming this function is properly defined to fetch direct messages
+
+                directMessagesData.forEach((chat) => {
+                    if ("lastMessage" in chat) {
+                        try {
+                            chat.lastMessage.message = AES.decrypt(chat.lastMessage.message, chat.id).toString(enc);
+                            if(chat.lastMessage.message === "") chat.lastMessage.message = "Unencrypted Message";
+                        } catch (error) {
+                            console.error("Error decrypting message:", error);
+                            chat.lastMessage.message = "Unencrypted Message";
+                        }
+                    }
+                });
+
+
                 console.log("Direct Messages 2: ", directMessagesData);
                 setDirectMessages(directMessagesData);
             } catch (error) {
@@ -93,7 +112,7 @@ export default function Messages() {
     useEffect(() => {
         if (!user || !withUser) return;
         setIsLoading(true); // Start loading before the async operation
-    
+
         const fetchUserData = async () => {
             try {
                 const fetchedUser = await fetchUser(withUser); // Fetch user data asynchronously
@@ -104,20 +123,20 @@ export default function Messages() {
                 setIsLoading(false); // Stop loading after the operation completes, regardless of success or failure
             }
         };
-    
+
         fetchUserData(); // Call the async function
     }, [user, withUser]);
 
 
     useEffect(() => {
         if (!user || !chatId || !userInfo) return;
-        
+
         const fetchAndSetMessages = async () => {
             if (!user || !chatId || !userInfo) return;
             setIsLoading(true);
             setLoadingState("FETCHING_MESSAGES");
             try {
-                console.log("Fetching messages for chat:",userInfo);
+                console.log("Fetching messages for chat:", userInfo);
                 const fetchedMessages = await fetchMessages(chatId, userInfo);
                 setMessages(fetchedMessages);
                 setIsLoading(false);
@@ -132,40 +151,28 @@ export default function Messages() {
         fetchAndSetMessages();
     }, [user, chatId, userInfo]);
 
-    const formatDate = (date) => {
-        return new Date(date).toLocaleString('en-US', {
-          hour12: true, // Use 12-hour clock
-          month: 'numeric', // Numeric month, e.g., 3, 4, ...
-          day: 'numeric', // Numeric day of the month
-          year: 'numeric', // 4-digit year
-          hour: 'numeric', // Numeric hour
-          minute: '2-digit', // 2-digit minute
-          second: '2-digit' // 2-digit second
-        });
-      };
-      
-      
+
 
     const uploadAttachments = async (attachments) => {
         // This function should handle the upload logic
         // For each attachment, upload it to your server or storage service
         // Return an array of URLs or references to the uploaded files
-      };
-      const sendPersonalMsg = async (msg, attachments, replyToMsg, reactions) => {
-        
+    };
+    const sendPersonalMsg = async (msg, attachments, replyToMsg, reactions) => {
         if (!sockCli.current) {
             console.log("Socket is not initialized yet.");
             return;
         }
         console.log("Sending Personal Message attributes are:", msg, attachments); // Debug to check the values
-    
+
         let attachmentUrls = [];
         if (attachments?.length > 0) {
-          // Assuming uploadAttachments is an async function that uploads files and returns their URLs
-          attachmentUrls = await uploadAttachments(attachments);
-          // Handle errors or failures in upload
+            attachmentUrls = await uploadAttachments(attachments);
+            // Handle errors or failures in upload
         }
-    
+
+        msg = maskProfanity(msg, "*");
+
         let sentAt = new Date();
         const formattedSentAt = formatDate(sentAt);
 
@@ -184,7 +191,7 @@ export default function Messages() {
             ...prevMessage,
             <MessageItem
                 key={prevMessage.length}
-                messageId = {prevMessage.length}
+                messageId={prevMessage.length}
                 sender={messageData.sender}
                 timestamp={formattedSentAt}
                 message={messageData.msg}
@@ -192,11 +199,15 @@ export default function Messages() {
                 userData={userInfo.data}
                 onReact={handleReact}
                 onReply={setReplyTo}
-                attachments={attachmentUrls} // Use the URLs from uploadAttachments
+                attachments={attachments}
                 replyTo={replyToMsg}
             />,
         ]);
-    
+
+        if(containsProfanity(msg,true)) return;
+
+        messageData.msg = AES.encrypt(msg, chatId).toString();
+
         sockCli.current.emit("directMsg", messageData); // Send the direct message to the server
         setReplyTo(null); // Reset replyTo state after sending a message
     };
@@ -233,14 +244,14 @@ export default function Messages() {
             });
         });
     };
-    
-      
-      
-    
+
+
+
+
     // Handler for the friends button
     const openFriends = () => {
         // Toggles the display between ChatWindow and FriendsWindow
-        
+
         setShowChat(false);
         router.push("/messages");
     };
@@ -260,7 +271,7 @@ export default function Messages() {
                     userData={userInfo}
                     friendsHandler={() => setShowChat(false)}
                     chatList={directMessages}
-                    openChat = {openChat}
+                    openChat={openChat}
                     chatHandler={(id, user) => {
                         router.push(`/messages?chatID=${id}&user=${user}`);
                     }}
@@ -268,11 +279,11 @@ export default function Messages() {
                 {withUser ? (
                     <ChatWindow
                         messages={message}
-                        setMessagess = {setMessages}
+                        setMessagess={setMessages}
                         sendPersonalMsg={sendPersonalMsg}
                         userInfo={userInfo}
                         withUserInfo={withUserInfo}
-                        switchToFriends = {openFriends}
+                        switchToFriends={openFriends}
                         onReact={handleReact}
                         onReply={setReplyTo}
                         replyTo={replyTo}

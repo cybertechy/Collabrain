@@ -10,29 +10,21 @@ let io;
 // Current connections
 let currLinks = {};
 let rooms = {};
-
 let connectionTimes = {};
 
+// DEBUG controller
+const DEBUG = false;
+
+// Redis controller
+let BAPS_ERROR = false;
+let BAPS_ERROR_ID = null;
+
+// Initialize the socket server
 function init(server) {
 
 	io = new Server(server, { cors: { origin: "*" } });
 
-	try {
-		const pubClient = createClient({
-			url: "rediss://red-cndgdnf109ks738rsaf0:EyChYWWMVnUrrqGRfWA2OOgIAJFBPslf@singapore-redis.render.com:6379"
-		});
-		const subClient = pubClient.duplicate();
-
-		Promise.all([pubClient.connect(), subClient.connect()]).then(() => {
-			console.log("Connected to redis");
-			io.adapter(createAdapter(pubClient, subClient));
-		}).catch((error) => {
-			console.log("Error connecting to redis: ", error);
-		});
-	} catch (error) {
-		console.log("Error connecting to redis: ", error);
-	}
-
+	connectToRedis(io);
 
 	// Sync up with the database
 	fb.getObjectFromRealtimeDB("currLinks").then((data) => {
@@ -49,7 +41,7 @@ function init(server) {
 	// Listen for connections
 	fb.listenToRealtimeDB("currLinks", (data) => {
 		currLinks = data || {};
-		console.log("Listen currLinks: ", currLinks);
+		if (DEBUG) console.log("Listen currLinks: ", currLinks);
 	});
 
 	fb.listenToRealtimeDB("rooms", (data) => {
@@ -60,11 +52,12 @@ function init(server) {
 		connectionTimes = data || {};
 	});
 
+	
 
 
 	io.on('connection', (socket) => {
 		socket.on('user', (msg) => {
-			console.log(`user ${msg.id} connected`);
+			if (DEBUG) console.log(`user ${msg.id} connected`);
 			currLinks[msg.id] = socket.id;
 			// FSR1 - Difference between user connecting and disconnecting
 			connectionTimes[msg.id] = Date.now();
@@ -81,18 +74,18 @@ function init(server) {
 			if (ref) {
 				let disconnectTime = Date.now();
 				let connectTime = connectionTimes[ref];
-				console.log(`Connection time: ${connectTime}, Disconnect time: ${disconnectTime}`);
+				if (DEBUG) console.log(`Connection time: ${connectTime}, Disconnect time: ${disconnectTime}`);
 				if (connectTime) {
 					let timeSpent = disconnectTime - connectTime; // Time spent in milliseconds
 
 					// Update the timeSpent for the user in Firebase
-					await fb.db.collection('users').doc(ref).update({
+					fb.db.collection('users').doc(ref).update({
 						timeSpent: fb.admin.firestore.FieldValue.increment(timeSpent)
 					});
 
 					// Cleanup
 					delete connectionTimes[ref]; // Ensure to remove the user from here as well
-					console.log(`user disconnected, time spent: ${timeSpent}ms`);
+					if (DEBUG) console.log(`user disconnected, time spent: ${timeSpent}ms`);
 				}
 
 				delete currLinks[ref];
@@ -104,14 +97,14 @@ function init(server) {
 						if (Object.keys(rooms[room].members).length == 0) delete rooms[room];
 
 					}
-					console.log(`user ${ref} left room ${room}`)
+					if (DEBUG) console.log(`user ${ref} left room ${room}`)
 				});
-
-				// Save the user to the database
-				fb.addObjectToRealtimeDB("currLinks", currLinks);
-				fb.addObjectToRealtimeDB("rooms", rooms);
-				fb.addObjectToRealtimeDB("connectionTimes", connectionTimes);
 			}
+
+			// Save the user to the database
+			fb.addObjectToRealtimeDB("currLinks", currLinks);
+			fb.addObjectToRealtimeDB("rooms", rooms);
+			fb.addObjectToRealtimeDB("connectionTimes", connectionTimes);
 		});
 
 		socket.on('teamMsg', (data) => broadcastMessage(data));
@@ -132,7 +125,7 @@ function init(server) {
 
 
 			socket.join(data.id);
-			console.log(`user ${data.user.id} joined room ${data.id}`)
+			if (DEBUG) console.log(`user ${data.user.id} joined room ${data.id}`)
 
 			// Sync up with the database
 			fb.addObjectToRealtimeDB("rooms", rooms);
@@ -147,7 +140,7 @@ function init(server) {
 					if (Object.keys(rooms[room].members).length == 0) delete rooms[room];
 
 				}
-				console.log(`user ${data.user.id} left room ${room}`)
+				if (DEBUG) console.log(`user ${data.user.id} left room ${room}`)
 			});
 
 			fb.addObjectToRealtimeDB("rooms", rooms);
@@ -181,15 +174,80 @@ async function broadcastMessage(data, type = "team") {
 	if (index > -1) // only splice array when item is found
 		membersList.splice(index, 1); // 2nd parameter means remove one item only
 
+	// Generate a unique id for the message
+	let msgID = uuid.v4();
+
+
 	// Send to all online members
 	membersList.forEach((member) => {
 		if (Object.keys(currLinks).includes(member))
-			io.to(currLinks[member]).emit((type == "team") ? "teamMsg" : "directMsg", data);
+			io.to(currLinks[member]).emit((type == "team") ? "teamMsg" : "directMsg", { ...data, id: msgID });
 	});
+
+	// send the message to the sender
+	io.to(currLinks[data.senderID]).emit("updateID", { ... data, id: msgID });
+
 
 	// Restore the sentAt field
 	data.sentAt = DateBackup;
+	data.msgID = msgID;
 	(type == "team") ? fb.saveTeamMsg(data) : fb.saveDirectMsg(data);
+}
+
+
+
+function connectToRedis(io) {
+
+	let reconnectToRedis = () => connectToRedis(io)
+
+	if (!io) return null;
+
+	const pubClient = createClient({
+		url: "rediss://default:AVNS_oCy6bX7J5KUh0ssBCOv@redis-m1-siddhtailor96-db76.a.aivencloud.com:18227"
+	});
+	const subClient = pubClient.duplicate();
+
+
+
+	Promise.all([pubClient.connect(), subClient.connect()])
+		.then(() => {
+			console.log("BAPS: Enabled");
+			if (io) io.adapter(createAdapter(pubClient, subClient));
+
+			if (BAPS_ERROR) {
+				BAPS_ERROR = false;
+
+				// turn off the interval
+				clearInterval(BAPS_ERROR_ID);
+				BAPS_ERROR_ID = null;
+			}
+		})
+		.catch((error) => {
+			console.log("BAPS: Disabled");
+			console.log("Error connecting to Redis: ", error);
+			// Retry after 5 seconds
+			if (!BAPS_ERROR) {
+				BAPS_ERROR = true;
+				BAPS_ERROR_ID = setInterval(reconnectToRedis, 5000);
+			}
+		});
+
+	pubClient.on("error", (error) => {
+		if (!BAPS_ERROR) {
+			console.log("BAPS: Disabled");
+			BAPS_ERROR = true;
+			BAPS_ERROR_ID = setInterval(reconnectToRedis, 5000);
+		}
+
+	});
+
+	subClient.on("error", (error) => {
+		if (!BAPS_ERROR) {
+			console.log("BAPS: Disabled");
+			BAPS_ERROR = true;
+			BAPS_ERROR_ID = setInterval(reconnectToRedis, 5000);
+		}
+	});
 }
 
 module.exports = {
