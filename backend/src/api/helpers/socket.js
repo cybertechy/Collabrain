@@ -247,7 +247,7 @@ function connectToRedis(io)
 	if (!io) return null;
 
 	const pubClient = createClient({
-		url: "rediss://red-cndgdnf109ks738rsaf0:EyChYWWMVnUrrqGRfWA2OOgIAJFBPslf@singapore-redis.render.com:6379"
+		url: "rediss://default:AVNS_oCy6bX7J5KUh0ssBCOv@redis-m1-siddhtailor96-db76.a.aivencloud.com:18227"
 	});
 	const subClient = pubClient.duplicate();
 
