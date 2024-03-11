@@ -9,7 +9,7 @@ import ChatIcon from '@mui/icons-material/Chat';
 const DMSidebar = ({ userData, onMute, onDeafen, onSettings, chatList, openChat }) => {
     console.log(userData)
     return (
-        <div className="flex flex-col h-full bg-white shadow-md z-20">
+        <div className="flex flex-col h-full bg-white shadow-md">
             {/* Chat Header */}
             <div className = "flex flex-col justify-between h-full">
             <div >
