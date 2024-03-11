@@ -63,7 +63,7 @@ const FriendTile = ({ friendData, openChat, setRefreshList }) => {
         const token = await fb.getToken();
         
         // Replace 'your_server_url' with your actual server URL
-        const response = await axios.post('https://0h32zx14-8080.asse.devtunnels.ms/api/chats/', {
+        const response = await axios.post('http://localhost:8080/api/chats/', {
           members: [id], // Include the current user and the friend in the chat
         }, {
           headers: {
@@ -88,7 +88,7 @@ const FriendTile = ({ friendData, openChat, setRefreshList }) => {
         const token = await fb.getToken();
         
         console.log(id);
-        const response = await axios.post(`https://0h32zx14-8080.asse.devtunnels.ms/api/users/friends/request/${id}`, null, {
+        const response = await axios.post(`http://localhost:8080/api/users/friends/request/${id}`, null, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -112,7 +112,7 @@ const FriendTile = ({ friendData, openChat, setRefreshList }) => {
         const token = await fb.getToken();
 
         console.log(token);
-        const response = await axios.post(`https://0h32zx14-8080.asse.devtunnels.ms/api/users/friends/${friendData.id}`, null, {
+        const response = await axios.post(`http://localhost:8080/api/users/friends/${friendData.id}`, null, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -137,7 +137,7 @@ const FriendTile = ({ friendData, openChat, setRefreshList }) => {
 
         // Replace 'your_server_url' with your actual server URL
         console.log(friendData)
-        const response = await axios.delete(`https://0h32zx14-8080.asse.devtunnels.ms/api/users/friends/request/${friendData.id}`, {
+        const response = await axios.delete(`http://localhost:8080/api/users/friends/request/${friendData.id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

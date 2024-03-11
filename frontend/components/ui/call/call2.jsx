@@ -31,7 +31,7 @@ export default function Call()
 	useEffect(() =>
 	{
 		// Setup socket and event listeners
-		sockCli.current = socket.init('https://0h32zx14-8080.asse.devtunnels.ms/');
+		sockCli.current = socket.init('http://localhost:8080/');
 
 		if (peer.current)
 			return;
@@ -65,11 +65,11 @@ export default function Call()
 	useEffect(() =>
 	{
 		// // Setup socket and event listeners
-		// sockCli.current = socket.init('https://0h32zx14-8080.asse.devtunnels.ms/');
+		// sockCli.current = socket.init('http://localhost:8080/');
 
 		// // Setup peerjs connection
 		// peer.current = new Peer(undefined, {
-		// 	host: "https://0h32zx14-3000.asse.devtunnels.ms",
+		// 	host: "	",
 		// 	port: 3001,
 		// });
 

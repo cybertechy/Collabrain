@@ -64,7 +64,7 @@ export default function Editor()
 		// Get user data
 		fb.getToken().then(token =>
 		{
-			axios.get(`https://0h32zx14-8080.asse.devtunnels.ms/api/users/${user.uid}`, {
+			axios.get(`http://localhost:8080/api/users/${user.uid}`, {
 				headers: {
 					"Authorization": `Bearer ${token}`
 				}
@@ -72,7 +72,7 @@ export default function Editor()
 		});
 
 		// Setup socket and event listeners
-		sockCli.current = socket.init('https://0h32zx14-8080.asse.devtunnels.ms/') || {};
+		sockCli.current = socket.init('http://localhost:8080/') || {};
 		sockCli.current.on('get-doc-changes', delta =>
 		{
 			quillRef.current.getEditor().updateContents(delta);
@@ -104,7 +104,7 @@ export default function Editor()
 		// Get document
 		fb.getToken().then(token =>
 		{
-			axios.get(`https://0h32zx14-8080.asse.devtunnels.ms/api/docs/${id}`, {
+			axios.get(`http://localhost:8080/api/docs/${id}`, {
 				headers: {
 					"Authorization": `Bearer ${token}`
 				}

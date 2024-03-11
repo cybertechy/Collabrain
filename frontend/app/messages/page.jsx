@@ -39,7 +39,7 @@ export default function Messages() {
         if (!user) return;
         setIsLoading(true);
 
-        sockCli.current = socket.init("https://0h32zx14-8080.asse.devtunnels.ms/") || {};
+        sockCli.current = socket.init("http://localhost:8080/") || {};
         console.log("Socket initialized", sockCli);
         sockCli.current.on("directMsg", (data) => {
             let sentAt = new Date(

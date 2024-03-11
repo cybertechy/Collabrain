@@ -62,7 +62,7 @@ const UsernameInputField = ({ placeholder, color, username, setUsername }) => {
     setError(false);
 
     try {
-      const response = await fetch(`https://0h32zx14-8080.asse.devtunnels.ms/users/username/${enteredUsername}`, {
+      const response = await fetch(`http://localhost:8080/users/username/${enteredUsername}`, {
       });
       if (response.ok) {
         toast.success("Username is available");

@@ -31,7 +31,7 @@ export default function Call()
 	useEffect(() =>
 	{
 		// Setup socket
-		sockCli.current = socket.init('https://0h32zx14-8080.asse.devtunnels.ms/');
+		sockCli.current = socket.init('http://localhost:8080/');
 
 		// Setup peer
 		if (myPeer.current)

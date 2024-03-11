@@ -6,7 +6,7 @@ const hasUsername = async () => {
     const uid = fb.getUserID();
     console.log("IN HAS USERNAME, UID:",uid);
     try {
-        const res = await axios.get(`https://0h32zx14-8080.asse.devtunnels.ms/api/users/${uid}`, {
+        const res = await axios.get(`http://localhost:8080/api/users/${uid}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -24,7 +24,7 @@ const hasUsername = async () => {
 const fetchUser = async (uid) => {
     try {
         const token = await fb.getToken();
-        const response = await axios.get(`https://0h32zx14-8080.asse.devtunnels.ms/api/users/${uid}`, {
+        const response = await axios.get(`http://localhost:8080/api/users/${uid}`, {
             headers: { "Authorization": "Bearer " + token }
         });
        return response.data;

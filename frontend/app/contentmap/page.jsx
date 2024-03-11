@@ -47,7 +47,7 @@ function page() {
     const [Delete, setDelete] = useState(false);
     const [Share, setShare] = useState(false);
 
-    const Serverlocation = "https://0h32zx14-8080.asse.devtunnels.ms/";
+    const Serverlocation = "http://localhost:8080/";
 
 
 

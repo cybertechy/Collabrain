@@ -28,7 +28,7 @@ export default function FileToolbar(props)
 	{
 		try
 		{
-			let res = await axios.get(`https://0h32zx14-8080.asse.devtunnels.ms/api/maps/ut/search?${query}`, {
+			let res = await axios.get(`http://localhost:8080/api/maps/ut/search?${query}`, {
 				headers: {
 					authorization: `Bearer ${token}`,
 				},
@@ -45,13 +45,13 @@ export default function FileToolbar(props)
 		// Different API calls for different file types due to inconsistencies
 		if (props.fileType === "doc")
 		{
-			res = await axios.patch(`https://0h32zx14-8080.asse.devtunnels.ms/api/${props.fileType}s/${props.fileID}`, newData, {
+			res = await axios.patch(`http://localhost:8080/api/${props.fileType}s/${props.fileID}`, newData, {
 				headers: { "Authorization": "Bearer " + token }
 			});
 		}
 		else if (props.fileType === "map")
 		{
-			res = await axios.put(`https://0h32zx14-8080.asse.devtunnels.ms/api/${props.fileType}s/${props.fileID}`, newData, {
+			res = await axios.put(`http://localhost:8080/api/${props.fileType}s/${props.fileID}`, newData, {
 				headers: { "Authorization": "Bearer " + token }
 			});
 		}

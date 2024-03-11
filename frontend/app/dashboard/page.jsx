@@ -250,7 +250,7 @@ export default function Dashboard() {
         console.log(loading);
         console.log(user);
         if (user) {
-            sock_cli = socket.init("https://0h32zx14-8080.asse.devtunnels.ms/");
+            sock_cli = socket.init("http://localhost:8080/");
             //    fetchTeams();
             //    fetchTeams();
         }

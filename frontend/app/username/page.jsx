@@ -66,7 +66,7 @@ const checkUsernameAvailability = async (enteredUsername) => {
     setError('');
 
     try {
-        const response = await axios.get(`https://0h32zx14-8080.asse.devtunnels.ms/api/users/username/${enteredUsername}`);
+        const response = await axios.get(`http://localhost:8080/api/users/username/${enteredUsername}`);
         if (response.status === 200) {
             setError("Username is available");
             setUsername(enteredUsername);
@@ -119,7 +119,7 @@ const checkUsernameAvailability = async (enteredUsername) => {
         if (user) {
             token = await fb.getToken();
         }
-        const response = await axios.patch('https://0h32zx14-8080.asse.devtunnels.ms/api/users/', { username: username }, {
+        const response = await axios.patch('http://localhost:8080/api/users/', { username: username }, {
             headers: {
                 authorization: `Bearer ${token}`
             }
