@@ -134,8 +134,6 @@ function init(server)
 
 		socket.on('save-doc', data => oci.addData("B3", data.ociID, "application/json", JSON.stringify(data.data)));
 
-		socket.on('directMsg', data => broadcastMessage(data, "direct"));
-
 		//Join a collab room
 		socket.on('startCollab', (data) =>
 		{
