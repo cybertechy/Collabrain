@@ -35,7 +35,42 @@ i18n
           "sort_date": "Date Modified",
           "folders": "Folders",
           "projects": "Projects",
-          "rclick_msg": "Right click to make your first project!"
+          "rclick_msg": "Right click to make your first project!",
+          "new_folder_rclick": "New Folder",
+          "new_map_rclick": "New Map",
+          "new_doc_rclick": "New Document",
+          "my_brain": "My Brain",
+        },
+
+        dashboard_folder: {
+          "rename_button": "Rename",
+          "new_folder_name": "New Folder Name",
+          "rename_top": "Rename Folder",
+          "cancel_button": "Cancel",
+          "delete_button": "Delete",
+          "delete_top": "Confirm Delete",
+          "delete_msg": "Are you sure you want to delete this folder and its contents?"
+        },
+
+        dashboard_project: {
+          "rename_button": "Rename",
+          "new_folder_name": "New Project Name",
+          "rename_top": "Rename Project",
+          "cancel_button": "Cancel",
+          "delete_button": "Delete",
+          "delete_top": "Confirm Delete",
+          "delete_msg": "Are you sure you want to delete this folder and its contents?",
+          "share_button": "Share",
+          "organize_button": "Organize"
+        },
+
+        sidebar: {
+          "my_brain": "My Brain",
+          "shared_with_me": "Shared with Me",
+          "dms": "Direct Messages",
+          "new_project": "New Project",
+          "new_team": "New Team",
+          "teams_disc": "Discover Teams"
         },
 
         leaderboard: {
@@ -44,10 +79,10 @@ i18n
           "view_less": "View Less"
         },
 
-        folder_overlay: {
+        create_folder_overlay: {
           "folder_top": "Create a New Folder",
           "folder_name": "Enter folder name",
-          "folder_color": "Pick a color for your folder: ",
+          "folder_clr": "Pick a color for your folder: ",
           "folder_cancel": "Cancel",
           "folder_create": "Create",
           "folder_wait": "Creating..."
@@ -151,11 +186,46 @@ i18n
 
         dashboard: {
           "sort_by": "Сорт. По",
-          "sort_name": "Имени",
-          "sort_date": "Дате измен.",
+          "sort_name": "Имя",
+          "sort_date": "Дата измен.",
           "folders": "Папки",
           "projects": "Проекты",
-          "rclick_msg": "Нажмите правую кнопку мыши, чтобы создать свой первый проект!"
+          "rclick_msg": "Нажмите правую кнопку мыши, чтобы создать свой первый проект!",
+          "new_folder_rclick": "Новая Папка",
+          "new_map_rclick": "Новая Карта",
+          "new_doc_rclick": "Новый Документ",
+          "my_brain": "Мой Мозг"
+        },
+
+        dashboard_folder: {
+          "rename_button": "Переименовать",
+          "new_folder_name": "Новое Имя Папки",
+          "rename_top": "Переименовать Папку",
+          "cancel_button": "Отмена",
+          "delete_button": "Удалить",
+          "delete_top": "Подтвердите Удаление",
+          "delete_msg": "Вы уверены, что хотите удалить эту папку, и ее содержимое?"
+        },
+
+        dashboard_project: {
+          "rename_button": "Переименовать",
+          "new_project_name": "Новое Имя Проекта",
+          "rename_top": "Переименовать Проект",
+          "cancel_button": "Отмена",
+          "delete_button": "Удалить",
+          "delete_top": "Подтвердите Удаление",
+          "delete_msg": "Вы уверены, что хотите удалить этот проект, и его содержимое?",
+          "share_button": "Поделиться",
+          "organize_button": "Организовать"
+        },
+
+        sidebar: {
+          "my_brain": "Мой Мозг",
+          "shared_with_me": "Общие Файлы",
+          "dms": "Сообщения",
+          "new_project": "Новый Проект",
+          "new_team": "Новая Команда",
+          "teams_disc": "Найти Команды"
         },
 
         leaderboard: {
@@ -164,7 +234,7 @@ i18n
           "view_less": "Свернуть"
         },
 
-        folder_overlay: {
+        create_folder_overlay: {
           "folder_top": "Создать Новую Папку",
           "folder_name": "Введите имя папки",
           "folder_clr": "Выберите цвет вашей папки: ",
