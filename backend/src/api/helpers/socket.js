@@ -52,7 +52,7 @@ function init(server) {
 		connectionTimes = data || {};
 	});
 
-	
+
 
 
 	io.on('connection', (socket) => {
@@ -107,10 +107,18 @@ function init(server) {
 			fb.addObjectToRealtimeDB("connectionTimes", connectionTimes);
 		});
 
-		socket.on('teamMsg', (data) => broadcastMessage(data));
+		socket.on('teamMsg', (data) => broadcastMessage(data, "team", true));
 
 		socket.on('directMsg', (data) => {
-			broadcastMessage(data, "direct");
+			broadcastMessage(data, "direct", true);
+		});
+
+		socket.on('updateDirectMessage', (data) => {
+			broadcastMessage(data, "direct", false);
+		});
+
+		socket.on('updateTeamMessage', (data) => {
+			broadcastMessage(data, "team", false);
 		});
 
 		//Join a collab room
@@ -156,10 +164,12 @@ function init(server) {
 		});
 
 
+
+
 	});
 }
 
-async function broadcastMessage(data, type = "team") {
+async function broadcastMessage(data, type = "team", generateID = false) {
 	let members = type == "team" ? await fb.getTeamMembers(data.team) : await fb.getChatMembers(data.chat);
 	let membersList = members;
 
@@ -175,23 +185,26 @@ async function broadcastMessage(data, type = "team") {
 		membersList.splice(index, 1); // 2nd parameter means remove one item only
 
 	// Generate a unique id for the message
-	let msgID = uuid.v4();
+	let msgID = generateID ? uuid.v4() : data.msgID;
 
 
 	// Send to all online members
 	membersList.forEach((member) => {
-		if (Object.keys(currLinks).includes(member))
-			io.to(currLinks[member]).emit((type == "team") ? "teamMsg" : "directMsg", { ...data, id: msgID });
+		if (Object.keys(currLinks).includes(member)) {
+			if(generateID) io.to(currLinks[member]).emit((type == "team") ? "teamMsg" : "directMsg", { ...data, id: msgID });
+			else io.to(currLinks[member]).emit((type == "team") ? "updateTeamMessage" : "updateDirectMessage", { ...data, id: msgID });
+		}
+			
 	});
 
 	// send the message to the sender
-	io.to(currLinks[data.senderID]).emit("updateID", { ... data, id: msgID });
+	if (generateID) io.to(currLinks[data.senderID]).emit("updateID", { ...data, id: msgID });
 
 
 	// Restore the sentAt field
 	data.sentAt = DateBackup;
 	data.msgID = msgID;
-	(type == "team") ? fb.saveTeamMsg(data) : fb.saveDirectMsg(data);
+	(type == "team") ? fb.saveTeamMsg(data, generateID) : fb.saveDirectMsg(data, generateID);
 }
 
 
