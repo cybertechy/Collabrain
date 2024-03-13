@@ -192,7 +192,7 @@ async function broadcastMessage(data, type = "team", generateID = false) {
 	membersList.forEach((member) => {
 		if (Object.keys(currLinks).includes(member)) {
 			if(generateID) io.to(currLinks[member]).emit((type == "team") ? "teamMsg" : "directMsg", { ...data, id: msgID });
-			else io.to(currLinks[member]).emit((type == "team") ? "updateTeamMessage" : "updateDirectMessage", { ...data, id: msgID });
+			else io.to(currLinks[member]).emit((type == "team") ? "updateTeamMessageR" : "updateDirectMessageR", { ...data, id: msgID });
 		}
 			
 	});
