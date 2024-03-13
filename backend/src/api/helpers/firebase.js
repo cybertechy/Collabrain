@@ -127,8 +127,7 @@ async function deleteQueryBatch(query, resolve) {
 	});
 }
 
-// Untested after modification
-// Untested after modification
+
 async function saveTeamMsg(data, newMessage = false) {
 	let channels = (await db.collection(`teams/${data.team}/channels/`).where("name", "==", data.channel).get());
 	let channelID = channels.docs[0].id;
@@ -191,7 +190,6 @@ async function saveTeamMsg(data, newMessage = false) {
 	}
 }
 
-// Untested after modification
 async function saveDirectMsg(data, newMessage = false) {
 	// convert sent at to firebase timestamp seconds and nanoseconds
 	let sentAt = admin.firestore.Timestamp.fromDate(new Date(data.sentAt));
@@ -252,6 +250,19 @@ async function saveDirectMsg(data, newMessage = false) {
 	}
 }
 
+// unTested
+async function deleteChatMsg(chatID, msgID) {
+	if(chatID && msgID) db.collection(`chats/${chatID}/messages`).doc(msgID).delete();
+}
+
+// unTested
+async function deleteTeamMsg(teamID, channel, msgID) {
+	if (!teamID || !channel || !msgID) return;
+	let channels = (await db.collection(`teams/${teamID}/channels/`).where("name", "==", channel).get());
+	let channelID = channels.docs[0].id;
+	db.collection(`teams/${teamID}/channels/${channelID}/messages`).doc(msgID).delete();
+}
+
 const realtimeDB = admin.database();
 
 
@@ -300,5 +311,7 @@ module.exports = {
 	getObjectFromRealtimeDB,
 	updateObjectInRealtimeDB,
 	removeObjectFromRealtimeDB,
-	listenToRealtimeDB
+	listenToRealtimeDB,
+	deleteChatMsg,
+	deleteTeamMsg
 };
