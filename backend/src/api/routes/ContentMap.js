@@ -11,7 +11,7 @@ const router = Router();
 // @RequestBody: { name: string, data: any, path: string }
 router.post("/", async (req, res) => {
 
-    if (!req.headers.authorization || !req.body.name || !req.body.path) return res.status(400).json({ code: 400, error: "Missing token or name" });
+    if (!req.headers.authorization || !req.body.name || !req.body.path) return res.status(400).json({ code: 400, error: "Missing token or name or path" });
 
     //verify user
     const token = req.headers.authorization.split(' ')[1];

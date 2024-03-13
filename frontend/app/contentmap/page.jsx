@@ -337,7 +337,9 @@ function page() {
         try {
             const res = await axios.post(`${Serverlocation}/api/maps`, {
                 name: "New Content Map",
-                data: ""
+                data: "",
+                path: "/"
+
             }, {
                 headers: {
                     authorization: `Bearer ${token}`,
@@ -387,7 +389,8 @@ function page() {
         try {
             const res = await axios.post(`${Serverlocation}/api/maps`, {
                 name: ContentMapName + " (copy)",
-                data: appdata
+                data: appdata,
+                path: "/"
             }, {
                 headers: {
                     authorization: `Bearer ${token}`,
