@@ -16,7 +16,7 @@ const fetchFolders = async (path='/') => {
       }
     })
     .then(token => {
-      return axios.get("http://localhost:8080/api/dashboard/folders", {
+      return axios.get(`http://localhost:8080/api/dashboard/folders?timestamp=${new Date().getTime()}`, {
         headers: {
           Authorization: `Bearer ${token}`, 
         },
@@ -49,7 +49,7 @@ const fetchFolders = async (path='/') => {
       }
      
   
-      const response = await axios.get("http://localhost:8080/api/dashboard/files", {
+      const response = await axios.get(`http://localhost:8080/api/dashboard/files?timestamp=${new Date().getTime()}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
