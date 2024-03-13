@@ -47,12 +47,12 @@ const DashboardProjectButton = ({
     const truncateTitle = (title, maxLength = 14, fixedWidthChar = "\u00A0") => {
         let truncatedTitle = title;
         if (title.length > maxLength) {
-          truncatedTitle = title.substring(0, maxLength - 2) + "..";
+            truncatedTitle = title.substring(0, maxLength - 2) + "..";
         } else {
-          truncatedTitle += fixedWidthChar.repeat(maxLength*2 - title.length); // Pad with non-breaking spaces
+            truncatedTitle += fixedWidthChar.repeat(maxLength * 2 - title.length); // Pad with non-breaking spaces
         }
         return truncatedTitle;
-      };
+    };
     const map = () => (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -166,86 +166,92 @@ const DashboardProjectButton = ({
                     <div className="flex flex-col items-center justify-between h-full">
                         <div className="flex flex-col gap-2 items-center">
                             {/* Project type text (left-aligned) */}
-                           
+
                             <div onClick={handleContentMapClick}>
                                 {type === "Document" ? doc() : map()}
                             </div>
-                            <div className="text-sm font-medium text-left justify-start flex items-start">
-                                {type === "Document" ? "Document" : "Map"}
+
+
+                        </div>
+                        <div className="flex flex-col w-full mt-2 ">
+                            <div className="text-xs font-medium text-left justify-start flex items-start">
+                                <p className="">{type === "Document" ? "Document" : "Content Map"}</p>
+                            </div>
+                            
+                            <div className="flex flex-row justify-between items-center w-full">
+
+                                <span className="text-md font-bold overflow-hidden whitespace-nowrap">
+                                    {truncateTitle(title)}
+                                </span>
+                                <IconButton
+                                    color="inherit"
+                                    onClick={handleClick}
+                                    className="ml-auto" // Pushed to the right side
+                                >
+                                    <MoreVertIcon fontSize="small" />
+                                </IconButton>
+                                <Menu
+                                    anchorEl={anchorEl}
+                                    open={open}
+                                    onClose={handleClose}
+                                >
+                                    <MenuItem
+                                        onClick={() => {
+                                            handleClose();
+                                            setRenameOverlayOpen(true);
+                                        }}
+                                    >
+                                        <EditIcon
+                                            fontSize="small text-tertiary"
+                                            className="mr-2 text-tertiary flex justify-between gap-5"
+                                        />
+                                        <span className="text-tertiary">
+                                            Rename
+                                        </span>
+                                    </MenuItem>
+                                    <MenuItem onClick={handleClose}>
+                                        <ShareIcon
+                                            fontSize="small text-tertiary"
+                                            className="mr-2  text-tertiary flex justify-between gap-5"
+                                        />
+                                        <span className="text-tertiary">Share</span>
+                                    </MenuItem>
+                                    <MenuItem onClick={handleClose}>
+                                        <SortIcon
+                                            fontSize="small text-tertiary"
+                                            className="mr-2  text-tertiary flex justify-between gap-5"
+                                        />
+                                        <span className="text-tertiary">
+                                            Organize
+                                        </span>
+                                    </MenuItem>
+                                    <MenuItem
+                                        onClick={() => {
+                                            handleClose();
+                                            setDeleteOverlayOpen(true);
+                                        }}
+                                    >
+                                        <DeleteIcon
+                                            fontSize="small text-tertiary"
+                                            className="mr-2  text-tertiary flex justify-between gap-5"
+                                        />
+                                        <span className="text-tertiary">
+                                            Delete
+                                        </span>
+                                    </MenuItem>
+                                </Menu>
                             </div>
                         </div>
-                        <div className="flex flex-row justify-between items-center w-full"> 
-                            <span className="text-md font-semibold overflow-hidden whitespace-nowrap">
-                                {truncateTitle(title)}
-                            </span>
-                            <IconButton
-                                color="inherit"
-                                onClick={handleClick}
-                                className="ml-auto" // Pushed to the right side
-                            >
-                                <MoreVertIcon fontSize="small" />
-                            </IconButton>
-                            <Menu
-                                anchorEl={anchorEl}
-                                open={open}
-                                onClose={handleClose}
-                            >
-                            <MenuItem
-                                onClick={() => {
-                                    handleClose();
-                                    setRenameOverlayOpen(true);
-                                }}
-                            >
-                                <EditIcon
-                                    fontSize="small text-tertiary"
-                                    className="mr-2 text-tertiary flex justify-between gap-5"
-                                />
-                                <span className="text-tertiary">
-                                    Rename
-                                </span>
-                            </MenuItem>
-                            <MenuItem onClick={handleClose}>
-                                <ShareIcon
-                                    fontSize="small text-tertiary"
-                                    className="mr-2  text-tertiary flex justify-between gap-5"
-                                />
-                                <span className="text-tertiary">Share</span>
-                            </MenuItem>
-                            <MenuItem onClick={handleClose}>
-                                <SortIcon
-                                    fontSize="small text-tertiary"
-                                    className="mr-2  text-tertiary flex justify-between gap-5"
-                                />
-                                <span className="text-tertiary">
-                                    Organize
-                                </span>
-                            </MenuItem>
-                            <MenuItem
-                                onClick={() => {
-                                    handleClose();
-                                    setDeleteOverlayOpen(true);
-                                }}
-                            >
-                                <DeleteIcon
-                                    fontSize="small text-tertiary"
-                                    className="mr-2  text-tertiary flex justify-between gap-5"
-                                />
-                                <span className="text-tertiary">
-                                    Delete
-                                </span>
-                            </MenuItem>
-                        </Menu>
                     </div>
                 </div>
-            </div>
-            {/* Rename Overlay */}
-            <Dialog
-                open={renameOverlayOpen}
-                onClose={() => setRenameOverlayOpen(false)}
-                sx={dialogStyles}
-            >
-                <DialogTitle>Rename Project</DialogTitle>
-                <DialogContent>
+                {/* Rename Overlay */}
+                <Dialog
+                    open={renameOverlayOpen}
+                    onClose={() => setRenameOverlayOpen(false)}
+                    sx={dialogStyles}
+                >
+                    <DialogTitle>Rename Project</DialogTitle>
+                    <DialogContent>
                         <TextField
                             label="New Project Name"
                             variant="outlined"
@@ -305,7 +311,7 @@ DashboardProjectButton.propTypes = {
     createdAt: PropTypes.string,
     updatedAt: PropTypes.string,
 
-   
+
 };
 
 export default DashboardProjectButton;
