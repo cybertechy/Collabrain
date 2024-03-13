@@ -5,7 +5,7 @@ import DMSideBar from "@/components/ui/messagesComponents/DMSidebar";
 import MessageItem from "../chat/messageItem";
 const { useRouter, useSearchParams } = require("next/navigation");
 import AES from "crypto-js/aes";
-// Add the enc.utf8 module
+import { maskProfanity , containsProfanity } from "../utils/textmoderator";
 import enc from "crypto-js/enc-utf8";
 const axios = require("axios");
 const fb = require("_firebase/firebase");
@@ -171,6 +171,8 @@ export default function Messages() {
             // Handle errors or failures in upload
         }
 
+        msg = maskProfanity(msg, "*");
+
         let sentAt = new Date();
         const messageData = {
             senderID: user.uid, // Ensure this is the correct Firebase user ID
@@ -201,6 +203,8 @@ export default function Messages() {
                 replyTo={replyToMsg}
             />,
         ]);
+
+        if(containsProfanity(msg,true)) return;
 
         messageData.msg = AES.encrypt(msg, chatId).toString();
 

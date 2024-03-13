@@ -456,7 +456,7 @@ const ProfilePage = () => {
             ) : (
               <>
                 <ul className='text-tertiary'>
-                  {education.map((edu, index) => (
+                  {education?.map((edu, index) => (
                     <li key={index}>
                       <hr className="border-t-1 mx-1 border-solid border-gray-400 opacity-30 py-1"></hr>
                       <i>{edu.degree}</i> from <i>{edu.school}</i> ({edu.startYear} - {edu.endYear})
@@ -498,7 +498,7 @@ const ProfilePage = () => {
               </div>
             ) : (
               <ul className='text-tertiary'>
-                {certifications.map((cert, index) => (
+                {certifications?.map((cert, index) => (
                   <li key={index}>
                     <hr className="border-t-1 mx-1 border-solid border-gray-400 opacity-30 py-1"></hr>
                     <i>{cert.title}</i>, obtained on {cert.date}

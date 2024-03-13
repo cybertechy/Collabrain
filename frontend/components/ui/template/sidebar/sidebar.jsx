@@ -28,17 +28,6 @@ const navigationItems1 = [
     
 ];
 
-
-// const groups = [
-//     { name: 'Team Alpha',   imageUrl: '/path/to/image1.jpg', href: "/chat" },
-//     { name: 'Team Beta',    imageUrl: '/path/to/image2.jpg'}, 
-//     { name: 'Team Gamma',   imageUrl: '/path/to/image3.jpg'} ,
-//     { name: 'Team Delta',   imageUrl: '/path/to/image4.jpg'},
-//     { name: 'Team Epsilon', imageUrl: '/path/to/image5.jpg'},  
-
-//     // Add more teams or use real data from your state
-// ];
-
 const navigationItems2 = [
     { name: "Direct Messages", href: "/messages", icon: ForumIcon },
    
@@ -56,15 +45,7 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
     const toggleProjectModal = () => { 
         setIsProjectModalOpen(!isProjectModalOpen);
     };
-    // const toggleSidebar = () => {
-    //     setIsOpen(!isOpen);
-    // };
-    // const handleSidebarClick = (e) => {
-    //     // Check if the click is not on an interactive element
-    //     if (!e.target.closest('.interactive-element')) {
-    //         toggleSidebar();
-    //     }
-    // };
+    
 
     const pathname = usePathname(); 
     // const [windowWidth, setWindowWidth] = useState(window.innerWidth);
