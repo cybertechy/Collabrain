@@ -159,7 +159,7 @@ const DashboardProjectButton = ({
         <Tooltip title={title} enterDelay={1000} leaveDelay={200}>
             <div>
                 <div
-                    className="flex flex-col items-stretch justify-center bg-aliceBlue text-primary rounded-md hover:bg-columbiablue duration-300  pt-2 px-3 " // Added mb-2 for bottom spacing
+                    className="flex flex-wrap items-stretch justify-center bg-aliceBlue text-primary rounded-md hover:bg-columbiablue duration-300  pt-2 px-3  border border-unselected" // Added mb-2 for bottom spacing
                     draggable="true"
                     onDragStart={(e) => handleDragStart(e, project.id, type)}
                 >
