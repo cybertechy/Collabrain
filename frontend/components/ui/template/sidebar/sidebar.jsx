@@ -21,12 +21,16 @@ import TeamSidebarItem from "./sidebarSubComponents/sidebarTeamButton"
 // Define the sidebar navigation items
 import { usePathname } from "next/navigation";
 import NewProjectOverlay from "../../overlays/NewProjectOverlay";
+import { useMediaQuery } from "react-responsive"; // Import useMediaQuery
+
 import axios from "axios";
 const navigationItems1 = [
     { name: "My Brain", href: "/dashboard", icon: FolderIcon },
     { name: "Shared With Me", href: "/shared-with-me", icon: PeopleIcon },
     
 ];
+
+
 
 const navigationItems2 = [
     { name: "Direct Messages", href: "/messages", icon: ForumIcon },
@@ -41,11 +45,12 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
     const toggleModal = () => { // Define toggleModal function
         setIsModalOpen(!isModalOpen);
     };
-    
+    const isSmallScreen = useMediaQuery({ query: "(max-width: 768px)" }); // Define breakpoint
+
     const toggleProjectModal = () => { 
         setIsProjectModalOpen(!isProjectModalOpen);
     };
-    
+
 
     const pathname = usePathname(); 
     // const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -114,67 +119,15 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
     }, [user]);
     
     
-     // Empty dependency array to run the effect only once
 
-    // useEffect(() => {
-    //     const handleResize = () => {
-    //         setWindowWidth(window.innerWidth);
-    //     };
-        
-    //     window.addEventListener('resize', handleResize);
-    //     return () => window.removeEventListener('resize', handleResize);
-    // }, []);
-
-    // const sidebarStyle = () => {
-    //     if (windowWidth >= 800) {
-    //         return {
-    //             width: '18rem'
-    //         }
-    //     }
-    //     if (windowWidth > 550 && windowWidth < 800) {
-    //         return {
-    //             width: '18rem'
-    //         }
-    //     }
-    //     else {
-    //         return {
-    //             width: '100%',  // Use '100vw' for full width
-    //             // maxWidth: '100%'
-    
-    //         }
-    //     }
-    // }
-    
-    // const sidebarStyle1 = () => {
-    //     if (windowWidth >= 800) {
-    //         return {
-    //             width: '5rem'
-    //         }
-    //     }
-    //     if (windowWidth >= 400 && windowWidth < 800) {
-    //         return {
-    //             width: '5rem'
-    //         }
-    //     }
-    //     else {
-    //         return {
-    //             // overflow: 'hidden',
-    //             display: 'none',
-    //             // width: '0px'
-    //         }
-    //     }
-    // }
 
     return (
         <aside
-            className={`transition-all shadow-md h-screen pt-[height_of_navbar] z-10 duration-500 ease-in-out 
-            ${
-                isOpen ? "xsm:w-80 max-xsm:w-screen" : "xsm:w-20 max-xsm:hidden"
-            }
-             bg-basicallylight text-basicallydark`}
-            // style={isOpen ? sidebarStyle() : sidebarStyle1()}
-            // onClick={handleSidebarClick}
-        >
+      className={`transition-all shadow-md h-screen pt-[height_of_navbar] z-10 duration-500 ease-in-out
+     ${isOpen ? (isSmallScreen ? "w-full" : "lg:w-80 md:w-80") : "hidden"}
+     ${isSmallScreen && isOpen ? "fixed top-0 left-0 z-40" : "lg:block md:block md:w-20"} // Adjusted for responsive design
+      bg-basicallylight text-basicallydark`}
+    >
             <div className="flex flex-col">
                 <div className="flex items-center justify-center h-24">
                     <div className="flex items-center justify-center">
@@ -191,7 +144,7 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
                                 </p>
                                 </div>
                                 <CloseIcon
-                                    className="text-lg ml-16 text-primary transition-all duration-1000 ease-in-out cursor-pointer"
+                                    className="text-xl ml-16 text-primary transition-all duration-1000 ease-in-out cursor-pointer"
                                     onClick={toggleSidebar}
                                     fontSize="large"
                                 />
@@ -258,16 +211,7 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
             
             {isModalOpen && <TeamOverlay toggleModal={ toggleModal} modalVisible= {isModalOpen} />}
             {isProjectModalOpen && <NewProjectOverlay toggleModal={ toggleProjectModal} modalVisible= {isProjectModalOpen} />}
-                {/* {teams.map(team => (
-                    <SidebarItem
-                        key={team.name}
-                        href={`/team/${team.uid}`} // Assuming each team has a unique ID and a page
-                        icon={GroupsIcon} // You can use a default icon for teams
-                        text={team.name}
-                        isSelected={pathname === `/team/${team.uid}`}
-                        isExpanded={isOpen}
-                    />
-                ))} */}
+                
 
                                        <SidebarButtonIcon
                         key={"Discover Teams"}

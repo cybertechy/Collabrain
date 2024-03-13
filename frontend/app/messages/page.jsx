@@ -151,39 +151,54 @@ export default function Messages() {
         fetchAndSetMessages();
     }, [user, chatId, userInfo]);
 
-
+    const formatDate = (date) => {
+        return new Date(date).toLocaleString('en-US', {
+          hour12: true, // Use 12-hour clock
+          month: 'numeric', // Numeric month, e.g., 3, 4, ...
+          day: 'numeric', // Numeric day of the month
+          year: 'numeric', // 4-digit year
+          hour: 'numeric', // Numeric hour
+          minute: '2-digit', // 2-digit minute
+          second: '2-digit' // 2-digit second
+        });
+      };
+      
+      
 
     const uploadAttachments = async (attachments) => {
         // This function should handle the upload logic
         // For each attachment, upload it to your server or storage service
         // Return an array of URLs or references to the uploaded files
-    };
+      };
     const sendPersonalMsg = async (msg, attachments, replyToMsg, reactions) => {
         if (!sockCli.current) {
             console.log("Socket is not initialized yet.");
             return;
         }
-        console.log("Sending Personal Message attributes are:", msg, attachments); // Debug to check the values
+        console.log("Sending Personal Message attributes are:",msg, attachments); // Debug to check the values
 
         let attachmentUrls = [];
         if (attachments?.length > 0) {
-            attachmentUrls = await uploadAttachments(attachments);
-            // Handle errors or failures in upload
+          // Assuming uploadAttachments is an async function that uploads files and returns their URLs
+          attachmentUrls = await uploadAttachments(attachments);
+          // Handle errors or failures in upload
         }
 
         msg = maskProfanity(msg, "*");
 
         let sentAt = new Date();
+        const formattedSentAt = formatDate(sentAt);
+
         const messageData = {
             senderID: user.uid, // Ensure this is the correct Firebase user ID
-            sender: userInfo.data.username,
+            sender: userInfo.data.username, // Assuming this is how you get the username
             chat: chatId, // The chat ID for the direct message
             msg: msg,
-            sentAt: sentAt, // Convert the date to a Firebase timestamp if necessary
-            reactions: reactions, // Starting with an empty array for reactions
-            attachments: attachmentUrls
+            sentAt: sentAt.toISOString(), // Convert to ISO string for consistency
+            reactions: reactions || [], // Ensure there are default reactions if none provided
+            attachments: attachmentUrls // This should be the processed URLs from uploadAttachments
         };
-
+    
         // Add the message to the real-time socket chat
         setMessages((prevMessage) => [
             ...prevMessage,
@@ -191,15 +206,13 @@ export default function Messages() {
                 key={prevMessage.length}
                 messageId={prevMessage.length}
                 sender={messageData.sender}
-                timestamp={
-                    sentAt.toDateString() + " " + sentAt.toLocaleTimeString()
-                }
+                timestamp={formattedSentAt}
                 message={messageData.msg}
-                reactions={reactions} // This is where you'd add reactions if you have them
+                reactions={messageData.reactions}
                 userData={userInfo.data}
                 onReact={handleReact}
                 onReply={setReplyTo}
-                attachments={attachments}
+                attachments={attachmentUrls} // Use the URLs from uploadAttachments
                 replyTo={replyToMsg}
             />,
         ]);
@@ -209,8 +222,9 @@ export default function Messages() {
         messageData.msg = AES.encrypt(msg, chatId).toString();
 
         sockCli.current.emit("directMsg", messageData); // Send the direct message to the server
-        setReplyTo(null); // Reset replyTo state after sending a messagez
+        setReplyTo(null); // Reset replyTo state after sending a message
     };
+    
     const handleReact = (messageId, emoji) => {
         setMessages((currentMessages) => {
             return currentMessages.map((message, index) => {
