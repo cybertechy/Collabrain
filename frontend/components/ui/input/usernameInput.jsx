@@ -5,6 +5,8 @@ import debounce from 'lodash.debounce';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
+
 const fb = require("../../../app/_firebase/firebase");
 const colorClasses = {
   primary: "bg-primary",
@@ -62,7 +64,7 @@ const UsernameInputField = ({ placeholder, color, username, setUsername }) => {
     setError(false);
 
     try {
-      const response = await fetch(`http://localhost:8080/users/username/${enteredUsername}`, {
+      const response = await fetch(`${SERVERLOCATION}/users/username/${enteredUsername}`, {
       });
       if (response.ok) {
         toast.success("Username is available");

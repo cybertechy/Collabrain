@@ -6,6 +6,9 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 const fb = require("_firebase/firebase");
 import { hasUsername } from "../utils/user";
+
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
+
 const UsernameSetting = () => {
   const router = useRouter();
   const [username, setUsername] = useState('');
@@ -66,7 +69,7 @@ const checkUsernameAvailability = async (enteredUsername) => {
     setError('');
 
     try {
-        const response = await axios.get(`http://localhost:8080/api/users/username/${enteredUsername}`);
+        const response = await axios.get(`${SERVERLOCATION}/api/users/username/${enteredUsername}`);
         if (response.status === 200) {
             setError("Username is available");
             setUsername(enteredUsername);
@@ -119,7 +122,7 @@ const checkUsernameAvailability = async (enteredUsername) => {
         if (user) {
             token = await fb.getToken();
         }
-        const response = await axios.patch('http://localhost:8080/api/users/', { username: username }, {
+        const response = await axios.patch(`${SERVERLOCATION}/api/users/`, { username: username }, {
             headers: {
                 authorization: `Bearer ${token}`
             }

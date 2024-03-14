@@ -16,6 +16,7 @@ import Template from "@/components/ui/template/template";
 import { fetchUser } from "@/app/utils/user";
 import { fetchMessages, fetchDirectMessages } from "@/app/utils/messages";
 import LoaderComponent from "@/components/ui/loader/loaderComponent";
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 export default function Messages() {
     const router = useRouter();
     const [user, loading] = fb.useAuthState();
@@ -39,7 +40,7 @@ export default function Messages() {
         if (!user) return;
         setIsLoading(true);
 
-        sockCli.current = socket.init("http://localhost:8080") || {};
+        sockCli.current = socket.init(SERVERLOCATION) || {};
         console.log("Socket initialized", sockCli);
         sockCli.current.on("directMsg", (data) => {
             let sentAt = new Date(

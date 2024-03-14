@@ -25,6 +25,9 @@ import EditIcon from '@mui/icons-material/Edit';
 import axios from 'axios';
 import { useAuthState } from '_firebase/firebase';
 import CustomAvatar from './avatar';
+
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
+
 const FriendTile = ({ friendData, openChat, setRefreshList }) => {
   const [user, loading] = useAuthState();
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -63,7 +66,7 @@ const FriendTile = ({ friendData, openChat, setRefreshList }) => {
         const token = await fb.getToken();
         
         // Replace 'your_server_url' with your actual server URL
-        const response = await axios.post('http://localhost:8080/api/chats/', {
+        const response = await axios.post(`${SERVERLOCATION}/api/chats/`, {
           members: [id], // Include the current user and the friend in the chat
         }, {
           headers: {
@@ -88,7 +91,7 @@ const FriendTile = ({ friendData, openChat, setRefreshList }) => {
         const token = await fb.getToken();
         
         console.log(id);
-        const response = await axios.post(`http://localhost:8080/api/users/friends/request/${id}`, null, {
+        const response = await axios.post(`${SERVERLOCATION}/api/users/friends/request/${id}`, null, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -112,7 +115,7 @@ const FriendTile = ({ friendData, openChat, setRefreshList }) => {
         const token = await fb.getToken();
 
         console.log(token);
-        const response = await axios.post(`http://localhost:8080/api/users/friends/${friendData.id}`, null, {
+        const response = await axios.post(`${SERVERLOCATION}/api/users/friends/${friendData.id}`, null, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -137,7 +140,7 @@ const FriendTile = ({ friendData, openChat, setRefreshList }) => {
 
         // Replace 'your_server_url' with your actual server URL
         console.log(friendData)
-        const response = await axios.delete(`http://localhost:8080/api/users/friends/request/${friendData.id}`, {
+        const response = await axios.delete(`${SERVERLOCATION}/api/users/friends/request/${friendData.id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

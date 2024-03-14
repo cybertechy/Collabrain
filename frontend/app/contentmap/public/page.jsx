@@ -21,7 +21,7 @@ import WorkingJSON from "../../../public/assets/json/Working.json";
 import Lottie from "lottie-react";
 
 
-
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
 function page() {
     const [token, setToken] = useState(null);
@@ -116,7 +116,7 @@ function page() {
         // console.log("Fetchingg data");
 
         try {
-            const res = await axios.get(`http://localhost:8080/api/maps/public/${id}`, {
+            const res = await axios.get(`${SERVERLOCATION}/api/maps/public/${id}`, {
             });
             console.log("res");
             if (res.status !== 200) {
@@ -151,7 +151,7 @@ function page() {
         if (!token) return null;
 
         // make axois put rquest with token in header to update the content map, pass data (appState) in body
-        axios.put(`http://localhost:8080/api/maps/public${id}`, { name: ContentMapName }, {
+        axios.put(`${SERVERLOCATION}/api/maps/public${id}`, { name: ContentMapName }, {
             headers: {
                 authorization: `Bearer ${token}`,
             },

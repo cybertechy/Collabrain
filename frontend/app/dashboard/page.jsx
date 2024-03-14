@@ -22,6 +22,7 @@ import {
 } from "../utils/filesAndFolders";
 import { hasUsername } from "../utils/user";
 import LoaderComponent from "../../components/ui/loader/loaderComponent";
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 export default function Dashboard() {
     const [user, loading] = fb.useAuthState();
     const [isLoading, setIsLoading] = useState(true);
@@ -250,7 +251,7 @@ export default function Dashboard() {
         console.log(loading);
         console.log(user);
         if (user) {
-            sock_cli = socket.init("http://localhost:8080");
+            sock_cli = socket.init(SERVERLOCATION);
             //    fetchTeams();
             //    fetchTeams();
         }

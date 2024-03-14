@@ -17,6 +17,9 @@ import ShareIcon from "@mui/icons-material/Share"; // Icon for Share
 import SortIcon from "@mui/icons-material/Sort"; // Icon for Organize
 import DeleteIcon from "@mui/icons-material/Delete"; // Icon for Delete
 import fb from "../../../app/_firebase/firebase";
+
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
+
 const DashboardProjectButton = ({
     title,
     project,
@@ -96,7 +99,7 @@ const DashboardProjectButton = ({
         let token = await fb.getToken();
         await axios
             .put(
-                "http://localhost:8080/api/maps/" + contentMapId,
+                `${SERVERLOCATION}/api/maps/` + contentMapId,
                 {
                     name: newName,
                 },
@@ -118,7 +121,7 @@ const DashboardProjectButton = ({
     async function deleteContentMap(contentMapId) {
         let token = await fb.getToken();
         await axios
-            .delete("http://localhost:8080/api/maps/" + contentMapId, {
+            .delete(`${SERVERLOCATION}/api/maps/` + contentMapId, {
                 headers: {
                     Authorization: `Bearer ${token}`, // Replace <UserToken> with actual token
                 },

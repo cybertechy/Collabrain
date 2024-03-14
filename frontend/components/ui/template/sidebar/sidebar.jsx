@@ -30,6 +30,7 @@ const navigationItems1 = [
     
 ];
 
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
 
 const navigationItems2 = [
@@ -65,7 +66,7 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
             try {
                 // Make a GET request to retrieve user's team IDs
                 const token = await fb.getToken();
-                const response = await axios.get('http://localhost:8080/api/teams', {
+                const response = await axios.get(`${SERVERLOCATION}/api/teams`, {
                     headers: {
                         Authorization: `Bearer ${token}`, // Replace with the actual auth token
                     },
@@ -77,7 +78,7 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
     
                     // Create an array of promises to fetch team information
                     const teamPromises = teamIds.map(async (teamId) => {
-                        const teamResponse = await axios.get(`http://localhost:8080/api/teams/${teamId}`, {
+                        const teamResponse = await axios.get(`${SERVERLOCATION}/api/teams/${teamId}`, {
                             headers: {
                                 Authorization: `Bearer ${token}`, // Replace with the actual auth token
                             },

@@ -23,6 +23,8 @@ import Lottie from "lottie-react";
 const SOCKET_DEBUG = false;
 const POINTER_DEBUG = false;
 
+const Serverlocation = process.env.NEXT_PUBLIC_SERVER_LOCATION;
+
 function page() {
     const [token, setToken] = useState(null);
     const [Excalidraw, setExcalidraw] = useState(null);
@@ -46,11 +48,6 @@ function page() {
     const [New, setNew] = useState(false);
     const [Delete, setDelete] = useState(false);
     const [Share, setShare] = useState(false);
-
-    const Serverlocation = "http://localhost:8080";
-
-
-
 
     let Guide = {
         showProgress: true,
