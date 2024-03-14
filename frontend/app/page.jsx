@@ -14,7 +14,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import { useEffect, useState } from 'react';
 import { hasUsername } from "./utils/user";
 import "../i18n"
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'next-i18next';
 
 export default function Home() {
     const [user, loading]  = fb.useAuthState();
