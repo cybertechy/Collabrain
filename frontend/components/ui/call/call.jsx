@@ -1,9 +1,8 @@
 import { useEffect, useState, useRef } from "react";
-
-const socket = require("_socket/socket");
+import socket from "_socket/socket";
 import { Peer } from "peerjs";
 
-export default function Call()
+export default function Call(props)
 {
 	let myPeer = useRef(null);
 	let sockCli = useRef(null);
@@ -16,7 +15,7 @@ export default function Call()
 		const video = document.createElement('video');
 		video.playsInline = true;
 		video.id = userId;
-		call.on('stream', userVideoStream => { addVideoStream(video, userVideoStream); });
+		call.on('stream', userVideoStream => addVideoStream(video, userVideoStream));
 		call.on('close', () => { video.remove(); });
 		setPeers({ ...peers, [userId]: call });
 	};
@@ -24,7 +23,10 @@ export default function Call()
 	const addVideoStream = (video, stream) =>
 	{
 		video.srcObject = stream;
+		video.className = "rounded-md aspect-video object-cover w-auto h-full";
 		video.addEventListener('loadedmetadata', () => { video.play(); });
+		// Increment numUsers
+		props.setNumUsers((prev) => prev + 1);
 		document.querySelector('#video-grid').append(video);
 	};
 
@@ -78,7 +80,11 @@ export default function Call()
 				peers[userId].close();
 
 			// Remove video
-			document.getElementById(userId).remove();
+			try { document.getElementById(userId).remove(); }
+			catch (e) { console.log(e); }
+
+			// Decrement numUsers
+			props.setNumUsers((prev) => prev - 1);
 		});
 
 		myPeer.current.on('open', id =>
@@ -87,10 +93,4 @@ export default function Call()
 			sockCli.current.emit('join-call', "room1", id);
 		});
 	}, []);
-
-	return (
-		<div>
-			Call
-		</div>
-	);
 }

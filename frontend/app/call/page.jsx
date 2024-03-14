@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import dynamic from "next/dynamic";
 const fb = require("_firebase/firebase");
 const CallComp = dynamic(() => import("@/components/ui/call/call"), { ssr: false });
@@ -9,6 +10,7 @@ import Template from "@/components/ui/template/template";
 export default function Call(props)
 {
 	const [user, loading] = fb.useAuthState();
+	const [numUsers, setNumUsers] = useState(1);
 
 	if (loading)
 	{
@@ -21,11 +23,10 @@ export default function Call(props)
 
 	return (
 		<Template>
-		<div className="flex-col justify-center w-full h-full">
-			<h1>Call</h1>
-			<CallComp />
-			<CallScreen />
-		</div>
+			<div className="flex-col justify-center w-full h-full">
+				<CallComp setNumUsers={setNumUsers} numUsers={numUsers} />
+				<CallScreen numUsers={numUsers} />
+			</div>
 		</Template>
 	);
 }
