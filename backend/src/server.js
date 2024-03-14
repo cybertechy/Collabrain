@@ -18,6 +18,7 @@ const notificationsRoute = require("./api/routes/Notifications");
 const storageRoute = require("./api/routes/Storage");
 const aiRoute = require("./api/routes/AI");
 const statsRoute = require("./api/routes/Stats");
+const twoFARoute = require("./api/routes/twoFA");
 
 // Helpers
 const sockServer = require("./api/helpers/socket");
@@ -78,6 +79,7 @@ app.use("/api/notifications", notificationsRoute);
 app.use("/api/storage", storageRoute);
 app.use("/api/stats", statsRoute);
 app.use("/api/ai", aiRoute);
+app.use("/api/2FA", twoFARoute);
 
 
 
