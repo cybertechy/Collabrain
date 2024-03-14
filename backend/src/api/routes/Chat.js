@@ -73,9 +73,17 @@ router.get("/", async (req, res) => {
         // get chat info
 		let chatId = chats[i];
         let chatRef = await fb.db.doc(`chats/${chatId}`).get();
-        result.push({id: chatId, ...chatRef.data()});
+		
+		if (!chatRef.data()?.members) {
+			console.log("ChatID: ",chatId,"Chat has no members");
+			continue;
+		}
+        
+		result.push({id: chatId, ...chatRef.data()});
 	
         // get chat members info
+		
+
         let members = [];
         await Promise.all(chatRef.data().members.map(async member => {
 			if(member === user.uid) return; // Skip the user themselves
