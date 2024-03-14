@@ -9,7 +9,7 @@ import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, B
 import { useRouter } from 'next/navigation';
 import jsPDF from 'jspdf';
 import "../../../i18n"
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'next-i18next';
 
 const fb = require("_firebase/firebase");
 

@@ -17,6 +17,8 @@ import ShareIcon from "@mui/icons-material/Share"; // Icon for Share
 import SortIcon from "@mui/icons-material/Sort"; // Icon for Organize
 import DeleteIcon from "@mui/icons-material/Delete"; // Icon for Delete
 import fb from "../../../app/_firebase/firebase";
+import "../../../i18n"
+import { useTranslation } from 'next-i18next';
 const DashboardProjectButton = ({
     title,
     project,
@@ -29,6 +31,7 @@ const DashboardProjectButton = ({
     handleProjectDeleted,
     OnClick
 }) => {
+    const { t } = useTranslation('dashboard_project');
     const [anchorEl, setAnchorEl] = useState(null);
     const [renameOverlayOpen, setRenameOverlayOpen] = useState(false);
     const [deleteOverlayOpen, setDeleteOverlayOpen] = useState(false);
@@ -192,7 +195,7 @@ const DashboardProjectButton = ({
                                         className="mr-2 text-tertiary flex justify-between gap-5"
                                     />
                                     <span className="text-tertiary">
-                                        Rename
+                                        {t('rename_button')}
                                     </span>
                                 </MenuItem>
                                 <MenuItem onClick={handleClose}>
@@ -200,7 +203,7 @@ const DashboardProjectButton = ({
                                         fontSize="small text-tertiary"
                                         className="mr-2  text-tertiary flex justify-between gap-5"
                                     />
-                                    <span className="text-tertiary">Share</span>
+                                    <span className="text-tertiary">{t('share_button')}</span>
                                 </MenuItem>
                                 <MenuItem onClick={handleClose}>
                                     <SortIcon
@@ -208,7 +211,7 @@ const DashboardProjectButton = ({
                                         className="mr-2  text-tertiary flex justify-between gap-5"
                                     />
                                     <span className="text-tertiary">
-                                        Organize
+                                        {t('organize_button')}
                                     </span>
                                 </MenuItem>
                                 <MenuItem
@@ -222,7 +225,7 @@ const DashboardProjectButton = ({
                                         className="mr-2  text-tertiary flex justify-between gap-5"
                                     />
                                     <span className="text-tertiary">
-                                        Delete
+                                        {t('delete_button')}
                                     </span>
                                 </MenuItem>
                             </Menu>
@@ -235,10 +238,10 @@ const DashboardProjectButton = ({
                     onClose={() => setRenameOverlayOpen(false)}
                     sx={dialogStyles}
                 >
-                    <DialogTitle>Rename Project</DialogTitle>
+                    <DialogTitle>{t('rename_top')}</DialogTitle>
                     <DialogContent>
                         <TextField
-                            label="New Project Name"
+                            label={t('new_project_name')}
                             variant="outlined"
                             fullWidth
                             value={newProjectName}
@@ -250,10 +253,10 @@ const DashboardProjectButton = ({
                             onClick={() => setRenameOverlayOpen(false)}
                             sx={buttonStyles}
                         >
-                            Cancel
+                            {t('cancel_button')}
                         </Button>
                         <Button onClick={handleRename} sx={buttonStyles}>
-                            Rename
+                            {t('rename_button')}
                         </Button>
                     </DialogActions>
                 </Dialog>
@@ -263,20 +266,19 @@ const DashboardProjectButton = ({
                     onClose={() => setDeleteOverlayOpen(false)}
                     sx={dialogStyles}
                 >
-                    <DialogTitle>Confirm Delete</DialogTitle>
+                    <DialogTitle>{t('delete_top')}</DialogTitle>
                     <DialogContent>
-                        Are you sure you want to delete this Project and its
-                        contents?
+                        {t('delete_msg')}
                     </DialogContent>
                     <DialogActions>
                         <Button
                             onClick={() => setDeleteOverlayOpen(false)}
                             sx={buttonStyles}
                         >
-                            Cancel
+                            {t('cancel_button')}
                         </Button>
                         <Button onClick={handleDelete} sx={buttonStyles}>
-                            Delete
+                            {t('delete_button')}
                         </Button>
                     </DialogActions>
                 </Dialog>

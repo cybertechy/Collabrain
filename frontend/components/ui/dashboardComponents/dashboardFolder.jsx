@@ -12,8 +12,11 @@ import EditIcon from '@mui/icons-material/Edit';
 import fb from '../../../app/_firebase/firebase';
 import axios from 'axios';
 import {useRouter} from 'next/navigation';
+import "../../../i18n"
+import { useTranslation } from 'next-i18next';
 
 const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, handleProjectDeleted}) => {
+    const { t } = useTranslation('dashboard_folder');
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
    const router = useRouter();
@@ -198,22 +201,22 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, h
                     setRenameOverlayOpen(true);
                 }} className="flex justify-between gap-5 text-tertiary">
                 <EditIcon className="mr-2 text-tertiary flex justify-between gap-5" />
-                    <span className='text-tertiary'>Rename</span>
+                    <span className='text-tertiary'>{t('rename_button')}</span>
                 </MenuItem>
                 <MenuItem onClick={() => {
                     handleClose();
                     setDeleteOverlayOpen(true);
                 }} className="flex justify-between gap-5  text-tertiary">
-                <DeleteIcon className='text-tertiary'/> <span className='text-tertiary'>Delete</span> 
+                <DeleteIcon className='text-tertiary'/> <span className='text-tertiary'>{t('delete_button')}</span> 
                 </MenuItem>
             </Menu>
             </div>
               {/* Rename Overlay */}
               <Dialog open={renameOverlayOpen} onClose={() => setRenameOverlayOpen(false)} sx={dialogStyles}>
-  <DialogTitle>Rename Folder</DialogTitle>
+  <DialogTitle>{t('rename_top')}</DialogTitle>
     <DialogContent>
         <TextField
-            label="New Folder Name"
+            label={t('new_folder_name')}
             variant="outlined"
             fullWidth
             value={newFolderName}
@@ -222,11 +225,11 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, h
     </DialogContent>
     <DialogActions>
     <Button onClick={() => setRenameOverlayOpen(false)} sx={buttonStyles}>
-    Cancel
+    {t('cancel_button')}
         </Button>
         <Button onClick={handleRename} sx={buttonStyles}>
 
-            Rename
+            {t('rename_button')}
         </Button>
     </DialogActions>
 </Dialog>

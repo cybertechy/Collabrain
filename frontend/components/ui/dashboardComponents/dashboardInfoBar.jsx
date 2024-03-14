@@ -2,8 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { ArrowCircleUp, ArrowCircleDown, ChevronRight } from '@mui/icons-material';
 import DropdownDashboard from './dropdownDashboard';
 import { useRouter } from 'next/navigation'; 
+import "../../../i18n"
+import { useTranslation } from 'next-i18next';
 
 const DashboardInfoBar = ({ currentPath, onSort, sortCriteria}) => {
+  const { t } = useTranslation('dashboard');
   // const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const router = useRouter();
 
@@ -61,14 +64,14 @@ const DashboardInfoBar = ({ currentPath, onSort, sortCriteria}) => {
       </div>
       <div className="flex items-center">
                 <DropdownDashboard
-                    title={sortCriteria? sortCriteria.sortName ? "Name" : "Date Modified" : "Sort By"}
+                    title={sortCriteria? sortCriteria.sortName ? t('sort_name') : t('sort_date') : t('sort_by')}
                     items={[
                         {
-                            name: "Name",
+                            name: t('sort_name'),
                             onClick: () => toggleSortOrder('name'),
                         },
                         {
-                            name: "Date Modified",
+                            name: t('sort_date'),
                             onClick: () => toggleSortOrder('date'),
                         },
                     ]}

@@ -372,7 +372,7 @@ export default function Dashboard() {
                
                 <div>
                     <p className="text-2xl text-left text-primary ml-4 mb-4 mt-5">
-                        {t('projects')}
+                        Projects
                     </p>
                     <div
                         className="scrollbar-thin scrollbar-thumb-primary scrollbar-thumb-scrollbar h-full  overflow-auto pr-28"
@@ -407,7 +407,7 @@ export default function Dashboard() {
                                 ))
                             ) : (
                                 <div className="text-primary font-poppins text-xl italic">
-                                    Right click to make your first project!
+                                    {t('rclick_msg')}
                                 </div>
                             )}
                         </div>

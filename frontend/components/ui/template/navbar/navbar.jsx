@@ -11,9 +11,12 @@ import { isSidebarOpen } from "../sidebar/sidebar";
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import SettingsOverlay from '../../overlays/settingsOverlay';
 import Template from '../template';
+import "../../../../i18n"
+import { useTranslation } from 'next-i18next';
 
 
 const Navbar = ({ isOpen, toggleSidebar }) => {
+    const { t } = useTranslation('navbar');
     const [showLeaderboard, setShowLeaderboard] = useState(false);
     const leaderboardRef = useRef(null);
     const leaderboardToggleRef = useRef(null); // Ref for the leaderboard toggle icon
@@ -57,7 +60,7 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
         return (
             <>
             <Tooltip
-            title={"Leaderboard"}
+            title={t('leaderboard')}
             enterDelay={1000}
             leaveDelay={200}
           
@@ -71,7 +74,7 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
                     </Tooltip>
                     <Tooltip
             title={
-                "Notifications"
+                t('notifications')
             }
             enterDelay={1000}
             leaveDelay={200}
@@ -83,7 +86,7 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
                     />
                      </Tooltip>
                      <Tooltip
-            title={"Profile Settings"}
+            title={t('profile_set')}
             enterDelay={1000}
             leaveDelay={200}
           

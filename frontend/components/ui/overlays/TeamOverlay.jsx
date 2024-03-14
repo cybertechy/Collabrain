@@ -4,6 +4,8 @@ import UploadButton from "../button/uploadButton";
 import axios from "axios";
 import fb from "../../../app/_firebase/firebase";
 import { FileVideo } from "lucide-react";
+import "../../../i18n"
+import { useTranslation } from 'next-i18next';
 
 const TeamOverlay = ({ toggleModal, modalVisible }) => {
 
@@ -43,6 +45,7 @@ const TeamOverlay = ({ toggleModal, modalVisible }) => {
 
 
 const CreateJoinTeamScreen = ({ switchToCreateTeam, switchToJoinTeam , toggleModal}) => {
+  const { t } = useTranslation('create_join_team');
   return (
       <div className='w-screen h-screen flex items-center justify-center'>
         <div className='w-2/4 h-3/5 shadow-lg bg-basicallylight rounded-md flex flex-col'> {/* Make sure this is a flex container with column direction */}
@@ -55,18 +58,18 @@ const CreateJoinTeamScreen = ({ switchToCreateTeam, switchToJoinTeam , toggleMod
 </button>
           </div>
           <div className="inline-block text-center mt-7 flex-grow"> {/* flex-grow will make this div take up available space */}
-            <p className="text-4xl block text-center text-basicallydark font-light">Create a team</p>
-            <p className="text-xl text-center text-basicallydark mb-4 ml-20 mr-20 mt-10 font-light">Creating a team has never been simpler, you're only a few clicks away from your exclusive space.</p>
+            <p className="text-4xl block text-center text-basicallydark font-light">{t('create_top')}</p>
+            <p className="text-xl text-center text-basicallydark mb-4 ml-20 mr-20 mt-10 font-light">{t('create_desc')}</p>
           </div>
           <div className="flex items-center mt-4 justify-center">
             <button className="w-96 h-16 mb-4 focus:outline-none text-basicallylight bg-primary hover:bg-tertiary focus:ring-4 focus:ring-secondary font-medium rounded-md text-lg dark:bg-primary dark:hover:bg-primary dark:focus:ring-primary"
-            onClick={switchToCreateTeam}>Create a Team</button>
+            onClick={switchToCreateTeam}>{t('create_button')}</button>
           </div>
           {/* Adjusted bottom part to stick to the bottom */}
           <div className="mt-auto flex flex-col items-center bg-secondary text-center p-4 w-full"> {/* mt-auto will push this div to the bottom */}
-            <p className="text-3xl text-basicallydark font-medium font-poppins">Have an invite already?</p>
+            <p className="text-3xl text-basicallydark font-medium font-poppins">{t('invite_q')}</p>
             <button className='w-80 h-12 mt-4 mb-4 focus:outline-none text-basicallylight bg-primary hover:bg-tertiary focus:ring-4 focus:ring-secondary font-medium rounded-md text-lg dark:bg-primary dark:hover:bg-primary dark:focus:ring-primary'
-            onClick={switchToJoinTeam}>Join a Team</button>
+            onClick={switchToJoinTeam}>{t('join_button')}</button>
           </div>
         </div>
       </div>

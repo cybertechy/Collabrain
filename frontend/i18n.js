@@ -54,7 +54,7 @@ i18n
 
         dashboard_project: {
           "rename_button": "Rename",
-          "new_folder_name": "New Project Name",
+          "new_project_name": "New Project Name",
           "rename_top": "Rename Project",
           "cancel_button": "Cancel",
           "delete_button": "Delete",
@@ -62,6 +62,12 @@ i18n
           "delete_msg": "Are you sure you want to delete this folder and its contents?",
           "share_button": "Share",
           "organize_button": "Organize"
+        },
+
+        navbar: {
+          "leaderboard": "Leaderboard",
+          "notifications": "Notifications",
+          "profile_set": "Profile Settings"
         },
 
         sidebar: {
@@ -77,6 +83,14 @@ i18n
           "leaderboard": "League Leaderboard",
           "view_more": "View More",
           "view_less": "View Less"
+        },
+
+        create_join_team: {
+          "create_top": "Create a team",
+          "create_desc": "Creating a team has never been simpler, you're only a few clicks away from your exclusive space.",
+          "create_button": "Create a Team",
+          "invite_q": "Have an invite already?",
+          "join_button": "Join a Team"
         },
 
         create_folder_overlay: {
@@ -219,6 +233,12 @@ i18n
           "organize_button": "Организовать"
         },
 
+        navbar: {
+          "leaderboard": "Доска Почета",
+          "notifications": "Уведомления",
+          "profile_set": "Настройки Профиля"
+        },
+
         sidebar: {
           "my_brain": "Мой Мозг",
           "shared_with_me": "Общие Файлы",
@@ -234,10 +254,18 @@ i18n
           "view_less": "Свернуть"
         },
 
+        create_join_team: {
+          "create_top": "Создать команду",
+          "create_desc": "Создание команды очень простое занятие, которое создаст для вас простор воображения.",
+          "create_button": "Создать Команду",
+          "invite_q": "Есть приглашение?",
+          "join_button": "Вступить в Команду"
+        },
+
         create_folder_overlay: {
           "folder_top": "Создать Новую Папку",
           "folder_name": "Введите имя папки",
-          "folder_clr": "Выберите цвет вашей папки: ",
+          "folder_clr": "Выберите цвет вашей папки : ",
           "folder_cancel": "Отмена",
           "folder_create": "Создать",
           "folder_wait": "Создание..."

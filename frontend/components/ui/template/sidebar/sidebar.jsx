@@ -22,12 +22,8 @@ import TeamSidebarItem from "./sidebarSubComponents/sidebarTeamButton"
 import { usePathname } from "next/navigation";
 import NewProjectOverlay from "../../overlays/NewProjectOverlay";
 import axios from "axios";
-const navigationItems1 = [
-    { name: "My Brain", href: "/dashboard", icon: FolderIcon },
-    { name: "Shared With Me", href: "/shared-with-me", icon: PeopleIcon },
-    
-];
-
+import "../../../../i18n"
+import { useTranslation } from 'next-i18next';
 
 // const groups = [
 //     { name: 'Team Alpha',   imageUrl: '/path/to/image1.jpg', href: "/chat" },
@@ -39,12 +35,19 @@ const navigationItems1 = [
 //     // Add more teams or use real data from your state
 // ];
 
-const navigationItems2 = [
-    { name: "Direct Messages", href: "/messages", icon: ForumIcon },
-   
-];
-
 const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
+    const { t } = useTranslation('sidebar');
+
+    const navigationItems1 = [
+        { name: t('my_brain'), href: "/dashboard", icon: FolderIcon },
+        { name: t('shared_with_me'), href: "/shared-with-me", icon: PeopleIcon },
+        
+    ];
+    const navigationItems2 = [
+        { name: t('dms'), href: "/messages", icon: ForumIcon },
+       
+    ];
+
     const router = useRouter();
     // const [isOpen, setIsOpen] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false); 
@@ -230,8 +233,8 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
                 {/* Navigation items */}
              <nav className="flex flex-col p-4">
                     <SidebarButtonIcon
-                        key={"New Project"}
-                        text={"New Project"}
+                        key={t('new_project')}
+                        text={t('new_project')}
                         color="primary"
                         withShadow={true}
                         onClick={toggleProjectModal}
@@ -264,8 +267,8 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
                         />
                     ))}
                                       <SidebarButtonIcon
-                key={"New Team"}
-                text={"New Team"}
+                key={t('new_team')}
+                text={t('new_team')}
                 color="primary"
                 withShadow={true}
                 onClick={toggleModal} // Use toggleModal to open the overlay
@@ -289,8 +292,8 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
                 ))} */}
 
                                        <SidebarButtonIcon
-                        key={"Discover Teams"}
-                        text={"Discover Teams"}
+                        key={t('teams_disc')}
+                        text={t('teams_disc')}
                         color="primary"
                         withShadow={true}
                         onClick={() => router.push("/new-project")}
