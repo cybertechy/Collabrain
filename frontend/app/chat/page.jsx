@@ -6,7 +6,7 @@ import MessageBox from "./messageBox";
 import Toolbar from '@mui/material/Toolbar';
 import { Timestamp } from "firebase/firestore";
 import ChannelBar from "../../components/ui/chatsComponents/channelBar";
-import MessageItem from "./messageItem";
+import MessageItem from "@/components/ui/messagesComponents/MessageItem";
 import Template from "../../components/ui/template/template";
 const { useRouter , useSearchParams} = require('next/navigation');
 const axios = require("axios");
