@@ -4,25 +4,30 @@ const { db, getWeekNumber, getCurrentMonth, getUserMetrics } = require("../helpe
 const dbUsageCount = require("../../../../backend/src/server.js");
 
 // Endpoint to retrieve the total time spent by a specific user, as well as their monthly message count
-router.get('/userinfo/:userId', async (req, res) => {
-    const userId = req.params.userId;
+router.get('/userinfo', async (req, res) => {
     const currentMonth = getCurrentMonth();
     try {
-        const userRef = db.collection('users').doc(userId);
-        const doc = await userRef.get();
-        if (!doc.exists) {
-            return res.status(404).send('User not found');
+        const usersRef = db.collection('users');
+        const snapshot = await usersRef.get();
+        if (snapshot.empty) {
+            return res.status(404).send('No users found');
         }
-        const userData = doc.data();
-        const timeSpent = userData.timeSpent || 0;
-        const monthlyMessageCount = userData.monthlyMessageCount ? userData.monthlyMessageCount[currentMonth] : 0;
-        
-        res.json({
-            userId,
-            timeSpent,
-            month: currentMonth,
-            monthlyMessageCount
+
+        const usersData = [];
+        snapshot.forEach(doc => {
+            const userData = doc.data();
+            const timeSpent = userData.timeSpent || 0;
+            const monthlyMessageCount = userData.monthlyMessageCount ? userData.monthlyMessageCount[currentMonth] : 0;
+
+            usersData.push({
+                userId: doc.id,
+                timeSpent,
+                month: currentMonth,
+                monthlyMessageCount
+            });
         });
+
+        res.json(usersData);
     } catch (error) {
         console.error('Error getting user stats:', error);
         res.status(500).send('Internal Server Error');
@@ -42,8 +47,8 @@ router.get('/active-users', async (req, res) => {
         const weekStats = await db.collection('stats').doc(weekDocId).get();
         const monthStats = await db.collection('stats').doc(monthDocId).get();
 
-        const weeklyActiveUsers = weekStats.exists ? (weekStats.data().activeUserIDs || []).length : 0;
-        const monthlyActiveUsers = monthStats.exists ? (monthStats.data().activeUserIDs || []).length : 0;
+        const weeklyActiveUsers = weekStats.exists ? (weekStats.data().activeUsers || 0) : 0;
+        const monthlyActiveUsers = monthStats.exists ? (monthStats.data().activeUsers || 0) : 0;
 
         res.json({
             weekly: { period: weekDocId, activeUserCount: weeklyActiveUsers },
@@ -78,21 +83,26 @@ router.get('/random-user-metrics', async (req, res) => {
   });
 
 
-// Endpoint to retrieve the number of active members in a team
-router.get('/team/:teamId/active-members', async (req, res) => {
-    const { teamId } = req.params;
+// Endpoint to retrieve the number of active members in all teams
+router.get('/active-members', async (req, res) => {
     try {
-        const teamRef = db.collection('teams').doc(teamId);
-        const doc = await teamRef.get();
-        if (!doc.exists) {
-            return res.status(404).send('Team not found');
+        const teamsRef = db.collection('teams');
+        const snapshot = await teamsRef.get();
+        if (snapshot.empty) {
+            return res.status(404).send('No teams found');
         }
-        const teamData = doc.data();
-        const activeMembersCount = teamData.activeUserIDs ? teamData.activeUserIDs.length : 0;
-        res.json({
-            teamId,
-            activeMembersCount
+
+        const teamsActiveMembersCount = [];
+        snapshot.forEach(doc => {
+            const teamData = doc.data();
+            const activeMembersCount = teamData.activeUserIDs ? teamData.activeUserIDs.length : 0;
+            teamsActiveMembersCount.push({
+                teamId: doc.id,
+                activeMembersCount
+            });
         });
+
+        res.json(teamsActiveMembersCount);
     } catch (error) {
         console.error('Error retrieving active team members:', error);
         res.status(500).send('Internal Server Error');
