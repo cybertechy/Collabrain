@@ -3,7 +3,7 @@ const { useRouter } = require("next/navigation");
 import SidebarButtonIcon from "./sidebarSubComponents/sidebarButton";
 import AddIcon from '@mui/icons-material/Add';
 import FolderIcon from "@mui/icons-material/Folder";
-const fb = require("_firebase/firebase"); 
+const fb = require("_firebase/firebase");
 import SidebarItem from "./sidebarSubComponents/sidebarItem";
 import PeopleIcon from "@mui/icons-material/People";
 import HistoryIcon from "@mui/icons-material/History";
@@ -16,8 +16,8 @@ import { useState } from "react";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import { useEffect } from "react";
-import TeamOverlay from "../../overlays/TeamOverlay"
-import TeamSidebarItem from "./sidebarSubComponents/sidebarTeamButton"
+import TeamOverlay from "../../overlays/TeamOverlay";
+import TeamSidebarItem from "./sidebarSubComponents/sidebarTeamButton";
 // Define the sidebar navigation items
 import { usePathname } from "next/navigation";
 import NewProjectOverlay from "../../overlays/NewProjectOverlay";
@@ -25,17 +25,17 @@ import { useMediaQuery } from "react-responsive"; // Import useMediaQuery
 
 import axios from "axios";
 const navigationItems1 = [
-    { name: "My Brain", href: "/dashboard", icon: FolderIcon },
-    { name: "Shared With Me", href: "/shared-with-me", icon: PeopleIcon },
-    
+	{ name: "My Brain", href: "/dashboard", icon: FolderIcon },
+	{ name: "Shared With Me", href: "/shared-with-me", icon: PeopleIcon },
+
 ];
 
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
 
 const navigationItems2 = [
-    { name: "Direct Messages", href: "/messages", icon: ForumIcon },
-   
+	{ name: "Direct Messages", href: "/messages", icon: ForumIcon },
+
 ];
 
 const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
@@ -53,12 +53,14 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
     };
 
 
-    const pathname = usePathname(); 
-    // const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-    const [userTeams, setUserTeams] = useState(null);
-    const [user, loading] = fb.useAuthState();
-    useEffect(() => {
-        if (!user){
+	const pathname = usePathname();
+	// const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+	const [userTeams, setUserTeams] = useState(null);
+	const [user, loading] = fb.useAuthState();
+	useEffect(() =>
+	{
+		if (!user)
+		{
 
             return;
         }
@@ -214,27 +216,27 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
             {isProjectModalOpen && <NewProjectOverlay toggleModal={ toggleProjectModal} modalVisible= {isProjectModalOpen} />}
                 
 
-                                       <SidebarButtonIcon
-                        key={"Discover Teams"}
-                        text={"Discover Teams"}
-                        color="primary"
-                        withShadow={true}
-                        onClick={() => router.push("/new-project")}
-                        Icon={() => (
-                            <ExploreIcon fontSize = "medium"className=" text-basicallylight"></ExploreIcon>
-                        )}
-                        isExpanded={isOpen}
-                    />
-                      <div className={`h-full scrollbar-thin scrollbar-thumb-primary ${isOpen ? "overflow-y-auto overflow-x-hidden" : "overflow-hidden"}`}>
-    {userTeams ? userTeams?.map((team, index) => (
-        <TeamSidebarItem key={index} team={team} isExpanded={isOpen}  isSelected={pathname === `chat?teamId=${team.teamId}`} />
-    )):null}
-</div>
+					<SidebarButtonIcon
+						key={"Discover Teams"}
+						text={"Discover Teams"}
+						color="primary"
+						withShadow={true}
+						onClick={() => router.push("/new-project")}
+						Icon={() => (
+							<ExploreIcon fontSize="medium" className=" text-basicallylight"></ExploreIcon>
+						)}
+						isExpanded={isOpen}
+					/>
+					<div className={`h-full scrollbar-thin scrollbar-thumb-primary ${isOpen ? "overflow-y-auto overflow-x-hidden" : "overflow-hidden"}`}>
+						{userTeams ? userTeams?.map((team, index) => (
+							<TeamSidebarItem key={index} team={team} isExpanded={isOpen} isSelected={pathname === `chat?teamId=${team.teamId}`} />
+						)) : null}
+					</div>
 
-                </nav>
-            </div>
-        </aside>
-    );
+				</nav>
+			</div>
+		</aside>
+	);
 };
 
 export default Sidebar;
