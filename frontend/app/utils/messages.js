@@ -83,4 +83,4 @@ const updateMessage = async (chatId, messageId, updatedContent) => {
     }
 };
 
-module.exports = { fetchMessages, fetchDirectMessages, updateMessage };
+module.exports = { fetchMessages, fetchDirectMessages};

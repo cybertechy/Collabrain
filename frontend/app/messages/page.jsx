@@ -15,7 +15,7 @@ import ChatWindow from "@/components/ui/messagesComponents/chatWindow";
 import FriendsWindow from "./friendWindow";
 import Template from "@/components/ui/template/template";
 import { fetchUser } from "@/app/utils/user";
-import { fetchMessages, fetchDirectMessages,updateMessage } from "@/app/utils/messages";
+import { fetchMessages, fetchDirectMessages } from "@/app/utils/messages";
 import LoaderComponent from "@/components/ui/loader/loaderComponent";
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
@@ -88,6 +88,32 @@ export default function Messages() {
     }, [user,chatId]);
 
 
+    useEffect(() => {
+        if (!user) return;
+        const handleUpdateDirectMessage = (updatedMessage) => {
+            console.log("Received updateDirectMessage event:", updatedMessage); 
+            setMessages(currentMessages => currentMessages.map(messageComponent => {
+                if (messageComponent.props.messageId === updatedMessage.messageId) {
+                    // Update the component with new reactions
+                    return React.cloneElement(messageComponent, {
+                        ...updatedMessage
+                    });
+                }
+                return messageComponent;
+            }));
+        };
+    
+        if (sockCli.current) {
+            sockCli.current.on("updateDirectMessage", handleUpdateDirectMessage);
+        }
+    
+        // Cleanup on component unmount
+        return () => {
+            if (sockCli.current) {
+                sockCli.current.off("updateDirectMessage", handleUpdateDirectMessage);
+            }
+        };
+    }, [user]); // Dependency array is empty to set up the listener once on mount
     
     useEffect(() => {
         if (!sockCli.current || !user) return;
@@ -319,54 +345,47 @@ export default function Messages() {
         sockCli.current.emit("directMsg", messageData);
     };
 
-    const handleReact = async (messageId, emoji) => {
-        let updatedMessages = [];
-        let updateNeeded = false;
-        let updatedReactions = {};
-    
-        // First, prepare the updated reactions data without immediately updating the state
-        messages.forEach((messageComponent) => {
+    const handleReact = (messageId, emoji) => {
+        let updatedReactions  = {};
+        let updatedMessage = {};
+        // Prepare the updated reactions
+        const messagesCopy = messages.map((messageComponent) => {
             if (messageComponent.props.messageId === messageId) {
                 const currentReactions = messageComponent.props.reactions || {};
                 updatedReactions = { ...currentReactions };
     
                 if (updatedReactions[emoji]) {
                     if (updatedReactions[emoji].includes(user.uid)) {
-                        updatedReactions[emoji] = updatedReactions[emoji].filter((id) => id !== user.uid);
+                        updatedReactions[emoji] = updatedReactions[emoji].filter(id => id !== user.uid);
                     } else {
                         updatedReactions[emoji].push(user.uid);
                     }
                 } else {
                     updatedReactions[emoji] = [user.uid];
                 }
-    
-                updateNeeded = true;
+                updatedMessage = {...messageComponent.props, reactions: updatedReactions};
+                // Return an updated component for local state update
+                return React.cloneElement(messageComponent, {
+                    ...messageComponent.props,
+                    reactions: updatedReactions,
+                });
             }
-            updatedMessages.push(messageComponent);
+            return messageComponent;
         });
     
-        // If an update is needed, call the updateMessage function and then update the state
-        if (updateNeeded) {
-            const chatId = '...'; // Ensure you have the chatId available
-            const updatedContent = { reactions: updatedReactions };
-    
-            const response = await updateMessage(chatId, messageId, updatedContent);
-            if (response) {
-                // Update the state only if the server update was successful
-                setMessages(updatedMessages.map((messageComponent) => {
-                    if (messageComponent.props.messageId === messageId) {
-                        return React.cloneElement(messageComponent, {
-                            ...messageComponent.props,
-                            reactions: updatedReactions,
-                        });
-                    }
-                    return messageComponent;
-                }));
-            } else {
-                console.error("Failed to update message reactions on the server.");
-            }
+        // Emit the updateDirectMessage event with updated reactions
+        if (sockCli.current) {
+           
+            let sentAt = new Date();
+            updatedMessage = {chat: chatId, sentAt: sentAt.toISOString(),  msgId: updatedMessage.messageId, reactions: updatedMessage.reactions}
+            console.log("Emitting updateDirectMessage event with updated reactions:",  updatedMessage);
+            sockCli.current.emit("updateDirectMessage", updatedMessage );
         }
+    
+        // Update local state
+        setMessages(messagesCopy);
     };
+    
     
 
     // Handler for the friends button
