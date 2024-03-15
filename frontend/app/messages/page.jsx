@@ -47,6 +47,11 @@ export default function Messages() {
                 data.sentAt._seconds * 1000 + data.sentAt._nanoseconds / 1000000
             );
 
+            if (!data) {
+                console.error("Invalid message data received:", data);
+                return;
+            }
+
             data.msg = AES.decrypt(data.msg, chatId).toString(enc);
 
             setMessages((prevMessage) => [
