@@ -19,7 +19,7 @@ const roles = {
 router.post('/', async (req, res) =>
 {
 	// Make sure all required fields are present
-	if (!req.headers.authorization || !req.body.name)
+	if (!req.headers.authorization || !req.body.name || !req.body.path)
 		return res.status(400).json({ error: "Missing required data" });
 
 	// verify token
@@ -57,16 +57,36 @@ router.post('/', async (req, res) =>
 	};
 
 	// Add document collection
-	fb.db.collection(`documents`).add(doc)
-		.then(docRef =>
-		{
-			userRef.update({
-				documents: fb.admin.firestore.FieldValue.arrayUnion(docRef.id)
-			})
-				.then(() => { res.status(200).json({ message: "Document created", id: docRef.id }); })
-				.catch((error) => { res.status(500).json({ error: "Failed to create document" }); });
+	let docRef = await fb.db.collection(`documents`).add(doc);
 
-		}).catch((error) => { res.status(500).json({ error: "Failed to create document" }); });
+	// Add document to user
+	if(req.body.path==="/") {
+		userRef.update({
+			documents: fb.admin.firestore.FieldValue.arrayUnion(docRef.id)
+		})
+	} else {
+		// Get the folder of the user
+		let folderRef = await userRef.collection("folders").where("path", "==", req.body.path).get();
+
+		if(folderRef?.empty) {
+			return res.status(500).json({ error: "Failed to create document" });
+		}
+
+		let folder = folderRef.docs[0].data();
+		if(!folder?.documents) return res.status(500).json({ code: 500, error: "Critical Server Error" });
+
+		let documents = folder.documents || [];
+		documents.push(docRef.id);
+
+		let updateStatus = await userRef.collection("folders").doc(folderRef.docs[0].id).update({
+			documents: documents
+		});
+		if (!updateStatus) return res.status(500).json({ error: "Failed to create document" });
+
+	}
+
+	return res.status(200).json({ message: "Document created", id: docRef.id });
+
 });
 
 // Get all documents of user
