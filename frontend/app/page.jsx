@@ -13,6 +13,7 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import { ToastContainer, toast } from 'react-toastify';
 import { useEffect, useState } from 'react';
 import { hasUsername } from "./utils/user";
+import axios from 'axios';
 export default function Home() {
     const [user, loading]  = fb.useAuthState();
     const router = useRouter();
@@ -79,10 +80,20 @@ export default function Home() {
                 }
             }
         };
-       await fb.emailSignIn(customEvent);
-       
-        
-    };
+        await fb.emailSignIn(customEvent);
+ 
+        // Check if user is enrolled in 2FA and redirect to OTP verification page
+        const token = await fb.getToken();
+        const twoFAStatus = await axios.get('http://localhost:8080/api/2FA/status', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (twoFAStatus.data.twoFA) {
+          router.push('/2fa'); // Redirect to OTP verification page
+          
+        }
+      };
+
+    
     return (
         <div className="max-sm:min-w-full md:w-3/4 lg:w-1/2 mx-auto max-w-md">
             <ToastContainer />
