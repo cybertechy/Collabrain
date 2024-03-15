@@ -7,6 +7,7 @@ const axios = require('axios');
 const fb = require("_firebase/firebase");
 import { ToastContainer, toast } from "react-toastify";
 
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
 /**
  * @param props.userID - The user's uid
@@ -28,7 +29,7 @@ export default function FileToolbar(props)
 	{
 		try
 		{
-			let res = await axios.get(`http://localhost:8080/api/maps/ut/search?${query}`, {
+			let res = await axios.get(`${SERVERLOCATION}/api/maps/ut/search?${query}`, {
 				headers: {
 					authorization: `Bearer ${token}`,
 				},
@@ -45,13 +46,13 @@ export default function FileToolbar(props)
 		// Different API calls for different file types due to inconsistencies
 		if (props.fileType === "doc")
 		{
-			res = await axios.patch(`http://localhost:8080/api/${props.fileType}s/${props.fileID}`, newData, {
+			res = await axios.patch(`${SERVERLOCATION}/api/${props.fileType}s/${props.fileID}`, newData, {
 				headers: { "Authorization": "Bearer " + token }
 			});
 		}
 		else if (props.fileType === "map")
 		{
-			res = await axios.put(`http://localhost:8080/api/${props.fileType}s/${props.fileID}`, newData, {
+			res = await axios.put(`${SERVERLOCATION}/api/${props.fileType}s/${props.fileID}`, newData, {
 				headers: { "Authorization": "Bearer " + token }
 			});
 		}

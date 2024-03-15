@@ -19,6 +19,8 @@ import LoadingJSON from "../../public/assets/json/Loading.json";
 import ErrorJSON from "../../public/assets/json/Error.json";
 import WorkingJSON from "../../public/assets/json/Working.json";
 
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
+
 
 export default function Editor() {
 	const router = useRouter();
@@ -63,7 +65,7 @@ export default function Editor() {
 
 		// Get user data
 		fb.getToken().then(token => {
-			axios.get(`http://localhost:8080/api/users/${user.uid}`, {
+			axios.get(`${SERVERLOCATION}/api/users/${user.uid}`, {
 				headers: {
 					"Authorization": `Bearer ${token}`
 				}
@@ -71,7 +73,7 @@ export default function Editor() {
 		});
 
 		// Setup socket and event listeners
-		sockCli.current = socket.init('http://localhost:8080/') || {};
+		sockCli.current = socket.init(SERVERLOCATION) || {};
 		sockCli.current.on('get-doc-changes', delta => {
 			quillRef.current.getEditor().updateContents(delta);
 		});
@@ -98,7 +100,7 @@ export default function Editor() {
 		const id = searchParams.get('id');
 		// Get document
 		fb.getToken().then(token => {
-			axios.get(`http://localhost:8080/api/docs/${id}`, {
+			axios.get(`${SERVERLOCATION}/api/docs/${id}`, {
 				headers: {
 					"Authorization": `Bearer ${token}`
 				}

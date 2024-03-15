@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import socket from "_socket/socket";
 import { Peer } from "peerjs";
 
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 export default function Call(props)
 {
 	let myPeer = useRef(null);
@@ -33,7 +34,7 @@ export default function Call(props)
 	useEffect(() =>
 	{
 		// Setup socket
-		sockCli.current = socket.init('http://localhost:8080/');
+		sockCli.current = socket.init(SERVERLOCATION) || {};
 
 		// Setup peer
 		if (myPeer.current)
