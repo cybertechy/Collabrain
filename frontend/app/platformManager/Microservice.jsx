@@ -7,7 +7,7 @@ const PieChart = () => {
   useEffect(() => {
     const fetchUserMetrics = async () => {
       try {
-        const response = await fetch('/random-user-metrics'); // Assuming this is the endpoint to fetch user metrics
+        const response = await fetch('http://localhost:8080/api/stats/random-user-metrics'); // Assuming this is the endpoint to fetch user metrics
         if (!response.ok) {
           throw new Error('Failed to fetch user metrics');
         }
