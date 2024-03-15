@@ -7,7 +7,7 @@ const DashboardCard = () => {
 
   useEffect(() => {
     // Fetch database usage count from backend
-    axios.get('/api/dbUsage')
+    axios.get('http://localhost:8080/api/dbUsage')
       .then(response => {
         setDbUsage(response.data.count);
 
