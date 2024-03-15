@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
@@ -48,7 +49,7 @@ const Moderation = () => {
   useEffect(() => {
     const fetchReports = async () => {
       try {
-        const response = await axios.get('/api/reports');
+        const response = await axios.get('http://localhost:8080/api/report');
         setReports(response.data);
         // Calculate reported users count
         const count = response.data.length;
