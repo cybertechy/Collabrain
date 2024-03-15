@@ -53,7 +53,7 @@ const UserStats = () => {
             <div className="ml-48">
                 <p className='pt-12 pl-10 pb-8 font-medium text-3xl'>User Statistics</p>           
                 <div className="flex ">
-                <div className="w-2/3 h-96 border-gray-200 border-2 bg-kindagrey rounded-md drop-shadow-md  ml-10">
+                <div className="w-2/3 h-96 border-gray-200 border-2 bg-white rounded-md drop-shadow-md  ml-10">
                     <p className='pb-4 pl-4 pt-4 font-medium text-xl'>Active Platform Users 
                     <button type="button" class="text-black hover:text-white border border-gray-800  focus:outline-none  font-medium rounded-lg text-sm text-center ml-56  dark:border-gray-600 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-800 w-36 h-10" onClick={toggleGraphType}>
                         {isMonthly ? "Show Weekly" : "Show Monthly"}</button> </p>           
