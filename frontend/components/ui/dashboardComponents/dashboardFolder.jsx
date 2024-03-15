@@ -13,6 +13,8 @@ import fb from '../../../app/_firebase/firebase';
 import axios from 'axios';
 import {useRouter} from 'next/navigation';
 
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
+
 const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, handleProjectDeleted}) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
@@ -56,7 +58,7 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, h
         try {
             const token = await fb.getToken();
             const response = await axios.patch(
-                `https://collabrain-backend.cybertech13.eu.org/api/dashboard/folder/${folder.id}`,
+                `${SERVERLOCATION}/api/dashboard/folder/${folder.id}`,
                 {
                     name: newFolderName,
                 },
@@ -91,7 +93,7 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, h
             try {
                 const token = await fb.getToken();
                 const response = await axios.delete(
-                    `https://collabrain-backend.cybertech13.eu.org/api/dashboard/folder/${folder.id}`,
+                    `${SERVERLOCATION}/api/dashboard/folder/${folder.id}`,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`,
@@ -117,7 +119,7 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, h
         try {
           const token = await fb.getToken(); // Assuming you have a function to get the user's token
           const response = await axios.patch(
-            `https://collabrain-backend.cybertech13.eu.org/api/dashboard/moveFile/${projectId}`, // Adjust the endpoint URL
+            `${SERVERLOCATION}/api/dashboard/moveFile/${projectId}`, // Adjust the endpoint URL
             {
               to: folderPath, // Specify the folder path you want to move the file to
               fileType: type, // Specify the file type ('contentMap' or 'document')

@@ -7,6 +7,8 @@ import Button from "../../components/ui/button/button";
 import InputField from "../../components/ui/input/input";
 import { useEffect, useState } from 'react';
 const socket = require("_socket/socket");
+
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 export default function OTP()
 {
 	const router = useRouter();
@@ -15,7 +17,7 @@ export default function OTP()
 	useEffect(() =>
 	{
 		if (user)
-			sock_cli = socket.init('https://collabrain-backend.cybertech13.eu.org');
+			sock_cli = socket.init(SERVERLOCATION) || {};
 	}, [user]);
 	useEffect(() =>
 	{

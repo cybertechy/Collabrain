@@ -5,6 +5,7 @@ import axios from "axios";
 import fb from "../../../app/_firebase/firebase";
 import { FileVideo } from "lucide-react";
 
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 const TeamOverlay = ({ toggleModal, modalVisible }) => {
 
   // const [modalVisible, setModalVisible] = useState(true); // Set to false initially
@@ -102,7 +103,7 @@ const handleCreateTeam = async () => {
 
         const token = await fb.getToken();
         // Make a POST request to create the team
-        const response = await axios.post('https://collabrain-backend.cybertech13.eu.org/api/teams', teamData, {
+        const response = await axios.post(`${SERVERLOCATION}/api/teams`, teamData, {
             headers: {
                 Authorization: `Bearer ${token}`, // Replace with the actual auth token
             },

@@ -4,6 +4,7 @@ const { useRouter } = require("next/navigation");
 import fb from '../../../app/_firebase/firebase';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 const ContentMapBackground = () => (
 	<svg width="597" height="519" viewBox="0 0 597 519" fill="none" xmlns="http://www.w3.org/2000/svg">
 <line x1="196.083" y1="462.442" x2="105.083" y2="397.061" stroke="#30475E" stroke-width="10"/>
@@ -56,7 +57,7 @@ const ContentMapOverlay = ({ setOpenModal, switchToDocument }) =>
 
 		try
 		{
-			const res = await axios.post(`https://collabrain-backend.cybertech13.eu.org/api/maps`, {
+			const res = await axios.post(`${SERVERLOCATION}/api/maps`, {
 				name: "New Content Map",
 				data: ""
 			}, {

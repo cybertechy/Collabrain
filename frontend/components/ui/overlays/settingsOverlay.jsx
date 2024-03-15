@@ -8,7 +8,7 @@ import axios from "axios";
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import jsPDF from 'jspdf';
-
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 const fb = require("_firebase/firebase");
 
 const BadBehaviorStrikes = ({ strikes }) => {
@@ -283,7 +283,7 @@ const router = useRouter();
         const fetchUser = async () => {
             try {
                 const token = await fb.getToken();
-                const response = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/users/${user.uid}`, {
+                const response = await axios.get(`${SERVERLOCATION}/api/users/${user.uid}`, {
                     headers: { "Authorization": "Bearer " + token }
                 });
                 
@@ -307,7 +307,7 @@ const router = useRouter();
     const handleDeleteUser = async () => {
         try {
             const token = await fb.getToken(); // Assuming fb.getToken() gets the current user's token
-            await axios.delete(`https://collabrain-backend.cybertech13.eu.org/api/users/${user.uid}`, {
+            await axios.delete(`${SERVERLOCATION}/api/users/${user.uid}`, {
                 headers: { "Authorization": "Bearer " + token }
             });
             router.push('/'); 
@@ -589,7 +589,7 @@ const PrivacyOverlay = (user) => {
         const fetchUser = async () => {
             try {
                 const token = await fb.getToken();
-                const response = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/users/${user.user.uid}`, {
+                const response = await axios.get(`${SERVERLOCATION}/api/users/${user.user.uid}`, {
                     headers: { "Authorization": "Bearer " + token }
                 });
              
