@@ -24,6 +24,7 @@ import { hasUsername } from "../utils/user";
 import LoaderComponent from "../../components/ui/loader/loaderComponent";
 import "../../i18n"
 import { useTranslation } from 'next-i18next';
+import ErrorBoundary from '../../components/ui/errorboundary';
 
 export default function Dashboard() {
     const { t } = useTranslation('dashboard');
@@ -309,6 +310,7 @@ export default function Dashboard() {
     }, [user, folderChanges,path]);
 
     return (
+        <ErrorBoundary>
         <Template>
             <LoaderComponent
                 isLoading={isLoading}
@@ -339,7 +341,7 @@ export default function Dashboard() {
                
                     <div>
                         <p className="text-2xl text-left text-primary ml-4 mb-4">
-                            Folders
+                            {t('folders')}
                         </p>
 
                         <div className="flex flex-wrap content-start items-start w-full justify-start ml-4 gap-8 ">
@@ -372,7 +374,7 @@ export default function Dashboard() {
                
                 <div>
                     <p className="text-2xl text-left text-primary ml-4 mb-4 mt-5">
-                        Projects
+                        {t('projects')}
                     </p>
                     <div
                         className="scrollbar-thin scrollbar-thumb-primary scrollbar-thumb-scrollbar h-full  overflow-auto pr-28"
@@ -424,5 +426,6 @@ export default function Dashboard() {
                 />
             )}
         </Template>
+        </ErrorBoundary>
     );
 }
