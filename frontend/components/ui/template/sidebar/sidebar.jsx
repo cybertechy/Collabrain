@@ -104,7 +104,7 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
     
                     // Update the userTeams state with the array of team information
                     setUserTeams(filteredTeamsData);
-                    console.log(filteredTeamsData);
+                  
                 } else {
                     throw new Error('Failed to fetch user teams');
                 }

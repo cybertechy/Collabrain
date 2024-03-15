@@ -1,7 +1,7 @@
 import React from 'react';
 import Avatar from '@mui/material/Avatar';
 
-function CustomAvatar({ username }) {
+function CustomAvatar({ username = "User"}) {
     function stringToColor(string = "User") {
         let hash = 0;
         let i;
@@ -37,7 +37,7 @@ function CustomAvatar({ username }) {
         return brightness > 155; // Brightness threshold, adjust if needed
     }
 
-    const initials = username.split(' ')
+    const initials = username?.split(' ')
         .map(word => word[0] ? word[0].toUpperCase() : '') // Capitalize the first letter of each word
         .join('');
 

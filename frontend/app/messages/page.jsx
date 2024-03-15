@@ -2,10 +2,11 @@
 
 import { useState, useEffect, useRef } from "react";
 import DMSideBar from "@/components/ui/messagesComponents/DMSidebar";
-import MessageItem from "../chat/messageItem";
+import MessageItem from "@/components/ui/messagesComponents/MessageItem";
 const { useRouter, useSearchParams } = require("next/navigation");
 import AES from "crypto-js/aes";
-import { maskProfanity , containsProfanity } from "../utils/textmoderator";
+import React from "react";
+import { maskProfanity, containsProfanity } from "../utils/textmoderator";
 import enc from "crypto-js/enc-utf8";
 const axios = require("axios");
 const fb = require("_firebase/firebase");
@@ -14,8 +15,10 @@ import ChatWindow from "@/components/ui/messagesComponents/chatWindow";
 import FriendsWindow from "./friendWindow";
 import Template from "@/components/ui/template/template";
 import { fetchUser } from "@/app/utils/user";
-import { fetchMessages, fetchDirectMessages } from "@/app/utils/messages";
+import { fetchMessages, fetchDirectMessages,updateMessage } from "@/app/utils/messages";
 import LoaderComponent from "@/components/ui/loader/loaderComponent";
+
+import { addMedia } from "@/app/utils/storage";
 export default function Messages() {
     const router = useRouter();
     const [user, loading] = fb.useAuthState();
@@ -23,7 +26,7 @@ export default function Messages() {
     const [isLoading, setIsLoading] = useState(false);
     const [loadingState, setLoadingState] = useState("");
     const [userInfo, setUserInfo] = useState(null);
-    const [message, setMessages] = useState([]);
+    const [messages, setMessages] = useState([]);
     const [directMessages, setDirectMessages] = useState([]);
     const params = useSearchParams();
     const [withUserInfo, setWithUserInfo] = useState(null);
@@ -36,8 +39,10 @@ export default function Messages() {
     let sockCli = useRef(null);
 
     useEffect(() => {
-        if (!user) return;
         setIsLoading(true);
+        if (!user) return;
+       
+       
 
         sockCli.current = socket.init("http://localhost:8080") || {};
         console.log("Socket initialized", sockCli);
@@ -51,14 +56,15 @@ export default function Messages() {
             setMessages((prevMessage) => [
                 ...prevMessage,
                 <MessageItem
-                    key={prevMessage.length}
+                    key={`temp-${Date.now()}`}
                     sender={data.sender}
                     message={data.msg}
                     timestamp={
                         sentAt.toDateString() +
-                        " " +
+                        ", " +
                         sentAt.toLocaleTimeString()
                     }
+                    messageId={`temp-${Date.now()}`}
                     reactions={{}}
                     onReact={handleReact}
                     onReply={setReplyTo}
@@ -71,6 +77,65 @@ export default function Messages() {
         return () => sockCli.current.off("directMsg");
     }, [user]);
 
+
+    
+    useEffect(() => {
+        if (!sockCli.current || !user) return;
+     
+      
+        const handleUpdateID = (updatedMessage) => {
+         
+          updatedMessage.msg = AES.decrypt(updatedMessage.msg, chatId).toString(enc);
+          setMessages((prevMessages) => {
+            return prevMessages.map((messageComponent) => {
+            
+              // Extract props from each MessageItem component
+              const { sender, message, timestamp, messageId } = messageComponent.props;
+              
+              // Convert updatedMessage.sentAt to Date object
+              const updatedMessageDate = new Date(
+                updatedMessage.sentAt._seconds * 1000 +
+                updatedMessage.sentAt._nanoseconds / 1000000
+              );
+            
+              // Options to format the date as '3/13/2024, 11:07:25 PM'
+              const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+    
+              const updatedMessageTimestampString = updatedMessageDate.toLocaleString('en-US', options);
+      
+              const tempIDCheck = messageId.startsWith("temp-");
+              const senderMatch = sender === updatedMessage.sender;
+              const messageMatch = message === updatedMessage.msg;
+              const timestampMatch = timestamp === updatedMessageTimestampString;
+            
+      
+              // Reconstruct component with updated ID if conditions match
+              if (tempIDCheck && senderMatch && messageMatch && timestampMatch) {
+              
+                return React.cloneElement(messageComponent, {
+                  ...messageComponent.props,
+                  key: updatedMessage.id, // Update the key
+                  messageId: updatedMessage.id // Update the ID
+                });
+              }
+      
+              // Return the original component if no match
+              return messageComponent;
+            });
+          });
+        };
+      
+        sockCli.current.on("updateID", handleUpdateID);
+      
+        return () => {
+          if (sockCli.current) {
+            sockCli.current.off("updateID", handleUpdateID);
+          }
+        };
+    }, [user]);
+    
+      
+      
     useEffect(() => {
         if (!user) return;
 
@@ -78,7 +143,7 @@ export default function Messages() {
             setIsLoading(true);
             try {
                 const fetchedUser = await fetchUser(user.uid);
-                setLoadingState("DEFAULT")
+                setLoadingState("DEFAULT");
                 setUserInfo({ data: fetchedUser });
                 setLoadingState("FETCHING_MESSAGES");
                 const directMessagesData = await fetchDirectMessages(); // Assuming this function is properly defined to fetch direct messages
@@ -86,8 +151,13 @@ export default function Messages() {
                 directMessagesData.forEach((chat) => {
                     if ("lastMessage" in chat) {
                         try {
-                            chat.lastMessage.message = AES.decrypt(chat.lastMessage.message, chat.id).toString(enc);
-                            if(chat.lastMessage.message === "") chat.lastMessage.message = "Unencrypted Message";
+                            chat.lastMessage.message = AES.decrypt(
+                                chat.lastMessage.message,
+                                chat.id
+                            ).toString(enc);
+                            if (chat.lastMessage.message === "")
+                                chat.lastMessage.message =
+                                    "Unencrypted Message";
                         } catch (error) {
                             console.error("Error decrypting message:", error);
                             chat.lastMessage.message = "Unencrypted Message";
@@ -95,8 +165,7 @@ export default function Messages() {
                     }
                 });
 
-
-                console.log("Direct Messages 2: ", directMessagesData);
+               
                 setDirectMessages(directMessagesData);
             } catch (error) {
                 console.error("Error fetching data:", error);
@@ -127,7 +196,6 @@ export default function Messages() {
         fetchUserData(); // Call the async function
     }, [user, withUser]);
 
-
     useEffect(() => {
         if (!user || !chatId || !userInfo) return;
 
@@ -136,8 +204,9 @@ export default function Messages() {
             setIsLoading(true);
             setLoadingState("FETCHING_MESSAGES");
             try {
-                console.log("Fetching messages for chat:", userInfo);
+               
                 const fetchedMessages = await fetchMessages(chatId, userInfo);
+
                 setMessages(fetchedMessages);
                 setIsLoading(false);
                 setLoadingState(""); // Or any state indicating success
@@ -151,102 +220,144 @@ export default function Messages() {
         fetchAndSetMessages();
     }, [user, chatId, userInfo]);
 
-
-
-    const uploadAttachments = async (attachments) => {
-        // This function should handle the upload logic
-        // For each attachment, upload it to your server or storage service
-        // Return an array of URLs or references to the uploaded files
+    const formatDate = (date) => {
+        return new Date(date).toLocaleString("en-US", {
+            hour12: true, // Use 12-hour clock
+            month: "2-digit", // Numeric month, e.g., 3, 4, ...
+            day: "2-digit", // Numeric day of the month
+            year: "numeric", // 4-digit year
+            hour: "2-digit", // Numeric hour
+            minute: "2-digit", // 2-digit minute
+            second: "2-digit", // 2-digit second
+        });
     };
-    const sendPersonalMsg = async (msg, attachments, replyToMsg, reactions) => {
+    const sendPersonalMsg = async (msg, attachments = []) => {
         if (!sockCli.current) {
-            console.log("Socket is not initialized yet.");
+            console.error("Socket is not initialized yet.");
             return;
         }
-        console.log("Sending Personal Message attributes are:", msg, attachments); // Debug to check the values
 
-        let attachmentUrls = [];
-        if (attachments?.length > 0) {
-            attachmentUrls = await uploadAttachments(attachments);
-            // Handle errors or failures in upload
+        // Check and mask profanity in message
+        if (typeof msg === "string" && msg.trim() !== "") {
+            msg = maskProfanity(msg, "*");
+        } else if (
+            typeof msg === "string" &&
+            msg.trim() !== "" &&
+            containsProfanity(msg, true)
+        ) {
+            console.error("Message contains profanity.");
+            return;
         }
 
-        msg = maskProfanity(msg, "*");
-
         let sentAt = new Date();
-        const formattedSentAt = formatDate(sentAt);
 
+        // Handle attachment upload
+        let attachmentIds = [];
+        try {
+            const uploadResponses = await Promise.all(
+                attachments.map(async (file) => {
+                    try {
+                        const uploadResponse = await addMedia(
+                            file.type,
+                            file.base64
+                        ); // Adjust based on your API structure
+                        return uploadResponse?.mediaId; // Assuming the response includes an id
+                    } catch (error) {
+                        console.error("Failed to upload attachment:", error);
+                        return null;
+                    }
+                })
+            );
+
+            // Filter out null values after all promises have resolved
+            attachmentIds = uploadResponses.filter((id) => id != null);
+        } catch (error) {
+            console.error("Error uploading attachments:", error);
+        }
+        
         const messageData = {
-            senderID: user.uid, // Ensure this is the correct Firebase user ID
-            sender: userInfo.data.username, // Assuming this is how you get the username
-            chat: chatId, // The chat ID for the direct message
-            msg: msg,
-            sentAt: sentAt.toISOString(), // Convert to ISO string for consistency
-            reactions: reactions || [], // Ensure there are default reactions if none provided
-            attachments: attachmentUrls // This should be the processed URLs from uploadAttachments
+            senderID: user.uid,
+            sender: userInfo.data.username,
+            chat: chatId,
+            msg: AES.encrypt(msg, chatId).toString(),
+            sentAt: sentAt.toISOString(),
+            attachments: attachmentIds,
+            reactions: [],
         };
-    
-        // Add the message to the real-time socket chat
-        setMessages((prevMessage) => [
-            ...prevMessage,
+
+        // Optimistically update the UI with the new message and attachments
+        const optimisticMessage = {
+            ...messageData,
+            msg: msg, // Display the original, unencrypted message in the UI
+            sentAt: formatDate(sentAt),
+            attachments: attachmentIds, // Include the attachment IDs for rendering
+        };
+
+        setMessages((prevMessages) => [
+            ...prevMessages,
             <MessageItem
-                key={prevMessage.length}
-                messageId={prevMessage.length}
-                sender={messageData.sender}
-                timestamp={formattedSentAt}
-                message={messageData.msg}
-                reactions={messageData.reactions}
+                key={`temp-${Date.now()}`}
+                sender={optimisticMessage.sender}
+                timestamp={optimisticMessage.sentAt}
+                message={optimisticMessage.msg}
                 userData={userInfo.data}
-                onReact={handleReact}
-                onReply={setReplyTo}
-                attachments={attachments}
-                replyTo={replyToMsg}
+                attachmentIds={optimisticMessage.attachments} // Pass the attachment IDs to the MessageItem component
+                messageId={`temp-${Date.now()}`}
             />,
         ]);
 
-        if(containsProfanity(msg,true)) return;
+        sockCli.current.emit("directMsg", messageData);
+    };
 
-        messageData.msg = AES.encrypt(msg, chatId).toString();
-
-        sockCli.current.emit("directMsg", messageData); // Send the direct message to the server
-        setReplyTo(null); // Reset replyTo state after sending a message
+    const handleReact = async (messageId, emoji) => {
+        let updatedMessages = [];
+        let updateNeeded = false;
+        let updatedReactions = {};
+    
+        // First, prepare the updated reactions data without immediately updating the state
+        messages.forEach((messageComponent) => {
+            if (messageComponent.props.messageId === messageId) {
+                const currentReactions = messageComponent.props.reactions || {};
+                updatedReactions = { ...currentReactions };
+    
+                if (updatedReactions[emoji]) {
+                    if (updatedReactions[emoji].includes(user.uid)) {
+                        updatedReactions[emoji] = updatedReactions[emoji].filter((id) => id !== user.uid);
+                    } else {
+                        updatedReactions[emoji].push(user.uid);
+                    }
+                } else {
+                    updatedReactions[emoji] = [user.uid];
+                }
+    
+                updateNeeded = true;
+            }
+            updatedMessages.push(messageComponent);
+        });
+    
+        // If an update is needed, call the updateMessage function and then update the state
+        if (updateNeeded) {
+            const chatId = '...'; // Ensure you have the chatId available
+            const updatedContent = { reactions: updatedReactions };
+    
+            const response = await updateMessage(chatId, messageId, updatedContent);
+            if (response) {
+                // Update the state only if the server update was successful
+                setMessages(updatedMessages.map((messageComponent) => {
+                    if (messageComponent.props.messageId === messageId) {
+                        return React.cloneElement(messageComponent, {
+                            ...messageComponent.props,
+                            reactions: updatedReactions,
+                        });
+                    }
+                    return messageComponent;
+                }));
+            } else {
+                console.error("Failed to update message reactions on the server.");
+            }
+        }
     };
     
-    const handleReact = (messageId, emoji) => {
-        setMessages((currentMessages) => {
-            return currentMessages.map((message, index) => {
-                if (index === messageId) {
-                    // Clone the reactions object or initialize if undefined
-                    let newReactions = { ...message.props.reactions };
-                    // If the emoji already exists in reactions
-                    if (newReactions[emoji]) {
-                        // If it's exactly 1, remove the reaction entirely (toggle off)
-                        if (newReactions[emoji] === 1) {
-                            delete newReactions[emoji];
-                        } else {
-                            // Decrement if more than 1 (this handles the case of multiple users reacting with the same emoji)
-                            newReactions[emoji] -= 1;
-                        }
-                    } else {
-                        // If the emoji doesn't exist, initialize it with 1
-                        newReactions[emoji] = 1;
-                    }
-                    // Return the updated message with new reactions
-                    return {
-                        ...message,
-                        props: {
-                            ...message.props,
-                            reactions: newReactions,
-                        },
-                    };
-                }
-                return message;
-            });
-        });
-    };
-
-
-
 
     // Handler for the friends button
     const openFriends = () => {
@@ -272,13 +383,15 @@ export default function Messages() {
                     friendsHandler={() => setShowChat(false)}
                     chatList={directMessages}
                     openChat={openChat}
+                    loadingState = {loadingState}
+                    setLoadingState = {setLoadingState}
                     chatHandler={(id, user) => {
                         router.push(`/messages?chatID=${id}&user=${user}`);
                     }}
                 />
                 {withUser ? (
                     <ChatWindow
-                        messages={message}
+                        messages={messages}
                         setMessagess={setMessages}
                         sendPersonalMsg={sendPersonalMsg}
                         userInfo={userInfo}

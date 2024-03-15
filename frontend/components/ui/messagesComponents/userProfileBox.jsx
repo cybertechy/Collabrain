@@ -13,7 +13,7 @@ const userProfileBox = ({ userData, onMute, onDeafen, onSettings }) => {
     const [displayName, setDisplayName] = useState("User");
     const [avatarName, setAvatarName] = useState("User");
     useEffect(() => {
-        console.log("USER DATA IN PROFILE BOX",userData)
+      
        userData?.data?.username ? setDisplayName(userData.data?.username) : setDisplayName("User");
          userData?.data?.fname ? setAvatarName(`${userData.data?.fname} ${userData.data?.lname}`) : setAvatarName("User");
     }, [userData]);

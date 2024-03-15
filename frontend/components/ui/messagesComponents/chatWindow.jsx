@@ -10,7 +10,7 @@ export default function ChatWindow({ messages, setMessages, sendPersonalMsg, wit
   const [title, setTitle] = useState(withUserInfo?.username || 'User');
   const messagesEndRef = useRef(null); // Create a ref for the scrolling target
 
-
+  console.log("Messages in Chat window", messages);
   useEffect(() => {
     if (withUserInfo) {
       setTitle(withUserInfo?.data?.username || 'User');
@@ -22,8 +22,8 @@ export default function ChatWindow({ messages, setMessages, sendPersonalMsg, wit
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  console.log("MESSAGES ARE ", messages);
-
+ 
+// console.log("Messages in Chat window", messages);
   return (
     <div className="flex flex-col flex-grow h-full relative">
       <div className="flex-none">
@@ -37,8 +37,8 @@ export default function ChatWindow({ messages, setMessages, sendPersonalMsg, wit
       </div>
       <div className="flex-auto overflow-y-scroll p-5 mb-[76px]  max-h-[calc(100vh-160px)] sm:max-h-[calc(100vh-180px)] md:max-h-[calc(100vh-200px)] lg:max-h-[calc(100vh-220px)] xl:max-h-[calc(100vh-240px)]">
        <div className="mt-10"></div>
-        {messages?.map((message, index) => (
-          <MessageItem key={index} {...message.props} onReact = {onReact} onReply ={onReply}  messageId = {index}/>
+        {messages?.map((message) => (
+          <MessageItem key={message?.key} {...message?.props} onReact = {onReact} onReply ={onReply} />
         ))}
         <div ref={messagesEndRef} /> {/* Invisible element at the end of messages */}
       </div>
