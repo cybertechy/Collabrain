@@ -2,7 +2,7 @@ import { ListItem, ListItemAvatar, ListItemText, Typography } from '@mui/materia
 import CustomAvatar from './avatar';
 
 const userDMTile = ({ message, avatar, openChat, username, data, chatID }) => {
-    console.log(data);
+   
     const formattedDate = data.lastMessage?.sentAt? new Date(data.lastMessage.sentAt._seconds * 1000 + data.lastMessage.sentAt._nanoseconds / 1000000).toLocaleDateString() : ""; 
 
     const truncateMessage = (message, maxLength = 20) => {

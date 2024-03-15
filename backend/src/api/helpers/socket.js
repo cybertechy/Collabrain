@@ -247,7 +247,7 @@ async function broadcastMessage(data, type = "team", generateID = false, deleteM
         membersList.splice(index, 1); // 2nd parameter means remove one item only
 
 	// Generate a unique id for the message
-	let msgID = generateID ? uuid.v4() : data.msgID;
+	let msgID = generateID ? uuid.v4() : data.msgId;
 
 
 	// Send to all online members

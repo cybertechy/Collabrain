@@ -205,11 +205,12 @@ router.get("/:chat/messages", async (req, res) =>
 
 	// Get messages
 	fb.db.collection(`chats/${req.params.chat}/messages`)
-		.orderBy("sentAt").limit(100).get()
+		.orderBy("sentAt","desc").limit(100).get()
 		.then(snapshot =>
 		{
 			let messages = [];
 			snapshot.forEach(doc => messages.push({... doc.data(), id: doc.id}));
+			messages.reverse();
 			return res.status(200).json(messages);
 		})
 		.catch(err => { return res.status(500).json({ error: err }); });

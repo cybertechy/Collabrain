@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import CustomAvatar from "@/components/ui/messagesComponents/avatar";
 import Linkify from 'react-linkify';
-
+import CircularProgress from '@mui/material/CircularProgress';
 import IconButton from '@mui/material/IconButton';
 import ReplyIcon from '@mui/icons-material/Reply';
+import { getMedia } from '@/app/utils/storage';
+import {updateMessage} from '@/app/utils/messages';
 const commonReactions = [
   { emoji: '👍', label: 'thumbs up' },
   { emoji: '👎', label: 'thumbs down' },
@@ -14,11 +16,14 @@ const commonReactions = [
   { emoji: '😢', label: 'sad' },
 ];
 
-function MessageItem({ sender, timestamp, message, messageId, attachments, reactions, onReact, onReply, replyTo }) {
+function MessageItem({ sender, timestamp, message, messageId, attachmentIds, reactions = {}, onReact }) {
+  const [attachments, setAttachments] = useState([]);
+  const [loadingAttachments, setLoadingAttachments] = useState(false);
   if (reactions && reactions.length>0){
-
    console.log(`reactions are` , reactions)
   }
+
+  
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const emojiPickerRef = useRef(null); // Ref for the emoji picker
   const CustomLink = ({ href, children }) => (
@@ -53,41 +58,55 @@ function MessageItem({ sender, timestamp, message, messageId, attachments, react
   }, [emojiPickerRef]);
 
  
+  useEffect(() => {
+    const fetchAttachments = async () => {
+      setLoadingAttachments(true);
+      const fetchedAttachments = await Promise.all(
+        attachmentIds.map(async (id) => {
+          try {
+            const response = await getMedia(id);
+            return response.data; // Assuming the API response structure includes a data object with the file info
+          } catch (error) {
+            console.error("Failed to fetch attachment:", error);
+            return null;
+          }
+        })
+      );
+      setAttachments(fetchedAttachments.filter(Boolean)); // Filter out null responses
+      setLoadingAttachments(false);
+    };
 
-  const renderMediaAttachments = (attachments) => {
-    return (attachments || []).map((attachment, index) => {
-      if (!attachment || typeof attachment !== 'object') return null; // Ensure attachment is defined and is an object
+    if (attachmentIds && attachmentIds.length > 0) {
+      fetchAttachments();
+    }
+  }, [attachmentIds]); // Dependency array to refetch when attachmentIds change
+
+  const renderAttachments = () => {
+    if (loadingAttachments) {
+      return <CircularProgress size={24} />;
+    }
   
-      console.log('Attachment:', attachment); // Debugging: Log attachment object
-  
-      if (attachment && attachment.type.startsWith('image/')) {
-        const blobUrl = URL.createObjectURL(attachment);
-        return <img key={index} src={blobUrl} alt="attachment" className="max-w-full h-auto" />;
-      } else if (attachment && attachment.type === 'video') {
-        return <video key={index} controls src={attachment.url} className="max-w-full h-auto"></video>;
-      } else if (attachment && attachment.type === 'file') {
-        return <a key={index} href={attachment.url} download={attachment.name} className="text-blue-500 underline">{attachment.name}</a>;
-      }
-      return null;
-    });
+    return attachments.map((attachment, index) => (
+      // The <img> tag works for both images and GIFs encoded in base64.
+      <img key={index} src={attachment} alt={`Attachment ${index}`} className="max-w-full h-auto" />
+    ));
   };
+  
+  
   
 
  
-  const handleReply = () => {
-    onReply({sender:sender, timestamp:timestamp, message:message, messageId:messageId, attachments:attachments}); // Pass the entire message object
-  };
-  
+
   return (
     <div className="relative border-b-2 hover:bg-gray-100" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
-    {replyTo &&  (
+    {/* {replyTo &&  (
       <div className="bg-gray-100 p-3 rounded-lg mb-2">
         <span className = "text-md font-poppins font-semibold"> Replying To </span>
         <span className="text-md font-poppins font-semibold">{replyTo.sender}: </span>
-        {/* Truncate reply message if needed */}
+       
         <span className="text-md">{replyTo.message.length > 20 ? replyTo.message.substring(0, 20) + "..." : replyTo.message}</span>
       </div>
-    )}
+    )} */}
     <div className="flex gap-4 p-2">
       <CustomAvatar username={sender} />
       <div className="flex flex-col">
@@ -99,7 +118,7 @@ function MessageItem({ sender, timestamp, message, messageId, attachments, react
         <Linkify componentDecorator={(decoratedHref, decoratedText, key) => (
           <CustomLink href={decoratedHref} key={key}>{decoratedText}</CustomLink>
         )}>
-          <p className="whitespace-pre-wrap break-words max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl">{message}</p>
+          <p className="whitespace-pre-wrap break-words max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl"> {message} </p>
       {urls.map((url, index) => (
         <div key={index} className="iframe-container my-2">
           <iframe 
@@ -116,15 +135,15 @@ function MessageItem({ sender, timestamp, message, messageId, attachments, react
         </Linkify>
         {attachments && (
           <div className="mt-2 flex flex-wrap gap-2">
-            {renderMediaAttachments(attachments)}
+            {renderAttachments(attachments)}
           </div>
         )}
         {reactions && Object.keys(reactions).length > 0 && (
   <div className="mt-2 flex">
-    {Object.entries(reactions).map(([emoji, count], index) => (
+    {Object.entries(reactions).filter(([_, users]) => users.length > 0).map(([emoji, users], index) => (
       <div key={index} className="flex items-center mr-2">
         <span>{emoji}</span>
-        <span className="ml-2 text-sm">{count}</span>
+        <span className="ml-2 text-sm">{users.length}</span>
       </div>
     ))}
   </div>
@@ -136,12 +155,12 @@ function MessageItem({ sender, timestamp, message, messageId, attachments, react
         <div className="absolute -top-10 left-0 flex items-center bg-white rounded-full border-2 shadow-lg p-1" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
         {commonReactions.map((reaction, index) => {
         // Check if the current reaction is included in the message's reactions
-        const isReacted = reactions && reactions[reaction.emoji];
+        const isReacted = reactions && reactions[reaction.emoji] && reactions[reaction.emoji].includes(sender);
         return (
             <IconButton 
                 key={index} 
                 size="small" 
-                onClick={() => {onReact(messageId, reaction.emoji)}}
+                onClick={() =>  {onReact(messageId, reaction.emoji)}}//{onReact(messageId, reaction.emoji)}}
                 // Apply a different style if the reaction is already selected
                 style={{ backgroundColor: isReacted ? '#f0f0f0' : 'transparent' }}
                 title={reaction.label}>
@@ -151,23 +170,17 @@ function MessageItem({ sender, timestamp, message, messageId, attachments, react
             </IconButton>
         );
     })}
-          {/* <IconButton size="small" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
-            <AddIcon />
-          </IconButton>
-         */}
+         
+       
          
         </div>
-        {/* {showEmojiPicker && (
-          <div className="absolute items-center mt-2 bg-white z-50" style={{ transform: 'translateX(-100%)', position: 'absolute', right: '0' }}>
-            <EmojiPicker onSelect={handleEmojiSelect} />
-          </div>
-        )} */}
-        <div className="absolute -top-10  right-0 flex items-center bg-white rounded-t-full shadow-xl border-2 p-1" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
-          {/* Render common reactions and AddIcon button */}
-          <IconButton size="small" onClick={() => handleReply()} title="Reply">
+      
+        {/* <div className="absolute -top-10  right-0 flex items-center bg-white rounded-t-full shadow-xl border-2 p-1" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
+         
+          <IconButton size="small" onClick={() => handleReply()} title="Options">
             <ReplyIcon />
           </IconButton>
-        </div>
+        </div> */}
           
         </div>
         )

@@ -260,11 +260,11 @@ const FriendsWindow = () => {
   };
   
   // Inside the return statement of the FriendsWindow component, replace the old "No friends found" messages with:
-  {visibleList.length > 0 ? (
-    visibleList.map((friend, index) => (
-      <FriendTile key={index} id={friend.id} friendData={friend} onMoreOptions={handleMoreOptions} />
-    ))
-  ) : renderEmptyState()}
+  // {visibleList.length > 0 ? (
+  //   visibleList.map((friend, index) => (
+  //     <FriendTile key={index} id={friend.id} friendData={friend} onMoreOptions={handleMoreOptions} />
+  //   ))
+  // ) : renderEmptyState()}
     return (
       <Box sx={{ width: '100%' }}>
       <TopBar activeTab={activeTab} onTabChange={handleTabChange} />
@@ -275,9 +275,11 @@ const FriendsWindow = () => {
             <FriendTile key = {index} id={friend.id} friendData={friend} onMoreOptions={handleMoreOptions} />
           ))
         ) : (
-          <Typography variant="body1" sx={{ p: 2 }}>
+          // <Typography variant="body1" sx={{ p: 2 }}>
+          <div>
           {renderEmptyState()}
-          </Typography>
+          </div>
+          // </Typography>
         )}
       </List>
     </Box>
