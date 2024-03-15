@@ -221,20 +221,27 @@ async function broadcastMessage(data, type = "team", generateID = false, deleteM
 	if(deleteMsg && type == "direct" && !data.chatId && !data.msgId) return;
 
 	let members = type == "team" ? await fb.getTeamMembers(data.team) : await fb.getChatMembers(data.chat);
-	let membersList = members;
+	let membersList = Array.isArray(members) ? members : [];
 	
 
-	// if their is a sentAt field, convert it to a firebase timestamp
-	let DateBackup = data.sentAt;
-	if (data.sentAt)
-	{
-		data.sentAt = fb.admin.firestore.Timestamp.fromDate(new Date(data.sentAt));
-	}
+    // if their is a sentAt field, convert it to a firebase timestamp
+    let DateBackup = data.sentAt;
+    const date = new Date(data.sentAt)
+    if (data.sentAt){
+         if (!isNaN(date.getTime())) {
+            // If sentAt is in date format, creates a timestamp
+            data.sentAt = fb.admin.firestore.Timestamp.fromDate(new Date(data.sentAt));;
+        } else {
+			// Otherwise, converts seconds and nanoseconds into a timestamp
+            data.sentAt = fb.admin.firestore.Timestamp.fromDate(new Date(new Date(data.sentAt.seconds * 1000 + 
+                data.sentAt.nanoseconds / 1000, ).toLocaleDateString()));
+        }
+    }
 
-	// Remove the sender
-	const index = membersList.indexOf(data.senderID);
-	if (index > -1) // only splice array when item is found
-		membersList.splice(index, 1); // 2nd parameter means remove one item only
+    // Remove the sender
+    const index = membersList.indexOf(data.senderID);
+    if (index > -1) // only splice array when item is found
+        membersList.splice(index, 1); // 2nd parameter means remove one item only
 
 	// Generate a unique id for the message
 	let msgID = generateID ? uuid.v4() : data.msgID;
@@ -254,10 +261,10 @@ async function broadcastMessage(data, type = "team", generateID = false, deleteM
 	if (generateID) io.to(currLinks[data.senderID]).emit("updateID", { ...data, id: msgID });
 
 
-	// Restore the sentAt field
-	data.sentAt = DateBackup;
+    // Restore the sentAt field
+    data.sentAt = DateBackup;
 	data.msgID = msgID;
-	(type == "team" && !deleteMsg) ? fb.saveTeamMsg(data, generateID) : fb.saveDirectMsg(data, generateID);
+    (type == "team" && !deleteMsg) ? fb.saveTeamMsg(data, generateID) : fb.saveDirectMsg(data, generateID);
 	(type == "team" && deleteMsg===true) ? fb.deleteTeamMsg(data.teamId,data.channelId,data.msgID) : fb.deleteChatMsg(data.chatId,data.msgId);
 }
 
@@ -322,6 +329,7 @@ function connectToRedis(io) {
 		}
 	});
 }
+
 
 module.exports = {
 	init,

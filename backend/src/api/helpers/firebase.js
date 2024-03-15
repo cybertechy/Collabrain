@@ -8,17 +8,11 @@ admin.initializeApp({
 });
 
 function getWeekNumber(d) {
-	// Copy date so don't modify original
-	d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-	// Set to nearest Thursday: current date + 4 - current day number
-	// Make Sunday's day number 7
-	d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
-	// Get first day of year
-	const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-	// Calculate full weeks to nearest Thursday
-	const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-	// Return array of year and week number
-	return [d.getUTCFullYear(), weekNo];
+    d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+    const weekNo = Math.ceil(( ( (d - yearStart) / 86400000) + 1)/7);
+    return [d.getUTCFullYear(), weekNo];
 }
 
 function getCurrentMonth() {
@@ -158,41 +152,100 @@ async function saveTeamMsg(data, newMessage = false) {
 			score
 		}).catch(err => console.log(err));
 
-		// Adds an active user to the "stats" collection.
-		// Generates identifiers for docs that will hold weekly/ monthly stats
-		// Score greater than 0 means that the user is active
-		if (members[data.senderID].score > 0) {
-			const [year, weekNumber] = getWeekNumber(new Date());
-			const month = getCurrentMonth();
-			const weekDocId = `week-${year}-${weekNumber}`;
-			const monthDocId = `month-${month}`;
+	// Increment the user's score in the "users" collection
+    await db.runTransaction(async (transaction) => {
+        const userRef = db.collection('users').where("username", "==", data.sender);
+        const snapshot = await userRef.get();
 
-			// Update weekly stats
-			const weekRef = db.collection('stats').doc(weekDocId);
-			weekRef.get().then(doc => {
-				if (!doc.exists) {
-					weekRef.set({ activeUsers: 1 });
-				} else {
-					weekRef.update({ activeUsers: admin.firestore.FieldValue.increment(1) });
-				}
-			});
+        if (!snapshot.empty) {
+            const userDoc = snapshot.docs[0]; // Assuming 'username' is unique and only gets one document
+            const userData = userDoc.data();
+            const newScore = (userData.score || 0) + 1; // Increment score or initialize to 1 if undefined
 
-			// Update monthly stats
-			const monthRef = db.collection('stats').doc(monthDocId);
-			monthRef.get().then(doc => {
-				if (!doc.exists) {
-					monthRef.set({ activeUsers: 1 });
-				} else {
-					monthRef.update({ activeUsers: admin.firestore.FieldValue.increment(1) });
-				}
-			});
-		}
-	}
+            transaction.update(userDoc.ref, { score: newScore });
+        } else {
+            console.log("User not found");
+        }
+    }).catch(err => console.log(err));
+
+
+	// Identifiers to be used in monthly message incrementing
+    const userRef = db.collection('users').doc(data.senderID);
+    const month = getCurrentMonth();
+    const messageCountField = `monthlyMessageCount.${month}`;
+
+	// Increment the user's monthly message count in the "users" collection
+    await db.runTransaction(async (transaction) => {
+        const userDoc = await transaction.get(userRef);
+        if (!userDoc.exists) {
+            console.log("User document does not exist");
+            return;
+        }
+        transaction.update(userRef, {
+            [messageCountField]: admin.firestore.FieldValue.increment(1)
+        });
+    }).catch(err => console.log(err));
+
+	// Identifiers for docs that will hold weekly/ monthly stats
+    const senderID = data.senderID;
+    const [year, weekNumber] = getWeekNumber(new Date());
+    const weekDocId = `week-${year}-${weekNumber}`;
+    const monthDocId = `month-${month}`;
+
+    // Check and update weekly stats
+	const weekRef = db.collection('stats').doc(weekDocId);
+	weekRef.get().then(doc => {
+    	if (!doc.exists) {
+     		weekRef.set({ activeUserIDs: [senderID] });
+    	} else {
+        	let statsData = doc.data(); // Renamed variable to avoid confusion with outer `data`
+        	// Ensure activeUserIDs is always an array before calling includes
+        	if (!(statsData.activeUserIDs || []).includes(senderID)) {
+            	weekRef.update({
+                	activeUserIDs: admin.firestore.FieldValue.arrayUnion(senderID)
+            	});
+        	}
+    	}
+	});
+
+    // Check and update monthly stats
+	const monthRef = db.collection('stats').doc(monthDocId);
+	monthRef.get().then(doc => {
+    	if (!doc.exists) {
+        	monthRef.set({ activeUserIDs: [senderID] });
+    	} else {
+        	let statsData = doc.data();
+        	if (!(statsData.activeUserIDs || []).includes(senderID)) {
+            	monthRef.update({
+                	activeUserIDs: admin.firestore.FieldValue.arrayUnion(senderID)
+            	});
+        	}
+    	}
+	});
+
+	// Updates active users in a team's document
+	const teamRef = db.collection('teams').doc(data.team);
+	await db.runTransaction(async (transaction) => {
+    	const teamDoc = await transaction.get(teamRef);
+    	if (!teamDoc.exists) {
+        	console.log("Team not found");
+       		return;
+    	}
+    	let teamData = teamDoc.data();
+    	teamData.activeUserIDs = teamData.activeUserIDs || [];
+
+    	if (!teamData.activeUserIDs.includes(data.senderID)) {
+     		transaction.update(teamRef, {
+            	activeUserIDs: admin.firestore.FieldValue.arrayUnion(data.senderID)
+        	});
+    	}
+	}).catch(err => console.log(err));
 }
 
-async function saveDirectMsg(data, newMessage = false) {
-	// convert sent at to firebase timestamp seconds and nanoseconds
-	let sentAt = admin.firestore.Timestamp.fromDate(new Date(data.sentAt));
+
+async function saveDirectMsg(data) {
+    // convert sent at to firebase timestamp seconds and nanoseconds
+    let sentAt = admin.firestore.Timestamp.fromDate(new Date(data.sentAt));
 
 	// Save message to chat
 	db.collection(`chats/${data.chat}/messages`)
@@ -210,13 +263,46 @@ async function saveDirectMsg(data, newMessage = false) {
 		// This part is for Points (Check no.of messages)
 		let userData = (await db.doc(`users/${data.senderID}`).get()).data();
 
-		// Increase user score
-		let score = userData.score += 1;
+	// Update the user's message count for the month
+    await db.runTransaction(async (transaction) => {
+        const userRef = db.collection('users').doc(data.senderID);
+        const userDoc = await transaction.get(userRef);
 
-		db.doc(`users/${data.senderID}`).update({
-			score
-		}).catch(err => console.log(err));
+        if (userDoc.exists) {
+            const month = getCurrentMonth();
+            // Create or update the field for the current month's message count
+            const messageCountField = `monthlyMessageCount.${month}`;
+            const increment = admin.firestore.FieldValue.increment(1);
 
+            transaction.update(userRef, { [messageCountField]: increment });
+        } else {
+            console.log("User not found");
+        }
+    }).catch(err => console.log(err));
+
+	// Increment the user's score in the "users" collection
+	await db.runTransaction(async (transaction) => {
+		const userRef = db.collection('users').where("username", "==", data.sender);
+        const snapshot = await userRef.get();
+
+        if (!snapshot.empty) {
+            const userDoc = snapshot.docs[0]; // Assuming 'username' is unique and only gets one document
+            const userData = userDoc.data();
+            const newScore = (userData.score || 0) + 1; // Increment score or initialize to 1 if undefined
+
+            // Update the user's score
+            transaction.update(userDoc.ref, { score: newScore });
+        } else {
+            console.log("User not found");
+        }
+    }).catch(err => console.log(err));
+
+    // Identifiers for weekly/monthly stats
+    const senderID = data.senderID; // Assuming 'senderID' represents the unique ID of the sender
+    const [year, weekNumber] = getWeekNumber(new Date());
+    const month = getCurrentMonth();
+    const weekDocId = `week-${year}-${weekNumber}`;
+    const monthDocId = `month-${month}`;
 		// Adds an active user to the "stats" collection.
 		// Generates identifiers for docs that will hold weekly/ monthly stats
 		// Score greater than 0 means that the user is active
@@ -227,15 +313,20 @@ async function saveDirectMsg(data, newMessage = false) {
 			const weekDocId = `week-${year}-${weekNumber}`;
 			const monthDocId = `month-${year}-${month}`;
 
-			// Update weekly stats
-			const weekRef = db.collection('stats').doc(weekDocId);
-			weekRef.get().then(doc => {
-				if (!doc.exists) {
-					weekRef.set({ activeUsers: admin.firestore.FieldValue.increment(1) });
-				} else {
-					weekRef.update({ activeUsers: admin.firestore.FieldValue.increment(1) });
-				}
-			});
+    // Update weekly stats
+    const weekRef = db.collection('stats').doc(weekDocId);
+    weekRef.get().then(doc => {
+        if (!doc.exists) {
+            weekRef.set({ activeUsers: 1, activeUserIDs: [senderID] });
+        } else {
+            let data = doc.data();
+            if (!data.activeUserIDs.includes(senderID)) {
+                weekRef.update({
+                    activeUserIDs: admin.firestore.FieldValue.arrayUnion(senderID)
+                });
+            }
+        }
+    });
 
 			// Update monthly stats
 			const monthRef = db.collection('stats').doc(monthDocId);
@@ -304,6 +395,9 @@ module.exports = {
 	deleteCollection,
 	saveTeamMsg,
 	saveDirectMsg,
+	getUserMetrics,
+    getCurrentMonth,
+    getWeekNumber,
 	deleteUser,
 	updateUser,
 	getUser,
