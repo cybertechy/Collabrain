@@ -236,7 +236,10 @@ async function broadcastMessage(data, type = "team", generateID = false, deleteM
             data.sentAt = fb.admin.firestore.Timestamp.fromDate(new Date(new Date(data.sentAt.seconds * 1000 + 
                 data.sentAt.nanoseconds / 1000, ).toLocaleDateString()));
         }
-    }
+    } else {
+		// If sentAt is not defined, creates a timestamp for the current time
+		data.sentAt = fb.admin.firestore.Timestamp.fromDate(new Date());
+	}
 
     // Remove the sender
     const index = membersList.indexOf(data.senderID);
