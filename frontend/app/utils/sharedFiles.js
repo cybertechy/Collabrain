@@ -1,7 +1,8 @@
 import axios from "axios";
 // Replace these URLs with the actual URLs for your backend API
-const SHARED_PROJECTS_URL = "http://localhost:8080/api/shared/projects";
-const SHARED_CONTENT_MAPS_URL = "http://localhost:8080/api/shared/contentmaps";
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
+const SHARED_PROJECTS_URL = SERVERLOCATION + "/api/shared/projects";
+const SHARED_CONTENT_MAPS_URL = SERVERLOCATION + "/api/shared/contentmaps";
 
 /**
  * Fetch shared projects for a user.

@@ -17,6 +17,7 @@ import Template from "@/components/ui/template/template";
 import { fetchUser } from "@/app/utils/user";
 import { fetchMessages, fetchDirectMessages,updateMessage } from "@/app/utils/messages";
 import LoaderComponent from "@/components/ui/loader/loaderComponent";
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
 import { addMedia } from "@/app/utils/storage";
 export default function Messages() {
@@ -44,12 +45,21 @@ export default function Messages() {
        
        
 
-        sockCli.current = socket.init("http://localhost:8080") || {};
+        sockCli.current = socket.init(SERVERLOCATION) || {};
         console.log("Socket initialized", sockCli);
         sockCli.current.on("directMsg", (data) => {
             let sentAt = new Date(
                 data.sentAt._seconds * 1000 + data.sentAt._nanoseconds / 1000000
             );
+
+            if (!data) {
+                console.error("Invalid message data received:", data);
+                return;
+            }
+
+            console.log("Received direct message:", data);
+
+            if( chatId !== data.chat) return;
 
             data.msg = AES.decrypt(data.msg, chatId).toString(enc);
 
@@ -75,7 +85,7 @@ export default function Messages() {
         });
         setIsLoading(false);
         return () => sockCli.current.off("directMsg");
-    }, [user]);
+    }, [user,chatId]);
 
 
     

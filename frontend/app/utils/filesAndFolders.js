@@ -1,6 +1,9 @@
 const fb = require("_firebase/firebase");
 const axios = require("axios");
 import { toast } from "react-toastify";
+
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
+
 const retrieveToken = async () => {
 return await fb.getToken();
 }
@@ -16,7 +19,7 @@ const fetchFolders = async (path='/') => {
       }
     })
     .then(token => {
-      return axios.get("http://localhost:8080/api/dashboard/folders", {
+      return axios.get(`${SERVERLOCATION}/api/dashboard/folders?timestamp=${new Date().getTime()}`, {
         headers: {
           Authorization: `Bearer ${token}`, 
         },
@@ -49,7 +52,7 @@ const fetchFolders = async (path='/') => {
       }
      
   
-      const response = await axios.get("http://localhost:8080/api/dashboard/files", {
+      const response = await axios.get(`${SERVERLOCATION}/api/dashboard/files?timestamp=${new Date().getTime()}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -76,7 +79,7 @@ const fetchFolders = async (path='/') => {
     if (!token) return null;
 
     try {
-        const res = await axios.post(`http://localhost:8080/api/maps`, {
+        const res = await axios.post(`${SERVERLOCATION}/api/maps`, {
             name: "New Content Map",
             data: "",
             path: path
@@ -107,7 +110,7 @@ const createFolder = async (folderName, folderColor, path = '/') => {
     try {
         const token = await fb.getToken();
         const response = await axios.post(
-            'http://localhost:8080/api/dashboard/folder',
+            SERVERLOCATION+'/api/dashboard/folder',
             { name: folderName, color: folderColor, path: path }, // Assuming path is always `/` for simplicity
             { headers: { Authorization: `Bearer ${token}` } }
         );

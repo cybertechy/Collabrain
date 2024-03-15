@@ -15,9 +15,11 @@ const dashboardRoute = require("./api/routes/Dashboard");
 const mapRoute = require("./api/routes/ContentMap");
 const reportReport = require("./api/routes/Report");
 const notificationsRoute = require("./api/routes/Notifications");
+const docRoute = require("./api/routes/Doc");
 const storageRoute = require("./api/routes/Storage");
 const aiRoute = require("./api/routes/AI");
 const statsRoute = require("./api/routes/Stats");
+const twoFARoute = require("./api/routes/twoFA");
 
 // Helpers
 const sockServer = require("./api/helpers/socket");
@@ -27,6 +29,15 @@ const sockServer = require("./api/helpers/socket");
 const app = express();
 const port = process.env.PORT || 8080;
 const server = http.createServer(app);
+
+// Database usage counter
+let APIUsageCount = 0;
+
+// Middleware to increment database usage count
+app.use((req, res, next) => {
+    APIUsageCount++;
+    next();
+});
 
 app.use(
 	treblle({
@@ -75,11 +86,14 @@ app.use("/api/dashboard", dashboardRoute);
 app.use("/api/maps", mapRoute);
 app.use("/api/reports", reportReport);
 app.use("/api/notifications", notificationsRoute);
+app.use("/api/docs", docRoute); 
 app.use("/api/storage", storageRoute);
 app.use("/api/stats", statsRoute);
-app.use("/api/ai", aiRoute);
 
-
+// Endpoint to display DB usage
+app.get("/api/dbUsage", (req, res) => {
+    res.json({ message: "Database Usage", count: APIUsageCount });
+});
 
 app.get("/api/home", (req, res) =>
 {

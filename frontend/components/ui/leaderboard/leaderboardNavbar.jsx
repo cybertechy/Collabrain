@@ -5,6 +5,7 @@ import QueryBuilderIcon from '@mui/icons-material/QueryBuilder';
 import { IconButton, Button } from '@mui/material';
 
 const fb = require('_firebase/firebase');
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
 const LeaderboardNavbar = ({ user }) => {
     const [showAnimation, setShowAnimation] = useState(false);
@@ -23,7 +24,7 @@ const LeaderboardNavbar = ({ user }) => {
         const token = await fb.getToken(); // Make sure this function properly retrieves the auth token
 
         try {
-            const res = await axios.get(`http://localhost:8080/api/teams/search?page=0`, {
+            const res = await axios.get(`${SERVERLOCATION}/api/teams/search?page=0`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

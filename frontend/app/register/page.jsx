@@ -10,6 +10,8 @@
     import { useEffect, useState } from 'react';
     import { ToastContainer, toast } from 'react-toastify'
     import { hasUsername } from "../utils/user";
+
+    const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
     export default function Register() {
         const router = useRouter();
         const [backgroundLoaded, setBackgroundLoaded] = useState(false);
@@ -50,7 +52,7 @@
         useEffect(() =>
         {
             if (user){
-                sock_cli = socket.init('https://collabrain-backend.cybertech13.eu.org');
+                sock_cli = socket.init(SERVERLOCATION) || {};
             console.log(sock_cli)
             }
         }, [user]);

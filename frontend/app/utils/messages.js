@@ -2,9 +2,10 @@ const fb = require("_firebase/firebase");
 const axios = require("axios");
 const cryptoJS = require("crypto-js");
 import MessageItem from "@/components/ui/messagesComponents/MessageItem";
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 const fetchMessages = async (chatId, userInfo) => {
     const token = await fb.getToken();
-    const response = await axios.get(`http://localhost:8080/api/chats/${chatId}/messages`, {
+    const response = await axios.get(`${SERVERLOCATION}/api/chats/${chatId}/messages`, {
         headers: { "Authorization": "Bearer " + token }
     });
 
@@ -40,7 +41,7 @@ const fetchDirectMessages = async () => {
     try {
         const token = await fb.getToken();
         const response = await axios.get(
-            "http://localhost:8080/api/chats/",
+            `${SERVERLOCATION}/api/chats/`,
             {
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -70,7 +71,7 @@ const updateMessage = async (chatId, messageId, updatedContent) => {
         }
 
         // Send the PATCH request
-        const response = await axios.patch(`http://localhost:8080/api/chats/${chatId}/messages/${messageId}`, payload, {
+        const response = await axios.patch(`${SERVERLOCATION}/api/chats/${chatId}/messages/${messageId}`, payload, {
             headers: { "Authorization": "Bearer " + token }
         });
 

@@ -3,7 +3,8 @@
     "paths": {
       "@/*": ["./*"],
 	  "_firebase/*": ["./app/_firebase/*"],
-	  "_socket/*": ["./app/_socket/*"]
+	  "_socket/*": ["./app/_socket/*"],
+	  "_components/*": ["./components/*"],
     }
   }
 }

@@ -22,6 +22,7 @@ import {
 } from "../utils/filesAndFolders";
 import { hasUsername } from "../utils/user";
 import LoaderComponent from "../../components/ui/loader/loaderComponent";
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 export default function Dashboard() {
     const [user, loading] = fb.useAuthState();
     const [isLoading, setIsLoading] = useState(true);
@@ -35,17 +36,17 @@ export default function Dashboard() {
     const [isContentMapsLoading, setContentMapsLoading] = useState(true);
     const [isFoldersLoading, setFoldersLoading] = useState(true);
     const [isProjectsLoading, setProjectsLoading] = useState(true);
-	const [sortCriteria, setSortCriteria] = useState({ sortName: false, sortDate: false, isAscending: true });
+    const [sortCriteria, setSortCriteria] = useState({ sortName: false, sortDate: false, isAscending: true });
     const [isCreateFolderOverlayOpen, setIsCreateFolderOverlayOpen] =
         useState(false);
     const searchParams = useSearchParams();
-	const [path, setPath] = useState(searchParams.get("path") || "/");
-	useEffect(() => {
-		const newPath = searchParams.get("path") || "/";
-		console.log("Updated path in Dashboard:", newPath); // Debugging line
-		setPath(newPath);
-	}, [searchParams]);
-	
+    const [path, setPath] = useState(searchParams.get("path") || "/");
+    useEffect(() => {
+        const newPath = searchParams.get("path") || "/";
+        console.log("Updated path in Dashboard:", newPath); // Debugging line
+        setPath(newPath);
+    }, [searchParams]);
+
 
     let sock_cli;
     let currentDoc;
@@ -74,7 +75,7 @@ export default function Dashboard() {
                 createContentMap();
             },
         },
-        { text: "New Document", icon: <DescriptionIcon />, onClick: () => {} },
+        { text: "New Document", icon: <DescriptionIcon />, onClick: () => { } },
     ];
 
 
@@ -96,19 +97,19 @@ export default function Dashboard() {
 
 
 
-	useEffect(() => {
-		// Wait for the loading state to confirm that the auth check is complete
-		if (!loading) {
-		  if (user) {
-			// User is logged in, proceed with any logged-in only logic here
-			console.log("User is logged in:", user);
-		  } else {
-			// No user is logged in, redirect to the root
-			console.log("No user found, redirecting to /");
-			router.push("/");
-		  }
-		}
-	  }, [user, loading, router]);
+    useEffect(() => {
+        // Wait for the loading state to confirm that the auth check is complete
+        if (!loading) {
+            if (user) {
+                // User is logged in, proceed with any logged-in only logic here
+                console.log("User is logged in:", user);
+            } else {
+                // No user is logged in, redirect to the root
+                console.log("No user found, redirecting to /");
+                router.push("/");
+            }
+        }
+    }, [user, loading, router]);
     useEffect(() => {
         const checkUserUsername = async () => {
             if (user) {
@@ -127,49 +128,49 @@ export default function Dashboard() {
 
         checkUserUsername();
     }, [user]);
-	const handleSort = (newSortCriteria) => {
-		setSortCriteria(newSortCriteria);
-	  };
-	  const sortedProjects = useMemo(() => {
-		return [...projects].filter(project => project.path === path).sort((a, b) => {
-			if (sortCriteria.sortName) {
-				return sortCriteria.isAscending ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
-			} else if (sortCriteria.sortDate) {
-				const dateA = new Date(a.updatedAt); // Ensure correct property name
-				const dateB = new Date(b.updatedAt); // Ensure correct property name
-				return sortCriteria.isAscending ? dateA - dateB : dateB - dateA;
-			}
-			return 0; // Default case if no sorting criteria are set
-		});
-	}, [projects, sortCriteria, path]);
-	
-	const sortedFolders = useMemo(() => {
-		return [...folders].filter(folder => {
-			// Split the folder's path and the current path on '/'
-			const folderPathParts = folder.path.split('/').filter(part => part);
-			const currentPathParts = path.split('/').filter(part => part);
-	
-			// For the root path, match folders that are directly under root
-			if (path === "/") {
-				return folderPathParts.length === 1;
-			} else {
-				// For nested paths, check if the folder is exactly one level deeper than the current path
-				// This requires matching all parts of the current path, plus one additional segment for the folder
-				return folderPathParts.slice(0, -1).every((part, index) => currentPathParts[index] === part) && folderPathParts.length === currentPathParts.length + 1;
-			}
-		})
-		.sort((a, b) => {
-			if (sortCriteria.sortName) {
-				return sortCriteria.isAscending ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
-			} else if (sortCriteria.sortDate) {
-				const dateA = new Date(a.updatedAt); // Corrected to match your example date format
-				const dateB = new Date(b.updatedAt); // Corrected to match your example date format
-				return sortCriteria.isAscending ? dateA - dateB : dateB - dateA;
-			}
-			return 0; // Default case if no sorting criteria are set
-		});
-	}, [folders, sortCriteria, path]);
-	
+    const handleSort = (newSortCriteria) => {
+        setSortCriteria(newSortCriteria);
+    };
+    const sortedProjects = useMemo(() => {
+        return [...projects].filter(project => project.path === path).sort((a, b) => {
+            if (sortCriteria.sortName) {
+                return sortCriteria.isAscending ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
+            } else if (sortCriteria.sortDate) {
+                const dateA = new Date(a.updatedAt); // Ensure correct property name
+                const dateB = new Date(b.updatedAt); // Ensure correct property name
+                return sortCriteria.isAscending ? dateA - dateB : dateB - dateA;
+            }
+            return 0; // Default case if no sorting criteria are set
+        });
+    }, [projects, sortCriteria, path]);
+
+    const sortedFolders = useMemo(() => {
+        return [...folders].filter(folder => {
+            // Split the folder's path and the current path on '/'
+            const folderPathParts = folder.path.split('/').filter(part => part);
+            const currentPathParts = path.split('/').filter(part => part);
+
+            // For the root path, match folders that are directly under root
+            if (path === "/") {
+                return folderPathParts.length === 1;
+            } else {
+                // For nested paths, check if the folder is exactly one level deeper than the current path
+                // This requires matching all parts of the current path, plus one additional segment for the folder
+                return folderPathParts.slice(0, -1).every((part, index) => currentPathParts[index] === part) && folderPathParts.length === currentPathParts.length + 1;
+            }
+        })
+            .sort((a, b) => {
+                if (sortCriteria.sortName) {
+                    return sortCriteria.isAscending ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
+                } else if (sortCriteria.sortDate) {
+                    const dateA = new Date(a.updatedAt); // Corrected to match your example date format
+                    const dateB = new Date(b.updatedAt); // Corrected to match your example date format
+                    return sortCriteria.isAscending ? dateA - dateB : dateB - dateA;
+                }
+                return 0; // Default case if no sorting criteria are set
+            });
+    }, [folders, sortCriteria, path]);
+
     const addNewFolder = (newFolder) => {
         setFolders((prevFolders) => [...prevFolders, newFolder]);
 
@@ -190,10 +191,10 @@ export default function Dashboard() {
         // Increment the folderChanges count when a new folder is added
         setProjectChanges((prevCount) => prevCount + 1);
     };
-	const addNewProject = (newProject) => {
-		setProjects((prevProjects) => [...prevProjects, newProject]);
-		
-	};
+    const addNewProject = (newProject) => {
+        setProjects((prevProjects) => [...prevProjects, newProject]);
+
+    };
     const handleProjectDeleted = (deletedProject) => {
         // Filter out the deleted project from the current state
         setProjects((prevProjects) =>
@@ -222,16 +223,16 @@ export default function Dashboard() {
 
 
     const createContentMap = async () => {
-		setIsLoading(true);
+        setIsLoading(true);
         await newContentMap(fb.getToken, (url) => {
-			setProjectChanges((prevCount) => prevCount + 1);
-			router.push(url);
-			
-		
-		
-		}, path);
-		setIsLoading(false);
-		setProjectChanges((prevCount) => prevCount + 1);
+            setProjectChanges((prevCount) => prevCount + 1);
+            router.push(url);
+
+
+
+        }, path);
+        setIsLoading(false);
+        setProjectChanges((prevCount) => prevCount + 1);
     };
 
     const handleContextMenu = (e) => {
@@ -250,7 +251,7 @@ export default function Dashboard() {
         console.log(loading);
         console.log(user);
         if (user) {
-            sock_cli = socket.init("http://localhost:8080");
+            sock_cli = socket.init(SERVERLOCATION);
             //    fetchTeams();
             //    fetchTeams();
         }
@@ -259,7 +260,7 @@ export default function Dashboard() {
     useEffect(() => {
         if (user) {
             setLoadingState("FETCHING_FILES");
-			setProjectsLoading(true);
+            setProjectsLoading(true);
             (async () => {
                 try {
                     const files = await fetchProjects(path);
@@ -274,14 +275,14 @@ export default function Dashboard() {
             })();
         } else {
             console.log("User not logged in, skipping fetch");
-			setProjectsLoading(false);
+            setProjectsLoading(false);
         }
     }, [user, path, projectChanges]);
 
     useEffect(() => {
         if (user) {
             console.log("before fetching folders");
-			setFoldersLoading(true);
+            setFoldersLoading(true);
             (async () => {
                 try {
                     setLoadingState("FETCHING_FOLDERS");
@@ -302,7 +303,7 @@ export default function Dashboard() {
             console.log("User not logged in, skipping folder fetch");
             setFoldersLoading(false);
         }
-    }, [user, folderChanges,path]);
+    }, [user, folderChanges, path]);
 
     return (
         <Template>
@@ -311,12 +312,12 @@ export default function Dashboard() {
                 loadingState={loadingState}
             />
 
-			<DashboardInfoBar
-			currentPath={searchParams.get("path") ? "My Brain" + searchParams.get("path") : "My Brain"}
-		
-			onSort={handleSort} 
-			sortCriteria = {sortCriteria}
-			/>
+            <DashboardInfoBar
+                currentPath={searchParams.get("path") ? "My Brain" + searchParams.get("path") : "My Brain"}
+
+                onSort={handleSort}
+                sortCriteria={sortCriteria}
+            />
 
             {/* Main Content area */}
             <div
@@ -332,40 +333,40 @@ export default function Dashboard() {
                     menuOptions={contextMenuOptions}
                 />
 
-               
-                    <div>
-                        <p className="text-2xl text-left text-primary ml-4 mb-4">
-                            Folders
-                        </p>
 
-                        <div className="flex flex-wrap content-start items-start w-full justify-start ml-4 gap-8 ">
-						<DashboardNewFolder
-                                onNewFolderCreated={addNewFolder}
-                            />
-						    {
-                                isFoldersLoading ? (
-									<Lottie animationData={smallLoader} play="true" loop="true" 
-									style={{ width: 100, height: 100 }} />
-                                ) : sortedFolders.length > 0 ? (
-                                    sortedFolders.map((folder) => (
-                                        <DashboardFolder
-                                            key={folder.id}
-                                            id={folder.id}
-                                            title={folder.name}
-                                            folder={folder}
-                                            onFolderDeleted={
-                                                handleFolderDeleted
-                                            }
-											handleProjectDeleted={handleProjectDeleted}
-											projectUpdate = {()=>{setProjectChanges((prevCount) => prevCount + 1);}}
-                                        />
-                                    ))
-                                ) : null // Do not display any text if there are no folders
-                            }
-                           
-                        </div>
+                <div>
+                    <p className="text-2xl text-left text-primary ml-4 mb-4">
+                        Folders
+                    </p>
+
+                    <div className="flex flex-wrap content-start items-start w-full justify-start ml-4 gap-8 ">
+                        <DashboardNewFolder
+                            onNewFolderCreated={addNewFolder}
+                        />
+                        {
+                            isFoldersLoading ? (
+                                <Lottie animationData={smallLoader} play="true" loop="true"
+                                    style={{ width: 100, height: 100 }} />
+                            ) : sortedFolders.length > 0 ? (
+                                sortedFolders.map((folder) => (
+                                    <DashboardFolder
+                                        key={folder.id}
+                                        id={folder.id}
+                                        title={folder.name}
+                                        folder={folder}
+                                        onFolderDeleted={
+                                            handleFolderDeleted
+                                        }
+                                        handleProjectDeleted={handleProjectDeleted}
+                                        projectUpdate={() => { setProjectChanges((prevCount) => prevCount + 1); }}
+                                    />
+                                ))
+                            ) : null // Do not display any text if there are no folders
+                        }
+
                     </div>
-               
+                </div>
+
                 <div>
                     <p className="text-2xl text-left text-primary ml-4 mb-4 mt-5">
                         Projects
@@ -375,11 +376,11 @@ export default function Dashboard() {
                         style={{ maxHeight: "500px" }}
                     >
                         <div className="flex flex-wrap gap-4 ml-4 justify-start">
-                            
+
 
                             {isProjectsLoading ? (
-                               <Lottie animationData={smallLoader} play="true" loop="true" 
-							   style={{ width: 100, height: 100 }} />
+                                <Lottie animationData={smallLoader} play="true" loop="true"
+                                    style={{ width: 100, height: 100 }} />
                             ) : sortedProjects.length > 0 ? (
                                 sortedProjects.map((project) => (
                                     <DashboardProjectButton
@@ -394,7 +395,7 @@ export default function Dashboard() {
                                                 ? "Content Map"
                                                 : "Document"
                                         }
-										OnClick={() => {setIsLoading(true); setLoadingState("FETCHING_FILES");}}
+                                        OnClick={() => { setIsLoading(true); setLoadingState("FETCHING_FILES"); }}
                                         renamedProject={renamedProject}
                                         handleProjectDeleted={
                                             handleProjectDeleted
@@ -416,7 +417,7 @@ export default function Dashboard() {
                     isOpen={isCreateFolderOverlayOpen}
                     onClose={toggleCreateFolderOverlay}
                     onFolderCreated={addNewFolder}
-					
+
                 />
             )}
         </Template>
