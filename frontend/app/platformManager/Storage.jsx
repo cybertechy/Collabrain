@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import ApexCharts from 'apexcharts';
+
 import axios from 'axios'; 
+import dynamic from 'next/dynamic';
+
+const ApexCharts = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 const DashboardCard = () => {
   const [dbUsage, setDbUsage] = useState(null);

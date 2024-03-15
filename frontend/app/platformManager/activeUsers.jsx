@@ -1,8 +1,13 @@
+import dynamic from 'next/dynamic';
 import React, { useEffect, useState } from 'react';
-import ApexCharts from 'apexcharts';
+import { set } from 'react-hook-form';
+
+const ApexCharts = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 const ChartComponent = ({ isMonthly }) => {
   const [chartData, setChartData] = useState([]);
+  const [option, setoption] = useState({});
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -94,15 +99,14 @@ const ChartComponent = ({ isMonthly }) => {
       fill: {
         opacity: 1,
       },
-    };
-
-    if (document.getElementById("column-chart") && typeof ApexCharts !== 'undefined') {
-      const chart = new ApexCharts(document.getElementById("column-chart"), options);
-      chart.render();
-    }
+    };  
+    
+    setoption(options);
   }, [chartData, isMonthly]);
 
-  return <div id="column-chart" className="h-full"></div>;
+  return <div id="column-chart" className="h-full">
+    <ApexCharts options={option} series={option.series} type="bar" height="100%" />
+  </div>;
 };
 
 export default ChartComponent;

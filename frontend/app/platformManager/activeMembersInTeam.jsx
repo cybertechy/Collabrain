@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Card, CardBody, CardHeader } from "@material-tailwind/react";
-import Chart from "react-apexcharts";
+import dynamic from "next/dynamic";
+
+const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 const LineChart = ({ teamId }) => {
   const [chartData, setChartData] = useState([]);
@@ -108,7 +110,11 @@ const LineChart = ({ teamId }) => {
         shadow={false}
         color="transparent"
         className="flex flex-col gap-4 rounded-none md:flex-row md:items-center"
-      ></CardHeader>
+      >
+        <h2 className="text-base font-medium text-gray-800 dark:text-gray-100">
+          Active Members (in a team)
+        </h2>
+      </CardHeader>
       <CardBody className="px-2 pb-0">
         <Chart {...chartConfig} />
       </CardBody>
