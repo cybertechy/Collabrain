@@ -2,7 +2,8 @@
 
 import dynamic from "next/dynamic";
 import { useRef, useState, useEffect } from "react";
-const { useRouter, useSearchParams } = require("next/navigation");
+const { useSearchParams } = require("next/navigation");
+import { useRouter } from "next/navigation";
 
 import axios from 'axios';
 import Lottie from "lottie-react";
@@ -18,8 +19,8 @@ import LoadingJSON from "../../public/assets/json/Loading.json";
 import ErrorJSON from "../../public/assets/json/Error.json";
 import WorkingJSON from "../../public/assets/json/Working.json";
 
-export default function Editor()
-{
+
+export default function Editor() {
 	const router = useRouter();
 	const [user, loading] = fb.useAuthState();
 	const searchParams = useSearchParams();
@@ -38,16 +39,16 @@ export default function Editor()
 	const [isSaved, setIsSaved] = useState(true);
 
 	// Redirect to dashboard if no document is specified
-	if (searchParams.get('id') == null)
-	{
-		// No document selected
-		// Redirect to dashboard
-		router.push("/dashboard");
-	}
+	useEffect(() => {
+		if (searchParams.get('id') == null) {
+			// No document selected
+			// Redirect to dashboard
+			if(router?.push) router.push("/dashboard");
+		}
+	}, [searchParams,router]);
 
 	// Generate random color for cursor
-	const randomColor = () =>
-	{
+	const randomColor = () => {
 		const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 		var h = randomInt(0, 360);
 		var s = randomInt(42, 98);
@@ -57,13 +58,11 @@ export default function Editor()
 
 	// Setup socket and event listeners
 	let sockCli = useRef(null);
-	useEffect(() =>
-	{
+	useEffect(() => {
 		if (!user) return;
 
 		// Get user data
-		fb.getToken().then(token =>
-		{
+		fb.getToken().then(token => {
 			axios.get(`http://localhost:8080/api/users/${user.uid}`, {
 				headers: {
 					"Authorization": `Bearer ${token}`
@@ -73,13 +72,11 @@ export default function Editor()
 
 		// Setup socket and event listeners
 		sockCli.current = socket.init('http://localhost:8080/') || {};
-		sockCli.current.on('get-doc-changes', delta =>
-		{
+		sockCli.current.on('get-doc-changes', delta => {
 			quillRef.current.getEditor().updateContents(delta);
 		});
 
-		sockCli.current.on('get-doc-cursor-changes', data =>
-		{
+		sockCli.current.on('get-doc-cursor-changes', data => {
 			// Create a cursor for the user if it doesn't exist
 			const cursor = quillRef.current.getEditor().getModule('cursors');
 			cursor.createCursor(data.username, data.username, randomColor()); // Username is id since it's unique
@@ -87,30 +84,26 @@ export default function Editor()
 		});
 
 		// Cleanup event listeners
-		return () =>
-		{
+		return () => {
 			sockCli.current.off('get-doc-changes');
 			sockCli.current.off('get-doc-cursor-changes');
 		};
 	}, [user]);
 
 	// Load document
-	useEffect(() =>
-	{
+	useEffect(() => {
 		if (!user || !userData || !sockCli.current)
 			return;
 
 		const id = searchParams.get('id');
 		// Get document
-		fb.getToken().then(token =>
-		{
+		fb.getToken().then(token => {
 			axios.get(`http://localhost:8080/api/docs/${id}`, {
 				headers: {
 					"Authorization": `Bearer ${token}`
 				}
 			})
-				.then(res =>
-				{
+				.then(res => {
 					setFileData(res.data);
 					setDocName(res.data.name);
 					setOciID(res.data.data);
@@ -119,8 +112,7 @@ export default function Editor()
 					if (res.data.access[userData.uid] != "view")
 						setIsDisabled(false);
 				})
-				.catch(err =>
-				{
+				.catch(err => {
 					console.log(err.response.data.error);
 					setLoadFailed(err.response.data.error);
 				});
@@ -131,8 +123,7 @@ export default function Editor()
 	}, [user, userData]);
 
 	// Signing in animation
-	if (loading || !user || !userData)
-	{
+	if (loading || !user || !userData) {
 		return (
 			<Template>
 				<div className="bg-[#F3F3F3] w-screen h-full flex flex-col justify-center items-center text-basicallydark">
@@ -144,8 +135,7 @@ export default function Editor()
 	}
 
 	// Failed to load animation
-	if (loadFailed)
-	{
+	if (loadFailed) {
 		return (
 			<Template>
 				<div className="bg-[#F3F3F3] w-screen h-full flex flex-col justify-center items-center text-basicallydark">
@@ -157,8 +147,7 @@ export default function Editor()
 	}
 
 	// Loading animation
-	if (!fileData || !ociID || !docName)
-	{
+	if (!fileData || !ociID || !docName) {
 		return (
 			<Template>
 				<div className="bg-[#F3F3F3] w-screen h-full flex flex-col justify-center items-center text-basicallydark">

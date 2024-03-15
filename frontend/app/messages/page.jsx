@@ -52,6 +52,10 @@ export default function Messages() {
                 return;
             }
 
+            console.log("Received direct message:", data);
+
+            if( chatId !== data.chat) return;
+
             data.msg = AES.decrypt(data.msg, chatId).toString(enc);
 
             setMessages((prevMessage) => [
@@ -75,7 +79,7 @@ export default function Messages() {
         });
         setIsLoading(false);
         return () => sockCli.current.off("directMsg");
-    }, [user]);
+    }, [user,chatId]);
 
     useEffect(() => {
         if (!user) return;
