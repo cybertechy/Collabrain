@@ -1,3 +1,4 @@
+"use client";
 import { useState, useEffect } from "react";
 import PieChart from "./Microservice";
 import LineChart from "./activeMembersInTeam";
@@ -36,7 +37,7 @@ const UserStats = () => {
 
 
     useEffect(() => {
-        fetch('/active-users')
+        fetch('http://localhost:8080/api/stats/active-users')
             .then(response => response.json())
             .then(data => {
                 setWeeklyActiveUsers(data.weekly.activeUserCount);
