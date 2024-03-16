@@ -24,18 +24,6 @@ const ForgotPassword = () => {
   };
 
   return (
-    // <div>
-    //   <h1>Forgot Password</h1>
-    //   <input
-    //     type="email"
-    //     placeholder="Enter your email"
-    //     value={email}
-    //     onChange={(e) => setEmail(e.target.value)}
-    //   />
-    //   <button onClick={handleResetPassword}>Reset Password</button>
-    //   {error && <p style={{ color: 'red' }}>{error}</p>}
-    //   {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
-    // </div>
     <div className="max-sm:min-h-screen flex items-center justify-center min-h-screen">
       <ToastContainer />
       <div className="flex flex-col items-center justify-center">
