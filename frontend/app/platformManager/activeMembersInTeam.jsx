@@ -10,12 +10,15 @@ const LineChart = ({ teamId }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`http://localhost:8080/api/stats/team/:teamId/active-members`);
+        const response = await fetch(`http://localhost:8080/api/stats/active-members`);
+        
         if (!response.ok) {
           throw new Error("Failed to fetch data");
         }
         const data = await response.json();
         setChartData(data);
+        console.log(data);
+        
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -107,13 +110,9 @@ const LineChart = ({ teamId }) => {
     <Card>
       <CardHeader
         floated={false}
-        shadow={false}
         color="transparent"
         className="flex flex-col gap-4 rounded-none md:flex-row md:items-center"
       >
-        <h2 className="text-base font-medium text-gray-800 dark:text-gray-100">
-          Active Members (in a team)
-        </h2>
       </CardHeader>
       <CardBody className="px-2 pb-0">
         <Chart {...chartConfig} />
