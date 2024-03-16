@@ -11,6 +11,7 @@ import { isSidebarOpen } from "../sidebar/sidebar";
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import SettingsOverlay from '../../overlays/settingsOverlay';
 import Template from '../template';
+import { ColorblindFilterProvider } from '../../../../app/utils/colorblind/ColorblindFilterContext';
 
 
 const Navbar = ({ isOpen, toggleSidebar }) => {
@@ -55,6 +56,7 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
 
     const tooltips = () => {
         return (
+            <ColorblindFilterProvider>
             <>
             <Tooltip
             title={"Leaderboard"}
@@ -95,11 +97,13 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
                     />
                      </Tooltip>
                      </>
+                     </ColorblindFilterProvider>
 
         )
     }
 
     return (
+        <ColorblindFilterProvider>
         <>
             <nav className="bg-primary p-4 flex items-center justify-between">
                 <div className={`flex-grow flex xsm:hidden ${isOpen ? "hidden" : ""}`}>
@@ -126,6 +130,7 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
     </div>
 )}
         </>
+        </ColorblindFilterProvider>
     );
 };
 

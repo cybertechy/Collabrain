@@ -5,9 +5,11 @@ import PersonIcon from "@mui/icons-material/Person";
 import SentimentVeryDissatisfiedIcon from "@mui/icons-material/SentimentVeryDissatisfied";
 import Image from 'next/image';
 import axios from "axios";
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button,
+    List, ListItem, ListItemText, Radio, RadioGroup, FormControlLabel} from '@mui/material';
 import { useRouter } from 'next/navigation';
 import jsPDF from 'jspdf';
+import { useColorblindFilter } from '../../../app/utils/colorblind/ColorblindFilterContext';
 
 const fb = require("_firebase/firebase");
 
@@ -770,6 +772,14 @@ const NotificationsOverlay = () => {
 };
 // ACCESSIBILITY SETTINGS PAGE
 const AccessibilityOverlay = () => {
+    const [colorblindDialogOpen, setColorblindDialogOpen] = useState(false);
+    const [selectedFilter, setSelectedFilter] = useState('None');
+    const { setColorblindFilter } = useColorblindFilter();
+
+    const colorblindOptions = [
+        'None', 'Achromatopsia', 'Achromatomaly', 'Deuteranomaly', 'Deuteranopia', 
+        'Protanomaly', 'Protanopia', 'Tritanomaly', 'Tritanopia'
+    ];
     // Functions to handle configuration can be added here
     // For example:
     const handleConfigureTTS = () => {
@@ -782,6 +792,16 @@ const AccessibilityOverlay = () => {
 
     const handleConfigureColorblindFilters = () => {
         // Implement Colorblind Filters configuration logic
+        setColorblindDialogOpen(true);
+    };
+
+    const handleClose = () => {
+        setColorblindDialogOpen(false);
+    };
+
+    const handleFilterChange = (event) => {
+        setSelectedFilter(event.target.value);
+        setColorblindFilter(event.target.value); // This updates the global filter state
     };
 
     return (
@@ -822,6 +842,24 @@ const AccessibilityOverlay = () => {
                             Configure
                         </button>
                     </div>
+
+                    <Dialog onClose={handleClose} open={colorblindDialogOpen}>
+                        <DialogTitle>Configure Colorblind Filters</DialogTitle>
+                        <List>
+                            <RadioGroup value={selectedFilter} onChange={handleFilterChange}>
+                                {colorblindOptions.map((option) => (
+                                    <ListItem key={option} button onClick={() => setSelectedFilter(option)}>
+                                        <FormControlLabel
+                                            value={option}
+                                            control={<Radio />}
+                                            label={option}
+                                        />
+                                    </ListItem>
+                                ))}
+                            </RadioGroup>
+                        </List>
+                        <Button onClick={handleClose}>Done</Button>
+                    </Dialog>
                 </div>
             </div>
         </div>

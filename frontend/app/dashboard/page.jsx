@@ -22,6 +22,8 @@ import {
 } from "../utils/filesAndFolders";
 import { hasUsername } from "../utils/user";
 import LoaderComponent from "../../components/ui/loader/loaderComponent";
+import '../utils/colorblind/accecss.scss';
+import { ColorblindFilterProvider } from '../utils/colorblind/ColorblindFilterContext';
 export default function Dashboard() {
     const [user, loading] = fb.useAuthState();
     const [isLoading, setIsLoading] = useState(true);
@@ -305,6 +307,7 @@ export default function Dashboard() {
     }, [user, folderChanges,path]);
 
     return (
+        <ColorblindFilterProvider>
         <Template>
             <LoaderComponent
                 isLoading={isLoading}
@@ -420,5 +423,6 @@ export default function Dashboard() {
                 />
             )}
         </Template>
+        </ColorblindFilterProvider>
     );
 }
