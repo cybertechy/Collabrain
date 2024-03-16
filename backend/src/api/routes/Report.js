@@ -60,11 +60,29 @@ router.get("/", async (req, res) =>
 
 	// Check if user is admin
 	let userRef = await fb.db.doc(`users/${user.uid}`).get();
+	let userRole = userRef.data().role;
+	if (!(userRole=== "content moderator" || userRole=== "platform manager")) {
+		return res.status(401).json({ error: "Unauthorized Access" });
+	}
 
 	// Get reports
 	let reports = [];
 	let snapshot = await fb.db.collection("reports").get();
 	snapshot.forEach(doc => reports.push(doc.data()));
+
+	// add user and team names
+	for (let i = 0; i < reports.length; i++) {
+		if (reports[i].chatID) {
+			let senderRef = await fb.db.doc(`users/${reports[i].sender}`).get();
+			let sender = senderRef.data();
+			reports[i].sender = sender.username;
+		} else if (reports[i].teamID) {
+			let teamRef = await fb.db.doc(`teams/${reports[i].teamID}`).get();
+			let team = teamRef.data();
+			reports[i].team = team.name;
+		}
+	}
+
 	return res.status(200).json(reports);
 });
 

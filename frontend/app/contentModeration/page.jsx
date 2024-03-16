@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import CloseIcon from '@mui/icons-material/Close';
-const fb = require('_firebase/firebase');
+const { useAuthState, getToken } = require("_firebase/firebase");
 
 const Overlay = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
@@ -34,6 +34,9 @@ const Moderation = () => {
   const [isOverlayOpen, setIsOverlayOpen] = useState(false);
   const [reports, setReports] = useState([]);
   const [reportedUsersCount, setReportedUsersCount] = useState(0);
+  const [user, loading] = useAuthState();
+  const [dataLoading, setdataLoading] = useState(false);
+
 
   const toggleDropdown = (index) => {
     setOpenIndex(openIndex === index ? -1 : index);
@@ -49,25 +52,32 @@ const Moderation = () => {
 
   useEffect(() => {
     const fetchReports = async () => {
-    const token = await fb.getToken(); 
+      const token = await getToken();
+      if (!token) return;
       try {
+        setdataLoading(true);
         const response = await axios.get('http://localhost:8080/api/reports', {
           headers: {
             Authorization: `Bearer ${token}`
           }
         });
         setReports(response.data);
-
+        console.log(response.data);
         const count = response.data.length;
         setReportedUsersCount(count);
+        setdataLoading(false);
       } catch (error) {
         console.error('Error fetching reports:', error);
+        setdataLoading(false);
       }
     };
 
     fetchReports();
-  }, []);
+  }, [user]);
 
+  if (loading) return <p>Loading...</p>;
+
+  // {("ChatID: "+report.chatID) || ("TeamID:"+report.teamID)}
   return (
     <>
       <div className="ml-48">
@@ -75,7 +85,7 @@ const Moderation = () => {
         <div className="flex pt-10">
           <div className="w-7/12 h-48 ml-24 border-gray-200 border-2 bg-white rounded-md drop-shadow-md">
             <div className="flex pt-5 pl-5 pb-2 gap-2 ">
-              <WarningAmberIcon className="text-red-500 h-24 w-24"/>
+              <WarningAmberIcon className="text-red-500 h-24 w-24" />
               <p className="font-medium text-xl">Warning!</p>
             </div>
             <div className="ml-5 p-2 w-11/12 h-20 border-t-2 border-gray-200">
@@ -90,6 +100,7 @@ const Moderation = () => {
             </div>
             <div className="pl-5">
               <p className=" pb-2 text-xl font-medium ">Number of Users Reported</p>
+
               <div className="w-11/12 pt-2 h-20 border-t-2 border-gray-200">
                 <div className='flex justify-center pt-4'>
                   <p className="font-medium text-6xl text-center">{reportedUsersCount}</p>
@@ -112,12 +123,15 @@ const Moderation = () => {
               <p className="font-medium pl-12">Date</p>
             </div>
             <div className="pl-8 pr-16 pb-5 pt-2">
+              {dataLoading && <p className='text-center text-lg font-semibold p-3'>Loading Data...</p>}
               {reports.map((report, index) => (
                 <div key={index} className="grid grid-cols-4 w-full py-2  border-b-2 border-gray-200">
-                  <p className="font-light">{report.reporter}</p>
-                  <p className="font-light pl-4">{report.message || report.image}</p>
-                  <p className="font-light pl-8">{report.reason}</p>
-                  <p className="font-light pl-12">{report.chatID || report.teamID}</p>
+                  <p className="font-light">{report.sender} <br></br> <span className='text-xs'>{report.reporter}</span></p>
+                  <p className="font-light pl-4">{
+                    (report.message) ? report.message : <span > <image src={report.image} alt="Violation Image"></image></span>
+                  }</p>
+                  <p className="font-light pl-8">{report.policy}</p>
+                  <p className="font-light pl-12">{(new Date(report.date._seconds * 1000 + report.date._nanoseconds / 1000000)).toLocaleString()}</p>
                   <div className="col-span-4 mt-2">
                     <button
                       className="text-blue-500 underline ml-72 text-xs"
@@ -129,9 +143,10 @@ const Moderation = () => {
                       <div className="mt-2 ml-72 py-2 ">
                         <p className="font-medium">Violation Details:</p>
                         <ul className="list-disc pl-5">
-                          {report.violationDetails.map((detail, idx) => (
-                            <li key={idx}>{detail}</li>
-                          ))}
+                          {report.teamId && <li>Team Name: {report.team}</li>}
+                          {report.teamId && <li>Team Id: {report.teamId}</li>}
+                          {report.chatID && <li>Chat Id: {report.chatID}</li>}
+                          {report.reason && <li>Reason: {report.reason}</li>}
                         </ul>
                       </div>
                     )}
