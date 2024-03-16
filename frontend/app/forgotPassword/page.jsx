@@ -5,7 +5,6 @@ import EmailInputField from "../../components/ui/input/emailinput2";
 import Button from "../../components/ui/button/button";
 import fb from "_firebase/firebase";
 
-
 const ForgotPassword = () => {
 
   const [email, setEmail] = useState('');
