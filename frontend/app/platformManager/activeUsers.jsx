@@ -1,14 +1,12 @@
 import dynamic from 'next/dynamic';
 import React, { useEffect, useState } from 'react';
-import { set } from 'react-hook-form';
-
+ 
 const ApexCharts = dynamic(() => import('react-apexcharts'), { ssr: false });
-
+ 
 const ChartComponent = ({ isMonthly }) => {
-  const [chartData, setChartData] = useState([]);
-  const [option, setoption] = useState({});
-  
-
+  const [monthlyActiveUsers, setMonthlyActiveUsers] = useState(0);
+  const [weeklyActiveUsers, setWeeklyActiveUsers] = useState(0);
+ 
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -17,96 +15,74 @@ const ChartComponent = ({ isMonthly }) => {
           throw new Error('Failed to fetch data');
         }
         const jsonData = await response.json();
-        const data = isMonthly ? jsonData.monthly.data : jsonData.weekly.data;
-        setChartData(data);
+        setMonthlyActiveUsers(jsonData.monthly?.activeUserCount || 0);
+        setWeeklyActiveUsers(jsonData.weekly?.activeUserCount || 0);
       } catch (error) {
         console.error('Error fetching data:', error);
+        setMonthlyActiveUsers(0);
+        setWeeklyActiveUsers(0);
       }
     };
-
+ 
     fetchData();
-  }, [isMonthly]);
-
-  useEffect(() => {
-    const options = {
-      colors: ["#1A56DB"],
-      series: [{
-        name: "Active Users",
-        data: chartData.map(item => ({ x: item.x, y: item.y }))
-      }],
-      chart: {
-        type: "bar",
-        height: "100%",
-        fontFamily: "Inter, sans-serif",
-        toolbar: {
-          show: false,
-        },
+  }, []);
+ 
+  const options = {
+    colors: ["rgb(164, 101, 241)", "#FF0000"], // Color for monthly and weekly bars
+    chart: {
+      type: "bar",
+      height: "100%",
+      fontFamily: "Inter, sans-serif",
+      toolbar: {
+        show: false,
       },
-      plotOptions: {
-        bar: {
-          horizontal: false,
-          columnWidth: "70%",
-          borderRadiusApplication: "end",
-          borderRadius: 8,
-        },
+    },
+    plotOptions: {
+      bar: {
+        horizontal: false,
+        columnWidth: "40%",
+        borderRadius: 8,
       },
-      tooltip: {
-        shared: true,
-        intersect: false,
+    },
+    xaxis: {
+      categories: ['Monthly', 'Weekly'],
+      labels: {
         style: {
           fontFamily: "Inter, sans-serif",
+          fontSize: "14px",
         },
       },
-      states: {
-        hover: {
-          filter: {
-            type: "darken",
-            value: 1,
-          },
+    },
+    yaxis: {
+      title: {
+        text: "Active Users",
+        style: {
+          fontFamily: "Inter, sans-serif",
+          fontSize: "14px",
         },
       },
-      stroke: {
-        show: true,
-        width: 0,
-        colors: ["transparent"],
-      },
-      dataLabels: {
-        enabled: false,
-      },
-      legend: {
-        show: false,
-      },
-      xaxis: {
-        floating: false,
-        labels: {
-          show: true,
-          style: {
-            fontFamily: "Inter, sans-serif",
-            cssClass: 'text-xs font-normal fill-gray-500 dark:fill-gray-400'
-          }
-        },
-        axisBorder: {
-          show: false,
-        },
-        axisTicks: {
-          show: false,
-        },
-        categories: chartData.map(item => item.x),
-      },
-      yaxis: {
-        show: false,
-      },
-      fill: {
-        opacity: 1,
-      },
-    };  
-    
-    setoption(options);
-  }, [chartData, isMonthly]);
-
-  return <div id="column-chart" className="h-full">
-    <ApexCharts options={option} series={option.series} type="bar" height="100%" />
-  </div>;
+    },
+    dataLabels: {
+      enabled: false,
+    },
+    legend: {
+      show: false,
+    },
+  };
+ 
+  const series = [
+    {
+      name: "Active Users",
+      data: [monthlyActiveUsers, weeklyActiveUsers],
+    },
+  ];
+ 
+  return (
+<div id="column-chart" className="h-full">
+<ApexCharts options={options} series={series} type="bar" height="100%" />
+</div>
+  );
 };
-
+ 
 export default ChartComponent;
+
