@@ -39,6 +39,23 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
         setShowSettingsOverlay(true); // Use setShowSettingsOverlay to show the settings overlay.
       };
       
+    const loadJQueryAndArticulate = () => {
+        import('jquery').then(jQuery => {
+        window.jQuery = window.$ = jQuery.default; // Ensure jQuery is globally available
+        require('../../../../app/utils/tts/articulate'); // Now we can safely load articulate.js
+        });
+    };
+
+    useEffect(() => {
+        loadJQueryAndArticulate();
+    }, []);
+
+    const readAloud = (text) => {
+        if (window.jQuery) {
+            const speech = new SpeechSynthesisUtterance(text);
+            window.speechSynthesis.speak(speech);
+        }
+    };
     
     useEffect(() => {
         function handleClickOutside(event) {
@@ -62,6 +79,7 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
             title={"Leaderboard"}
             enterDelay={1000}
             leaveDelay={200}
+            onMouseEnter={() => readAloud("Leaderboard")}
           
         > 
                     <EmojiEventsIcon
@@ -77,6 +95,7 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
             }
             enterDelay={1000}
             leaveDelay={200}
+            onMouseEnter={() => readAloud("Notifications")}
           
         > 
                     <NotificationsIcon
@@ -88,6 +107,7 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
             title={"Profile Settings"}
             enterDelay={1000}
             leaveDelay={200}
+            onMouseEnter={() => readAloud("Profile Settings")}
           
         > 
                     <AccountCircleIcon

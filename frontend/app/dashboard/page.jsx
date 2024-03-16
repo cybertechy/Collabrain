@@ -2,7 +2,7 @@
 const fb = require("_firebase/firebase"); // Import the authentication functions
 const socket = require("_socket/socket");
 const { useRouter, useSearchParams } = require("next/navigation");
-const { useEffect, useState, useMemo } = require("react");
+const { useEffect, useState, useMemo, useRef } = require("react");
 import DashboardInfoBar from "../../components/ui/dashboardComponents/dashboardInfoBar";
 import DashboardFolder from "../../components/ui/dashboardComponents/dashboardFolder";
 import DashboardNewFolder from "../../components/ui/dashboardComponents/dashboardNewFolder";
@@ -22,8 +22,7 @@ import {
 } from "../utils/filesAndFolders";
 import { hasUsername } from "../utils/user";
 import LoaderComponent from "../../components/ui/loader/loaderComponent";
-import '../utils/colorblind/accecss.scss';
-import { ColorblindFilterProvider } from '../utils/colorblind/ColorblindFilterContext';
+
 export default function Dashboard() {
     const [user, loading] = fb.useAuthState();
     const [isLoading, setIsLoading] = useState(true);
@@ -79,6 +78,22 @@ export default function Dashboard() {
         { text: "New Document", icon: <DescriptionIcon />, onClick: () => {} },
     ];
 
+    const loadJQueryAndArticulate = () => {
+        import('jquery').then(jQuery => {
+            window.jQuery = window.$ = jQuery.default; // Ensure jQuery is globally available
+            require('../utils/tts/articulate'); // Now we can safely load articulate.js
+        });
+    };
+
+    useEffect(() => {
+        loadJQueryAndArticulate();
+    }, []);
+
+    const readAloud = (ref) => {
+        if (window.jQuery) {
+            window.jQuery(ref.current).articulate('speak');
+        }
+    };
 
 
 
@@ -307,7 +322,6 @@ export default function Dashboard() {
     }, [user, folderChanges,path]);
 
     return (
-        <ColorblindFilterProvider>
         <Template>
             <LoaderComponent
                 isLoading={isLoading}
@@ -337,7 +351,9 @@ export default function Dashboard() {
 
                
                     <div>
-                        <p className="text-2xl text-left text-primary ml-4 mb-4">
+                        <p className="text-2xl text-left text-primary ml-4 mb-4"
+                        ref={folders} 
+                        onMouseEnter={() => readAloud(folders)}>
                             Folders
                         </p>
 
@@ -370,9 +386,12 @@ export default function Dashboard() {
                     </div>
                
                 <div>
-                    <p className="text-2xl text-left text-primary ml-4 mb-4 mt-5">
+                    <p className="text-2xl text-left text-primary ml-4 mb-4 mt-5"
+                    ref={projects} 
+                    onMouseEnter={() => readAloud(projects)}>
                         Projects
                     </p>
+
                     <div
                         className="scrollbar-thin scrollbar-thumb-primary scrollbar-thumb-scrollbar h-full  overflow-auto pr-28"
                         style={{ maxHeight: "500px" }}
@@ -423,6 +442,5 @@ export default function Dashboard() {
                 />
             )}
         </Template>
-        </ColorblindFilterProvider>
     );
 }
