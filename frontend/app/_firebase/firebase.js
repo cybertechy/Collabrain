@@ -1,7 +1,7 @@
 const { app: firebase } = require("_firebase/cli"); // Required for all pages
 const { getAuth, signInWithPopup, GoogleAuthProvider, OAuthProvider,
 	signInWithEmailAndPassword, createUserWithEmailAndPassword,
-	EmailAuthProvider, getAdditionalUserInfo } = require("firebase/auth");
+	EmailAuthProvider, getAdditionalUserInfo,sendPasswordResetEmail } = require("firebase/auth");
 const { Timestamp } = require("firebase/firestore");
 const authHook = require("react-firebase-hooks/auth"); // Required for all pages
 const axios = require("axios");
@@ -20,6 +20,15 @@ const getUserID = () => auth.currentUser?.uid;
 const toFbTimestamp = (date) => Timestamp.fromDate(date);
 const fromFbTimestamp = (timestamp) => timestamp.toDate();
 const useAuthState = () => authHook.useAuthState(auth);
+
+const sendPasswordReset = async (email) => {
+	try {
+	  await sendPasswordResetEmail(auth, email);
+	  return null; // No error if password reset email is sent successfully
+	} catch (error) {
+	  return error.message; // Return error message if sending password reset email fails
+	}
+  };
 
 
 async function emailSignIn(e)
@@ -112,5 +121,6 @@ module.exports = {
 	emailSignUp,
 	serviceSignIn,
 	toFbTimestamp,
-	fromFbTimestamp
+	fromFbTimestamp,
+	sendPasswordReset,
 };
