@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import CloseIcon from '@mui/icons-material/Close';
+const fb = require('_firebase/firebase');
 
 const Overlay = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
@@ -48,10 +49,15 @@ const Moderation = () => {
 
   useEffect(() => {
     const fetchReports = async () => {
+    const token = await fb.getToken(); 
       try {
-        const response = await axios.get('http://localhost:8080/api/report');
+        const response = await axios.get('http://localhost:8080/api/reports', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
         setReports(response.data);
-        // Calculate reported users count
+
         const count = response.data.length;
         setReportedUsersCount(count);
       } catch (error) {
