@@ -29,6 +29,7 @@ export default function Messages() {
     const [withUserInfo, setWithUserInfo] = useState(null);
     const [showChat, setShowChat] = useState(false);
     const [replyTo, setReplyTo] = useState(null);
+    const [showFriends, setShowFriends] = useState(false);
 
     const withUser = params.get("user");
     const chatId = params.get("chatID");
@@ -255,6 +256,7 @@ export default function Messages() {
         router.push("/messages");
     };
     const openChat = (userId, chatId) => {
+        setShowChat(true);
         router.push("/messages?user=" + userId + "&chatID=" + chatId);
     };
 
@@ -271,6 +273,10 @@ export default function Messages() {
                     friendsHandler={() => setShowChat(false)}
                     chatList={directMessages}
                     openChat={openChat}
+                    setShowChat={setShowChat}
+                    showChat={showChat}
+                    setShowFriends={setShowFriends}
+                    showFriends={showFriends}
                     chatHandler={(id, user) => {
                         router.push(`/messages?chatID=${id}&user=${user}`);
                     }}
@@ -283,12 +289,14 @@ export default function Messages() {
                         userInfo={userInfo}
                         withUserInfo={withUserInfo}
                         switchToFriends={openFriends}
+                        setShowFriends={setShowFriends}
+                        showFriends={showFriends}
                         onReact={handleReact}
                         onReply={setReplyTo}
                         replyTo={replyTo}
                     />
                 ) : (
-                    <FriendsWindow />
+                    <FriendsWindow showFriends={showFriends} setShowFriends={setShowFriends}/>
                 )}
             </div>
         </Template>

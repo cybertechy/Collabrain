@@ -14,7 +14,7 @@ import blockedLottie from "@/public/assets/json/blockedLottie.json";
 import recievedRequestsLottie from "@/public/assets/json/recievedRequestsLottie.json";
 import Lottie from "lottie-react";
 
-const FriendsWindow = () => {
+const FriendsWindow = ({showChat, showFriends, setShowFriends}) => {
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -123,7 +123,7 @@ const FriendsWindow = () => {
       console.log("friend Request recieved ", response.data);
       const friendRequests = response.data.map(async (friendRequest) => {
         // Fetch user data for each friend request by ID
-        const userResponse = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/users/${friendRequest}`, {
+        const userResponse = await axios.get(`http://localhost:8080/api/users/${friendRequest}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -263,8 +263,20 @@ const FriendsWindow = () => {
     ))
   ) : renderEmptyState()}
     return (
-      <Box sx={{ width: '100%' }}>
+      
+      <Box sx={{ width: '100%' }} className={`${showChat || showFriends ? '' : 'max-sm:hidden'}`}>
+        <div className="hidden max-sm:flex max-sm:flex-col items-center justify-center p-4 shadow-md bg-gray-100">
+                <h2 className="text-xl text-center font-semibold">Friends</h2>
+                <button 
+                className='hidden max-sm:block ml-auto'
+                onClick={() => {
+                    setShowFriends(false); 
+                    console.log("showFriends",showFriends);
+                    // router.push("/messages"); 
+                }}>Open Chats</button>
+            </div>
       <TopBar activeTab={activeTab} onTabChange={handleTabChange} />
+      {/* <div className='hidden max-sm:block'>open</div> */}
       <SearchBar onSearch={handleSearch} />
       <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
         {visibleList.length > 0 ? (
