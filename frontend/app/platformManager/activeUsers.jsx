@@ -79,7 +79,7 @@ const ChartComponent = ({ isMonthly }) => {
  
   return (
 <div id="column-chart" className="h-full">
-<ApexCharts options={options} series={series} type="bar" height="100%" />
+<ApexCharts  width="100%" options={options} series={series} type="bar" height="100%" />
 </div>
   );
 };

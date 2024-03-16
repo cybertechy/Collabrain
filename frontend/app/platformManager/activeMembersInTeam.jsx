@@ -113,9 +113,10 @@ const LineChart = ({ teamId }) => {
         color="transparent"
         className="flex flex-col gap-4 rounded-none md:flex-row md:items-center"
       >
+        <h2 className="text-base font-semibold"></h2>
       </CardHeader>
       <CardBody className="px-2 pb-0">
-        <Chart {...chartConfig} />
+        <Chart width={"100%"} {...chartConfig} />
       </CardBody>
     </Card>
   );

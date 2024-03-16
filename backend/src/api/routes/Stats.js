@@ -97,7 +97,7 @@ router.get('/active-members', async (req, res) => {
             const teamData = doc.data();
             const activeMembersCount = teamData.activeUserIDs ? teamData.activeUserIDs.length : 0;
             teamsActiveMembersCount.push({
-                teamId: doc.id,
+                teamId: doc.data().name,
                 activeMembersCount
             });
         });
