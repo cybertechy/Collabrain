@@ -80,6 +80,8 @@ export default function Messages() {
                     onReply={setReplyTo}
                     attachments={data.attachments}
                     replyTo={data.replyTo}
+                    userInfo={userInfo}
+                    
                 />,
             ]);
         });
@@ -114,6 +116,27 @@ export default function Messages() {
             }
         };
     }, [user]); // Dependency array is empty to set up the listener once on mount
+    useEffect(() => {
+        if (!user) return;
+        
+        const handleDeleteDirectMessage = (deletedMessage) => {
+            console.log("Received deleteDirectMessage event for message ID:", deletedMessage.messageId);
+            setMessages(currentMessages => currentMessages.filter(messageComponent => 
+                messageComponent.props.messageId !== deletedMessage.messageId
+            ));
+        };
+    
+        if (sockCli.current) {
+            sockCli.current.on("deleteDirectMessage", handleDeleteDirectMessage);
+        }
+    
+        // Cleanup on component unmount
+        return () => {
+            if (sockCli.current) {
+                sockCli.current.off("deleteDirectMessage", handleDeleteDirectMessage);
+            }
+        };
+    }, [user]);
     
     useEffect(() => {
         if (!sockCli.current || !user) return;
@@ -258,6 +281,7 @@ export default function Messages() {
 
     const formatDate = (date) => {
         return new Date(date).toLocaleString("en-US", {
+
             hour12: true, // Use 12-hour clock
             month: "2-digit", // Numeric month, e.g., 3, 4, ...
             day: "2-digit", // Numeric day of the month
@@ -267,6 +291,24 @@ export default function Messages() {
             second: "2-digit", // 2-digit second
         });
     };
+    const onDelete = (messageId) => {
+        // Assuming `chatId` is available in the scope as you mentioned
+        setMessages(currentMessages => currentMessages.filter(messageComponent => 
+            messageComponent.props.messageId !== messageId
+        ));
+        const messageToDelete = {
+            chatId: chatId,
+            msgId: messageId,
+            sentAt:  new Date().toISOString(),
+        };
+    
+        console.log("Emitting deleteDirectMessage event with:", messageToDelete);
+        
+        if (sockCli.current) {
+            sockCli.current.emit("deleteDirectMessage", messageToDelete);
+        }
+    };
+    
     const sendPersonalMsg = async (msg, attachments = []) => {
         if (!sockCli.current) {
             console.error("Socket is not initialized yet.");
@@ -339,6 +381,8 @@ export default function Messages() {
                 userData={userInfo.data}
                 attachmentIds={optimisticMessage.attachments} // Pass the attachment IDs to the MessageItem component
                 messageId={`temp-${Date.now()}`}
+                userInfo={userInfo}
+               
             />,
         ]);
 
@@ -387,7 +431,35 @@ export default function Messages() {
     };
     
     
-
+    const handleEdit = (messageId, editedText) => {
+        let updatedMessage = {};
+        // Prepare the updated messages
+        const messagesCopy = messages.map((messageComponent) => {
+            if (messageComponent.props.messageId === messageId) {
+                updatedMessage = { ...messageComponent.props, message: editedText };
+                // Return an updated component for local state update
+                return React.cloneElement(messageComponent, updatedMessage);
+            }
+            return messageComponent;
+        });
+    
+        // Emit the updateDirectMessage event with updated message text
+        if (sockCli.current) {
+            let sentAt = new Date();
+            // Assuming you have chatId and user information available as in handleReact
+            const messageUpdate = {
+                chat: chatId,
+                sentAt: sentAt.toISOString(),
+                msgId: updatedMessage.messageId,
+                msg:  AES.encrypt(updatedMessage.message, chatId).toString(),
+            };
+            console.log("Emitting updateDirectMessage event with updated message text:", messageUpdate);
+            sockCli.current.emit("updateDirectMessage", messageUpdate);
+        }
+    
+        // Update local state with the modified messages
+        setMessages(messagesCopy);
+    };
     // Handler for the friends button
     const openFriends = () => {
         // Toggles the display between ChatWindow and FriendsWindow
@@ -429,6 +501,8 @@ export default function Messages() {
                         onReact={handleReact}
                         onReply={setReplyTo}
                         replyTo={replyTo}
+                        onEdit={handleEdit}
+                        onDelete={onDelete}
                     />
                 ) : (
                     <FriendsWindow />
