@@ -7,7 +7,7 @@ const PieChart = () => {
   useEffect(() => {
     const fetchUserMetrics = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/stats/random-user-metrics'); // Assuming this is the endpoint to fetch user metrics
+        const response = await fetch('http://localhost:8080/api/stats/random-user-metrics'); 
         if (!response.ok) {
           throw new Error('Failed to fetch user metrics');
         }
@@ -44,17 +44,17 @@ const PieChart = () => {
         options: {
           plugins: {
             legend: {
-              position: 'bottom', // Display legend below the chart
+              position: 'bottom', 
             },
           },
-          maintainAspectRatio: false, // Make the chart responsive
+          maintainAspectRatio: false,
         },
       };
 
       const chartPie = new Chart(document.getElementById("chartPie"), configPie);
 
       return () => {
-        chartPie.destroy(); // Clean up chart instance to prevent memory leaks
+        chartPie.destroy(); 
       };
     }
   }, [userMetrics]);
