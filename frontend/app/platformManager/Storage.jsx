@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 const ApexCharts = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 const DashboardCard = () => {
-  const [dbUsage, setDbUsage] = useState(null);
+  const [dbUsage, setDbUsage] = useState(0);
 
   useEffect(() => {
 
@@ -22,7 +22,7 @@ const DashboardCard = () => {
     series: [
       {
         name: "Database Storage",
-        data: dbUsage !== null ? [dbUsage] : [], 
+        data: [dbUsage],
         color: "#F05252",
       }
     ],
@@ -65,6 +65,7 @@ const DashboardCard = () => {
   return (
     <div className="max-w-screen-lg w-full bg-white rounded-lg  p-4 md:p-6">
       <ApexCharts options={chartOptions} series={chartOptions.series} type="bar" height={chartOptions.chart.height} />
+
       {dbUsage !== null && (
         <div className="text-center mt-4">
           <p className="text-sm text-gray-600">Database Usage: {dbUsage}</p>
