@@ -13,6 +13,7 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import { ToastContainer, toast } from 'react-toastify';
 import { useEffect, useState } from 'react';
 import { hasUsername } from "./utils/user";
+import Link from 'next/link';
 export default function Home() {
     const [user, loading]  = fb.useAuthState();
     const router = useRouter();
@@ -109,10 +110,8 @@ export default function Home() {
                         <EmailInput email={email} setEmail={setemail} placeholder="Email ID"/>
                         <br />
                         <PasswordInput placeholder= "Password" password={password} setPassword={setpassword} />
-                     
-                        
                         <p className="text-sm text-primary font-sans font-light text-left mt-2">
-                            <a href="">Forgot your password?</a>
+                            <Link href="/forgotPassword">Forgot your password?</Link>
                         </p>
                         <Button
                             text="Log In"
