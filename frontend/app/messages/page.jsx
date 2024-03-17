@@ -66,7 +66,7 @@ export default function Messages() {
             setMessages((prevMessage) => [
                 ...prevMessage,
                 <MessageItem
-                    key={`temp-${Date.now()}`}
+                    key={data.id}
                     sender={data.sender}
                     message={data.msg}
                     timestamp={
@@ -74,7 +74,7 @@ export default function Messages() {
                         ", " +
                         sentAt.toLocaleTimeString()
                     }
-                    messageId={`temp-${Date.now()}`}
+                    messageId={data.id}
                     reactions={{}}
                     onReact={handleReact}
                     onReply={setReplyTo}
@@ -95,7 +95,7 @@ export default function Messages() {
         const handleUpdateDirectMessage = (updatedMessage) => {
             console.log("Received updateDirectMessage event:", updatedMessage); 
             setMessages(currentMessages => currentMessages.map(messageComponent => {
-                if (messageComponent.props.messageId === updatedMessage.messageId) {
+                if (messageComponent.props.messageId === updatedMessage.msgId) {
                     // Update the component with new reactions
                     return React.cloneElement(messageComponent, {
                         ...updatedMessage
@@ -122,7 +122,7 @@ export default function Messages() {
         const handleDeleteDirectMessage = (deletedMessage) => {
             console.log("Received deleteDirectMessage event for message ID:", deletedMessage.messageId);
             setMessages(currentMessages => currentMessages.filter(messageComponent => 
-                messageComponent.props.messageId !== deletedMessage.messageId
+                messageComponent.props.messageId !== deletedMessage.msgId
             ));
         };
     
@@ -361,6 +361,7 @@ export default function Messages() {
             sentAt: sentAt.toISOString(),
             attachments: attachmentIds,
             reactions: [],
+        
         };
 
         // Optimistically update the UI with the new message and attachments
@@ -419,7 +420,7 @@ export default function Messages() {
     
         // Emit the updateDirectMessage event with updated reactions
         if (sockCli.current) {
-           
+            console.log("Previous Update message",updatedMessage)
             let sentAt = new Date();
             updatedMessage = {chat: chatId, sentAt: sentAt.toISOString(),  msgId: updatedMessage.messageId, reactions: updatedMessage.reactions}
             console.log("Emitting updateDirectMessage event with updated reactions:",  updatedMessage);

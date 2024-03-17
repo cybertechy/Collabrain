@@ -258,7 +258,6 @@ async function broadcastMessage(data, type = "team", generateID = false, deleteM
 	// send the message to the sender
 	if (generateID) io.to(currLinks[data.senderID]).emit("updateID", { ...data, id: msgID });
 
-
     // Restore the sentAt field
     data.sentAt = DateBackup;
 	data.msgID = msgID;
