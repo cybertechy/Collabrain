@@ -3,12 +3,14 @@ const axios = require("axios");
 
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
+
 const hasUsername = async () => {
     const token = await fb.getToken();
     const uid = fb.getUserID();
     console.log("IN HAS USERNAME, UID:",uid);
+    console.log(SERVERLOCATION)
     try {
-        const res = await axios.get(`${SERVERLOCATION}/api/users/${uid}`, {
+        const res = await axios.get(SERVERLOCATION + `/api/users/${uid}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -26,7 +28,7 @@ const hasUsername = async () => {
 const fetchUser = async (uid) => {
     try {
         const token = await fb.getToken();
-        const response = await axios.get(`${SERVERLOCATION}/api/users/${uid}`, {
+        const response = await axios.get(SERVERLOCATION +   `/api/users/${uid}`, {
             headers: { "Authorization": "Bearer " + token }
         });
        return response.data;

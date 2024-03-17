@@ -133,7 +133,7 @@ export default function Messages() {
         if (!user) return;
 
         const handleDeleteDirectMessage = (deletedMessage) => {
-            console.log("Received deleteDirectMessage event for message ID:", deletedMessage.messageId);
+            console.log("Received deleteDirectMessage event for message ID:", deletedMessage);
             setMessages(currentMessages => currentMessages.filter(messageComponent =>
                 messageComponent.props.messageId !== deletedMessage.id
             ));
