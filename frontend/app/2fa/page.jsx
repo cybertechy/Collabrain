@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 const { useRouter } = require("next/navigation"); 
 import { ToastContainer, toast } from 'react-toastify';
 import Button from "../../components/ui/button/button";
@@ -12,6 +12,8 @@ const fb = require("_firebase/firebase");
 const OTPVerificationPage = () => {
   const router = useRouter();
   const [otp, setOTP] = useState('');
+
+  const [backgroundLoaded, setBackgroundLoaded] = useState(false);
 
   const handleSendOTP = async () => {
     try {
@@ -44,11 +46,43 @@ const OTPVerificationPage = () => {
     }
   };
 
+
+  useEffect(() => {
+    // Preload the background image
+    const img = new Image();
+    img.src = '/assets/images/background.jpg'; // Adjust the path to your background image
+    img.onload = () => {
+        setBackgroundLoaded(true);
+        document.body.classList.add('custom-background');
+    };
+
+    // Remove the custom background class when the component unmounts
+    return () =>
+    {
+        document.body.classList.remove('custom-background');
+    };
+}, []);
+
+if (!backgroundLoaded)
+{
+    return (
+        <div className="flex items-center justify-center min-h-screen">
+            <div className="loader"></div>
+        </div>
+    );
+}
+
   return (
     <div className="max-sm:min-w-full md:w-3/4 lg:w-1/2 mx-auto max-w-md">
+
       <ToastContainer />
+
       <div className="justify-center items-center flex flex-col min-h-screen">
-        
+      <img
+                        className="w-40"
+                        src="./assets/images/logo_whitebackground.png"
+                        alt="Logo"
+                    />
         <form onSubmit={handleOTPVerification} className="bg-basicallylight drop-shadow-lg flex flex-col justify-center items-center px-16 py-10 rounded-2xl">
         <Link href="/">
           
