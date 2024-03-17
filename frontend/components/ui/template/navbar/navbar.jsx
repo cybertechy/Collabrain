@@ -26,7 +26,7 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
         setShowLeaderboard(!showLeaderboard);
     };
     const [showSettingsOverlay, setShowSettingsOverlay] = useState(false);
-    const { speak, isTTSEnabled } = useTTS();
+    const { speak, stop, isTTSEnabled } = useTTS();
 
     const toggleSettingsOverlay = () => {
         setShowSettingsOverlay(!showSettingsOverlay); // Toggle the state
@@ -47,18 +47,6 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
             require('../../../../app/utils/tts/articulate');
         });
     }, []);
-
-    const readAloud = (text) => {
-        if (window.jQuery) {
-            // Create a new utterance for the speech synthesis
-            const speech = new SpeechSynthesisUtterance(text);
-            window.speechSynthesis.speak(speech);
-        }
-    };
-
-    const stopSpeaking = () => {
-        window.speechSynthesis.cancel();
-    };
     
     useEffect(() => {
         function handleClickOutside(event) {
@@ -82,7 +70,7 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
             title={"Leaderboard"}
             enterDelay={1000}
             leaveDelay={200}
-            onMouseEnter={() => readAloud("Leaderboard")}
+            onMouseEnter={() => isTTSEnabled && speak("Leaderboard")}
           
         > 
                     <EmojiEventsIcon
@@ -98,7 +86,7 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
             }
             enterDelay={1000}
             leaveDelay={200}
-            onMouseEnter={() => readAloud("Notifications")}
+            onMouseEnter={() => isTTSEnabled && speak("Notifications")}
           
         > 
                     <NotificationsIcon
@@ -110,7 +98,7 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
             title={"Profile Settings"}
             enterDelay={1000}
             leaveDelay={200}
-            onMouseEnter={() => readAloud("Profile Settings")}
+            onMouseEnter={() => isTTSEnabled && speak("Profile Settings")}
           
         > 
                     <AccountCircleIcon

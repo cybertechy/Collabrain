@@ -114,6 +114,8 @@ const ToggleButtonExample = ({ isToggled, handleToggle }) => {
     );
 };
 const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
+
+    const { speak, stop, isTTSEnabled } = useTTS();
    
   
     const handleButtonClick = (screen) => {
@@ -124,7 +126,10 @@ const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
         return (
             <div className=" h-full w-1/4 bg-basicallylight shadow-md rounded-bl-xl rounded-tl-xl z-50">
              <div className="p-4">
-          <h2 className="text-2xl font-bold">Settings</h2>
+          <h2 className="text-2xl font-bold" 
+          onMouseEnter={() => isTTSEnabled && speak("Settings")}
+          onMouseLeave={stop}>
+            Settings</h2>
           <ul className="mt-4">
             <li>
               <button
@@ -132,6 +137,8 @@ const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
                   currentScreen === "profile" ? "bg-primary text-basicallylight" : ""
                 }`}
                 onClick={() => handleButtonClick("profile")}
+                onMouseEnter={() => isTTSEnabled && speak("Profile")}
+                onMouseLeave={stop}
               >
                 Profile
               </button>
@@ -142,6 +149,9 @@ const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
                   currentScreen === "general" ? "bg-primary text-basicallylight" : ""
                 }`}
                 onClick={() => handleButtonClick("general")}
+                onMouseEnter={() => isTTSEnabled && speak("General")}
+                onMouseLeave={stop}
+                
               >
                 General
               </button>
@@ -152,6 +162,8 @@ const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
                   currentScreen === "sound" ? "bg-primary text-basicallylight" : ""
                 }`}
                 onClick={() => handleButtonClick("sound")}
+                onMouseEnter={() => isTTSEnabled && speak("Sound")}
+                onMouseLeave={stop}
               >
                 Sound
               </button>
@@ -162,6 +174,8 @@ const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
                   currentScreen === "privacy" ? "bg-primary text-basicallylight" : ""
                 }`}
                 onClick={() => handleButtonClick("privacy")}
+                onMouseEnter={() => isTTSEnabled && speak("Privacy")}
+                onMouseLeave={stop}
               >
                 Privacy
               </button>
@@ -174,6 +188,8 @@ const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
                     : ""
                 }`}
                 onClick={() => handleButtonClick("notifications")}
+                onMouseEnter={() => isTTSEnabled && speak("Notifications")}
+                onMouseLeave={stop}
               >
                 Notifications
               </button>
@@ -186,6 +202,8 @@ const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
                     : ""
                 }`}
                 onClick={() => handleButtonClick("accessibility")}
+                onMouseEnter={() => isTTSEnabled && speak("Accessibility")}
+                onMouseLeave={stop}
               >
                 Accessibility
               </button>
@@ -197,6 +215,7 @@ const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
   };
   
   const SettingsOverlay = ({ onClose }) => {
+    const { speak, stop, isTTSEnabled } = useTTS();
     const [currentScreen, setCurrentScreen] = useState("profile");
     const [user, loading] = fb.useAuthState();
     if (loading|| !user )
@@ -226,6 +245,9 @@ const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
                         <CloseIcon
                             className="text-basicallydark"
                             fontSize="large"
+                            onMouseEnter={() => isTTSEnabled && speak("Close settings")}
+                            onMouseLeave={stop}
+                            
                         />
                     </button>
 
@@ -772,7 +794,7 @@ const AccessibilityOverlay = () => {
     const [colorblindDialogOpen, setColorblindDialogOpen] = useState(false);
     const [selectedFilter, setSelectedFilter] = useState('None');
     const { setColorblindFilter } = useColorblindFilter();
-    const { isTTSEnabled, toggleTTS } = useTTS();
+    const { speak, stop, isTTSEnabled, toggleTTS } = useTTS();
 
     const colorblindOptions = [
         'None', 'Achromatopsia', 'Achromatomaly', 'Deuteranomaly', 'Deuteranopia', 
@@ -809,7 +831,9 @@ const AccessibilityOverlay = () => {
            {/* RIGHT SIDE */}
                 <div className="  w-full overflow-auto ">
                     <div className="mb-4 flex justify-between">
-                        <p className="text-2xl text-basicallydark">
+                        <p className="text-2xl text-basicallydark" 
+                        onMouseEnter={() => isTTSEnabled && speak("Text-to-speech")}
+                            onMouseLeave={stop}>
                             Text-to-speech (TTS)
                         </p>
                         <ToggleButtonExample
@@ -818,23 +842,31 @@ const AccessibilityOverlay = () => {
                         />
                     </div>
                     <div className="mb-4 flex justify-between">
-                        <p className="text-2xl text-basicallydark">
+                        <p className="text-2xl text-basicallydark"
+                        onMouseEnter={() => isTTSEnabled && speak("Font size")}
+                        onMouseLeave={stop}>
                             Font-size
                         </p>
                         <button 
                             className="text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3"
                             onClick={handleConfigureFontSize}
+                            onMouseEnter={() => isTTSEnabled && speak("Configure font size")}
+                            onMouseLeave={stop}
                         >
                             Configure
                         </button>
                     </div>
                     <div className="mb-4 flex justify-between">
-                        <p className="text-2xl text-basicallydark">
+                        <p className="text-2xl text-basicallydark"
+                        onMouseEnter={() => isTTSEnabled && speak("Colorblind Filters")}
+                        onMouseLeave={stop}>
                             Colorblind Filters
                         </p>
                         <button 
                             className="text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3"
                             onClick={handleConfigureColorblindFilters}
+                            onMouseEnter={() => isTTSEnabled && speak("Configure colorblind filters")}
+                            onMouseLeave={stop}
                         >
                             Configure
                         </button>

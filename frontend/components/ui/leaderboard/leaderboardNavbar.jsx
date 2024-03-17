@@ -3,10 +3,12 @@ import axios from 'axios';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
 import QueryBuilderIcon from '@mui/icons-material/QueryBuilder';
 import { IconButton, Button } from '@mui/material';
+import { useTTS } from "../../../app/utils/tts/TTSContext";
 
 const fb = require('_firebase/firebase');
 
 const LeaderboardNavbar = ({ user }) => {
+    const { speak, stop, isTTSEnabled } = useTTS();
     const [showAnimation, setShowAnimation] = useState(false);
     const [leaderboardData, setLeaderboardData] = useState({
         remainingDays: 2,
@@ -54,7 +56,10 @@ const LeaderboardNavbar = ({ user }) => {
             }`}
             style={{ transformOrigin: 'top' }}
         >
-            <div className="text-xl text-center mb-4 font-poppins">League Leaderboard</div>
+            <div className="text-xl text-center mb-4 font-poppins" 
+            onMouseEnter={() => isTTSEnabled && speak("League Leaderboard")}
+            onMouseLeave={stop}
+            >League Leaderboard</div>
 
             {/* Rest of the component remains unchanged */}
 
@@ -73,7 +78,9 @@ const LeaderboardNavbar = ({ user }) => {
                 ))}
                 {leaderboardData.teams.length > 3 && ( // Only show if there are more than 3 teams
                     <div className="text-center mt-4">
-                        <Button sx={{color:'white'}} variant="text" onClick={handleViewMore}>
+                        <Button sx={{color:'white'}} variant="text" onClick={handleViewMore}
+                        onMouseEnter={() => isTTSEnabled && speak(showMore ? 'View Less' : 'View More')}
+                        onMouseLeave={stop}>
                             {showMore ? 'View Less' : 'View More'}
                         </Button>
                     </div>

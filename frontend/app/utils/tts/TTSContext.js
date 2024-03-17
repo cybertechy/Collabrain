@@ -4,7 +4,6 @@ const TTSContext = createContext();
 
 export const TTSProvider = ({ children }) => {
     const [isTTSEnabled, setIsTTSEnabled] = useState(() => {
-        // Check if window is defined to avoid accessing localStorage during server-side rendering
         if (typeof window !== 'undefined') {
             const storedState = localStorage.getItem('isTTSEnabled');
             return storedState !== null ? JSON.parse(storedState) : false;
@@ -12,7 +11,6 @@ export const TTSProvider = ({ children }) => {
         return false;
     });
 
-    // Effect to store state in localStorage when it changes
     useEffect(() => {
         if (typeof window !== 'undefined') {
             localStorage.setItem('isTTSEnabled', JSON.stringify(isTTSEnabled));
@@ -30,8 +28,14 @@ export const TTSProvider = ({ children }) => {
         }
     };
 
+    const stop = () => {
+        if (window.speechSynthesis) {
+            window.speechSynthesis.cancel();
+        }
+    };
+
     return (
-        <TTSContext.Provider value={{ isTTSEnabled, toggleTTS, speak }}>
+        <TTSContext.Provider value={{ isTTSEnabled, toggleTTS, speak, stop }}>
             {children}
         </TTSContext.Provider>
     );

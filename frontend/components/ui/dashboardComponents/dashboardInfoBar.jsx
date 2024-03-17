@@ -6,7 +6,7 @@ import { useTTS } from "../../../app/utils/tts/TTSContext";
 
 const DashboardInfoBar = ({ currentPath, onSort, sortCriteria}) => {
 
-  const { speak, isTTSEnabled } = useTTS();
+  const { speak, stop, isTTSEnabled } = useTTS();
 
   useEffect(() => {
     import('jquery').then(jQuery => {
@@ -77,19 +77,27 @@ const DashboardInfoBar = ({ currentPath, onSort, sortCriteria}) => {
                         {
                             name: "Name",
                             onClick: () => toggleSortOrder('name'),
+                            onMouseEnter: () => isTTSEnabled && speak("Sort by name"),
+                            onMouseLeave: stop,
                         },
                         {
                             name: "Date Modified",
                             onClick: () => toggleSortOrder('date'),
+                            onMouseEnter: () => isTTSEnabled && speak("Sort by date modified"),
+                            onMouseLeave: stop,
                         },
                     ]}
+                    speak={speak}
+                    stop={stop}
+                    onMouseEnterTitle={() => isTTSEnabled && speak(sortCriteria.sortName ? "Sort files. Currently sorted by name." : "Sort files. Currently sorted by date modified.")}
+                    onMouseLeaveTitle={stop}
                 />
                 {sortCriteria.isAscending ? (
                     <ArrowCircleUp className="text-primary cursor-pointer" fontSize="large" 
-                    onClick={toggleAscending} onMouseEnter={() => isTTSEnabled && speak("Ascending Order")} />
+                    onClick={toggleAscending} onMouseEnter={() => isTTSEnabled && speak("Ascending Order")} onMouseLeave={stop}/>
                 ) : (
                     <ArrowCircleDown className="text-primary cursor-pointer" fontSize="large" 
-                    onClick={toggleAscending} onMouseEnter={() => isTTSEnabled && speak("Descending Order")}/>
+                    onClick={toggleAscending} onMouseEnter={() => isTTSEnabled && speak("Descending Order")} onMouseLeave={stop}/>
                 )}
             </div>
         </div>
