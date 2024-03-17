@@ -125,8 +125,9 @@ async function deleteQueryBatch(query, resolve) {
 async function saveTeamMsg(data, newMessage = false) {
 	let channels = (await db.collection(`teams/${data.team}/channels/`).where("name", "==", data.channel).get());
 	let channelID = channels.docs[0].id;
+	if(!data.id) return console.log("No message ID provided");
 	db.collection(`teams/${data.team}/channels/${channelID}/messages`)
-		.doc(data.msgID)
+		.doc(data.id)
 		.set({
 			"message": data.msg,
 			"sender": data.senderID,
@@ -248,10 +249,12 @@ async function saveTeamMsg(data, newMessage = false) {
 async function saveDirectMsg(data, newMessage = false) {
 	// convert sent at to firebase timestamp seconds and nanoseconds
 	let sentAt = admin.firestore.Timestamp.fromDate(new Date(data.sentAt));
+
+	if(!data.id) return console.log("No message ID provided");
 	// Save message to chat
 	if (newMessage)
 	db.collection(`chats/${data.chat}/messages`)
-		.doc(data.msgID)
+		.doc(data.id)
 		.set({
 			"message": data.msg,
 			"sender": data.sender,
@@ -265,7 +268,7 @@ async function saveDirectMsg(data, newMessage = false) {
 			if(data.msg) updateData.message = data.msg;
 			if(data.attachments) updateData.attachments = data.attachments;
 			if(data.reactions) updateData.reactions = data.reactions;
-			db.collection(`chats/${data.chat}/messages`).doc(data.msgID).update(updateData);
+			db.collection(`chats/${data.chat}/messages`).doc(data.id).update(updateData);
 		}
 	if (newMessage) {
 		// This part is for Points (Check no.of messages)
