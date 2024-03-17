@@ -11,6 +11,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { getMedia } from '@/app/utils/storage';
+import {reportMessage} from '@/app/utils/messages';
 const commonReactions = [
   { emoji: '👍', label: 'thumbs up' },
   { emoji: '👎', label: 'thumbs down' },
@@ -21,7 +22,7 @@ const commonReactions = [
   { emoji: '😢', label: 'sad' },
 ];
 
-function MessageItem({ sender, timestamp, message, messageId, attachmentIds, reactions = {}, onReact, onEdit, onDelete, userInfo}) {
+function MessageItem({ sender, senderId, timestamp, message, messageId, attachmentIds, reactions = {}, onReact, onEdit, onDelete, userInfo, chatId }) {
   const [attachments, setAttachments] = useState([]);
   const [loadingAttachments, setLoadingAttachments] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -29,7 +30,10 @@ function MessageItem({ sender, timestamp, message, messageId, attachmentIds, rea
   const [editedMessage, setEditedMessage] = useState(message);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [tempEditedMessage, setTempEditedMessage] = useState(message); 
-
+  const [showReportDialog, setShowReportDialog] = useState(false);
+  const [reportReason, setReportReason] = useState('');
+  const [additionalComments, setAdditionalComments] = useState('');
+  
   const handleEditSave = () => {
     if (tempEditedMessage.trim() !== '') {
       setEditedMessage(tempEditedMessage); // Update the local state optimistically
@@ -37,7 +41,26 @@ function MessageItem({ sender, timestamp, message, messageId, attachmentIds, rea
       setEditMode(false); // Exit edit mode
     }
   };
-
+  const onReport = () => {
+    setShowReportDialog(true);
+  };
+  const handleReport = async () => {
+    // Assuming you have the necessary information like chatId or teamId
+    const reportDetails = {
+      chatId: chatId, // You need to pass the correct chatId or teamId based on your app's context
+      messageId: messageId,
+      reason: reportReason + additionalComments? `: ${additionalComments}` : "",
+      source: "user", // or "team", depending on your context
+      sender: senderId,
+      message: editedMessage,
+      image: attachmentIds.length > 0 ? attachmentIds : null,
+    };
+  
+    await reportMessage(reportDetails);
+    setShowReportDialog(false);
+    setReportReason('');
+    setAdditionalComments('');
+  };
   const handleDelete = () => {
     onDelete(messageId);
     setEditedMessage('This message has been deleted.');
@@ -202,7 +225,7 @@ function MessageItem({ sender, timestamp, message, messageId, attachmentIds, rea
        
          
         </div>
-        {(sender == userInfo?.data?.username) && (   
+       
         <div>
           <div className="absolute -top-10 right-0 flex items-center bg-white rounded-t-full shadow-xl border-2 p-1" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
             <IconButton size="small" onClick={() => setMenuVisible(!menuVisible)} title="Options">
@@ -211,12 +234,50 @@ function MessageItem({ sender, timestamp, message, messageId, attachmentIds, rea
             {menuVisible && (
               <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-xl z-10">
                 <ul>
+                {(sender == userInfo?.data?.username) && (
+                  <div>   
                   <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={() => setEditMode(true)}>Edit Message</li>
                   <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={() => setShowDeleteConfirm(true)}>Delete Message</li>
+                  </div>
+                  )}
+                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={(onReport)}>Report Message</li>
                 </ul>
               </div>
             )}
           </div>
+          <Dialog open={showReportDialog} onClose={() => setShowReportDialog(false)}>
+  <DialogTitle>{"Report Message"}</DialogTitle>
+  <DialogContent>
+    <DialogContentText>
+      Please select a reason for reporting this message.
+    </DialogContentText>
+    <select
+      className="w-full mt-2 border-gray-300 rounded-md shadow-sm"
+      value={reportReason}
+      onChange={(e) => setReportReason(e.target.value)}
+    >
+      <option value="">Select a reason</option>
+      <option value="spam">Spam</option>
+      <option value="abuse">Abuse</option>
+      <option value="other">Other</option>
+    </select>
+    {reportReason === 'other' && (
+      <textarea
+        className="w-full mt-2 border-gray-300 rounded-md shadow-sm"
+        placeholder="Please provide additional comments"
+        value={additionalComments}
+        onChange={(e) => setAdditionalComments(e.target.value)}
+      ></textarea>
+    )}
+  </DialogContent>
+  <DialogActions>
+    <Button onClick={() => setShowReportDialog(false)}>Cancel</Button>
+    <Button onClick={() => handleReport()} color="primary">
+      Report
+    </Button>
+  </DialogActions>
+</Dialog>
+
           <Dialog open={showDeleteConfirm} onClose={() => setShowDeleteConfirm(false)}>
             <DialogTitle>{"Delete Message?"}</DialogTitle>
             <DialogContent>
@@ -231,7 +292,7 @@ function MessageItem({ sender, timestamp, message, messageId, attachmentIds, rea
               </Button>
             </DialogActions>
           </Dialog>
-          </div>)}
+          </div>
         </div>
       )}
     </div>

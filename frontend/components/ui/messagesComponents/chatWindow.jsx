@@ -6,7 +6,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CustomAvatar from "@/components/ui/messagesComponents/avatar";
 import MessageItem from "./MessageItem";
 
-export default function ChatWindow({ messages, setMessages, sendPersonalMsg, withUserInfo,userInfo, switchToFriends ,onReact, onReply, replyTo , onEdit, onDelete}) {
+export default function ChatWindow({ messages, setMessages, sendPersonalMsg, withUserInfo,userInfo, switchToFriends ,onReact, onReply, replyTo , onEdit, onDelete,chatId }) {
   const [title, setTitle] = useState(withUserInfo?.username || 'User');
   const messagesEndRef = useRef(null); // Create a ref for the scrolling target
 
@@ -38,7 +38,7 @@ export default function ChatWindow({ messages, setMessages, sendPersonalMsg, wit
       <div className="flex-auto overflow-y-scroll p-5 mb-[76px]  max-h-[calc(100vh-160px)] sm:max-h-[calc(100vh-180px)] md:max-h-[calc(100vh-200px)] lg:max-h-[calc(100vh-220px)] xl:max-h-[calc(100vh-240px)]">
        <div className="mt-10"></div>
         {messages?.map((message) => (
-          <MessageItem key={message?.key} {...message?.props} onReact = {onReact} onReply ={onReply} onEdit = {onEdit} onDelete = {onDelete}   userInfo={userInfo}
+          <MessageItem key={message?.key} {...message?.props} onReact = {onReact} onReply ={onReply} onEdit = {onEdit} onDelete = {onDelete}   userInfo={userInfo} chatId = {chatId}
           />
         ))}
         <div ref={messagesEndRef} /> {/* Invisible element at the end of messages */}

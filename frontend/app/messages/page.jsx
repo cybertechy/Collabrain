@@ -68,6 +68,7 @@ export default function Messages() {
                 <MessageItem
                     key={`temp-${Date.now()}`}
                     sender={data.sender}
+                    senderId= {data.senderId}
                     message={data.msg}
                     timestamp={
                         sentAt.toDateString() +
@@ -81,6 +82,7 @@ export default function Messages() {
                     attachments={data.attachments}
                     replyTo={data.replyTo}
                     userInfo={userInfo}
+                    chatId = {chatId}
                     
                 />,
             ]);
@@ -376,12 +378,14 @@ export default function Messages() {
             <MessageItem
                 key={`temp-${Date.now()}`}
                 sender={optimisticMessage.sender}
+                senderId = {messageData.senderID}
                 timestamp={optimisticMessage.sentAt}
                 message={optimisticMessage.msg}
                 userData={userInfo.data}
                 attachmentIds={optimisticMessage.attachments} // Pass the attachment IDs to the MessageItem component
                 messageId={`temp-${Date.now()}`}
                 userInfo={userInfo}
+                chatId = {chatId}
                
             />,
         ]);
@@ -503,6 +507,7 @@ export default function Messages() {
                         replyTo={replyTo}
                         onEdit={handleEdit}
                         onDelete={onDelete}
+                        chatId = {chatId}
                     />
                 ) : (
                     <FriendsWindow />
