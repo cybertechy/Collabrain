@@ -2,7 +2,7 @@
 const fb = require("_firebase/firebase"); // Import the authentication functions
 const socket = require("_socket/socket");
 const { useRouter, useSearchParams } = require("next/navigation");
-const { useEffect, useState, useMemo, useRef } = require("react");
+const { useEffect, useState, useMemo } = require("react");
 import DashboardInfoBar from "../../components/ui/dashboardComponents/dashboardInfoBar";
 import DashboardFolder from "../../components/ui/dashboardComponents/dashboardFolder";
 import DashboardNewFolder from "../../components/ui/dashboardComponents/dashboardNewFolder";
@@ -60,6 +60,25 @@ export default function Dashboard() {
 
     const router = useRouter();
 
+    useEffect(() => {
+        import('jquery').then(jQuery => {
+            window.jQuery = window.$ = jQuery.default;
+            require('../utils/tts/articulate');
+        });
+    }, []);
+
+    const readAloud = (text) => {
+        if (window.jQuery) {
+            // Create a new utterance for the speech synthesis
+            const speech = new SpeechSynthesisUtterance(text);
+            window.speechSynthesis.speak(speech);
+        }
+    };
+
+    const stopSpeaking = () => {
+        window.speechSynthesis.cancel();
+    };
+
     const contextMenuOptions = [
         {
             text: "New Folder",
@@ -77,23 +96,6 @@ export default function Dashboard() {
         },
         { text: "New Document", icon: <DescriptionIcon />, onClick: () => {} },
     ];
-
-    const loadJQueryAndArticulate = () => {
-        import('jquery').then(jQuery => {
-            window.jQuery = window.$ = jQuery.default; // Ensure jQuery is globally available
-            require('../utils/tts/articulate'); // Now we can safely load articulate.js
-        });
-    };
-
-    useEffect(() => {
-        loadJQueryAndArticulate();
-    }, []);
-
-    const readAloud = (ref) => {
-        if (window.jQuery) {
-            window.jQuery(ref.current).articulate('speak');
-        }
-    };
 
 
 
@@ -351,9 +353,7 @@ export default function Dashboard() {
 
                
                     <div>
-                        <p className="text-2xl text-left text-primary ml-4 mb-4"
-                        ref={folders} 
-                        onMouseEnter={() => readAloud(folders)}>
+                        <p className="text-2xl text-left text-primary ml-4 mb-4" ref={folders}>
                             Folders
                         </p>
 
@@ -386,9 +386,7 @@ export default function Dashboard() {
                     </div>
                
                 <div>
-                    <p className="text-2xl text-left text-primary ml-4 mb-4 mt-5"
-                    ref={projects} 
-                    onMouseEnter={() => readAloud(projects)}>
+                    <p className="text-2xl text-left text-primary ml-4 mb-4 mt-5" ref={projects}>
                         Projects
                     </p>
 

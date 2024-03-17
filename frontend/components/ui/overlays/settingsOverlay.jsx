@@ -10,6 +10,7 @@ import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, B
 import { useRouter } from 'next/navigation';
 import jsPDF from 'jspdf';
 import { useColorblindFilter } from '../../../app/utils/colorblind/ColorblindFilterContext';
+import { useTTS } from "../../../app/utils/tts/TTSContext";
 
 const fb = require("_firebase/firebase");
 
@@ -775,6 +776,7 @@ const AccessibilityOverlay = () => {
     const [colorblindDialogOpen, setColorblindDialogOpen] = useState(false);
     const [selectedFilter, setSelectedFilter] = useState('None');
     const { setColorblindFilter } = useColorblindFilter();
+    const { isTTSEnabled, toggleTTS } = useTTS();
 
     const colorblindOptions = [
         'None', 'Achromatopsia', 'Achromatomaly', 'Deuteranomaly', 'Deuteranopia', 
@@ -813,12 +815,10 @@ const AccessibilityOverlay = () => {
                         <p className="text-2xl text-basicallydark">
                             Text-to-speech (TTS)
                         </p>
-                        <button 
-                            className="text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3"
-                            onClick={handleConfigureTTS}
-                        >
-                            Configure
-                        </button>
+                        <ToggleButtonExample
+                            isToggled={isTTSEnabled}
+                            handleToggle={toggleTTS}
+                        />
                     </div>
                     <div className="mb-4 flex justify-between">
                         <p className="text-2xl text-basicallydark">
