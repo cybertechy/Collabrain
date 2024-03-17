@@ -473,7 +473,7 @@ export default function Messages() {
     };
 
     return (
-        <Template>
+        <>
             <LoaderComponent
                 isLoading={isLoading}
                 loadingState={loadingState}
@@ -509,6 +509,6 @@ export default function Messages() {
                     <FriendsWindow />
                 )}
             </div>
-        </Template>
+        </>
     );
 }

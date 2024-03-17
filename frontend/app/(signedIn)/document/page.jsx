@@ -21,8 +21,8 @@ import WorkingJSON from "_public/assets/json/Working.json";
 
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
-
-export default function Editor() {
+export default function Editor()
+{
 	const router = useRouter();
 	const [user, loading] = fb.useAuthState();
 	const searchParams = useSearchParams();
@@ -41,16 +41,19 @@ export default function Editor() {
 	const [isSaved, setIsSaved] = useState(true);
 
 	// Redirect to dashboard if no document is specified
-	useEffect(() => {
-		if (searchParams.get('id') == null) {
+	useEffect(() =>
+	{
+		if (searchParams.get('id') == null)
+		{
 			// No document selected
 			// Redirect to dashboard
-			if(router?.push) router.push("/dashboard");
+			if (router?.push) router.push("/dashboard");
 		}
-	}, [searchParams,router]);
+	}, [searchParams, router]);
 
 	// Generate random color for cursor
-	const randomColor = () => {
+	const randomColor = () =>
+	{
 		const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
 		var h = randomInt(0, 360);
 		var s = randomInt(42, 98);
@@ -60,11 +63,13 @@ export default function Editor() {
 
 	// Setup socket and event listeners
 	let sockCli = useRef(null);
-	useEffect(() => {
+	useEffect(() =>
+	{
 		if (!user) return;
 
 		// Get user data
-		fb.getToken().then(token => {
+		fb.getToken().then(token =>
+		{
 			axios.get(`${SERVERLOCATION}/api/users/${user.uid}`, {
 				headers: {
 					"Authorization": `Bearer ${token}`
@@ -74,11 +79,13 @@ export default function Editor() {
 
 		// Setup socket and event listeners
 		sockCli.current = socket.init(SERVERLOCATION) || {};
-		sockCli.current.on('get-doc-changes', delta => {
+		sockCli.current.on('get-doc-changes', delta =>
+		{
 			quillRef.current.getEditor().updateContents(delta);
 		});
 
-		sockCli.current.on('get-doc-cursor-changes', data => {
+		sockCli.current.on('get-doc-cursor-changes', data =>
+		{
 			// Create a cursor for the user if it doesn't exist
 			const cursor = quillRef.current.getEditor().getModule('cursors');
 			cursor.createCursor(data.username, data.username, randomColor()); // Username is id since it's unique
@@ -86,26 +93,30 @@ export default function Editor() {
 		});
 
 		// Cleanup event listeners
-		return () => {
+		return () =>
+		{
 			sockCli.current.off('get-doc-changes');
 			sockCli.current.off('get-doc-cursor-changes');
 		};
 	}, [user]);
 
 	// Load document
-	useEffect(() => {
+	useEffect(() =>
+	{
 		if (!user || !userData || !sockCli.current)
 			return;
 
 		const id = searchParams.get('id');
 		// Get document
-		fb.getToken().then(token => {
+		fb.getToken().then(token =>
+		{
 			axios.get(`${SERVERLOCATION}/api/docs/${id}`, {
 				headers: {
 					"Authorization": `Bearer ${token}`
 				}
 			})
-				.then(res => {
+				.then(res =>
+				{
 					setFileData(res.data);
 					setDocName(res.data.name);
 					setOciID(res.data.data);
@@ -114,7 +125,8 @@ export default function Editor() {
 					if (res.data.access[userData.uid] != "view")
 						setIsDisabled(false);
 				})
-				.catch(err => {
+				.catch(err =>
+				{
 					console.log(err.response.data.error);
 					setLoadFailed(err.response.data.error);
 				});
@@ -125,44 +137,40 @@ export default function Editor() {
 	}, [user, userData]);
 
 	// Signing in animation
-	if (loading || !user || !userData) {
+	if (loading || !user || !userData)
+	{
 		return (
-			<Template>
-				<div className="bg-[#F3F3F3] w-screen h-full flex flex-col justify-center items-center text-basicallydark">
-					<Lottie animationData={LoadingJSON} style={{ width: 300, height: 300 }} />
-					<h1 className="text-2xl font-bold text-primary px-10">Loading...</h1>
-				</div>
-			</Template>
+			<div className="bg-[#F3F3F3] w-screen h-full flex flex-col justify-center items-center text-basicallydark">
+				<Lottie animationData={LoadingJSON} style={{ width: 300, height: 300 }} />
+				<h1 className="text-2xl font-bold text-primary px-10">Loading...</h1>
+			</div>
 		);
 	}
 
 	// Failed to load animation
-	if (loadFailed) {
+	if (loadFailed)
+	{
 		return (
-			<Template>
-				<div className="bg-[#F3F3F3] w-screen h-full flex flex-col justify-center items-center text-basicallydark">
-					<Lottie animationData={ErrorJSON} style={{ width: 300, height: 300 }} />
-					<h1 className="text-2xl font-bold text-primary px-10 text-center"> {loadFailed} </h1>
-				</div>
-			</Template>
+			<div className="bg-[#F3F3F3] w-screen h-full flex flex-col justify-center items-center text-basicallydark">
+				<Lottie animationData={ErrorJSON} style={{ width: 300, height: 300 }} />
+				<h1 className="text-2xl font-bold text-primary px-10 text-center"> {loadFailed} </h1>
+			</div>
 		);
 	}
 
 	// Loading animation
-	if (!fileData || !ociID || !docName) {
+	if (!fileData || !ociID || !docName)
+	{
 		return (
-			<Template>
-				<div className="bg-[#F3F3F3] w-screen h-full flex flex-col justify-center items-center text-basicallydark">
-					<Lottie animationData={WorkingJSON} style={{ width: 300, height: 300 }} />
-					<h1 className="text-2xl font-bold text-primary px-10 text-center"> Working to load the Doc ... </h1>
-				</div>
-			</Template>
+			<div className="bg-[#F3F3F3] w-screen h-full flex flex-col justify-center items-center text-basicallydark">
+				<Lottie animationData={WorkingJSON} style={{ width: 300, height: 300 }} />
+				<h1 className="text-2xl font-bold text-primary px-10 text-center"> Working to load the Doc ... </h1>
+			</div>
 		);
-
 	}
 
 	return (
-		<Template>
+		<div>
 			{user && fileData &&
 				<FileToolbar userID={user.uid} name={docName} commentsEnabled={true} showCommentButton={showCommentButton}
 					fileType="doc" fileID={searchParams.get('id')} fileData={fileData} isSaved={isSaved} />
@@ -176,6 +184,6 @@ export default function Editor() {
 						setShowCommentButton={setShowCommentButton} setIsSaved={setIsSaved} />
 				</div>
 			</div>
-		</Template>
+		</div>
 	);
 }

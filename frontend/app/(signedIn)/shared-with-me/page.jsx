@@ -84,7 +84,7 @@ export default function SharedWithMe() {
   }), [projects, sortCriteria]);
 
   return (
-    <Template>
+    <div>
       <LoaderComponent
         isLoading={isLoading || isProjectsLoading || isSharedContentMapsLoading}
         loadingState={loadingState}
@@ -131,6 +131,6 @@ export default function SharedWithMe() {
           </div>
         )}
       </div>
-    </Template>
+    </div>
   );
 }
