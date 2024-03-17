@@ -25,7 +25,7 @@ router.post("/folder", async (req, res) => {
 	// Create new folder
 	fb.db.collection(`users/${user.uid}/folders/`).add({
 		name: req.body.name,
-		path: req.body.path + req.body.name,
+		path: req.body.path,
 		color: req.body.color,
 	})
 		.then(ref => res.status(200).json({ message: "Folder created", folderID: ref.id, path: req.body.path + req.body.name }))
