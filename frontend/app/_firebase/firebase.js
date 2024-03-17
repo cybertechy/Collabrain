@@ -41,8 +41,17 @@ async function emailSignIn(e)
 	try { result = await signInWithEmailAndPassword(auth, email.value, password.value); }
 	catch (err)
 	{
-		if (error.code == "auth/cancelled-popup-request") return;
-		return (err.code).slice(5);
+
+		if (err.code === "auth/user-not-found") return {error: "User not found"};
+		if(err.code === "auth/invalid-credential") return {error: "Invalid credentials"};
+		if(err.code === "auth/wrong-password") return {error: "Invalid credentials"};
+		if(err.code === "auth/too-many-requests") return {error: "Too many requests, please try again later"};
+		if(err.code === "auth/user-disabled") return {error: "User account is disabled"};
+		if(err.code === "auth/network-request-failed") return {error: "Network error, please try again later"};
+		if(err.code === "auth/invalid-email") return {error: "Invalid email"};
+		if(err.code === "auth/operation-not-allowed") return {error: "Operation not allowed"};
+		if(err.code === "auth/internal-error") return {error: "Internal error"};
+		return {error: err.message};
 	}
 }
 
