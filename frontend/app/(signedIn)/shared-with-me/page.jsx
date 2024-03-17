@@ -2,16 +2,16 @@
 import { useEffect, useState, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Lottie from "lottie-react";
-import smallLoader from "../../public/assets/json/smallLoaderLottie.json";
+import smallLoader from "_public/assets/json/smallLoaderLottie.json";
 import {
   fetchSharedProjects,
   fetchSharedContentMaps,
-} from "../utils/sharedFiles";
-import DashboardInfoBar from "../../components/ui/dashboardComponents/dashboardInfoBar";
-import DashboardProjectButton from "../../components/ui/dashboardComponents/dashboardProjectButton";
-import ContextMenu from "../../components/ui/contextMenu/contextMenu";
+} from "../../utils/sharedFiles";
+import DashboardInfoBar from "_components/ui/dashboardComponents/dashboardInfoBar";
+import DashboardProjectButton from "_components/ui/dashboardComponents/dashboardProjectButton";
+import ContextMenu from "_components/ui/contextMenu/contextMenu";
 import Template from "@/components/ui/template/template";
-import LoaderComponent from "../../components/ui/loader/loaderComponent";
+import LoaderComponent from "_components/ui/loader/loaderComponent";
 import { useAuthState } from "_firebase/firebase"; // Adjust based on actual path to useAuthState
 
 export default function SharedWithMe() {

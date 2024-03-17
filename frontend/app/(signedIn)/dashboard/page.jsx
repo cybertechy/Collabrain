@@ -3,25 +3,25 @@ const fb = require("_firebase/firebase"); // Import the authentication functions
 const socket = require("_socket/socket");
 const { useRouter, useSearchParams } = require("next/navigation");
 const { useEffect, useState, useMemo } = require("react");
-import DashboardInfoBar from "../../components/ui/dashboardComponents/dashboardInfoBar";
-import DashboardFolder from "../../components/ui/dashboardComponents/dashboardFolder";
-import DashboardNewFolder from "../../components/ui/dashboardComponents/dashboardNewFolder";
-import DashboardProjectButton from "../../components/ui/dashboardComponents/dashboardProjectButton";
+import DashboardInfoBar from "_components/ui/dashboardComponents/dashboardInfoBar";
+import DashboardFolder from "_components/ui/dashboardComponents/dashboardFolder";
+import DashboardNewFolder from "_components/ui/dashboardComponents/dashboardNewFolder";
+import DashboardProjectButton from "_components/ui/dashboardComponents/dashboardProjectButton";
 import DescriptionIcon from "@mui/icons-material/Description";
 import FolderIcon from "@mui/icons-material/Folder";
 import MapIcon from "@mui/icons-material/Map";
-import ContextMenu from "../../components/ui/contextMenu/contextMenu";
+import ContextMenu from "_components/ui/contextMenu/contextMenu";
 import Template from "@/components/ui/template/template";
-import CreateFolderOverlay from "../../components/ui/overlays/CreateFolderOverlay";
+import CreateFolderOverlay from "_components/ui/overlays/CreateFolderOverlay";
 import Lottie from "lottie-react";
-import smallLoader from '../../public/assets/json/smallLoaderLottie.json';
+import smallLoader from '_public/assets/json/smallLoaderLottie.json';
 import {
     fetchFolders,
     fetchProjects,
     newContentMap,
-} from "../utils/filesAndFolders";
-import { hasUsername } from "../utils/user";
-import LoaderComponent from "../../components/ui/loader/loaderComponent";
+} from "../../utils/filesAndFolders";
+import { hasUsername } from "../../utils/user";
+import LoaderComponent from "_components/ui/loader/loaderComponent";
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 export default function Dashboard() {
     const [user, loading] = fb.useAuthState();

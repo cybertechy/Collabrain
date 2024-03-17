@@ -6,7 +6,7 @@ import MessageItem from "@/components/ui/messagesComponents/MessageItem";
 const { useRouter, useSearchParams } = require("next/navigation");
 import AES from "crypto-js/aes";
 import React from "react";
-import { maskProfanity, containsProfanity } from "../utils/textmoderator";
+import { maskProfanity, containsProfanity } from "../../utils/textmoderator";
 import enc from "crypto-js/enc-utf8";
 const axios = require("axios");
 const fb = require("_firebase/firebase");
