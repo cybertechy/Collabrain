@@ -4,8 +4,7 @@ const cors = require("cors");
 
 const bodyParser = require('body-parser');
 const http = require('http');
-const treblle = require('@treblle/express');
-
+const fb = require('./api/helpers/firebase');
 
 // Routes
 const chatRoute = require("./api/routes/Chat");
@@ -31,21 +30,18 @@ const port = process.env.PORT || 8080;
 const server = http.createServer(app);
 
 // Database usage counter
-let APIUsageCount = 0;
+let APIUsageCount = fb.getObjectFromRealtimeDB("usageCount") || 0;
+
+fb.listenToRealtimeDB("usageCount", (data) => {
+	APIUsageCount = data || 0;
+});
 
 // Middleware to increment database usage count
 app.use((req, res, next) => {
     APIUsageCount++;
+	fb.addObjectToRealtimeDB("usageCount", APIUsageCount);
     next();
 });
-
-app.use(
-	treblle({
-		apiKey: "FWAsJIjJ9SUC48XJ52CmWPzrH5V5dDn7",
-		projectId: "4n251kwdeS2Q4FUt",
-		additionalFieldsToMask: [],
-	})
-);
 
 // Set headers 
 app.use(function(req, res, next) {
@@ -66,12 +62,7 @@ app.use(function(req, res, next) {
 	res.setHeader("X-WebKit-CSP", "default-src 'self'");
 
 	// Content type
-	res.setHeader('Content-Type', 'application/json');
-
-	// // Cache the data
-	// res.setHeader('Cache-Control', 'public, max-age=31557600');
-
-	
+	res.setHeader('Content-Type', 'application/json');	
 	next();
 });
 
