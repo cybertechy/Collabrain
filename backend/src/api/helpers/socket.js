@@ -90,7 +90,8 @@ function init(server)
 					// Update the timeSpent for the user in Firebase
 					fb.db.collection('users').doc(ref).update({
 						timeSpent: fb.admin.firestore.FieldValue.increment(timeSpent)
-					});
+					})
+						.catch((error) => console.error(error));
 
 					// Cleanup
 					delete connectionTimes[ref]; // Ensure to remove the user from here as well
