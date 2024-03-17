@@ -30,10 +30,9 @@ const port = process.env.PORT || 8080;
 const server = http.createServer(app);
 
 // Database usage counter
-let APIUsageCount = fb.getObjectFromRealtimeDB("usageCount") || 0;
-
+let APIUsageCount = fb.getObjectFromRealtimeDB("usageCount").then((data) => { return data || 0; });
 fb.listenToRealtimeDB("usageCount", (data) => {
-	APIUsageCount = data || 0;
+	if(Number.isInteger(data)) APIUsageCount = data || 0;
 });
 
 // Middleware to increment database usage count
