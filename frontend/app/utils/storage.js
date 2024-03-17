@@ -2,7 +2,8 @@
 import axios from 'axios';
 const fb = require("_firebase/firebase");
 
-const apiBaseUrl = 'http://localhost:8080/api/storage'; // Adjust accordingly to your actual API base URL
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
+const apiBaseUrl = SERVERLOCATION + '/api/storage'; // Adjust accordingly to your actual API base URL
 
 // Function to add media to the bucket
 export const addMedia = async (MIMEtype, base64Data) => {

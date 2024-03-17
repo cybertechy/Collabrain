@@ -103,12 +103,6 @@ router.get("/media/:mediaId", async (req, res) =>
 		return res.status(404).json({ code: "GM105", message: "Data not found" });
 	}
 
-	if (response.opcMeta["opc-meta-userid"] !== user.uid && response.opcMeta["opc-meta-user"] !== user.uid)
-	{
-
-		return res.status(403).json({ code: "GM104", message: "Validation Failed", data: response.data });
-	}
-
 	if (!response.eTag)
 	{
 		return res.status(404).json({ code: "GM105", message: "Data not found" });

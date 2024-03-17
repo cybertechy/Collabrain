@@ -215,13 +215,17 @@ function init(server)
 	});
 }
 
-async function broadcastMessage(data, type = "team", generateID = false, deleteMsg = false) {
+async function broadcastMessage(data, type = "team", newMessage = false, deleteMsg = false) {
 
-	if(deleteMsg && type == "team" && !data.teamId && !data.channelId && !data.msgID) return;
-	if(deleteMsg && type == "direct" && !data.chatId && !data.msgId) return;
+	// If the message is a delete message, check if the message has the required fields
+	if(deleteMsg && type == "team" && !data.team && !data.channelId && !data.id) return;
+	if(deleteMsg && type == "direct" && !data.chat && !data.id) return;
+
+	// Get the members of the team or chat
 	let members = type == "team" ? await fb.getTeamMembers(data.team) : await fb.getChatMembers(data.chat);
 	let membersList = Array.isArray(members) ? members : [];
-	
+
+	if (membersList.length === 0) return console.log("No members found for this team or chat");
 
     // if their is a sentAt field, convert it to a firebase timestamp
     let DateBackup = data.sentAt;
@@ -230,41 +234,35 @@ async function broadcastMessage(data, type = "team", generateID = false, deleteM
          if (!isNaN(date.getTime())) {
             // If sentAt is in date format, creates a timestamp
             data.sentAt = fb.admin.firestore.Timestamp.fromDate(new Date(data.sentAt));;
-        } else {
-			// Otherwise, converts seconds and nanoseconds into a timestamp
-            data.sentAt = fb.admin.firestore.Timestamp.fromDate(new Date(new Date(data.sentAt.seconds * 1000 + 
-                data.sentAt.nanoseconds / 1000, ).toLocaleDateString()));
         }
-    }
+    } else {
+		// If sentAt is not defined, creates a timestamp for the current time
+		data.sentAt = fb.admin.firestore.Timestamp.fromDate(new Date());
+	}
 
     // Remove the sender
     const index = membersList.indexOf(data.senderID);
     if (index > -1) // only splice array when item is found
         membersList.splice(index, 1); // 2nd parameter means remove one item only
 
-	// Generate a unique id for the message
-	let msgID = generateID ? uuid.v4() : data.msgId;
-
-
 	// Send to all online members
 	membersList.forEach((member) => {
 		if (Object.keys(currLinks).includes(member)) {
-			if(generateID===true) io.to(currLinks[member]).emit((type == "team") ? "teamMsg" : "directMsg", { ...data, id: msgID });
-			else if (generateID === false && !deleteMsg) io.to(currLinks[member]).emit((type == "team") ? "updateTeamMessage" : "updateDirectMessage", { ...data, id: msgID });
-			else if (deleteMsg) io.to(currLinks[member]).emit((type == "team") ? "deleteTeamMsg" : "deleteDirectMsg", { ...data, id: msgID });
+			if(newMessage===true) io.to(currLinks[member]).emit((type == "team") ? "teamMsg" : "directMsg", data);
+			else if (newMessage === false && !deleteMsg) io.to(currLinks[member]).emit((type == "team") ? "updateTeamMessage" : "updateDirectMessage",data);
+			else if (deleteMsg) io.to(currLinks[member]).emit((type == "team") ? "deleteTeamMessage" : "deleteDirectMessage", data);
 		}
 			
 	});
 
-	// send the message to the sender
-	if (generateID) io.to(currLinks[data.senderID]).emit("updateID", { ...data, id: msgID });
-
-
     // Restore the sentAt field
     data.sentAt = DateBackup;
-	data.msgID = msgID;
-	if(!deleteMsg){(type == "team" ) ? fb.saveTeamMsg(data, generateID) : fb.saveDirectMsg(data, generateID);}
-    else{(type == "team") ? fb.deleteTeamMsg(data.teamId,data.channelId,data.msgID) : fb.deleteChatMsg(data.chatId,data.msgId);}
+	if(!deleteMsg){
+		(type == "team" ) ? fb.saveTeamMsg(data, newMessage) : fb.saveDirectMsg(data, newMessage);
+	}
+    else{
+		(type == "team") ? fb.deleteTeamMsg(data.team,data.channelId,data.id) : fb.deleteChatMsg(data.chat,data.id);
+	}
 
 }
 

@@ -17,9 +17,12 @@ import Template from "@/components/ui/template/template";
 import { fetchUser } from "@/app/utils/user";
 import { fetchMessages, fetchDirectMessages } from "@/app/utils/messages";
 import LoaderComponent from "@/components/ui/loader/loaderComponent";
+const uuid = require("uuid");
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
 import { addMedia } from "@/app/utils/storage";
+import { ToastContainer, toast } from "react-toastify";
+import { search } from "homoglyph-search";
 export default function Messages() {
     const router = useRouter();
     const [user, loading] = fb.useAuthState();
@@ -42,8 +45,8 @@ export default function Messages() {
     useEffect(() => {
         setIsLoading(true);
         if (!user) return;
-       
-       
+
+
 
         sockCli.current = socket.init(SERVERLOCATION) || {};
         console.log("Socket initialized", sockCli);
@@ -59,14 +62,14 @@ export default function Messages() {
 
             console.log("Received direct message:", data);
 
-            if( chatId !== data.chat) return;
+            if (chatId !== data.chat) return;
 
             data.msg = AES.decrypt(data.msg, chatId).toString(enc);
 
             setMessages((prevMessage) => [
                 ...prevMessage,
                 <MessageItem
-                    key={`temp-${Date.now()}`}
+                    key={data.id }
                     sender={data.sender}
                     senderId= {data.senderId}
                     message={data.msg}
@@ -75,7 +78,7 @@ export default function Messages() {
                         ", " +
                         sentAt.toLocaleTimeString()
                     }
-                    messageId={`temp-${Date.now()}`}
+                    messageId={data.id}
                     reactions={{}}
                     onReact={handleReact}
                     onReply={setReplyTo}
@@ -89,49 +92,57 @@ export default function Messages() {
         });
         setIsLoading(false);
         return () => sockCli.current.off("directMsg");
-    }, [user,chatId]);
+    }, [user, chatId]);
 
 
     useEffect(() => {
-        if (!user) return;
+        if (!user || !chatId) return;
         const handleUpdateDirectMessage = (updatedMessage) => {
-            console.log("Received updateDirectMessage event:", updatedMessage); 
+            console.log("Received updateDirectMessage event:", updatedMessage);
+            if (updatedMessage?.msg) updatedMessage.msg = AES.decrypt(updatedMessage.msg, chatId).toString(enc);
             setMessages(currentMessages => currentMessages.map(messageComponent => {
-                if (messageComponent.props.messageId === updatedMessage.messageId) {
-                    // Update the component with new reactions
-                    return React.cloneElement(messageComponent, {
-                        ...updatedMessage
-                    });
+                if (messageComponent.props.messageId === updatedMessage.id) {
+                    return <MessageItem
+                        key={updatedMessage.id+Math.random()}
+                        sender={messageComponent.props.sender}
+                        message={updatedMessage.msg ? updatedMessage.msg : messageComponent.props.message}
+                        timestamp={messageComponent.props.timestamp}
+                        messageId={updatedMessage.id}
+                        reactions={updatedMessage.reactions ? updatedMessage.reactions : messageComponent.props.reactions}
+                        attachmentIds={updatedMessage.attachmentIds ? updatedMessage.attachmentIds : messageComponent.props.attachmentIds}
+                        userInfo={messageComponent.props.userInfo}
+                    />
                 }
+
                 return messageComponent;
             }));
         };
-    
+
         if (sockCli.current) {
             sockCli.current.on("updateDirectMessage", handleUpdateDirectMessage);
         }
-    
+
         // Cleanup on component unmount
         return () => {
             if (sockCli.current) {
                 sockCli.current.off("updateDirectMessage", handleUpdateDirectMessage);
             }
         };
-    }, [user]); // Dependency array is empty to set up the listener once on mount
+    }, [user, chatId]); // Dependency array is empty to set up the listener once on mount
     useEffect(() => {
         if (!user) return;
-        
+
         const handleDeleteDirectMessage = (deletedMessage) => {
             console.log("Received deleteDirectMessage event for message ID:", deletedMessage.messageId);
-            setMessages(currentMessages => currentMessages.filter(messageComponent => 
-                messageComponent.props.messageId !== deletedMessage.messageId
+            setMessages(currentMessages => currentMessages.filter(messageComponent =>
+                messageComponent.props.messageId !== deletedMessage.id
             ));
         };
-    
+
         if (sockCli.current) {
             sockCli.current.on("deleteDirectMessage", handleDeleteDirectMessage);
         }
-    
+
         // Cleanup on component unmount
         return () => {
             if (sockCli.current) {
@@ -139,64 +150,64 @@ export default function Messages() {
             }
         };
     }, [user]);
-    
+
     useEffect(() => {
-        if (!sockCli.current || !user) return;
-     
-      
+        if (!sockCli.current || !user || !chatId) return;
+
+
         const handleUpdateID = (updatedMessage) => {
-         
-          updatedMessage.msg = AES.decrypt(updatedMessage.msg, chatId).toString(enc);
-          setMessages((prevMessages) => {
-            return prevMessages.map((messageComponent) => {
-            
-              // Extract props from each MessageItem component
-              const { sender, message, timestamp, messageId } = messageComponent.props;
-              
-              // Convert updatedMessage.sentAt to Date object
-              const updatedMessageDate = new Date(
-                updatedMessage.sentAt._seconds * 1000 +
-                updatedMessage.sentAt._nanoseconds / 1000000
-              );
-            
-              // Options to format the date as '3/13/2024, 11:07:25 PM'
-              const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
-    
-              const updatedMessageTimestampString = updatedMessageDate.toLocaleString('en-US', options);
-      
-              const tempIDCheck = messageId.startsWith("temp-");
-              const senderMatch = sender === updatedMessage.sender;
-              const messageMatch = message === updatedMessage.msg;
-              const timestampMatch = timestamp === updatedMessageTimestampString;
-            
-      
-              // Reconstruct component with updated ID if conditions match
-              if (tempIDCheck && senderMatch && messageMatch && timestampMatch) {
-              
-                return React.cloneElement(messageComponent, {
-                  ...messageComponent.props,
-                  key: updatedMessage.id, // Update the key
-                  messageId: updatedMessage.id // Update the ID
+            console.log("Received updateID event:", updatedMessage);
+            updatedMessage.msg = AES.decrypt(updatedMessage.msg, chatId).toString(enc);
+            setMessages((prevMessages) => {
+                return prevMessages.map((messageComponent) => {
+
+                    // Extract props from each MessageItem component
+                    const { sender, message, timestamp, messageId } = messageComponent.props;
+
+                    // Convert updatedMessage.sentAt to Date object
+                    const updatedMessageDate = new Date(
+                        updatedMessage.sentAt._seconds * 1000 +
+                        updatedMessage.sentAt._nanoseconds / 1000000
+                    );
+
+                    // Options to format the date as '3/13/2024, 11:07:25 PM'
+                    const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+
+                    const updatedMessageTimestampString = updatedMessageDate.toLocaleString('en-US', options);
+
+                    const tempIDCheck = messageId.startsWith("temp-");
+                    const senderMatch = sender === updatedMessage.sender;
+                    const messageMatch = message === updatedMessage.msg;
+                    const timestampMatch = timestamp === updatedMessageTimestampString;
+
+
+                    // Reconstruct component with updated ID if conditions match
+                    if (tempIDCheck && senderMatch && messageMatch && timestampMatch) {
+
+                        return React.cloneElement(messageComponent, {
+                            ...messageComponent.props,
+                            key: updatedMessage.id, // Update the key
+                            messageId: updatedMessage.id // Update the ID
+                        });
+                    }
+
+                    // Return the original component if no match
+                    return messageComponent;
                 });
-              }
-      
-              // Return the original component if no match
-              return messageComponent;
             });
-          });
         };
-      
+
         sockCli.current.on("updateID", handleUpdateID);
-      
+
         return () => {
-          if (sockCli.current) {
-            sockCli.current.off("updateID", handleUpdateID);
-          }
+            if (sockCli.current) {
+                sockCli.current.off("updateID", handleUpdateID);
+            }
         };
-    }, [user]);
-    
-      
-      
+    }, [user, chatId]);
+
+
+
     useEffect(() => {
         if (!user) return;
 
@@ -210,23 +221,23 @@ export default function Messages() {
                 const directMessagesData = await fetchDirectMessages(); // Assuming this function is properly defined to fetch direct messages
 
                 directMessagesData.forEach((chat) => {
-                    if ("lastMessage" in chat) {
+                    if ("lastMessage" in chat && chat?.lastMessage?.message) {
                         try {
                             chat.lastMessage.message = AES.decrypt(
                                 chat.lastMessage.message,
                                 chat.id
                             ).toString(enc);
-                            if (chat.lastMessage.message === "")
-                                chat.lastMessage.message =
-                                    "Unencrypted Message";
                         } catch (error) {
                             console.error("Error decrypting message:", error);
                             chat.lastMessage.message = "Unencrypted Message";
                         }
+                    } else {
+                        chat.lastMessage.message = "Start a new chat!"
+                           
                     }
                 });
 
-               
+
                 setDirectMessages(directMessagesData);
             } catch (error) {
                 console.error("Error fetching data:", error);
@@ -265,7 +276,7 @@ export default function Messages() {
             setIsLoading(true);
             setLoadingState("FETCHING_MESSAGES");
             try {
-               
+
                 const fetchedMessages = await fetchMessages(chatId, userInfo);
 
                 setMessages(fetchedMessages);
@@ -293,24 +304,27 @@ export default function Messages() {
             second: "2-digit", // 2-digit second
         });
     };
+    
+
     const onDelete = (messageId) => {
         // Assuming `chatId` is available in the scope as you mentioned
-        setMessages(currentMessages => currentMessages.filter(messageComponent => 
+        if(!chatId) return console.error("Chat ID is not available.");
+        setMessages(currentMessages => currentMessages.filter(messageComponent =>
             messageComponent.props.messageId !== messageId
         ));
         const messageToDelete = {
-            chatId: chatId,
-            msgId: messageId,
-            sentAt:  new Date().toISOString(),
+            chat: chatId,
+            id: messageId,
+            sentAt: new Date().toISOString(),
         };
-    
+
         console.log("Emitting deleteDirectMessage event with:", messageToDelete);
-        
+
         if (sockCli.current) {
             sockCli.current.emit("deleteDirectMessage", messageToDelete);
         }
     };
-    
+
     const sendPersonalMsg = async (msg, attachments = []) => {
         if (!sockCli.current) {
             console.error("Socket is not initialized yet.");
@@ -330,7 +344,7 @@ export default function Messages() {
         }
 
         let sentAt = new Date();
-
+        let msgId = uuid.v4() + "D" + sentAt.getTime();
         // Handle attachment upload
         let attachmentIds = [];
         try {
@@ -354,8 +368,9 @@ export default function Messages() {
         } catch (error) {
             console.error("Error uploading attachments:", error);
         }
-        
+
         const messageData = {
+            id: msgId,
             senderID: user.uid,
             sender: userInfo.data.username,
             chat: chatId,
@@ -363,6 +378,7 @@ export default function Messages() {
             sentAt: sentAt.toISOString(),
             attachments: attachmentIds,
             reactions: [],
+
         };
 
         // Optimistically update the UI with the new message and attachments
@@ -376,14 +392,14 @@ export default function Messages() {
         setMessages((prevMessages) => [
             ...prevMessages,
             <MessageItem
-                key={`temp-${Date.now()}`}
+                key={msgId}
                 sender={optimisticMessage.sender}
                 senderId = {messageData.senderID}
                 timestamp={optimisticMessage.sentAt}
                 message={optimisticMessage.msg}
                 userData={userInfo.data}
                 attachmentIds={optimisticMessage.attachments} // Pass the attachment IDs to the MessageItem component
-                messageId={`temp-${Date.now()}`}
+                messageId={msgId}
                 userInfo={userInfo}
                 chatId = {chatId}
                
@@ -394,14 +410,25 @@ export default function Messages() {
     };
 
     const handleReact = (messageId, emoji) => {
-        let updatedReactions  = {};
+        if (messageId.startsWith("temp-")) return toast.error("Cannot react to unsent messages", {
+            position: "top-center",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored"
+        });
+
+        let updatedReactions = {};
         let updatedMessage = {};
         // Prepare the updated reactions
         const messagesCopy = messages.map((messageComponent) => {
             if (messageComponent.props.messageId === messageId) {
                 const currentReactions = messageComponent.props.reactions || {};
                 updatedReactions = { ...currentReactions };
-    
+
                 if (updatedReactions[emoji]) {
                     if (updatedReactions[emoji].includes(user.uid)) {
                         updatedReactions[emoji] = updatedReactions[emoji].filter(id => id !== user.uid);
@@ -411,7 +438,7 @@ export default function Messages() {
                 } else {
                     updatedReactions[emoji] = [user.uid];
                 }
-                updatedMessage = {...messageComponent.props, reactions: updatedReactions};
+                updatedMessage = { ...messageComponent.props, reactions: updatedReactions };
                 // Return an updated component for local state update
                 return React.cloneElement(messageComponent, {
                     ...messageComponent.props,
@@ -420,21 +447,20 @@ export default function Messages() {
             }
             return messageComponent;
         });
-    
+
         // Emit the updateDirectMessage event with updated reactions
         if (sockCli.current) {
-           
             let sentAt = new Date();
-            updatedMessage = {chat: chatId, sentAt: sentAt.toISOString(),  msgId: updatedMessage.messageId, reactions: updatedMessage.reactions}
-            console.log("Emitting updateDirectMessage event with updated reactions:",  updatedMessage);
-            sockCli.current.emit("updateDirectMessage", updatedMessage );
+            updatedMessage = { chat: chatId, sentAt: sentAt.toISOString(), id: updatedMessage.messageId, reactions: updatedMessage.reactions }
+            console.log("Emitting updateDirectMessage event with updated reactions:", updatedMessage);
+            sockCli.current.emit("updateDirectMessage", updatedMessage);
         }
-    
+
         // Update local state
         setMessages(messagesCopy);
     };
-    
-    
+
+
     const handleEdit = (messageId, editedText) => {
         let updatedMessage = {};
         // Prepare the updated messages
@@ -446,7 +472,7 @@ export default function Messages() {
             }
             return messageComponent;
         });
-    
+
         // Emit the updateDirectMessage event with updated message text
         if (sockCli.current) {
             let sentAt = new Date();
@@ -454,13 +480,13 @@ export default function Messages() {
             const messageUpdate = {
                 chat: chatId,
                 sentAt: sentAt.toISOString(),
-                msgId: updatedMessage.messageId,
-                msg:  AES.encrypt(updatedMessage.message, chatId).toString(),
+                id: updatedMessage.messageId,
+                msg: AES.encrypt(updatedMessage.message, chatId).toString(),
             };
             console.log("Emitting updateDirectMessage event with updated message text:", messageUpdate);
             sockCli.current.emit("updateDirectMessage", messageUpdate);
         }
-    
+
         // Update local state with the modified messages
         setMessages(messagesCopy);
     };
@@ -477,6 +503,7 @@ export default function Messages() {
 
     return (
         <Template>
+            <ToastContainer />
             <LoaderComponent
                 isLoading={isLoading}
                 loadingState={loadingState}
@@ -488,8 +515,8 @@ export default function Messages() {
                     friendsHandler={() => setShowChat(false)}
                     chatList={directMessages}
                     openChat={openChat}
-                    loadingState = {loadingState}
-                    setLoadingState = {setLoadingState}
+                    loadingState={loadingState}
+                    setLoadingState={setLoadingState}
                     chatHandler={(id, user) => {
                         router.push(`/messages?chatID=${id}&user=${user}`);
                     }}
