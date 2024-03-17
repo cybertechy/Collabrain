@@ -2,8 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { ArrowCircleUp, ArrowCircleDown, ChevronRight } from '@mui/icons-material';
 import DropdownDashboard from './dropdownDashboard';
 import { useRouter } from 'next/navigation'; 
+import { useTTS } from "../../../app/utils/tts/TTSContext";
 
 const DashboardInfoBar = ({ currentPath, onSort, sortCriteria}) => {
+
+  const { speak, isTTSEnabled } = useTTS();
+
+  useEffect(() => {
+    import('jquery').then(jQuery => {
+        window.jQuery = window.$ = jQuery.default;
+        require('../../../app/utils/tts/articulate');
+    });
+}, []);
+
   // const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const router = useRouter();
 
@@ -74,9 +85,11 @@ const DashboardInfoBar = ({ currentPath, onSort, sortCriteria}) => {
                     ]}
                 />
                 {sortCriteria.isAscending ? (
-                    <ArrowCircleUp className="text-primary cursor-pointer" fontSize="large" onClick={toggleAscending} />
+                    <ArrowCircleUp className="text-primary cursor-pointer" fontSize="large" 
+                    onClick={toggleAscending} onMouseEnter={() => isTTSEnabled && speak("Ascending Order")} />
                 ) : (
-                    <ArrowCircleDown className="text-primary cursor-pointer" fontSize="large" onClick={toggleAscending} />
+                    <ArrowCircleDown className="text-primary cursor-pointer" fontSize="large" 
+                    onClick={toggleAscending} onMouseEnter={() => isTTSEnabled && speak("Descending Order")}/>
                 )}
             </div>
         </div>

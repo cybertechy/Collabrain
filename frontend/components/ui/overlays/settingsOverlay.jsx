@@ -10,7 +10,7 @@ import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, B
 import { useRouter } from 'next/navigation';
 import jsPDF from 'jspdf';
 import { useColorblindFilter } from '../../../app/utils/colorblind/ColorblindFilterContext';
-import { useTTS } from "../../../app/utils/tts/TTSContext";
+import { TTSProvider, useTTS } from "../../../app/utils/tts/TTSContext";
 
 const fb = require("_firebase/firebase");
 
@@ -95,11 +95,7 @@ const Dropdown = ({ buttonLabel, dropdownItems, onSelect }) => {
     );
 };
 
-const ToggleButtonExample = () => {
-    const [isToggled, setToggled] = useState(false);
-    const handleToggle = () => {
-        setToggled(!isToggled);
-    };
+const ToggleButtonExample = ({ isToggled, handleToggle }) => {
     return (
         <div>
             <button
@@ -807,6 +803,7 @@ const AccessibilityOverlay = () => {
     };
 
     return (
+        <TTSProvider>
         <div className="w-full h-5/6 flex justify-center items-start">
         <div className="w-full h-full p-5  bg-basicallylight flex overflow-auto">
            {/* RIGHT SIDE */}
@@ -863,6 +860,7 @@ const AccessibilityOverlay = () => {
                 </div>
             </div>
         </div>
+        </TTSProvider>
     );
 };
 

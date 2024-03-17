@@ -16,6 +16,7 @@ import Template from "@/components/ui/template/template";
 import { fetchUser } from "@/app/utils/user";
 import { fetchMessages, fetchDirectMessages } from "@/app/utils/messages";
 import LoaderComponent from "@/components/ui/loader/loaderComponent";
+import { TTSProvider, useTTS } from "../utils/tts/TTSContext";
 export default function Messages() {
     const router = useRouter();
     const [user, loading] = fb.useAuthState();
@@ -29,6 +30,13 @@ export default function Messages() {
     const [withUserInfo, setWithUserInfo] = useState(null);
     const [showChat, setShowChat] = useState(false);
     const [replyTo, setReplyTo] = useState(null);
+
+    useEffect(() => {
+        import('jquery').then(jQuery => {
+            window.jQuery = window.$ = jQuery.default;
+            require('../utils/tts/articulate');
+        });
+    }, []);
 
     const withUser = params.get("user");
     const chatId = params.get("chatID");

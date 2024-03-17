@@ -14,9 +14,10 @@ const fb = require("_firebase/firebase");
 const socket = require("_socket/socket");
 import ShortTextIcon from '@mui/icons-material/ShortText'; // This can act as a hash
 import { set } from "lodash";
+import { TTSProvider, useTTS } from "../utils/tts/TTSContext";
 
 export default function ChatRoom() {
-   
+
 const router = useRouter();
 const params = useSearchParams();
     const [user, loading] = fb.useAuthState();
@@ -30,6 +31,12 @@ const [channelsUpdated, setChannelsUpdated] = useState(0);
    
 const messagesEndRef = useRef(null); // Create a reference to the message container
 
+useEffect(() => {
+    import('jquery').then(jQuery => {
+        window.jQuery = window.$ = jQuery.default;
+        require('../utils/tts/articulate');
+    });
+}, []);
 // Function to scroll to the bottom
 const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -192,6 +199,7 @@ const scrollToBottom = () => {
     }, [text]); 
 	if (loading|| !user )
     return (
+        <TTSProvider>
         <div className="flex flex-col items-center justify-around min-h-screen">
             <div className="flex flex-col items-center justify-center min-h-screen">
                 <h1 className="text-xl font-bold mb-5 text-primary">Trying to sign in</h1>
@@ -205,11 +213,13 @@ const scrollToBottom = () => {
                 </p>
             </div>
         </div>
+        </TTSProvider>
     );
 
 
 
 	return (
+        <TTSProvider>
 		<Template>
 		{/* // <div className="flex h-full w-full drop-shadow-lg"> */}
 		<div className="flex flex-row flex-grow">
@@ -248,6 +258,7 @@ const scrollToBottom = () => {
 				</div>
 		{/* <ChannelBar /> */}
 		</Template>
+        </TTSProvider>
 	)
 		{/* </div> */}
 }

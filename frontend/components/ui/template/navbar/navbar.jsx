@@ -12,6 +12,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import SettingsOverlay from '../../overlays/settingsOverlay';
 import Template from '../template';
 import { ColorblindFilterProvider } from '../../../../app/utils/colorblind/ColorblindFilterContext';
+import { useTTS } from "../../../../app/utils/tts/TTSContext";
 
 
 const Navbar = ({ isOpen, toggleSidebar }) => {
@@ -25,6 +26,7 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
         setShowLeaderboard(!showLeaderboard);
     };
     const [showSettingsOverlay, setShowSettingsOverlay] = useState(false);
+    const { speak, isTTSEnabled } = useTTS();
 
     const toggleSettingsOverlay = () => {
         setShowSettingsOverlay(!showSettingsOverlay); // Toggle the state
@@ -39,22 +41,23 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
         setShowSettingsOverlay(true); // Use setShowSettingsOverlay to show the settings overlay.
       };
       
-    const loadJQueryAndArticulate = () => {
+      useEffect(() => {
         import('jquery').then(jQuery => {
-        window.jQuery = window.$ = jQuery.default; // Ensure jQuery is globally available
-        require('../../../../app/utils/tts/articulate'); // Now we can safely load articulate.js
+            window.jQuery = window.$ = jQuery.default;
+            require('../../../../app/utils/tts/articulate');
         });
-    };
-
-    useEffect(() => {
-        loadJQueryAndArticulate();
     }, []);
 
     const readAloud = (text) => {
         if (window.jQuery) {
+            // Create a new utterance for the speech synthesis
             const speech = new SpeechSynthesisUtterance(text);
             window.speechSynthesis.speak(speech);
         }
+    };
+
+    const stopSpeaking = () => {
+        window.speechSynthesis.cancel();
     };
     
     useEffect(() => {

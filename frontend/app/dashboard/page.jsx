@@ -22,6 +22,7 @@ import {
 } from "../utils/filesAndFolders";
 import { hasUsername } from "../utils/user";
 import LoaderComponent from "../../components/ui/loader/loaderComponent";
+import { TTSProvider, useTTS } from "../utils/tts/TTSContext";
 
 export default function Dashboard() {
     const [user, loading] = fb.useAuthState();
@@ -67,24 +68,15 @@ export default function Dashboard() {
         });
     }, []);
 
-    const readAloud = (text) => {
-        if (window.jQuery) {
-            // Create a new utterance for the speech synthesis
-            const speech = new SpeechSynthesisUtterance(text);
-            window.speechSynthesis.speak(speech);
-        }
-    };
-
-    const stopSpeaking = () => {
-        window.speechSynthesis.cancel();
-    };
-
     const contextMenuOptions = [
         {
             text: "New Folder",
             icon: <FolderIcon />,
             onClick: () => {
                 toggleCreateFolderOverlay();
+            },
+            onMouseEnter: () => {
+                isTTSEnabled && speak("New Folder")
             },
         },
         {
@@ -324,6 +316,7 @@ export default function Dashboard() {
     }, [user, folderChanges,path]);
 
     return (
+        <TTSProvider>
         <Template>
             <LoaderComponent
                 isLoading={isLoading}
@@ -440,5 +433,6 @@ export default function Dashboard() {
                 />
             )}
         </Template>
+        </TTSProvider>
     );
 }
