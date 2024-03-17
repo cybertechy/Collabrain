@@ -11,6 +11,7 @@ const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
+  const [backgroundLoaded, setBackgroundLoaded] = useState(false);
 
   const handleResetPassword = async () => {
     const errorMessage = await fb.sendPasswordReset(email);
@@ -23,7 +24,6 @@ const ForgotPassword = () => {
     }
   };
 
-  const [backgroundLoaded, setBackgroundLoaded] = useState(false);
   useEffect(() => {
     // Preload the background image
     const img = new Image();
