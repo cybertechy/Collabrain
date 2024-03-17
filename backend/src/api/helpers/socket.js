@@ -219,7 +219,6 @@ async function broadcastMessage(data, type = "team", generateID = false, deleteM
 
 	if(deleteMsg && type == "team" && !data.teamId && !data.channelId && !data.msgID) return;
 	if(deleteMsg && type == "direct" && !data.chatId && !data.msgId) return;
-
 	let members = type == "team" ? await fb.getTeamMembers(data.team) : await fb.getChatMembers(data.chat);
 	let membersList = Array.isArray(members) ? members : [];
 	
@@ -250,7 +249,7 @@ async function broadcastMessage(data, type = "team", generateID = false, deleteM
 	membersList.forEach((member) => {
 		if (Object.keys(currLinks).includes(member)) {
 			if(generateID===true) io.to(currLinks[member]).emit((type == "team") ? "teamMsg" : "directMsg", { ...data, id: msgID });
-			else if (generateID === false) io.to(currLinks[member]).emit((type == "team") ? "updateTeamMessage" : "updateDirectMessage", { ...data, id: msgID });
+			else if (generateID === false && !deleteMsg) io.to(currLinks[member]).emit((type == "team") ? "updateTeamMessage" : "updateDirectMessage", { ...data, id: msgID });
 			else if (deleteMsg) io.to(currLinks[member]).emit((type == "team") ? "deleteTeamMsg" : "deleteDirectMsg", { ...data, id: msgID });
 		}
 			
@@ -259,12 +258,12 @@ async function broadcastMessage(data, type = "team", generateID = false, deleteM
 	// send the message to the sender
 	if (generateID) io.to(currLinks[data.senderID]).emit("updateID", { ...data, id: msgID });
 
-
     // Restore the sentAt field
     data.sentAt = DateBackup;
 	data.msgID = msgID;
-    (type == "team" && !deleteMsg) ? fb.saveTeamMsg(data, generateID) : fb.saveDirectMsg(data, generateID);
-	(type == "team" && deleteMsg===true) ? fb.deleteTeamMsg(data.teamId,data.channelId,data.msgID) : fb.deleteChatMsg(data.chatId,data.msgId);
+	if(!deleteMsg){(type == "team" ) ? fb.saveTeamMsg(data, generateID) : fb.saveDirectMsg(data, generateID);}
+    else{(type == "team") ? fb.deleteTeamMsg(data.teamId,data.channelId,data.msgID) : fb.deleteChatMsg(data.chatId,data.msgId);}
+
 }
 
 
