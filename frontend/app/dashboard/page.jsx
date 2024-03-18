@@ -247,13 +247,15 @@ export default function Dashboard() {
     const handleCloseContextMenu = () => {
         setContextMenuVisible(false);
     };
-    const moveProjectToPath = async (projectId, newPath) => {
+    const moveProjectToPath = async (projectId, newPath, type) => {
+        console.log("MOving project to path", projectId,newPath, type);
         try {
           const token = await fb.getToken(); // Assuming you have a function to get the user's token
           const response = await axios.patch(
-            `${SERVERLOCATION}/api/dashboard/moveProject/${projectId}`, // Adjust the endpoint URL
+            `${SERVERLOCATION}/api/dashboard/moveFile/${projectId}`, // Adjust the endpoint URL
             {
               to: newPath, // Specify the new path you want to move the project to
+              fileType: type, // Specify the file type ('contentMap' or 'document')
             },
             {
               headers: {

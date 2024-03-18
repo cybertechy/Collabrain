@@ -26,21 +26,31 @@ const DashboardInfoBar = ({ currentPath, onSort, sortCriteria, moveProjectToPath
     } else if (index === 0) {
       router.push('/dashboard');
     } else {
-      const pathToNavigate = `/${pathParts.slice(0, index + 1).join('/')}`;
+      console.log("Navigating to ", part, index);
+      const pathToNavigate = `/${pathParts.slice(1, index+1).join('/')}`;
+      console.log("Path to navigate: ", pathToNavigate, "pathParts", pathParts)
       router.push(`/dashboard?path=${pathToNavigate}`);
     }
   };
 
   // Handling the drop event to move the project to the dropped path
-  const handleDrop = (e, dropPath) => {
+  const handleDrop = (e, part, index) => {
     e.preventDefault();
     e.stopPropagation();
 
     const projectId = e.dataTransfer.getData("projectId");
+    const type = e.dataTransfer.getData("type") === "Content Map" ? "contentMap": "documents";
     if (projectId) {
-      moveProjectToPath(projectId, dropPath);
+      if(index === 0 ){
+        moveProjectToPath(projectId, "/", type);
+      }else{
+        const pathToNavigate = `/${pathParts.slice(1, index+1).join('/')}`;
+        moveProjectToPath(projectId, pathToNavigate, type);
+      }
+     
     }
   };
+
 
   // Allowing the drop by preventing the default behavior
   const handleDragOver = (e) => {
@@ -56,8 +66,7 @@ const DashboardInfoBar = ({ currentPath, onSort, sortCriteria, moveProjectToPath
               className='text-xl font-bold font-poppins text-primary cursor-pointer underline'
               onClick={() => navigateToPath(part, index)}
               onDragOver={handleDragOver}
-              onDrop={(e) => handleDrop(e, `/${pathParts.slice(0, index + 1).join('/')}`)}
-              draggable
+            onDrop={(e) => handleDrop(e, part, index)}
             >
               {part}
             </p>
