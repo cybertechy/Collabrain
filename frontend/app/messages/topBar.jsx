@@ -28,25 +28,7 @@ const TopBar = ({ activeTab, onTabChange }) => {
         <Button sx={tabButtonStyle('all')} onClick={() => onTabChange('all')}>All</Button>
         <Button sx={tabButtonStyle('Recieved')} onClick={() => onTabChange('Recieved')}>Received</Button>
         <Button sx={tabButtonStyle('blocked')} onClick={() => onTabChange('blocked')}>Blocked</Button>
-        <Button
-  variant="contained"
-  startIcon={<AddCircleOutlineIcon />}
-  onClick={handleAddFriendClick}
-  sx={{
-    // If "addFriend" tab is active, button has a white background and dark text.
-    // Otherwise, it has a dark background and white text.
-    bgcolor: activeTab === "addFriend" ? '#FFFFFF' : '#30475E',
-    color: activeTab === "addFriend" ? '#30475E' : '#FFFFFF',
-    '&:hover': {
-      // On hover, regardless of the tab state, invert colors for contrast
-      bgcolor: '#FFFFFF',
-      color: '#30475E',
-    },
-    marginLeft: 2,
-  }}
->
-  Add Friend
-</Button>
+        <Button sx={tabButtonStyle('addFriend')} onClick={() => onTabChange('addFriend')}>Add Friend</Button>
 
       </Box>
     </Box>
