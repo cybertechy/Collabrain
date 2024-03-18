@@ -35,6 +35,8 @@ const BadBehaviorStrikes = ({ strikes }) => {
 
 const Dropdown = ({ buttonLabel, dropdownItems, onSelect }) => {
     const [isDropdownOpen, setDropdownOpen] = useState(false);
+    const { speak, stop, isTTSEnabled } = useTTS();
+
     const toggleDropdown = () => {
         setDropdownOpen(!isDropdownOpen);
     };
@@ -42,11 +44,24 @@ const Dropdown = ({ buttonLabel, dropdownItems, onSelect }) => {
         onSelect(label);
         toggleDropdown();
     };
+   
+    const handleItemMouseEnter = (label) => {
+        if (isTTSEnabled) {
+            speak(label);
+        }
+    };
+
     return (
         <div className="relative inline-block text-left">
             <button
                 id="dropdownDefaultButton"
                 onClick={toggleDropdown}
+                onMouseEnter={() => {
+                    if (isTTSEnabled) {
+                        speak(buttonLabel);
+                    }
+                }}
+                onMouseLeave={stop}
                 className="text-center text-xl sm:text-sm md:text-base lg:text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight sm:px-8 md:px-12 lg:px-16 xl:px-20 py-3 rounded"
                 type="button"
             >
@@ -82,6 +97,8 @@ const Dropdown = ({ buttonLabel, dropdownItems, onSelect }) => {
                                 <button
                                     href={item.link}
                                     onClick={() => handleItemClick(item.label)}
+                                    onMouseEnter={() => handleItemMouseEnter(item.label)}
+                                    onMouseLeave={stop}
                                     className="block text-center px-20 py-3 text-xl hover:bg-primary hover:text-basicallylight dark:hover:bg-primary dark:hover:text-basicallylight text-primary w-full "
                                 >
                                     {item.label}
@@ -96,6 +113,14 @@ const Dropdown = ({ buttonLabel, dropdownItems, onSelect }) => {
 };
 
 const ToggleButtonExample = ({ isToggled, handleToggle }) => {
+    const { speak, stop, isTTSEnabled } = useTTS();
+
+    const handleMouseEnter = () => {
+        if (isTTSEnabled) {
+            const status = isToggled ? "Currently toggled on. Click to toggle off." : "Currently toggled off. Click to toggle on.";
+            speak(status);
+        }
+    };
     return (
         <div>
             <button
@@ -103,6 +128,8 @@ const ToggleButtonExample = ({ isToggled, handleToggle }) => {
                     isToggled ? "bg-primary" : "bg-gray-400"
                 }`}
                 onClick={handleToggle}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={stop}
             >
                 <span
                     className={`absolute left-0 top-0 w-6 h-6 rounded-full bg-basicallylight shadow-md transform transition-transform duration-300 ease-in-out ${
@@ -245,7 +272,7 @@ const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
                         <CloseIcon
                             className="text-basicallydark"
                             fontSize="large"
-                            onMouseEnter={() => isTTSEnabled && speak("Close settings")}
+                            onMouseEnter={() => isTTSEnabled && speak("Close settings button")}
                             onMouseLeave={stop}
                             
                         />
@@ -277,6 +304,7 @@ const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
   };
 //  PROFILE SETTINGS PAGE
 const ProfileOverlay = ({ user }) => {
+    const { speak, stop, isTTSEnabled } = useTTS();
     const [name, setName] = useState("");
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
@@ -359,64 +387,99 @@ const router = useRouter();
                             <div className="mb-4">
                                         
                                         <button className="justify-center w-full font-semibold inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 rounded-full"
-                                        onClick= {() => router.push('/profile')}>
+                                        onClick= {() => router.push('/profile')}
+                                        onMouseEnter={() => isTTSEnabled && speak("View your profile button")}
+                                        onMouseLeave={stop}>
                                             View your Profile
                                         </button>
                                     </div>
                                     <div className="mt-8 mb-4">
-                                        <p className="mb-2 text-xl  text-basicallydark ">
+                                        <p className="mb-2 text-xl  text-basicallydark "
+                                        onMouseEnter={() => isTTSEnabled && speak("Password and authentication")}
+                                        onMouseLeave={stop}>
                                             Password and Authentication
                                         </p>
-                                        <button className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 ">
+                                        <button className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 "
+                                        onMouseEnter={() => isTTSEnabled && speak("Change password button")}
+                                        onMouseLeave={stop}>
                                             Change Password
                                         </button>
                                     </div>
                                     <div className="mb-6 ">
-                                        <p className="mb-2 text-xl text-basicallydark ">
+                                        <p className="mb-2 text-xl text-basicallydark "
+                                        onMouseEnter={() => isTTSEnabled && speak("Two-factor authentication")}
+                                        onMouseLeave={stop}>
                                             Two-factor Authentication
                                         </p>
-                                        <p className="mb-2 text-base text-basicallydark ">
+                                        <p className="mb-2 text-base text-basicallydark "
+                                        onMouseEnter={() => isTTSEnabled && speak("Protect your Collabrain account with an extra layer of security.")}
+                                        onMouseLeave={stop}>
                                             Protect your Collabrain account with
                                             an extra layer of security.
                                         </p>
-                                        <button className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 ">
+                                        <button className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 "
+                                        onMouseEnter={() => isTTSEnabled && speak("Enable two-factor authentication button")}
+                                        onMouseLeave={stop}>
                                             Enable
                                         </button>
                                     </div>
                                 </div>
                                 <div className="  w-11/12 h-48  bg-basicallylight rounded-md">
                                     <div className="mb-6 ">
-                                        <p className="mb-2 text-xl text-basicallydark   ">
+                                        <p className="mb-2 text-xl text-basicallydark   "
+                                        onMouseEnter={() => isTTSEnabled && speak("Account removal")}
+                                        onMouseLeave={stop}>
                                             Account Removal
                                         </p>
-                                        <p className="mb-2 text-basicallydark  ">
+                                        <p className="mb-2 text-basicallydark  "
+                                        onMouseEnter={() => isTTSEnabled && speak("Disabling your account means you can recover it at any time after taking this action")}
+                                        onMouseLeave={stop}>
                                             Disabling your account means you can
                                             recover it at any time after taking
                                             this action
                                         </p>
                                         <div className="flex space-x-5">
-                                        <button className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 " onClick={handleClickOpen}>
+                                        <button className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 " 
+                                        onClick={handleClickOpen}
+                                        onMouseEnter={() => isTTSEnabled && speak("Delete account button")}
+                                        onMouseLeave={stop}>
                 Delete
             </button>
             {/* Dialog for confirmation */}
             <Dialog open={openDialog} onClose={handleClose}>
-                <DialogTitle>{"Confirm Account Deletion"}</DialogTitle>
+                <DialogTitle
+                onMouseEnter={() => isTTSEnabled && speak("Confirm account deletion")}
+                onMouseLeave={stop}>
+                {"Confirm Account Deletion"}
+                </DialogTitle>
+
                 <DialogContent>
-                    <DialogContentText>
+                    <DialogContentText 
+                    onMouseEnter={() => isTTSEnabled && speak("Are you sure you want to delete your account? This action cannot be undone.")}
+                    onMouseLeave={stop}>
                         Are you sure you want to delete your account? This action cannot be undone.
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose}>Cancel</Button>
+                    <Button onClick={handleClose}
+                    onMouseEnter={() => isTTSEnabled && speak("Cancel account deletion button")}
+                    onMouseLeave={stop}>
+                        Cancel
+                    </Button>
+
                     <Button onClick={() => {
                         handleDeleteUser();
                         handleClose();
-                    }} autoFocus>
+                    }} autoFocus
+                    onMouseEnter={() => isTTSEnabled && speak("Confirm account deletion button")}
+                    onMouseLeave={stop}>
                         Confirm
                     </Button>
                 </DialogActions>
             </Dialog>
-                                            <button  onClick  = {fb.signOut} className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 ">
+                                            <button  onClick  = {fb.signOut} className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 "
+                                            onMouseEnter={() => isTTSEnabled && speak("Sign out button")}
+                                            onMouseLeave={stop}>
                                                 Sign Out
                                             </button>
                                         </div>
@@ -432,6 +495,7 @@ const router = useRouter();
 };
 //  GENERAL SETTINGS PAGE
 const GeneralOverlay = () => {
+    const { speak, stop, isTTSEnabled, toggleTTS } = useTTS();
     const [selectedLangLabel, setSelectedLangLabel] = useState("Select your language");
     const [selectedAppearance, setSelectedAppearance] = useState(null);
     const [badBehaviorStrikes, setBadBehaviorStrikes] = useState(3);
@@ -475,7 +539,9 @@ const GeneralOverlay = () => {
         <div className="w-full h-5/6 flex justify-center items-start">
           <div className="bg-basicallylight  rounded-md flex w-full p-5 overflow-y-auto scrollbar-thin scrollbar-thumb-primary">
             <div className="flex flex-col w-full">
-              <p className="mb-2 text-2xl text-left text-basicallydark md:text-lg sm:text-sm lg:text-2xl">
+              <p className="mb-2 text-2xl text-left text-basicallydark md:text-lg sm:text-sm lg:text-2xl"
+              onMouseEnter={() => isTTSEnabled && speak("Change appearance")}
+              onMouseLeave={stop}>
                 Change Appearance
               </p>
               <div className="flex flex-wrap sm:flex-nowrap space-y-2 sm:space-x-5 sm:space-y-0 mb-4">
@@ -488,6 +554,8 @@ const GeneralOverlay = () => {
                     selectedAppearance === index ? "border-4 border-secondary" : ""
                   }`}
                   onClick={() => handleAppearanceSelect(index)}
+                  onMouseEnter={() => isTTSEnabled && speak("Dark mode")}
+                    onMouseLeave={stop}
                 >
                   <div className={`w-full h-full ${option.colorClass} flex justify-center items-center`}>
                     <div className="w-12 h-12 bg-basicallylight"></div>
@@ -501,6 +569,8 @@ const GeneralOverlay = () => {
                     selectedAppearance === index ? "border-4 border-secondary" : ""
                   }`}
                   onClick={() => handleAppearanceSelect(index)}
+                  onMouseEnter={() => isTTSEnabled && speak("Light mode")}
+                        onMouseLeave={stop}
                 >
                   <div className={`w-full h-full ${option.colorClass} flex justify-center items-center`}>
                     <div className="w-12 h-12 bg-primary"></div>
@@ -512,7 +582,9 @@ const GeneralOverlay = () => {
              
             </div>
               <div className="mb-4">
-                <p className="mb-2 text-2xl text-left text-basicallydark md:text-lg sm:text-sm lg:text-2xl">
+                <p className="mb-2 text-2xl text-left text-basicallydark md:text-lg sm:text-sm lg:text-2xl"
+                onMouseEnter={() => isTTSEnabled && speak("Language")}
+                onMouseLeave={stop}>
                   Language
                 </p>
                 <Dropdown
@@ -522,7 +594,9 @@ const GeneralOverlay = () => {
                 />
               </div>
               <div className="mb-4">
-                <p className="text-2xl pb-2 text-left text-basicallydark md:text-lg sm:text-sm lg:text-2xl">
+                <p className="text-2xl pb-2 text-left text-basicallydark md:text-lg sm:text-sm lg:text-2xl"
+                onMouseEnter={() => isTTSEnabled && speak("Bad behavior strikes")}
+                onMouseLeave={stop}>
                   Bad behavior strikes
                 </p>
                 <div className="flex flex-row justify-start items-center">
@@ -538,6 +612,7 @@ const GeneralOverlay = () => {
   
 //  SOUND SETTINGS PAGE
 const SoundOverlay = () => {
+    const { speak, stop, isTTSEnabled, toggleTTS } = useTTS();
     const [selectedSpeakerLabel, setSelectedSpeakerLabel] = useState("Default Speaker");
     const [selectedMicrophoneLabel, setSelectedMicrophoneLabel] = useState("Default Microphone");
 
@@ -564,7 +639,9 @@ const SoundOverlay = () => {
             <div className="bg-basicallylight rounded-md flex h-full w-full p-5 overflow-y-auto scrollbar-thin scrollbar-thumb-primary">
                 <div className="flex flex-col w-full">
                     <div className="mb-4">
-                        <p className="text-2xl text-left text-basicallydark mb-2">
+                        <p className="text-2xl text-left text-basicallydark mb-2"
+                        onMouseEnter={() => isTTSEnabled && speak("Speaker device")}
+                        onMouseLeave={stop}>
                             Speaker Device
                         </p>
                         <Dropdown
@@ -574,7 +651,9 @@ const SoundOverlay = () => {
                         />
                     </div>
                     <div className="mb-4">
-                        <p className="text-2xl text-left text-basicallydark mb-2">
+                        <p className="text-2xl text-left text-basicallydark mb-2"
+                        onMouseEnter={() => isTTSEnabled && speak("Microphone")}
+                        onMouseLeave={stop}>
                             Microphone
                         </p>
                         <Dropdown
@@ -591,6 +670,7 @@ const SoundOverlay = () => {
 
 // PRIVACY SETTINGS PAGE
 const PrivacyOverlay = (user) => {
+    const { speak, stop, isTTSEnabled, toggleTTS } = useTTS();
     const [isDndToggled, setIsDndToggled] = useState(false);
     const [userInfo, setUserInfo] = useState(null);
     const handleDndToggle = () => {
@@ -689,7 +769,9 @@ const PrivacyOverlay = (user) => {
             <div className="bg-basicallylight rounded-md flex w-full p-5 overflow-y-auto scrollbar-thin scrollbar-thumb-primary">
                 <div className="flex flex-col w-full space-y-5">
                     <div className="mb-4 flex justify-between">
-                        <p className="text-2xl text-basicallydark">
+                        <p className="text-2xl text-basicallydark"
+                        onMouseEnter={() => isTTSEnabled && speak("Do not disturb")}
+                        onMouseLeave={stop}>
                             Do not disturb
                         </p>
                         <ToggleButtonExample
@@ -698,24 +780,32 @@ const PrivacyOverlay = (user) => {
                         />
                     </div>
                     <div className="mb-4 flex justify-between">
-                        <p className="text-2xl text-basicallydark">
+                        <p className="text-2xl text-basicallydark"
+                        onMouseEnter={() => isTTSEnabled && speak("Export my data")}
+                        onMouseLeave={stop}>
                             Export my data
                         </p>
                         <button 
                             className="text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3"
                             onClick={handleExportData}
+                            onMouseEnter={() => isTTSEnabled && speak("Export my data button")}
+                            onMouseLeave={stop}
                         >
                            &nbsp;&nbsp;Export&nbsp;
                         </button>
                     </div>
                     
                     <div className="mb-4 flex justify-between">
-                        <p className="text-2xl text-basicallydark">
+                        <p className="text-2xl text-basicallydark"
+                        onMouseEnter={() => isTTSEnabled && speak("Delete my data")}
+                        onMouseLeave={stop}>
                             Delete my data
                         </p>
                         <button 
                             className="text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-9 py-3"
                             onClick={handleDeleteData}
+                            onMouseEnter={() => isTTSEnabled && speak("Delete my data button")}
+                            onMouseLeave={stop}
                         >
                             Delete
                         </button>
@@ -727,6 +817,7 @@ const PrivacyOverlay = (user) => {
 };
 //  NOTIFICATIONS SETTINGS PAGE
 const NotificationsOverlay = () => {
+    const { speak, stop, isTTSEnabled, toggleTTS } = useTTS();
     const [selectedNotiLabel, setSelectedNotiLabel] = useState("Select an option");
     const [isNotiSoundToggled, setIsNotiSoundToggled] = useState(false);
 
@@ -737,6 +828,8 @@ const NotificationsOverlay = () => {
     const handleNotiSoundToggle = () => {
         setIsNotiSoundToggled(!isNotiSoundToggled);
     };
+
+
 
     // Function to handle configuration of notification sounds can be added here
     // For example:
@@ -755,7 +848,9 @@ const NotificationsOverlay = () => {
                 {/* RIGHT SIDE */}
                 <div className="  w-full h-full space-y-5">
                     <div className="mb-4">
-                        <p className="mb-2 text-2xl text-basicallydark">
+                        <p className="mb-2 text-2xl text-basicallydark"
+                        onMouseEnter={() => isTTSEnabled && speak("Receive notifications from")}
+                        onMouseLeave={stop}>
                             Receive Notifications from
                         </p>
                         <Dropdown
@@ -765,7 +860,9 @@ const NotificationsOverlay = () => {
                         />
                     </div>
                     <div className="mb-4 flex justify-between">
-                        <p className="text-2xl text-basicallydark">
+                        <p className="text-2xl text-basicallydark"
+                        onMouseEnter={() => isTTSEnabled && speak("Notification sound")}
+                        onMouseLeave={stop}>
                             Notification Sound
                         </p>
                         <ToggleButtonExample
@@ -774,12 +871,16 @@ const NotificationsOverlay = () => {
                         />
                     </div>
                     <div className="mb-4 flex justify-between">
-                        <p className="text-2xl text-basicallydark">
+                        <p className="text-2xl text-basicallydark"
+                        onMouseEnter={() => isTTSEnabled && speak("Choose notification sound")}
+                        onMouseLeave={stop}>
                             Choose Notification Sound
                         </p>
                         <button 
                             className="text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3"
                             onClick={handleConfigureNotificationSound}
+                            onMouseEnter={() => isTTSEnabled && speak("Configure notification sound button")}
+                            onMouseLeave={stop}
                         >
                             Configure
                         </button>
@@ -850,7 +951,7 @@ const AccessibilityOverlay = () => {
                         <button 
                             className="text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3"
                             onClick={handleConfigureFontSize}
-                            onMouseEnter={() => isTTSEnabled && speak("Configure font size")}
+                            onMouseEnter={() => isTTSEnabled && speak("Configure font size button")}
                             onMouseLeave={stop}
                         >
                             Configure
@@ -865,7 +966,7 @@ const AccessibilityOverlay = () => {
                         <button 
                             className="text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3"
                             onClick={handleConfigureColorblindFilters}
-                            onMouseEnter={() => isTTSEnabled && speak("Configure colorblind filters")}
+                            onMouseEnter={() => isTTSEnabled && speak("Configure colorblind filters button")}
                             onMouseLeave={stop}
                         >
                             Configure
