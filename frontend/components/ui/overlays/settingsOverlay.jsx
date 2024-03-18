@@ -17,6 +17,7 @@ import { useTranslation } from 'next-i18next';
 const fb = require("_firebase/firebase");
 
 const BadBehaviorStrikes = ({ strikes }) => {
+    const { t } = useTranslation('general_overlay')
     const renderSadFace = (_, index) => (
         <div key={index} style={{ marginRight: "10px", display: "inline-block" }}>
             <SentimentVeryDissatisfiedIcon
@@ -29,7 +30,7 @@ const BadBehaviorStrikes = ({ strikes }) => {
     return (
         <div>
             {Array.from({ length: strikes }, renderSadFace)}
-            <p className="p-1">{`${strikes} out of 3`}</p>
+            <p className="p-1">{`${strikes} ${t('strike_num')}`}</p>
         </div>
     );
 };
@@ -156,7 +157,7 @@ const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
             <div className=" h-full w-1/4 bg-basicallylight shadow-md rounded-bl-xl rounded-tl-xl z-50">
              <div className="p-4">
           <h2 className="text-2xl font-bold" 
-          onMouseEnter={() => isTTSEnabled && speak("Settings")}
+          onMouseEnter={() => isTTSEnabled && speak("Settings window")}
           onMouseLeave={stop}>
             {t('settings_top')}</h2>
           <ul className="mt-4">
@@ -166,7 +167,7 @@ const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
                   currentScreen === "profile" ? "bg-primary text-basicallylight" : ""
                 }`}
                 onClick={() => handleButtonClick("profile")}
-                onMouseEnter={() => isTTSEnabled && speak("Profile")}
+                onMouseEnter={() => isTTSEnabled && speak("Profile settings")}
                 onMouseLeave={stop}
               >
                 {t('profile_side')}
@@ -178,7 +179,7 @@ const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
                   currentScreen === "general" ? "bg-primary text-basicallylight" : ""
                 }`}
                 onClick={() => handleButtonClick("general")}
-                onMouseEnter={() => isTTSEnabled && speak("General")}
+                onMouseEnter={() => isTTSEnabled && speak("General settings")}
                 onMouseLeave={stop}
                 
               >
@@ -191,7 +192,7 @@ const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
                   currentScreen === "sound" ? "bg-primary text-basicallylight" : ""
                 }`}
                 onClick={() => handleButtonClick("sound")}
-                onMouseEnter={() => isTTSEnabled && speak("Sound")}
+                onMouseEnter={() => isTTSEnabled && speak("Sound settings")}
                 onMouseLeave={stop}
               >
                 {t('sound_side')}
@@ -203,7 +204,7 @@ const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
                   currentScreen === "privacy" ? "bg-primary text-basicallylight" : ""
                 }`}
                 onClick={() => handleButtonClick("privacy")}
-                onMouseEnter={() => isTTSEnabled && speak("Privacy")}
+                onMouseEnter={() => isTTSEnabled && speak("Privacy settings")}
                 onMouseLeave={stop}
               >
                 {t('privacy_side')}
@@ -217,7 +218,7 @@ const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
                     : ""
                 }`}
                 onClick={() => handleButtonClick("notifications")}
-                onMouseEnter={() => isTTSEnabled && speak("Notifications")}
+                onMouseEnter={() => isTTSEnabled && speak("Notifications settings")}
                 onMouseLeave={stop}
               >
                 {t('notif_side')}
@@ -231,7 +232,7 @@ const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
                     : ""
                 }`}
                 onClick={() => handleButtonClick("accessibility")}
-                onMouseEnter={() => isTTSEnabled && speak("Accessibility")}
+                onMouseEnter={() => isTTSEnabled && speak("Accessibility settings")}
                 onMouseLeave={stop}
               >
                 {t('access_side')}
@@ -644,7 +645,7 @@ const SoundOverlay = () => {
                         <p className="text-2xl text-left text-basicallydark mb-2"
                         onMouseEnter={() => isTTSEnabled && speak("Speaker device")}
                         onMouseLeave={stop}>
-                            Speaker Device
+                            {t('speaker_header')}
                         </p>
                         <Dropdown
                             buttonLabel={selectedSpeakerLabel}
@@ -656,7 +657,7 @@ const SoundOverlay = () => {
                         <p className="text-2xl text-left text-basicallydark mb-2"
                         onMouseEnter={() => isTTSEnabled && speak("Microphone")}
                         onMouseLeave={stop}>
-                            Microphone
+                            {t('mic_header')}
                         </p>
                         <Dropdown
                             buttonLabel={selectedMicrophoneLabel}
@@ -672,6 +673,7 @@ const SoundOverlay = () => {
 
 // PRIVACY SETTINGS PAGE
 const PrivacyOverlay = (user) => {
+    const { t } = useTranslation('privacy_overlay');
     const { speak, stop, isTTSEnabled, toggleTTS } = useTTS();
     const [isDndToggled, setIsDndToggled] = useState(false);
     const [userInfo, setUserInfo] = useState(null);
@@ -774,7 +776,7 @@ const PrivacyOverlay = (user) => {
                         <p className="text-2xl text-basicallydark"
                         onMouseEnter={() => isTTSEnabled && speak("Do not disturb")}
                         onMouseLeave={stop}>
-                            Do not disturb
+                            {t('dnd')}
                         </p>
                         <ToggleButtonExample
                             isToggled={isDndToggled}
@@ -785,7 +787,7 @@ const PrivacyOverlay = (user) => {
                         <p className="text-2xl text-basicallydark"
                         onMouseEnter={() => isTTSEnabled && speak("Export my data")}
                         onMouseLeave={stop}>
-                            Export my data
+                            {t('export_data')}
                         </p>
                         <button 
                             className="text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3"
@@ -793,7 +795,7 @@ const PrivacyOverlay = (user) => {
                             onMouseEnter={() => isTTSEnabled && speak("Export my data button")}
                             onMouseLeave={stop}
                         >
-                           &nbsp;&nbsp;Export&nbsp;
+                           &nbsp;&nbsp;{t('export_button')}&nbsp;
                         </button>
                     </div>
                     
@@ -801,7 +803,7 @@ const PrivacyOverlay = (user) => {
                         <p className="text-2xl text-basicallydark"
                         onMouseEnter={() => isTTSEnabled && speak("Delete my data")}
                         onMouseLeave={stop}>
-                            Delete my data
+                            {t('delete_data')}
                         </p>
                         <button 
                             className="text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-9 py-3"
@@ -809,7 +811,7 @@ const PrivacyOverlay = (user) => {
                             onMouseEnter={() => isTTSEnabled && speak("Delete my data button")}
                             onMouseLeave={stop}
                         >
-                            Delete
+                            {t('delete_button')}
                         </button>
                     </div>
                 </div>
@@ -819,8 +821,9 @@ const PrivacyOverlay = (user) => {
 };
 //  NOTIFICATIONS SETTINGS PAGE
 const NotificationsOverlay = () => {
+    const { t } = useTranslation('notif_overlay');
     const { speak, stop, isTTSEnabled, toggleTTS } = useTTS();
-    const [selectedNotiLabel, setSelectedNotiLabel] = useState("Select an option");
+    const [selectedNotiLabel, setSelectedNotiLabel] = useState(t('notif_type'));
     const [isNotiSoundToggled, setIsNotiSoundToggled] = useState(false);
 
     const handleNotiSelect = (label) => {
@@ -840,8 +843,8 @@ const NotificationsOverlay = () => {
     };
 
     const dropdownItems3 = [
-        { label: "Everywhere", value: "everywhere" },
-        { label: "Choose other Option", value: "other" },
+        { label: t('notif_everywhere'), value: "everywhere" },
+        { label: t('notif_other'), value: "other" },
     ];
 
     return (
@@ -853,7 +856,7 @@ const NotificationsOverlay = () => {
                         <p className="mb-2 text-2xl text-basicallydark"
                         onMouseEnter={() => isTTSEnabled && speak("Receive notifications from")}
                         onMouseLeave={stop}>
-                            Receive Notifications from
+                            {t('notif_source')}
                         </p>
                         <Dropdown
                             buttonLabel={selectedNotiLabel}
@@ -865,7 +868,7 @@ const NotificationsOverlay = () => {
                         <p className="text-2xl text-basicallydark"
                         onMouseEnter={() => isTTSEnabled && speak("Notification sound")}
                         onMouseLeave={stop}>
-                            Notification Sound
+                            {t('sound_toggle')}
                         </p>
                         <ToggleButtonExample
                             isToggled={isNotiSoundToggled}
@@ -876,7 +879,7 @@ const NotificationsOverlay = () => {
                         <p className="text-2xl text-basicallydark"
                         onMouseEnter={() => isTTSEnabled && speak("Choose notification sound")}
                         onMouseLeave={stop}>
-                            Choose Notification Sound
+                            {t('sound_type')}
                         </p>
                         <button 
                             className="text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3"
@@ -884,7 +887,7 @@ const NotificationsOverlay = () => {
                             onMouseEnter={() => isTTSEnabled && speak("Configure notification sound button")}
                             onMouseLeave={stop}
                         >
-                            Configure
+                            {t('config')}
                         </button>
                     </div>
                 </div>

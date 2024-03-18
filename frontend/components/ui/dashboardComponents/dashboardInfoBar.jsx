@@ -57,6 +57,8 @@ const DashboardInfoBar = ({ currentPath, onSort, sortCriteria}) => {
       <p
         className='text-xl font-bold font-poppins text-primary cursor-pointer underline'
         onClick={() => router.push('/dashboard')}
+        onMouseEnter={() => isTTSEnabled && speak("My Brain")}
+        onMouseLeave={stop}
       >
         {part}
       </p>

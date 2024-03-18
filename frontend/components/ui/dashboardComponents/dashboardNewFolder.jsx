@@ -6,7 +6,12 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import {Tooltip}  from '@mui/material';
 import { useState } from 'react';
 import CreateFolderOverlay from  '../overlays/CreateFolderOverlay';
+import "../../../app/utils/i18n"
+import { useTranslation } from 'next-i18next';
+import { useTTS } from "../../../app/utils/tts/TTSContext";
 const DashboardNewFolder = ({ onNewFolderCreated }) => {
+    const { t } = useTranslation('create_folder_overlay');
+    const { speak, stop, isTTSEnabled } = useTTS();
     const [isCreateFolderOverlayOpen, setIsCreateFolderOverlayOpen] = useState(false);
 
     const toggleCreateFolderOverlay = () => {
@@ -14,7 +19,7 @@ const DashboardNewFolder = ({ onNewFolderCreated }) => {
     };
     // TODO: onClick(folder);
     return (
-        <Tooltip title={"New Folder"} enterDelay={1000} leaveDelay={200}>
+        <Tooltip title={t('folder_hover')} enterDelay={1000} leaveDelay={200}>
         <div>
           {isCreateFolderOverlayOpen && (
             <CreateFolderOverlay
@@ -25,7 +30,9 @@ const DashboardNewFolder = ({ onNewFolderCreated }) => {
               }}
             />
           )}
-          <div className="bg-aliceBlue shadow-md flex items-center justify-center rounded-xl w-min hover:bg-columbiablue duration-300">
+          <div className="bg-aliceBlue shadow-md flex items-center justify-center rounded-xl w-min hover:bg-columbiablue duration-300"
+          onMouseEnter={() => isTTSEnabled && speak("Create New Folder button")}
+          onMouseLeave={stop}>
             <IconButton onClick={toggleCreateFolderOverlay} color="inherit">
               <AddCircleIcon fontSize="large" sx={{ color: '#30475E' }} />
             </IconButton>

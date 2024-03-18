@@ -74,23 +74,26 @@ export default function Dashboard() {
 
     const contextMenuOptions = [
         {
-            text: "New Folder",
+            text: t('new_folder_rclick'),
             icon: <FolderIcon />,
             onClick: () => {
                 toggleCreateFolderOverlay();
             },
-            onMouseEnter: () => {
-                isTTSEnabled && speak("New Folder")
-            },
+            onMouseEnter: () => isTTSEnabled && speak("New folder"),
+            onMouseLeave: stop
         },
         {
-            text: "New Map",
+            text: t('new_map_rclick'),
             icon: <MapIcon />,
             onClick: () => {
                 createContentMap();
             },
+            onMouseEnter: () => isTTSEnabled && speak("New map"),
+            onMouseLeave: stop
         },
-        { text: "New Document", icon: <DescriptionIcon />, onClick: () => {} },
+        { text: t('new_doc_rclick'), icon: <DescriptionIcon />, onClick: () => {}, 
+        onMouseEnter: () => isTTSEnabled && speak("New document"),
+        onMouseLeave: stop},
     ];
 
 
@@ -422,8 +425,10 @@ export default function Dashboard() {
                                     />
                                 ))
                             ) : (
-                                <div className="text-primary font-poppins text-xl italic">
-                                    Right click to make your first project!
+                                <div className="text-primary font-poppins text-xl italic"
+                                onMouseEnter={() => isTTSEnabled && speak("Right click to make your first project!")}
+                                onMouseLeave={stop}>
+                                    {t('rclick_msg')}
                                 </div>
                             )}
                         </div>

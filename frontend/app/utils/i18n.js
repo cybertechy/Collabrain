@@ -44,12 +44,13 @@ i18n
         },
 
         dashboard_folder: {
+          "name_error": "Folder name cannot be empty",
           "rename_button": "Rename",
           "new_folder_name": "New Folder Name",
           "rename_top": "Rename Folder",
           "cancel_button": "Cancel",
           "delete_button": "Delete",
-          "delete_top": "Confirm Delete",
+          "delete_top": "Confirm Deletion",
           "delete_msg": "Are you sure you want to delete this folder and its contents?"
         },
 
@@ -59,7 +60,7 @@ i18n
           "rename_top": "Rename Project",
           "cancel_button": "Cancel",
           "delete_button": "Delete",
-          "delete_top": "Confirm Delete",
+          "delete_top": "Confirm Deletion",
           "delete_msg": "Are you sure you want to delete this folder and its contents?",
           "share_button": "Share",
           "organize_button": "Organize"
@@ -100,7 +101,8 @@ i18n
           "folder_clr": "Pick a color for your folder: ",
           "folder_cancel": "Cancel",
           "folder_create": "Create",
-          "folder_wait": "Creating..."
+          "folder_wait": "Creating...",
+          "folder_hover": "New Folder"
         },
 
         settings: {
@@ -264,12 +266,14 @@ i18n
         },
 
         create_folder_overlay: {
+          "name_error": "Имя папки не может быть пустым",
           "folder_top": "Создать Новую Папку",
           "folder_name": "Введите имя папки",
           "folder_clr": "Выберите цвет вашей папки : ",
           "folder_cancel": "Отмена",
           "folder_create": "Создать",
-          "folder_wait": "Создание..."
+          "folder_wait": "Создание...",
+          "folder_hover": "Новая Папка"
         },
 
         settings: {

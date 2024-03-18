@@ -12,8 +12,13 @@ import EditIcon from '@mui/icons-material/Edit';
 import fb from '../../../app/_firebase/firebase';
 import axios from 'axios';
 import {useRouter} from 'next/navigation';
+import "../../../app/utils/i18n"
+import { useTranslation } from 'next-i18next';
+import { useTTS } from "../../../app/utils/tts/TTSContext";
 
 const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, handleProjectDeleted}) => {
+    const { t } = useTranslation('dashboard_folder');
+    const { speak, stop, isTTSEnabled } = useTTS();
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
    const router = useRouter();
@@ -38,6 +43,12 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, h
             return title?.substring(0, maxLength - 3) + '..';
         }
         return title;
+    };
+
+    const handleMouseEnter = () => {
+        if (isTTSEnabled) {
+            speak(`Folder named ${title}`);
+        }
     };
     
     //this will only work once there is a patch api endpoint to update the folder name
@@ -173,6 +184,8 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, h
     };
    
     return (
+        <div onMouseEnter={handleMouseEnter} 
+        onMouseLeave={stop}>
         <Tooltip title={title} enterDelay={1000} leaveDelay={200} >
             <div>
             <div className="bg-aliceBlue shadow-md  text-primary flex items-center justify-center rounded-md w-min pl-3 hover:bg-columbiablue hover:customShadow duration-300"
@@ -193,27 +206,33 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, h
                     'aria-labelledby': 'folder-menu-button',
                 }}
             >
-                <MenuItem onClick={() => {
+                <MenuItem 
+                onMouseEnter={() => isTTSEnabled && speak("Rename button")}
+                onMouseLeave={stop}
+                onClick={() => {
                     handleClose();
                     setRenameOverlayOpen(true);
                 }} className="flex justify-between gap-5 text-tertiary">
                 <EditIcon className="mr-2 text-tertiary flex justify-between gap-5" />
-                    <span className='text-tertiary'>Rename</span>
+                    <span className='text-tertiary'>{t("rename_button")}</span>
                 </MenuItem>
-                <MenuItem onClick={() => {
+                <MenuItem 
+                onMouseEnter={() => isTTSEnabled && speak("Delete button")}
+                onMouseLeave={stop}
+                onClick={() => {
                     handleClose();
                     setDeleteOverlayOpen(true);
                 }} className="flex justify-between gap-5  text-tertiary">
-                <DeleteIcon className='text-tertiary'/> <span className='text-tertiary'>Delete</span> 
+                <DeleteIcon className='text-tertiary'/> <span className='text-tertiary'>{t("delete_button")}</span> 
                 </MenuItem>
             </Menu>
             </div>
               {/* Rename Overlay */}
               <Dialog open={renameOverlayOpen} onClose={() => setRenameOverlayOpen(false)} sx={dialogStyles}>
-  <DialogTitle>Rename Folder</DialogTitle>
+  <DialogTitle>{t("rename_top")}</DialogTitle>
     <DialogContent>
         <TextField
-            label="New Folder Name"
+            label={t("new_folder_name")}
             variant="outlined"
             fullWidth
             value={newFolderName}
@@ -222,11 +241,11 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, h
     </DialogContent>
     <DialogActions>
     <Button onClick={() => setRenameOverlayOpen(false)} sx={buttonStyles}>
-    Cancel
+    {t("cancel_button")}
         </Button>
         <Button onClick={handleRename} sx={buttonStyles}>
 
-            Rename
+            {t("rename_button")}
         </Button>
     </DialogActions>
 </Dialog>
@@ -249,6 +268,7 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, h
             </div>
            
         </Tooltip>
+        </div>
     );
 };
 
