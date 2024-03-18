@@ -13,13 +13,15 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import { ToastContainer, toast } from 'react-toastify';
 import { useEffect, useState } from 'react';
 import { hasUsername } from "./utils/user";
+import "./utils/i18n"
+import { useTranslation } from 'next-i18next';
 export default function Home() {
     const [user, loading]  = fb.useAuthState();
     const router = useRouter();
     const [backgroundLoaded, setBackgroundLoaded] = useState(false);
     const [email, setemail] = useState("");
     const [password, setpassword] = useState("");
-
+    const { t } = useTranslation('login_signup');
 
     useEffect(() => {
         // Preload the background image
@@ -93,10 +95,10 @@ export default function Home() {
                 />
                 <div className="bg-basicallylight drop-shadow-lg flex flex-col justify-center items-center px-16 py-10 rounded-2xl">
                     <h1 className="text-2xl text-primary font-sans font-bold mb-2">
-                        Log into Collabrain
+                        {t('login_top')}
                     </h1>
             <p className = "whitespace-normal break-words text-xs font-sans text-center font-thin">
-            You are now one step away from accessing the world of collaboration and productivity.
+            {t('login_desc')}
 
             </p>
                    
@@ -106,22 +108,22 @@ export default function Home() {
                        onSubmit={handleFormSubmit}
                         style={{ textAlign: "center" }}
                     >
-                        <EmailInput email={email} setEmail={setemail} placeholder="Email ID"/>
+                        <EmailInput email={email} setEmail={setemail} placeholder={t('email')}/>
                         <br />
                         <PasswordInput placeholder= "Password" password={password} setPassword={setpassword} />
                      
                         
                         <p className="text-sm text-primary font-sans font-light text-left mt-2">
-                            <a href="">Forgot your password?</a>
+                            <a href="">{t('forgot_password')}</a>
                         </p>
                         <Button
-                            text="Log In"
+                            text={t('login_button')}
                             color="primary"
                             type = "submit"
                         />
                       <div className="line-with-text">
   <span className="linesep"></span>
-  <span className="textsep font-bold">OR</span>
+  <span className="textsep font-bold">{t('or')}</span>
   <span className="linesep"></span>
 </div>
                     </form>
@@ -142,10 +144,10 @@ export default function Home() {
                       
                     </span>
                     <p className="text-xs text-primary font-sans font-light text-left ml-2">
-                        Need an account?
+                        {t('make_acc_q')}
                         <a href="/register" className="underline">
                             {" "}
-                            SIGN UP
+                            {t('sign_up')}
                         </a>
                     </p>
                 </div>

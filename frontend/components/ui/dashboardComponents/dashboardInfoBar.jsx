@@ -3,10 +3,13 @@ import { ArrowCircleUp, ArrowCircleDown, ChevronRight } from '@mui/icons-materia
 import DropdownDashboard from './dropdownDashboard';
 import { useRouter } from 'next/navigation'; 
 import { useTTS } from "../../../app/utils/tts/TTSContext";
+import "../../../app/utils/i18n"
+import { useTranslation } from 'next-i18next';
 
 const DashboardInfoBar = ({ currentPath, onSort, sortCriteria}) => {
 
   const { speak, stop, isTTSEnabled } = useTTS();
+  const { t } = useTranslation('dashboard');
 
   useEffect(() => {
     import('jquery').then(jQuery => {
@@ -72,16 +75,16 @@ const DashboardInfoBar = ({ currentPath, onSort, sortCriteria}) => {
       </div>
       <div className="flex items-center">
                 <DropdownDashboard
-                    title={sortCriteria? sortCriteria.sortName ? "Name" : "Date Modified" : "Sort By"}
+                    title={sortCriteria? sortCriteria.sortName ? t('sort_name') : t('sort_date') : t('sort_by')}
                     items={[
                         {
-                            name: "Name",
+                            name: t('sort_name'),
                             onClick: () => toggleSortOrder('name'),
                             onMouseEnter: () => isTTSEnabled && speak("Sort by name"),
                             onMouseLeave: stop,
                         },
                         {
-                            name: "Date Modified",
+                            name: t('sort_date'),
                             onClick: () => toggleSortOrder('date'),
                             onMouseEnter: () => isTTSEnabled && speak("Sort by date modified"),
                             onMouseLeave: stop,

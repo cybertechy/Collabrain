@@ -22,9 +22,12 @@ import {
 } from "../utils/filesAndFolders";
 import { hasUsername } from "../utils/user";
 import LoaderComponent from "../../components/ui/loader/loaderComponent";
-import { TTSProvider, useTTS } from "../utils/tts/TTSContext";
+import { useTTS } from "../utils/tts/TTSContext";
+import "../utils/i18n"
+import { useTranslation } from 'next-i18next';
 
 export default function Dashboard() {
+    const { t } = useTranslation('dashboard');
     const { speak, stop, isTTSEnabled } = useTTS();
     const [user, loading] = fb.useAuthState();
     const [isLoading, setIsLoading] = useState(true);
@@ -324,7 +327,7 @@ export default function Dashboard() {
             />
 
 			<DashboardInfoBar
-			currentPath={searchParams.get("path") ? "My Brain" + searchParams.get("path") : "My Brain"}
+			currentPath={searchParams.get("path") ? t("my_brain") + searchParams.get("path") : t("my_brain")}
 		
 			onSort={handleSort} 
 			sortCriteria = {sortCriteria}
@@ -349,7 +352,7 @@ export default function Dashboard() {
                         <p className="text-2xl text-left text-primary ml-4 mb-4" ref={folders}
                         onMouseEnter={() => isTTSEnabled && speak("Folders")}
                         onMouseLeave={stop}>
-                            Folders
+                            {t('folders')}
                         </p>
 
                         <div className="flex flex-wrap content-start items-start w-full justify-start ml-4 gap-8 ">
@@ -384,7 +387,7 @@ export default function Dashboard() {
                     <p className="text-2xl text-left text-primary ml-4 mb-4 mt-5" ref={projects}
                     onMouseEnter={() => isTTSEnabled && speak("Projects")}
                     onMouseLeave={stop}>
-                        Projects
+                        {t('projects')}
                     </p>
 
                     <div

@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import {createFolder} from '../../../app/utils/filesAndFolders';
 import { useSearchParams } from 'next/navigation'
+import "../../../app/utils/i18n"
+import { useTranslation } from 'next-i18next';
 const CreateFolderOverlay = ( {isOpen, onClose, onFolderCreated}) => {
+    const { t } = useTranslation('create_folder_overlay');
     const [folderName, setFolderName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -38,15 +41,15 @@ const CreateFolderOverlay = ( {isOpen, onClose, onFolderCreated}) => {
         <div className={`fixed top-0 left-0 w-full h-full flex items-center justify-center ${isOpen ? 'block' : 'hidden'} z-50 bg-basicallydark bg-opacity-50 backdrop-blur-sm`}>
             <div className="w-1/4 bg-basicallylight rounded-md shadow-lg">
                 <div className="p-8">
-                    <h2 className="text-2xl font-bold mb-4 text-basicallydark">Create a New Folder</h2>
+                    <h2 className="text-2xl font-bold mb-4 text-basicallydark">{t('folder_top')}</h2>
                     <input
                         type="text"
                         className="w-full text-basicallydark p-2 border border-gray-300 rounded focus:outline-none focus:border-primary"
-                        placeholder="Enter folder name"
+                        placeholder={t('folder_name')}
                         value={folderName}
                         onChange={(e) => setFolderName(e.target.value)}
                     />
-                    <div className='text-primary font-medium italic font-poppins'>Pick a color for your folder: <input
+                    <div className='text-primary font-medium italic font-poppins'>{t('folder_clr')} <input
     type="color"
     className="w-16 h-8 border mt-2 border-gray-300 rounded focus:outline-none text-primary"
     value={folderColor}
@@ -60,14 +63,14 @@ const CreateFolderOverlay = ( {isOpen, onClose, onFolderCreated}) => {
                             onClick={handleCancel}
                             disabled={isLoading}
                         >
-                            Cancel
+                            {t('folder_cancel')}
                         </button>
                         <button
                             className="px-4 py-2 bg-primary text-basicallylight rounded hover:opacity-80 border-2 border-solid border-primary duration-300 ease-in-out"
                             onClick={handleCreate}
                             disabled={isLoading}
                         >
-                            {isLoading ? 'Creating...' : 'Create'}
+                            {isLoading ? t('folder_wait') : t('folder_create')}
                         </button>
                     </div>
                 </div>

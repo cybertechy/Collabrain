@@ -4,10 +4,13 @@ import SwapVertIcon from '@mui/icons-material/SwapVert';
 import QueryBuilderIcon from '@mui/icons-material/QueryBuilder';
 import { IconButton, Button } from '@mui/material';
 import { useTTS } from "../../../app/utils/tts/TTSContext";
+import "../../../app/utils/i18n"
+import { useTranslation } from 'react-i18next';
 
 const fb = require('_firebase/firebase');
 
 const LeaderboardNavbar = ({ user }) => {
+    const { t } = useTranslation('leaderboard');
     const { speak, stop, isTTSEnabled } = useTTS();
     const [showAnimation, setShowAnimation] = useState(false);
     const [leaderboardData, setLeaderboardData] = useState({
@@ -59,7 +62,7 @@ const LeaderboardNavbar = ({ user }) => {
             <div className="text-xl text-center mb-4 font-poppins" 
             onMouseEnter={() => isTTSEnabled && speak("League Leaderboard")}
             onMouseLeave={stop}
-            >League Leaderboard</div>
+            >{t('leaderboard')}</div>
 
             {/* Rest of the component remains unchanged */}
 
@@ -81,7 +84,7 @@ const LeaderboardNavbar = ({ user }) => {
                         <Button sx={{color:'white'}} variant="text" onClick={handleViewMore}
                         onMouseEnter={() => isTTSEnabled && speak(showMore ? 'View Less' : 'View More')}
                         onMouseLeave={stop}>
-                            {showMore ? 'View Less' : 'View More'}
+                            {showMore ? t('view_less') : t('view_more')}
                         </Button>
                     </div>
                 )}

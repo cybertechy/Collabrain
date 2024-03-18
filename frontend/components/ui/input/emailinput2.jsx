@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import Tooltip from '@mui/material/Tooltip';
 import { styled } from '@mui/material/styles';
 import clsx from 'clsx';
+import "../../../app/utils/i18n"
+import { useTranslation } from 'react-i18next';
 // Create a custom styled tooltip with a red background
 const RedTooltip = styled(({ className, ...props }) => (
     <Tooltip {...props} classes={{ popper: className }} />
@@ -17,6 +19,7 @@ const RedTooltip = styled(({ className, ...props }) => (
   }));
 
 const EmailInput = ({ placeholder, email, setEmail }) => {
+  const { t } = useTranslation('login_signup');
   const [error, setError] = useState(false);
 
   useEffect(() => {
@@ -33,7 +36,7 @@ const EmailInput = ({ placeholder, email, setEmail }) => {
   return (
     <div className="mt-4 ">
       <RedTooltip
-        title={error ? "Invalid email address" : ''}
+        title={error ? t('email_invalid') : ''}
         placement="top"
         arrow
       >
@@ -51,7 +54,7 @@ const EmailInput = ({ placeholder, email, setEmail }) => {
       </RedTooltip>
       {error && (
         <span id="email-error" className="sr-only">
-          Invalid email address.
+          {t('email_invalid')}
         </span>
       )}
     </div>

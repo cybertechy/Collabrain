@@ -2,6 +2,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import 'react-toastify/dist/ReactToastify.css';
 import { TTSProvider, useTTS } from "../app/utils/tts/TTSContext";
+import "../app/utils/i18n"
 
 import localFont from 'next/font/local'
 const inter = Inter({ subsets: ["latin"] });
