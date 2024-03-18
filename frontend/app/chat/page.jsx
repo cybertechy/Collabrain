@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import MessageBox from "./messageBox";
+import MessageBox from "@/components/ui/messagesComponents/messageBox";
 import Toolbar from '@mui/material/Toolbar';
 import { Timestamp } from "firebase/firestore";
 import ChannelBar from "../../components/ui/chatsComponents/channelBar";
@@ -192,22 +192,7 @@ const scrollToBottom = () => {
      useEffect(() => {
         scrollToBottom();
     }, [text]); 
-	if (loading|| !user )
-    return (
-        <div className="flex flex-col items-center justify-around min-h-screen">
-            <div className="flex flex-col items-center justify-center min-h-screen">
-                <h1 className="text-xl font-bold mb-5 text-primary">Trying to sign in</h1>
-                <div className="loader mb-5"></div>
-
-                <p className="text-lg font-bold text-primary mb-5 ">
-                    If you're not signed in, sign in&nbsp;
-                    <span className="underline cursor-pointer" onClick={() => router.push("/")}>
-                        here
-                    </span>
-                </p>
-            </div>
-        </div>
-    );
+	
 
 
 

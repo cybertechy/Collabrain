@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import List from '@mui/material/List';
 import TopBar from './topBar';
 import SearchBar from './searchBar';
-import FriendTile from './friendTile';
+import FriendTile from '@/components/ui/messagesComponents/friendTile';
 import Typography from '@mui/material/Typography'; 
 import axios from 'axios';
 const fb = require("_firebase/firebase");
@@ -16,7 +16,7 @@ import Lottie from "lottie-react";
 
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
-const FriendsWindow = () => {
+const FriendsWindow = ({userInfo, handleAliasUpdate}) => {
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -222,7 +222,7 @@ const FriendsWindow = () => {
 
       
   return filteredFriends.map((friend, index) => (
-    <FriendTile key={index} id = {friend.id} friendData={friend} onMoreOptions={handleMoreOptions} />
+    <FriendTile key={index} id = {friend.id} friendData={friend} onMoreOptions={handleMoreOptions} userInfo = {userInfo} handleAliasUpdate = {handleAliasUpdate} />
   ));
     }
   };
@@ -272,7 +272,7 @@ const FriendsWindow = () => {
       <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
         {visibleList.length > 0 ? (
           visibleList.map((friend, index) => (
-            <FriendTile key = {index} id={friend.id} friendData={friend} onMoreOptions={handleMoreOptions} />
+            <FriendTile key = {index} id={friend.id} friendData={friend} onMoreOptions={handleMoreOptions} handleAliasUpdate = {handleAliasUpdate}  userInfo = {userInfo} />
           ))
         ) : (
           // <Typography variant="body1" sx={{ p: 2 }}>

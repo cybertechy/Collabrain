@@ -22,7 +22,7 @@ const commonReactions = [
   { emoji: '😢', label: 'sad' },
 ];
 
-function MessageItem({ sender, senderId, timestamp, message, messageId, attachmentIds, reactions = {}, onReact, onEdit, onDelete, userInfo, chatId }) {
+function MessageItem({ sender, senderId, title,timestamp, message, messageId, attachmentIds, reactions = {}, onReact, onEdit, onDelete, userInfo, chatId }) {
   const [attachments, setAttachments] = useState([]);
   const [loadingAttachments, setLoadingAttachments] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -148,7 +148,7 @@ function MessageItem({ sender, senderId, timestamp, message, messageId, attachme
         <CustomAvatar username={sender} />
         <div className="flex flex-col">
           <div className="flex items-baseline gap-2">
-            <span className="font-semibold">{sender}</span>
+            <span className="font-semibold">{sender == userInfo.data.username? sender:title}</span>
             <span className="text-xs text-gray-500">{timestamp}</span>
           </div>
           <Linkify componentDecorator={(decoratedHref, decoratedText, key) => (

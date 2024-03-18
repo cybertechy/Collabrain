@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Avatar,
   ListItem,
@@ -12,6 +12,7 @@ import {
   Button,
   List,
   ListItemIcon,
+  TextField,
   Box,
 } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
@@ -25,37 +26,62 @@ import EditIcon from '@mui/icons-material/Edit';
 import axios from 'axios';
 import { useAuthState } from '_firebase/firebase';
 import CustomAvatar from './avatar';
-
+import { updateFriendAlias,blockUser } from '@/app/utils/user';
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
-const FriendTile = ({ friendData, openChat, setRefreshList }) => {
+const FriendTile = ({ friendData, openChat, setRefreshList , userInfo, handleAliasUpdate}) => {
   const [user, loading] = useAuthState();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [alias, setAlias] = useState('');
+
+  useEffect(() => {
+    // This checks if user and friendData.alias are defined to safely access user.uid
+    console.log("Userinfo, ",userInfo);
+    if (user && userInfo.alias && userInfo.alias[friendData.id]) {
+    
+      setAlias(userInfo.alias[friendData.id]);
+    } else {
+      setAlias('');
+    }
+  }, [user, userInfo, friendData]);
+
   const openDialog = () => {
     setDialogOpen(true);
   };
 
   const closeDialog = () => {
     setDialogOpen(false);
+    setSelectedOption('');
+    // Resetting alias to the current value in userInfo
+    setAlias(userInfo?.alias?.[friendData.id] || '');
   };
+  
+  
 
   const handleOptionClick = (option) => {
     setSelectedOption(option);
+    console.log("Our user", user);
+    console.log('Option selected:', friendData);
     openDialog();
   };
 
-  const handleDialogAction = () => {
-    closeDialog();
-    if (selectedOption === 'alias') {
-      // Handle setting an alias logic here
-      console.log('Setting alias for user:', friendData.username);
+  const handleDialogAction = async () => {
+    if (selectedOption === 'alias' && alias.trim()) {
+      const isSuccess = await updateFriendAlias(friendData.id, alias.trim());
+      if (isSuccess) {
+        console.log(`Alias "${alias}" set for user:`, friendData);
+        handleAliasUpdate(friendData.id, alias.trim()); // Call the update function passed as prop
+      }
     } else if (selectedOption === 'block') {
-      // Handle blocking user logic here
-      console.log('Blocking user:', friendData.username);
+      await blockUser(friendData.id);
+      console.log('Blocking user:', friendData);
     }
+    closeDialog();
   };
+  
+  
 
   function handleChatClick(friend) {
     console.log('Chat clicked for:', friend.username);
@@ -241,16 +267,16 @@ const FriendTile = ({ friendData, openChat, setRefreshList }) => {
 
   const handleBlockUser = () => {
     // Add logic to block the user here
-    console.log('Blocking user:', friendData.username);
+    console.log('Blocking user:', friendData);
     handleClose();
   };
 
   const handleSetAlias = () => {
     // Add logic to set an alias for the user here
-    console.log('Setting alias for user:', friendData.username);
+    console.log('Setting alias for user:', friendData);
     handleClose();
   };
-
+console.log("Friend Data in friend tile" , friendData);
   return (
     <ListItem
       sx={{
@@ -266,10 +292,15 @@ const FriendTile = ({ friendData, openChat, setRefreshList }) => {
           <CustomAvatar username={friendData.username} />
         </ListItemAvatar>
         <ListItemText
-          primary={friendData.username}
-          secondary={friendData.email}
-          primaryTypographyProps={{ color: 'text.primary' }}
-        />
+  primary={
+    userInfo.data&& userInfo.data.alias && userInfo.data.alias[friendData.id]
+      ? `${userInfo.data.alias[friendData.id]}`
+      : friendData.username
+  }
+  secondary={friendData.email}
+  primaryTypographyProps={{ color: 'text.primary' }}
+/>
+
       </Box>
 
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -287,21 +318,36 @@ const FriendTile = ({ friendData, openChat, setRefreshList }) => {
       >
         <DialogTitle>Select an Option</DialogTitle>
         <DialogContent>
-          <List>
-            <ListItem button onClick={() => handleOptionClick('alias')}>
-              <ListItemIcon>
-                <EditIcon />
-              </ListItemIcon>
-              <ListItemText primary="Set Alias" />
-            </ListItem>
-            <ListItem button onClick={() => handleOptionClick('block')}>
-              <ListItemIcon>
-                <BlockIcon />
-              </ListItemIcon>
-              <ListItemText primary="Block User" />
-            </ListItem>
-          </List>
-        </DialogContent>
+  {selectedOption === 'alias' ? (
+    <TextField
+      autoFocus
+      margin="dense"
+      id="alias"
+      label="Alias"
+      type="text"
+      fullWidth
+      variant="standard"
+      value={alias}
+      onChange={(e) => setAlias(e.target.value)}
+    />
+  ) : (
+    <List>
+      <ListItem button onClick={() => handleOptionClick('alias')}>
+        <ListItemIcon>
+          <EditIcon />
+        </ListItemIcon>
+        <ListItemText primary="Set Alias" />
+      </ListItem>
+      <ListItem button onClick={() => handleOptionClick('block')}>
+        <ListItemIcon>
+          <BlockIcon />
+        </ListItemIcon>
+        <ListItemText primary="Block User" />
+      </ListItem>
+    </List>
+  )}
+</DialogContent>
+
         <DialogActions>
           <Button onClick={handleDialogAction} color="primary">
             Confirm
