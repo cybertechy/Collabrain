@@ -51,7 +51,7 @@ router.post("/media/", async (req, res) =>
 	if (dataInBytes > 10485760) return res.status(400).json({ code: "AM106", error: "Data is too large" });
 
 
-	const bucketName = "B1";
+	const bucketName = (req.body?.team===true) ? "B2" : "B1";
 
 	// Generate a random filename for the media uuid
 	const fileName = uuid.v4();
