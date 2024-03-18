@@ -25,6 +25,7 @@ import LoaderComponent from "../../components/ui/loader/loaderComponent";
 import { TTSProvider, useTTS } from "../utils/tts/TTSContext";
 
 export default function Dashboard() {
+    const { speak, stop, isTTSEnabled } = useTTS();
     const [user, loading] = fb.useAuthState();
     const [isLoading, setIsLoading] = useState(true);
     const [loadingState, setLoadingState] = useState("LOGGING_IN");
@@ -316,7 +317,6 @@ export default function Dashboard() {
     }, [user, folderChanges,path]);
 
     return (
-        <TTSProvider>
         <Template>
             <LoaderComponent
                 isLoading={isLoading}
@@ -346,7 +346,9 @@ export default function Dashboard() {
 
                
                     <div>
-                        <p className="text-2xl text-left text-primary ml-4 mb-4" ref={folders}>
+                        <p className="text-2xl text-left text-primary ml-4 mb-4" ref={folders}
+                        onMouseEnter={() => isTTSEnabled && speak("Folders")}
+                        onMouseLeave={stop}>
                             Folders
                         </p>
 
@@ -379,7 +381,9 @@ export default function Dashboard() {
                     </div>
                
                 <div>
-                    <p className="text-2xl text-left text-primary ml-4 mb-4 mt-5" ref={projects}>
+                    <p className="text-2xl text-left text-primary ml-4 mb-4 mt-5" ref={projects}
+                    onMouseEnter={() => isTTSEnabled && speak("Projects")}
+                    onMouseLeave={stop}>
                         Projects
                     </p>
 
@@ -433,6 +437,5 @@ export default function Dashboard() {
                 />
             )}
         </Template>
-        </TTSProvider>
     );
 }
