@@ -43,6 +43,7 @@
     "react-dom": "^18",
     "react-firebase-hooks": "^5.1.1",
     "react-hook-form": "^7.50.1",
+    "react-i18next": "^14.1.0",
     "react-linkify": "^1.0.0-alpha",
     "react-quill": "^2.0.0",
     "react-toastify": "^9.1.3",
