@@ -1,17 +1,22 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { getToken } from "_firebase/firebase"; // Assuming this function retrieves the authentication token
+import { getToken , useAuthState } from "@/app/_firebase/firebase";
 
 const Leaderboard = () => {
   const [teamData, setTeamData] = useState([]);
+  const [user, loading] = useAuthState();
 
   // Fetch team data from backend API
   useEffect(() => {
     const fetchData = async () => {
         try {
           const token = await getToken(); // Retrieve authentication token
-          const response = await axios.get('http://localhost:8080/api/teams', {
+          if (!token) {
+            console.error('Error: No token available');
+            return;
+          }
+          const response = await axios.get('http://localhost:8080/api/teams?sort=score', {
             headers: { Authorization: `Bearer ${token}` } // Include token in headers
           });
           
@@ -30,13 +35,13 @@ const Leaderboard = () => {
     };
 
     fetchData();
-  }, []);
+  }, [user]);
 
   // Function to handle joining a team
   const joinTeam = async (teamId) => {
     try {
       const token = await getToken(); // Retrieve authentication token
-      const response = await axios.post(`http://localhost:8080/api/teams`, null, {
+      const response = await axios.post(`http://localhost:8080/api/teams/`, null, {
         headers: { Authorization: `Bearer ${token}` } // Include token in headers
       });
       
