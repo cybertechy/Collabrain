@@ -95,6 +95,27 @@ i18n
           "join_button": "Join a Team"
         },
 
+        create_team: {
+          "create_top": "Customize your team",
+          "create_msg": "Give your team a nice snazzy name and an icon.",
+          "team_name": "Team Name",
+          "enter_name": "Enter team name",
+          "guidelines1": "By creating a team, you agree to Collabrain's ",
+          "guidelines2": "Community Guidelines*",
+          "back_button": "Back",
+          "create_button": "Create"
+        },
+
+        join_team: {
+          "join_top": "Join a team",
+          "join_msg": "Enter the invite details to join an existing team.",
+          "enter_link": "Enter invite link",
+          "no_invite_q": "Don't have an invite?",
+          "check_public": "Check out public teams in the discovery",
+          "back_button": "Back",
+          "join_button": "Join"
+        },
+
         create_folder_overlay: {
           "folder_top": "Create a New Folder",
           "folder_name": "Enter folder name",
@@ -257,12 +278,37 @@ i18n
           "view_less": "Свернуть"
         },
 
+        create_project: {
+
+        },
+
         create_join_team: {
           "create_top": "Создать команду",
           "create_desc": "Создание команды очень простое занятие, которое создаст для вас простор воображения.",
           "create_button": "Создать Команду",
           "invite_q": "Есть приглашение?",
           "join_button": "Вступить в Команду"
+        },
+
+        create_team: {
+          "create_top": "Персонализируйте вашу команду",
+          "create_msg": "Дайте вашей команде прикольное имя и иконку.",
+          "team_name": "Имя Команды",
+          "enter_name": "Введите имя команды",
+          "guidelines1": "Создавая команду, вы соглашаетесь с ",
+          "guidelines2": "Правилами Сообщества Collabrain*",
+          "back_button": "Назад",
+          "create_button": "Создать"
+        },
+
+        join_team: {
+          "join_top": "Вступить в команду",
+          "join_msg": "Введите данные приглашения, чтобы вступить в существующую команду.",
+          "enter_link": "Введите ссылку приглашения",
+          "no_invite_q": "Нет приглашения?",
+          "check_public": "Найдите команды по вашим интересам",
+          "back_button": "Назад",
+          "join_button": "Вступить"
         },
 
         create_folder_overlay: {
