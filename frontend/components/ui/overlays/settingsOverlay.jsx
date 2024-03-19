@@ -324,6 +324,33 @@ const router = useRouter();
     const handleClose = () => {
         setOpenDialog(false);
     };
+//for enabling 2fa
+    const handleEnable2FA = async () => {
+        try {
+            const token = await fb.getToken();
+            await axios.patch('http://localhost:8080/api/2FA/enable', null, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            alert('Two-factor authentication enabled successfully');
+        } catch (error) {
+            console.error('Error enabling 2FA:', error);
+            alert('Error enabling two-factor authentication. Please try again later.');
+        }
+    };
+ //for disabling 2fa
+    const handleDisable2FA = async () => {
+        try {
+            const token = await fb.getToken();
+            await axios.patch('http://localhost:8080/api/2FA/disable', null, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            alert('Two-factor authentication disabled successfully');
+        } catch (error) {
+            console.error('Error disabling 2FA:', error);
+            alert('Error disabling two-factor authentication. Please try again later.');
+        }
+    };
+
     return (
         <>
         <div className="w-full h-5/6 flex ">
@@ -358,9 +385,13 @@ const router = useRouter();
                                             Protect your Collabrain account with
                                             an extra layer of security.
                                         </p>
-                                        <button className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 ">
-                                            Enable
-                                        </button>
+                                        <div className="flex space-x-5">
+                                        <button onClick={handleEnable2FA} className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 ">
+                                             Enable</button>
+                                        <button onClick={handleDisable2FA} className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3">
+                                            Disable</button>
+                                            </div>
+
                                     </div>
                                 </div>
                                 <div className="  w-11/12 h-48  bg-basicallylight rounded-md">

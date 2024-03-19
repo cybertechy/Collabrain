@@ -40,7 +40,8 @@ router.post("/", async (req, res) =>
 		image: image,
 		reason: req.body.reason,
 		sender: req.params.sender,
-		reporter: user.uid
+		reporter: user.uid,
+		date: fb.admin.firestore.Timestamp.now()
 	})
     .then(() => res.status(200).json({ message: "Message reported" }))
     .catch(err => res.status(500).json({ error: err }))	
@@ -60,11 +61,24 @@ router.get("/", async (req, res) =>
 
 	// Check if user is admin
 	let userRef = await fb.db.doc(`users/${user.uid}`).get();
+	let userRole = userRef.data().role;
+	if (!(userRole=== "content moderator" || userRole=== "platform manager")) {
+		return res.status(401).json({ error: "Unauthorized Access" });
+	}
 
 	// Get reports
 	let reports = [];
 	let snapshot = await fb.db.collection("reports").get();
 	snapshot.forEach(doc => reports.push(doc.data()));
+
+	// add user and team names
+	for (let i = 0; i < reports.length; i++) {
+		if (reports[i].teamID) {
+			let teamRef = await fb.db.doc(`teams/${reports[i].teamID}`).get();
+			let team = teamRef.data();
+			reports[i].team = team.name;
+		}
+	}
 	return res.status(200).json(reports);
 });
 

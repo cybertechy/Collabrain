@@ -79,12 +79,12 @@ app.use("/api/notifications", notificationsRoute);
 app.use("/api/docs", docRoute); 
 app.use("/api/storage", storageRoute);
 app.use("/api/stats", statsRoute);
+app.use("/api/ai", aiRoute);
 
 // Endpoint to display DB usage
 app.get("/api/dbUsage", (req, res) => {
     res.json({ message: "Database Usage", count: APIUsageCount });
 });
-
 app.get("/api/home", (req, res) =>
 {
 	res.json({ message: "Running" });
