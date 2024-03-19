@@ -123,10 +123,10 @@ const Moderation = () => {
               <p className="font-medium pl-12">Date</p>
             </div>
             <div className="pl-8 pr-16 pb-5 pt-2">
-              {dataLoading && <p className='text-center text-lg font-semibold p-3'>Loading Data...</p>}
+              {dataLoading && <p className='animate-pulse text-center text-lg font-semibold p-3'>Loading Data...</p>}
               {reports.map((report, index) => (
                 <div key={index} className="grid grid-cols-4 w-full py-2  border-b-2 border-gray-200">
-                  <p className="font-light">{report.sender} <br></br> <span className='text-xs'>{report.reporter}</span></p>
+                  <p className="font-light">{report.sender} <br></br> <span className='text-xs'>Reported by: {report.reporter}</span></p>
                   <p className="font-light pl-4">{
                     (report.message) ? report.message : <span > <image src={report.image} alt="Violation Image"></image></span>
                   }</p>

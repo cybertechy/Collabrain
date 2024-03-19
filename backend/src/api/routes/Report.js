@@ -40,7 +40,8 @@ router.post("/", async (req, res) =>
 		image: image,
 		reason: req.body.reason,
 		sender: req.params.sender,
-		reporter: user.uid
+		reporter: user.uid,
+		date: fb.admin.firestore.Timestamp.now()
 	})
     .then(() => res.status(200).json({ message: "Message reported" }))
     .catch(err => res.status(500).json({ error: err }))	
@@ -72,17 +73,12 @@ router.get("/", async (req, res) =>
 
 	// add user and team names
 	for (let i = 0; i < reports.length; i++) {
-		if (reports[i].chatID) {
-			let senderRef = await fb.db.doc(`users/${reports[i].sender}`).get();
-			let sender = senderRef.data();
-			reports[i].sender = sender.username;
-		} else if (reports[i].teamID) {
+		if (reports[i].teamID) {
 			let teamRef = await fb.db.doc(`teams/${reports[i].teamID}`).get();
 			let team = teamRef.data();
 			reports[i].team = team.name;
 		}
 	}
-
 	return res.status(200).json(reports);
 });
 
