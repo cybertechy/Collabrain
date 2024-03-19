@@ -28,22 +28,8 @@ const TopBar = ({ activeTab, onTabChange }) => {
         <Button sx={tabButtonStyle('all')} onClick={() => onTabChange('all')}>All</Button>
         <Button sx={tabButtonStyle('Recieved')} onClick={() => onTabChange('Recieved')}>Received</Button>
         <Button sx={tabButtonStyle('blocked')} onClick={() => onTabChange('blocked')}>Blocked</Button>
-        <Button
-          variant="contained"
-          startIcon={<AddCircleOutlineIcon />}
-          onClick={handleAddFriendClick}
-          sx={{
-            bgcolor: activeTab === "addFriend" ? '#FFFFFF' : '#30475E',
-            color: activeTab === "addFriend" ? '#30475E' : '#FFFFFF',
-            '&:hover': {
-              bgcolor: '#FFFFFF', // Ensure contrast remains on hover
-              color: '#30475E',
-            },
-            marginLeft: 2,
-          }}
-        >
-          Add Friend
-        </Button>
+        <Button sx={tabButtonStyle('addFriend')} onClick={() => onTabChange('addFriend')}>Add Friend</Button>
+
       </Box>
     </Box>
   );

@@ -71,6 +71,7 @@ export default function Messages() {
                 <MessageItem
                     key={data.id }
                     sender={data.sender}
+                    senderId= {data.senderId}
                     message={data.msg}
                     timestamp={
                         sentAt.toDateString() +
@@ -84,7 +85,8 @@ export default function Messages() {
                     attachments={data.attachments}
                     replyTo={data.replyTo}
                     userInfo={userInfo}
-
+                    chatId = {chatId}
+                    
                 />,
             ]);
         });
@@ -131,7 +133,7 @@ export default function Messages() {
         if (!user) return;
 
         const handleDeleteDirectMessage = (deletedMessage) => {
-            console.log("Received deleteDirectMessage event for message ID:", deletedMessage.messageId);
+            console.log("Received deleteDirectMessage event for message ID:", deletedMessage);
             setMessages(currentMessages => currentMessages.filter(messageComponent =>
                 messageComponent.props.messageId !== deletedMessage.id
             ));
@@ -149,60 +151,60 @@ export default function Messages() {
         };
     }, [user]);
 
-    useEffect(() => {
-        if (!sockCli.current || !user || !chatId) return;
+    // useEffect(() => {
+    //     if (!sockCli.current || !user || !chatId) return;
 
 
-        const handleUpdateID = (updatedMessage) => {
-            console.log("Received updateID event:", updatedMessage);
-            updatedMessage.msg = AES.decrypt(updatedMessage.msg, chatId).toString(enc);
-            setMessages((prevMessages) => {
-                return prevMessages.map((messageComponent) => {
+    //     const handleUpdateID = (updatedMessage) => {
+    //         console.log("Received updateID event:", updatedMessage);
+    //         updatedMessage.msg = AES.decrypt(updatedMessage.msg, chatId).toString(enc);
+    //         setMessages((prevMessages) => {
+    //             return prevMessages.map((messageComponent) => {
 
-                    // Extract props from each MessageItem component
-                    const { sender, message, timestamp, messageId } = messageComponent.props;
+    //                 // Extract props from each MessageItem component
+    //                 const { sender, message, timestamp, messageId } = messageComponent.props;
 
-                    // Convert updatedMessage.sentAt to Date object
-                    const updatedMessageDate = new Date(
-                        updatedMessage.sentAt._seconds * 1000 +
-                        updatedMessage.sentAt._nanoseconds / 1000000
-                    );
+    //                 // Convert updatedMessage.sentAt to Date object
+    //                 const updatedMessageDate = new Date(
+    //                     updatedMessage.sentAt._seconds * 1000 +
+    //                     updatedMessage.sentAt._nanoseconds / 1000000
+    //                 );
 
-                    // Options to format the date as '3/13/2024, 11:07:25 PM'
-                    const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+    //                 // Options to format the date as '3/13/2024, 11:07:25 PM'
+    //                 const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
 
-                    const updatedMessageTimestampString = updatedMessageDate.toLocaleString('en-US', options);
+    //                 const updatedMessageTimestampString = updatedMessageDate.toLocaleString('en-US', options);
 
-                    const tempIDCheck = messageId.startsWith("temp-");
-                    const senderMatch = sender === updatedMessage.sender;
-                    const messageMatch = message === updatedMessage.msg;
-                    const timestampMatch = timestamp === updatedMessageTimestampString;
+    //                 const tempIDCheck = messageId.startsWith("temp-");
+    //                 const senderMatch = sender === updatedMessage.sender;
+    //                 const messageMatch = message === updatedMessage.msg;
+    //                 const timestampMatch = timestamp === updatedMessageTimestampString;
 
 
-                    // Reconstruct component with updated ID if conditions match
-                    if (tempIDCheck && senderMatch && messageMatch && timestampMatch) {
+    //                 // Reconstruct component with updated ID if conditions match
+    //                 if (tempIDCheck && senderMatch && messageMatch && timestampMatch) {
 
-                        return React.cloneElement(messageComponent, {
-                            ...messageComponent.props,
-                            key: updatedMessage.id, // Update the key
-                            messageId: updatedMessage.id // Update the ID
-                        });
-                    }
+    //                     return React.cloneElement(messageComponent, {
+    //                         ...messageComponent.props,
+    //                         key: updatedMessage.id, // Update the key
+    //                         messageId: updatedMessage.id // Update the ID
+    //                     });
+    //                 }
 
-                    // Return the original component if no match
-                    return messageComponent;
-                });
-            });
-        };
+    //                 // Return the original component if no match
+    //                 return messageComponent;
+    //             });
+    //         });
+    //     };
 
-        sockCli.current.on("updateID", handleUpdateID);
+    //     sockCli.current.on("updateID", handleUpdateID);
 
-        return () => {
-            if (sockCli.current) {
-                sockCli.current.off("updateID", handleUpdateID);
-            }
-        };
-    }, [user, chatId]);
+    //     return () => {
+    //         if (sockCli.current) {
+    //             sockCli.current.off("updateID", handleUpdateID);
+    //         }
+    //     };
+    // }, [user, chatId]);
 
 
 
@@ -235,7 +237,7 @@ export default function Messages() {
                     }
                 });
 
-
+               
                 setDirectMessages(directMessagesData);
             } catch (error) {
                 console.error("Error fetching data:", error);
@@ -322,7 +324,13 @@ export default function Messages() {
             sockCli.current.emit("deleteDirectMessage", messageToDelete);
         }
     };
-
+    const handleAliasUpdate = (friendId, newAlias) => {
+        console.log("USER UPDATE CALLED FOR ID", friendId,"WITH ALIAS", newAlias)
+        setUserInfo(prevUserInfo => ({
+          ...prevUserInfo,
+          alias: { ...prevUserInfo.alias, [friendId]: newAlias },
+        }));
+      };
     const sendPersonalMsg = async (msg, attachments = []) => {
         if (!sockCli.current) {
             console.error("Socket is not initialized yet.");
@@ -392,13 +400,15 @@ export default function Messages() {
             <MessageItem
                 key={msgId}
                 sender={optimisticMessage.sender}
+                senderId = {messageData.senderID}
                 timestamp={optimisticMessage.sentAt}
                 message={optimisticMessage.msg}
                 userData={userInfo.data}
                 attachmentIds={optimisticMessage.attachments} // Pass the attachment IDs to the MessageItem component
                 messageId={msgId}
                 userInfo={userInfo}
-
+                chatId = {chatId}
+               
             />,
         ]);
 
@@ -524,15 +534,17 @@ export default function Messages() {
                         sendPersonalMsg={sendPersonalMsg}
                         userInfo={userInfo}
                         withUserInfo={withUserInfo}
+                        withUserId = {withUser}
                         switchToFriends={openFriends}
                         onReact={handleReact}
                         onReply={setReplyTo}
                         replyTo={replyTo}
                         onEdit={handleEdit}
                         onDelete={onDelete}
+                        chatId = {chatId}
                     />
                 ) : (
-                    <FriendsWindow />
+                    <FriendsWindow userInfo = {userInfo} handleAliasUpdate  = {handleAliasUpdate}/>
                 )}
             </div>
         </Template>

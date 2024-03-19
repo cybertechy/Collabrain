@@ -25,6 +25,7 @@ const fetchMessages = async (chatId, userInfo) => {
         return <MessageItem
             key={messageData.id}
             sender={messageData.sender}
+            senderId = {messageData.senderId}
             timestamp={sentAt.toLocaleDateString() + ", " + sentAt.toLocaleTimeString()}
             message={decryptedMessage}
             messageId = {messageData.id}
@@ -82,5 +83,40 @@ const updateMessage = async (chatId, messageId, updatedContent) => {
         return null;
     }
 };
+const reportMessage = async ({ chatId, teamId, messageId, reason, source, sender, message, image }) => {
+    try {
+        const token = await fb.getToken();
+        let payload = {
+            reason: reason,
+            sender: sender,
+            // Include messageId, message, and image directly in the payload if your backend expects them in the body
+            ...(messageId && { messageId: messageId }),
+            ...(message && { message: message }),
+            ...(image && { image: image }),
+            source : source,
+            chat: chatId,
+            team: teamId,
+        };
 
-module.exports = { fetchMessages, fetchDirectMessages};
+       
+
+        // The endpoint URL now includes query parameters directly
+        const response = await axios.post(`${SERVERLOCATION}/api/reports`, payload, {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json" // Ensure to set Content-Type for JSON body
+            }
+        });
+
+        console.log("Report response:", response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error reporting message:", error);
+        return null;
+    }
+};
+
+
+
+
+module.exports = { fetchMessages, fetchDirectMessages, reportMessage};

@@ -15,6 +15,7 @@ import Template from "@/components/ui/template/template";
 import CreateFolderOverlay from "../../components/ui/overlays/CreateFolderOverlay";
 import Lottie from "lottie-react";
 import smallLoader from '../../public/assets/json/smallLoaderLottie.json';
+import axios from "axios";
 import {
     fetchFolders,
     fetchProjects,
@@ -246,7 +247,39 @@ export default function Dashboard() {
     const handleCloseContextMenu = () => {
         setContextMenuVisible(false);
     };
+    const moveProjectToPath = async (projectId, newPath, type) => {
+        console.log("MOving project to path", projectId,newPath, type);
+        try {
+          const token = await fb.getToken(); // Assuming you have a function to get the user's token
+          const response = await axios.patch(
+            `${SERVERLOCATION}/api/dashboard/moveFile/${projectId}`, // Adjust the endpoint URL
+            {
+              to: newPath, // Specify the new path you want to move the project to
+              fileType: type, // Specify the file type ('contentMap' or 'document')
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+          if (response.status === 200) {
+            // Project moved successfully, you can update your UI here if needed
+            console.log('Project moved successfully');
+            setProjectChanges((prevCount) => prevCount + 1);
 
+            // For example, you might want to navigate the user to the new project location or refresh the project list
+            router.push(`/dashboard?path=${newPath}`); // Adjust according to your routing logic
+          } else {
+            // Handle the case where the request was not successful
+            console.error('Failed to move project');
+          }
+        } catch (error) {
+          // Handle any errors that occur during the request
+          console.error('Error moving project:', error);
+        }
+      };
+      
     useEffect(() => {
         console.log(loading);
         console.log(user);
@@ -314,7 +347,7 @@ export default function Dashboard() {
 
             <DashboardInfoBar
                 currentPath={searchParams.get("path") ? "My Brain" + searchParams.get("path") : "My Brain"}
-
+                moveProjectToPath={moveProjectToPath}
                 onSort={handleSort}
                 sortCriteria={sortCriteria}
             />

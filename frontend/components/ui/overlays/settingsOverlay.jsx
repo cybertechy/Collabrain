@@ -635,65 +635,28 @@ const PrivacyOverlay = (user) => {
     }, [user]);
   
     const handleExportData = () => {
-        console.log("in handle export data")
-      if (!userInfo) return;
-
-  console.log("handle export data continued", userInfo, user)
-      // Create a new jsPDF instance
-      const pdf = new jsPDF();
-        
-      // Define the content for the PDF
-      const content = `
-      ---------User Information---------
-      Username: ${userInfo.username}
-      Name: ${userInfo.fname + " " + userInfo.lname}
-      Email: ${userInfo.email}
-      Bio: ${userInfo.bio}
-      Achievements: ${userInfo.achievements}
-      Aliases: ${userInfo.aliases}
-
-
-
-      -------------Education--------------
-      Courses: ${userInfo.courses}
-      Education: ${userInfo.education}
-      Learning Material: ${userInfo.learningMaterial}
-
-
-
-      -----------Accessibility------------
-      Color Blind Filter: ${userInfo.colorBlindFilter}
-      Preferred Font Size: ${userInfo.fontSize}
-      Language: ${userInfo.language}
-      Theme: ${userInfo.theme}
-
-
-
-      -------------Security--------------
-      Two Factor Authentication: ${userInfo.twoFA}
-
-
-
-      -------------Socials--------------
-      Friend Requests: ${userInfo.friendRequests}
-      Friends: ${userInfo.friends}
-      Team Invites: ${userInfo.teamInvites}
-      Teams: ${userInfo.teams}
-      Blocked: ${userInfo.blocked}
-
-
-
-      -------------Projects--------------
-      Content Maps: ${userInfo.contentMaps}
-      Documents: ${userInfo.documents}
-      `;
-  
-      // Add the content to the PDF
-      pdf.text(content, 10, 10); // Adjust coordinates as needed
-  
-      // Save the PDF with a specific filename
-      pdf.save('user_information.pdf');
+        console.log("in handle export data");
+        if (!userInfo) return;
+    
+        // Convert userInfo object to JSON string
+        const dataStr = JSON.stringify(userInfo, null, 2); // pretty print with indentation
+        // Create a Blob with JSON content
+        const blob = new Blob([dataStr], {type: "application/json"});
+        // Create a URL for the blob
+        const url = URL.createObjectURL(blob);
+    
+        // Create a temporary anchor element and trigger download
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = "userInfo.json"; // File name for download
+        document.body.appendChild(link); // Required for Firefox
+        link.click(); // Trigger download
+    
+        // Clean up
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
     };
+    
     return (
         <div className="w-full h-5/6 flex justify-center items-start">
             <div className="bg-basicallylight rounded-md flex w-full p-5 overflow-y-auto scrollbar-thin scrollbar-thumb-primary">

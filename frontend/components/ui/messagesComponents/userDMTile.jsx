@@ -1,7 +1,7 @@
 import { ListItem, ListItemAvatar, ListItemText, Typography } from '@mui/material';
 import CustomAvatar from './avatar';
 
-const userDMTile = ({ message, avatar, openChat, username, data, chatID }) => {
+const userDMTile = ({ message, avatar, openChat, username, data, chatID , actualUsername}) => {
    
     const formattedDate = data.lastMessage?.sentAt? new Date(data.lastMessage.sentAt._seconds * 1000 + data.lastMessage.sentAt._nanoseconds / 1000000).toLocaleDateString() : ""; 
 
@@ -18,7 +18,7 @@ const userDMTile = ({ message, avatar, openChat, username, data, chatID }) => {
     return (
         <ListItem onClick={() => openChat(data.members[1].id,chatID)} className="border-b border-gray-200">
             <ListItemAvatar>
-                <CustomAvatar username={username} />
+                <CustomAvatar username={actualUsername} />
             </ListItemAvatar>
             <ListItemText 
                 primary={

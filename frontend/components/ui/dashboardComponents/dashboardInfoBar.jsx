@@ -2,16 +2,14 @@ import React from 'react';
 import { ArrowCircleUp, ArrowCircleDown, ChevronRight } from '@mui/icons-material';
 import DropdownDashboard from './dropdownDashboard';
 import { useRouter } from 'next/navigation';
-
-const DashboardInfoBar = ({ currentPath, onSort, sortCriteria }) => {
+import axios from 'axios';
+const DashboardInfoBar = ({ currentPath, onSort, sortCriteria, moveProjectToPath }) => {
   const router = useRouter();
 
-  // This function is triggered when sort order (ascending/descending) is toggled
   const toggleAscending = () => {
     onSort({ ...sortCriteria, isAscending: !sortCriteria.isAscending });
   };
 
-  // Toggle sort criteria between name and date
   const toggleSortOrder = (criteria) => {
     if (criteria === 'name') {
       onSort({ sortName: true, sortDate: false, isAscending: sortCriteria.isAscending });
@@ -22,15 +20,41 @@ const DashboardInfoBar = ({ currentPath, onSort, sortCriteria }) => {
 
   const pathParts = currentPath.split('/').filter(part => part);
 
-  // This function handles navigation based on the title of the breadcrumb
   const navigateToPath = (part, index) => {
     if (part === 'Shared with Me') {
       router.push('/shared-with-me');
     } else if (index === 0) {
       router.push('/dashboard');
     } else {
-      router.push(`/dashboard?path=/${pathParts.slice(1, index + 1).join('/')}`);
+      console.log("Navigating to ", part, index);
+      const pathToNavigate = `/${pathParts.slice(1, index+1).join('/')}`;
+      console.log("Path to navigate: ", pathToNavigate, "pathParts", pathParts)
+      router.push(`/dashboard?path=${pathToNavigate}`);
     }
+  };
+
+  // Handling the drop event to move the project to the dropped path
+  const handleDrop = (e, part, index) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const projectId = e.dataTransfer.getData("projectId");
+    const type = e.dataTransfer.getData("type") === "Content Map" ? "contentMap": "documents";
+    if (projectId) {
+      if(index === 0 ){
+        moveProjectToPath(projectId, "/", type);
+      }else{
+        const pathToNavigate = `/${pathParts.slice(1, index+1).join('/')}`;
+        moveProjectToPath(projectId, pathToNavigate, type);
+      }
+     
+    }
+  };
+
+
+  // Allowing the drop by preventing the default behavior
+  const handleDragOver = (e) => {
+    e.preventDefault();
   };
 
   return (
@@ -41,6 +65,8 @@ const DashboardInfoBar = ({ currentPath, onSort, sortCriteria }) => {
             <p
               className='text-xl font-bold font-poppins text-primary cursor-pointer underline'
               onClick={() => navigateToPath(part, index)}
+              onDragOver={handleDragOver}
+            onDrop={(e) => handleDrop(e, part, index)}
             >
               {part}
             </p>
@@ -50,16 +76,10 @@ const DashboardInfoBar = ({ currentPath, onSort, sortCriteria }) => {
       </div>
       <div className="flex items-center">
         <DropdownDashboard
-          title={sortCriteria ? sortCriteria.sortName ? "Name" : "Date Modified" : "Sort By"}
+          title={sortCriteria ? (sortCriteria.sortName ? "Name" : "Date Modified") : "Sort By"}
           items={[
-            {
-              name: "Name",
-              onClick: () => toggleSortOrder('name'),
-            },
-            {
-              name: "Date Modified",
-              onClick: () => toggleSortOrder('date'),
-            },
+            { name: "Name", onClick: () => toggleSortOrder('name') },
+            { name: "Date Modified", onClick: () => toggleSortOrder('date') },
           ]}
         />
         {sortCriteria.isAscending ? (
