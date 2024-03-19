@@ -63,7 +63,8 @@ const DashboardInfoBar = ({ currentPath, onSort, sortCriteria, moveProjectToPath
         {pathParts.map((part, index) => (
           <React.Fragment key={index}>
             <p
-              className='text-xl font-bold font-poppins text-primary cursor-pointer underline'
+              // className='text-xl font-bold font-poppins text-primary cursor-pointer underline'
+              className='text-sm xs:text-xl font-bold font-poppins text-primary cursor-pointer underline'
               onClick={() => navigateToPath(part, index)}
               onDragOver={handleDragOver}
             onDrop={(e) => handleDrop(e, part, index)}

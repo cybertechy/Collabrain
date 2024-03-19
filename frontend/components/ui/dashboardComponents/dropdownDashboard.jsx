@@ -22,7 +22,8 @@ const DropdownDashboard = ({ title, items, hasBorders = false,  dropdownZIndex =
     return (
         <div ref={dropdownRef} className={`relative ${borderClasses}`} style={{ zIndex: dropdownZIndex }}>
         <button
-                className="text-primary text-lg bg-transparent px-4 py-2 rounded-md flex items-center"
+                // className="text-primary text-lg bg-transparent px-4 py-2 rounded-md flex items-center"
+                className="text-primary text-sm xs:text-lg bg-transparent px-4 py-2 rounded-md flex items-center"
                 onClick={() => setIsDropdownVisible(!isDropdownVisible)}
             >
                 {title}

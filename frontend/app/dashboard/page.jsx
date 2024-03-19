@@ -405,7 +405,8 @@ export default function Dashboard() {
                         Projects
                     </p>
                     <div
-                        className="scrollbar-thin scrollbar-thumb-primary scrollbar-thumb-scrollbar h-full  overflow-auto pr-28"
+                        // className="scrollbar-thin scrollbar-thumb-primary scrollbar-thumb-scrollbar h-full  overflow-auto pr-28"
+                        className="scrollbar-thin scrollbar-thumb-primary scrollbar-thumb-scrollbar h-full  overflow-auto pr-4"
                         style={{ maxHeight: "500px" }}
                     >
                         <div className="flex flex-wrap gap-4 ml-4 justify-start">

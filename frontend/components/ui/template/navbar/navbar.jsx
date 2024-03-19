@@ -101,19 +101,18 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
 
     return (
         <>
-           <nav className="bg-primary p-4 flex items-center justify-between">
-                {/* Only show MenuIcon on small screens */}
-                <div className="md:hidden">
+            <nav className="bg-primary p-4 flex items-center justify-between">
+                <div className={`flex-grow flex sm:hidden ${isOpen ? "hidden" : ""}`}>
                     <MenuIcon
-                        className="h-6 w-6 text-white cursor-pointer"
-                        onClick={toggleSidebar}
+                    className="h-6 w-6 mb-2 text-lg text-basicallylight transition-all duration-500 ease-in-out"
+                    onClick={toggleSidebar}
+                    fontSize="large"
                     />
                 </div>
-                <div className="flex-grow">
-                    <div className="flex justify-end space-x-4">
-                        {tooltips()}
-                    </div>
-                </div>
+                <div className={`h-1 hidden sm:block transition-all duration-1000 ease-in-out ${isOpen ? "max-sm:hidden" : ""}`}></div>
+                <div className="flex items-end space-x-10 lg:space-x-7">
+                    {tooltips()}
+                </div>                
             </nav>
 
             {showLeaderboard && (

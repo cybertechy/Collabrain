@@ -183,7 +183,8 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, h
             onDrop={(e) => handleDrop(e, folder.path)}>
                 <FolderIcon sx={{ color: folder?.color }} fontSize="large" />
 
-                <span className='mx-5 w-24 text-lg font-semibold mr-10'>{truncateTitle(title)}</span>
+                {/* <span className='mx-5 w-24 text-lg font-semibold mr-10'>{truncateTitle(title)}</span> */}
+                <span className='ml-5 w-24 text-lg font-semibold sm:mr-10'>{truncateTitle(title)}</span>
                 <IconButton onClick={handleClick} color="inherit">
                     <MoreVertIcon fontSize="large" />
                 </IconButton>

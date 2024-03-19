@@ -23,7 +23,7 @@ const Template = ({ children }) => {
           </div>
         </div> */}
       
-      <div className={`flex flex-col flex-grow overflow-hidden  ${isSidebarOpen ? "max-xsm:hidden": ""}`}>
+      <div className={`flex flex-col flex-grow overflow-hidden  ${isSidebarOpen ? "max-sm:hidden": ""}`}>
         <Navbar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
         {/* <div id="content" className="flex-grow flex flex-col items-center justify-center"> */}
           {children}

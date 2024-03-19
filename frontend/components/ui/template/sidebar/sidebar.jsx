@@ -3,7 +3,7 @@ const { useRouter } = require("next/navigation");
 import SidebarButtonIcon from "./sidebarSubComponents/sidebarButton";
 import AddIcon from '@mui/icons-material/Add';
 import FolderIcon from "@mui/icons-material/Folder";
-const fb = require("_firebase/firebase");
+const fb = require("_firebase/firebase"); 
 import SidebarItem from "./sidebarSubComponents/sidebarItem";
 import PeopleIcon from "@mui/icons-material/People";
 import HistoryIcon from "@mui/icons-material/History";
@@ -16,26 +16,32 @@ import { useState } from "react";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import { useEffect } from "react";
-import TeamOverlay from "../../overlays/TeamOverlay";
-import TeamSidebarItem from "./sidebarSubComponents/sidebarTeamButton";
+import TeamOverlay from "../../overlays/TeamOverlay"
+import TeamSidebarItem from "./sidebarSubComponents/sidebarTeamButton"
 // Define the sidebar navigation items
 import { usePathname } from "next/navigation";
 import NewProjectOverlay from "../../overlays/NewProjectOverlay";
-import { useMediaQuery } from "react-responsive"; // Import useMediaQuery
-
 import axios from "axios";
 const navigationItems1 = [
-	{ name: "My Brain", href: "/dashboard", icon: FolderIcon },
-	{ name: "Shared With Me", href: "/shared-with-me", icon: PeopleIcon },
-
+    { name: "My Brain", href: "/dashboard", icon: FolderIcon },
+    { name: "Shared With Me", href: "/shared-with-me", icon: PeopleIcon },
+    
 ];
 
-const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
+// const groups = [
+//     { name: 'Team Alpha',   imageUrl: '/path/to/image1.jpg', href: "/chat" },
+//     { name: 'Team Beta',    imageUrl: '/path/to/image2.jpg'}, 
+//     { name: 'Team Gamma',   imageUrl: '/path/to/image3.jpg'} ,
+//     { name: 'Team Delta',   imageUrl: '/path/to/image4.jpg'},
+//     { name: 'Team Epsilon', imageUrl: '/path/to/image5.jpg'},  
+
+//     // Add more teams or use real data from your state
+// ];
 
 const navigationItems2 = [
-	{ name: "Direct Messages", href: "/messages", icon: ForumIcon },
-
+    { name: "Direct Messages", href: "/messages", icon: ForumIcon },
+   
 ];
 
 const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
@@ -46,21 +52,26 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
     const toggleModal = () => { // Define toggleModal function
         setIsModalOpen(!isModalOpen);
     };
-    const isSmallScreen = useMediaQuery({ query: "(max-width: 768px)" }); // Define breakpoint
-
+    
     const toggleProjectModal = () => { 
         setIsProjectModalOpen(!isProjectModalOpen);
     };
+    // const toggleSidebar = () => {
+    //     setIsOpen(!isOpen);
+    // };
+    // const handleSidebarClick = (e) => {
+    //     // Check if the click is not on an interactive element
+    //     if (!e.target.closest('.interactive-element')) {
+    //         toggleSidebar();
+    //     }
+    // };
 
-
-	const pathname = usePathname();
-	// const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-	const [userTeams, setUserTeams] = useState(null);
-	const [user, loading] = fb.useAuthState();
-	useEffect(() =>
-	{
-		if (!user)
-		{
+    const pathname = usePathname(); 
+    // const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+    const [userTeams, setUserTeams] = useState(null);
+    const [user, loading] = fb.useAuthState();
+    useEffect(() => {
+        if (!user){
 
             return;
         }
@@ -68,7 +79,7 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
             try {
                 // Make a GET request to retrieve user's team IDs
                 const token = await fb.getToken();
-                const response = await axios.get(`${SERVERLOCATION}/api/teams`, {
+                const response = await axios.get('http://localhost:8080/api/teams', {
                     headers: {
                         Authorization: `Bearer ${token}`, // Replace with the actual auth token
                     },
@@ -80,7 +91,7 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
     
                     // Create an array of promises to fetch team information
                     const teamPromises = teamIds.map(async (teamId) => {
-                        const teamResponse = await axios.get(`${SERVERLOCATION}/api/teams/${teamId}`, {
+                        const teamResponse = await axios.get(`http://localhost:8080/api/teams/${teamId}`, {
                             headers: {
                                 Authorization: `Bearer ${token}`, // Replace with the actual auth token
                             },
@@ -107,7 +118,7 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
     
                     // Update the userTeams state with the array of team information
                     setUserTeams(filteredTeamsData);
-                  
+                    console.log(filteredTeamsData);
                 } else {
                     throw new Error('Failed to fetch user teams');
                 }
@@ -120,17 +131,17 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
         // Call the function to fetch user teams when the component mounts
         fetchUserTeams();
     }, [user]);
-    
-    
-
 
     return (
         <aside
-      className={`transition-all shadow-md h-screen pt-[height_of_navbar] z-10 duration-500 ease-in-out
-     ${isOpen ? (isSmallScreen ? "w-full" : "lg:w-80 md:w-80") : "hidden"}
-     ${isSmallScreen && isOpen ? "fixed top-0 left-0 z-40" : "lg:block md:block md:w-20"} // Adjusted for responsive design
-      bg-basicallylight text-basicallydark`}
-    >
+            className={`transition-all shadow-md h-screen pt-[height_of_navbar] z-10 duration-500 ease-in-out 
+            ${
+                isOpen ? "sm:w-80 max-sm:w-screen" : "sm:w-20 max-sm:hidden"
+            }
+             bg-basicallylight text-basicallydark`}
+            // style={isOpen ? sidebarStyle() : sidebarStyle1()}
+            // onClick={handleSidebarClick}
+        >
             <div className="flex flex-col">
                 <div className="flex items-center justify-center h-24">
                     <div className="flex items-center justify-center">
@@ -147,13 +158,13 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
                                 </p>
                                 </div>
                                 <CloseIcon
-                                    className="text-xl ml-16 text-primary transition-all duration-1000 ease-in-out cursor-pointer"
+                                    className="text-lg ml-16 text-primary transition-all duration-1000 ease-in-out cursor-pointer"
                                     onClick={toggleSidebar}
                                     fontSize="large"
                                 />
                             </div>
                         ) : (
-                            <div className="flex-grow flex max-xsm:hidden">
+                            <div className="flex-grow flex max-sm:hidden">
                             <MenuIcon
                                 className="h-6 w-6 mb-2 text-lg text-primary transition-all duration-500 ease-in-out"
                                 onClick={toggleSidebar}
@@ -214,29 +225,38 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
             
             {isModalOpen && <TeamOverlay toggleModal={ toggleModal} modalVisible= {isModalOpen} />}
             {isProjectModalOpen && <NewProjectOverlay toggleModal={ toggleProjectModal} modalVisible= {isProjectModalOpen} />}
-                
+                {/* {teams.map(team => (
+                    <SidebarItem
+                        key={team.name}
+                        href={`/team/${team.uid}`} // Assuming each team has a unique ID and a page
+                        icon={GroupsIcon} // You can use a default icon for teams
+                        text={team.name}
+                        isSelected={pathname === `/team/${team.uid}`}
+                        isExpanded={isOpen}
+                    />
+                ))} */}
 
-					<SidebarButtonIcon
-						key={"Discover Teams"}
-						text={"Discover Teams"}
-						color="primary"
-						withShadow={true}
-						onClick={() => router.push("/new-project")}
-						Icon={() => (
-							<ExploreIcon fontSize="medium" className=" text-basicallylight"></ExploreIcon>
-						)}
-						isExpanded={isOpen}
-					/>
-					<div className={`h-full scrollbar-thin scrollbar-thumb-primary ${isOpen ? "overflow-y-auto overflow-x-hidden" : "overflow-hidden"}`}>
-						{userTeams ? userTeams?.map((team, index) => (
-							<TeamSidebarItem key={index} team={team} isExpanded={isOpen} isSelected={pathname === `chat?teamId=${team.teamId}`} />
-						)) : null}
-					</div>
+                                       <SidebarButtonIcon
+                        key={"Discover Teams"}
+                        text={"Discover Teams"}
+                        color="primary"
+                        withShadow={true}
+                        onClick={() => router.push("/new-project")}
+                        Icon={() => (
+                            <ExploreIcon fontSize = "medium"className=" text-basicallylight"></ExploreIcon>
+                        )}
+                        isExpanded={isOpen}
+                    />
+                      <div className={`h-full scrollbar-thin scrollbar-thumb-primary ${isOpen ? "overflow-y-auto overflow-x-hidden" : "overflow-hidden"}`}>
+    {userTeams ? userTeams?.map((team, index) => (
+        <TeamSidebarItem key={index} team={team} isExpanded={isOpen}  isSelected={pathname === `chat?teamId=${team.teamId}`} />
+    )):null}
+</div>
 
-				</nav>
-			</div>
-		</aside>
-	);
+                </nav>
+            </div>
+        </aside>
+    );
 };
 
 export default Sidebar;
