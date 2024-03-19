@@ -105,7 +105,8 @@ const router  = useRouter();
 
   
   return (
-    <div className="flex flex-col h-full w-1/6  bg-neutral-50 shadow-2xl">
+    // <div className="flex flex-col h-full w-1/6  bg-neutral-50 shadow-2xl">
+    <div className="flex flex-col h-full w-2/6 sm:w-2/6 md:1/5 max-sm:w-2/5 bg-neutral-50 shadow-2xl">
       <div className="flex flex-col">
         <TeamChannelOptionsMenu teamName = {teamData.name} onOptionSelect={handleTeamOptionSelect} isOwner = {teamData.owner === userUID} />
       </div>

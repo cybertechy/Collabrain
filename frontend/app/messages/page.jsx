@@ -36,6 +36,7 @@ export default function Messages() {
     const [withUserInfo, setWithUserInfo] = useState(null);
     const [showChat, setShowChat] = useState(false);
     const [replyTo, setReplyTo] = useState(null);
+    const [showFriends, setShowFriends] = useState(false);
 
     const withUser = params.get("user");
     const chatId = params.get("chatID");
@@ -504,6 +505,7 @@ export default function Messages() {
         router.push("/messages");
     };
     const openChat = (userId, chatId) => {
+        setShowChat(true);
         router.push("/messages?user=" + userId + "&chatID=" + chatId);
     };
 
@@ -521,6 +523,10 @@ export default function Messages() {
                     friendsHandler={() => setShowChat(false)}
                     chatList={directMessages}
                     openChat={openChat}
+                    setShowChat={setShowChat}
+                    showChat={showChat}
+                    setShowFriends={setShowFriends}
+                    showFriends={showFriends}
                     loadingState={loadingState}
                     setLoadingState={setLoadingState}
                     chatHandler={(id, user) => {
@@ -536,6 +542,8 @@ export default function Messages() {
                         withUserInfo={withUserInfo}
                         withUserId = {withUser}
                         switchToFriends={openFriends}
+                        setShowFriends={setShowFriends}
+                        showFriends={showFriends}
                         onReact={handleReact}
                         onReply={setReplyTo}
                         replyTo={replyTo}
@@ -544,7 +552,7 @@ export default function Messages() {
                         chatId = {chatId}
                     />
                 ) : (
-                    <FriendsWindow userInfo = {userInfo} handleAliasUpdate  = {handleAliasUpdate}/>
+                    <FriendsWindow showFriends={showFriends} setShowFriends={setShowFriends} userInfo = {userInfo} handleAliasUpdate  = {handleAliasUpdate}/>
                 )}
             </div>
         </Template>

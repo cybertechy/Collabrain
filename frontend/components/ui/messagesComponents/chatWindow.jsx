@@ -46,7 +46,8 @@ export default function ChatWindow({ messages, setMessages, sendPersonalMsg, wit
         ))}
         <div ref={messagesEndRef} /> {/* Invisible element at the end of messages */}
       </div>
-      <div className="absolute bottom-0 left-0 right-0 p-3  bg-white" style={{ paddingLeft: '2rem', paddingRight: '2rem' }}>
+      {/* <div className="absolute bottom-0 left-0 right-0 p-3  bg-white" style={{ paddingLeft: '2rem', paddingRight: '2rem' }}> */}
+      <div className="absolute bottom-0 left-0 right-0 p-3  bg-white" style={{ paddingRight: '2rem' }}>
         <MessageBox onSendMessage={sendPersonalMsg} replyTo = {replyTo} onReply = {onReply}/>
       </div>
     </div>

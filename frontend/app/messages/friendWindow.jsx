@@ -16,7 +16,7 @@ import Lottie from "lottie-react";
 
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
-const FriendsWindow = ({userInfo, handleAliasUpdate}) => {
+const FriendsWindow = ({userInfo, handleAliasUpdate, showChat, showFriends, setShowFriends}) => {
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -266,7 +266,17 @@ const FriendsWindow = ({userInfo, handleAliasUpdate}) => {
   //   ))
   // ) : renderEmptyState()}
     return (
-      <Box sx={{ width: '100%' }}>
+      <Box sx={{ width: '100%' }} className={`${showChat || showFriends ? '' : 'max-sm:hidden'}`}>
+      <div className="hidden max-sm:flex max-sm:flex-col items-center justify-center p-4 shadow-md bg-gray-100">
+              <h2 className="text-xl text-center font-semibold">Friends</h2>
+              <button 
+              className='hidden max-sm:block ml-auto'
+              onClick={() => {
+                  setShowFriends(false); 
+                  console.log("showFriends",showFriends);
+                  // router.push("/messages"); 
+              }}>Open Chats</button>
+          </div>
       <TopBar activeTab={activeTab} onTabChange={handleTabChange} />
       <SearchBar onSearch={handleSearch} />
       <List sx={{ width: '100%', bgcolor: 'background.paper' }}>

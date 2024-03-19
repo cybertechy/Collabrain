@@ -227,7 +227,10 @@ const scrollToBottom = () => {
                     </div>
                 </div>
                    
-                    <div className="absolute z-10 inset-x-0 bottom-5 mx-5 text-white bg-baiscallylight">
+                    {/* <div className="absolute z-10 inset-x-0 bottom-5 mx-5 text-white bg-baiscallylight">
+                            <MessageBox callback={sendTeamMsg} />
+                        </div> */}
+                        <div className="absolute w-full bottom-0 left-0 right-0 p-3  bg-white" >
                             <MessageBox callback={sendTeamMsg} />
                         </div>
                 </div>

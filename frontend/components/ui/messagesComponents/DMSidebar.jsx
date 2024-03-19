@@ -6,16 +6,24 @@ import UserDMTile from './userDMTile'; // Corrected import
 import { IconButton } from '@mui/material';
 import ChatIcon from '@mui/icons-material/Chat';
 
-const DMSidebar = ({ userData, onMute, onDeafen, onSettings, chatList, openChat }) => {
+const DMSidebar = ({ userData, onMute, onDeafen, onSettings, chatList, openChat, showChat, setShowFriends, showFriends, openFriends }) => {
     console.log("UserData informtion", userData)
     return (
-        <div className="flex flex-col h-full bg-white shadow-md z-20">
+        <div className={`flex flex-col h-full ${showFriends ? 'max-sm:hidden' : `${showChat ? 'max-sm:hidden' : 'max-sm:w-full'}`}  bg-white shadow-md z-20`}>
             {/* Chat Header */}
             <div className = "flex flex-col justify-between h-full">
             <div >
-            <div className="flex items-center justify-center p-4 shadow-md bg-gray-100">
+            {/* <div className="flex items-center justify-center p-4 shadow-md bg-gray-100"> */}
+            <div className="flex flex-col items-center justify-center p-4 shadow-md bg-gray-100">
                 <h2 className="text-xl text-center font-semibold">Chats</h2>
-                
+                <button 
+                className='hidden max-sm:block ml-auto'
+                onClick={() => {
+        // Toggles the display between ChatWindow and FriendsWindow
+                    openFriends;
+                    setShowFriends(true); // Toggle showChat state
+                    console.log("showFriends",showFriends);
+                }}>Friends</button>
             </div>
             
             {/* Chat List */}
