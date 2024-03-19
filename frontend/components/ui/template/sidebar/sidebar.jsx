@@ -22,18 +22,26 @@ import TeamSidebarItem from "./sidebarSubComponents/sidebarTeamButton"
 import { usePathname } from "next/navigation";
 import NewProjectOverlay from "../../overlays/NewProjectOverlay";
 import axios from "axios";
-const navigationItems1 = [
-    { name: "My Brain", href: "/dashboard", icon: FolderIcon },
-    { name: "Shared With Me", href: "/shared-with-me", icon: PeopleIcon },
-    
-];
-
-const navigationItems2 = [
-    { name: "Direct Messages", href: "/messages", icon: ForumIcon },
-   
-];
+import { useTTS } from "../../../../app/utils/tts/TTSContext";
+import "../../../../app/utils/i18n"
+import { useTranslation } from 'next-i18next';
 
 const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
+    
+    const { t } = useTranslation('sidebar');
+    const { speak, stop, isTTSEnabled } = useTTS();
+
+    const navigationItems1 = [
+        { name: t('my_brain'), href: "/dashboard", icon: FolderIcon },
+        { name: t('shared_with_me'), href: "/shared-with-me", icon: PeopleIcon },
+        
+    ];
+    
+    const navigationItems2 = [
+        { name: t('dms'), href: "/messages", icon: ForumIcon },
+       
+    ];
+    
     const router = useRouter();
     // const [isOpen, setIsOpen] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false); 
@@ -194,6 +202,8 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
                                     className="text-lg ml-16 text-primary transition-all duration-1000 ease-in-out cursor-pointer"
                                     onClick={toggleSidebar}
                                     fontSize="large"
+                                    onMouseEnter={() => isTTSEnabled && speak("Close sidebar button")}
+                                    onMouseLeave={stop}
                                 />
                             </div>
                         ) : (
@@ -202,6 +212,8 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
                                 className="h-6 w-6 mb-2 text-lg text-primary transition-all duration-500 ease-in-out"
                                 onClick={toggleSidebar}
                                 fontSize="large"
+                                onMouseEnter={() => isTTSEnabled && speak("Open sidebar button")}
+                                onMouseLeave={stop}
                             />
                             </div>
                         )}
@@ -211,8 +223,8 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
                 {/* Navigation items */}
              <nav className="flex flex-col p-4">
                     <SidebarButtonIcon
-                        key={"New Project"}
-                        text={"New Project"}
+                        key={t('new_project')}
+                        text={t('new_project')}
                         color="primary"
                         withShadow={true}
                         onClick={toggleProjectModal}
@@ -245,8 +257,8 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
                         />
                     ))}
                                       <SidebarButtonIcon
-                key={"New Team"}
-                text={"New Team"}
+                key={t('new_team')}
+                text={t('new_team')}
                 color="primary"
                 withShadow={true}
                 onClick={toggleModal} // Use toggleModal to open the overlay
@@ -270,8 +282,8 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
                 ))} */}
 
                                        <SidebarButtonIcon
-                        key={"Discover Teams"}
-                        text={"Discover Teams"}
+                        key={t('teams_disc')}
+                        text={t('teams_disc')}
                         color="primary"
                         withShadow={true}
                         onClick={() => router.push("/new-project")}

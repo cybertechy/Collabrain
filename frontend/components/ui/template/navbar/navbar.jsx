@@ -17,7 +17,8 @@ import "../../../../app/utils/i18n"
 import { useTranslation } from 'next-i18next';
 
 const Navbar = ({ isOpen, toggleSidebar }) => {
-    const { t } = useTranslation('navbar');
+    const { t } = useTranslation('sidebar');
+    const { speak, stop, isTTSEnabled } = useTTS();
     const [showLeaderboard, setShowLeaderboard] = useState(false);
     const leaderboardRef = useRef(null);
     const leaderboardToggleRef = useRef(null); // Ref for the leaderboard toggle icon
@@ -28,7 +29,6 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
         setShowLeaderboard(!showLeaderboard);
     };
     const [showSettingsOverlay, setShowSettingsOverlay] = useState(false);
-    const { speak, stop, isTTSEnabled } = useTTS();
 
     const toggleSettingsOverlay = () => {
         setShowSettingsOverlay(!showSettingsOverlay); // Toggle the state
@@ -73,8 +73,8 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
             enterDelay={1000}
             leaveDelay={200}
             onMouseEnter={() => isTTSEnabled && speak("Leaderboard")}
-          
-        > 
+            onMouseLeave={stop}
+            > 
                     <EmojiEventsIcon
                         ref={leaderboardToggleRef} // Attach the ref here
                         onClick={toggleLeaderboard}
@@ -89,7 +89,7 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
             enterDelay={1000}
             leaveDelay={200}
             onMouseEnter={() => isTTSEnabled && speak("Notifications")}
-          
+            onMouseLeave={stop}
         > 
                     <NotificationsIcon
                         className="cursor-pointer"
@@ -101,7 +101,7 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
             enterDelay={1000}
             leaveDelay={200}
             onMouseEnter={() => isTTSEnabled && speak("Profile Settings")}
-          
+            onMouseLeave={stop}
         > 
                     <AccountCircleIcon
                         className="cursor-pointer"
@@ -116,7 +116,6 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
     }
 
     return (
-        <ColorblindFilterProvider>
         <>
             <nav className="bg-primary p-4 flex items-center justify-between">
                 <div className={`flex-grow flex xsm:hidden ${isOpen ? "hidden" : ""}`}>
@@ -124,6 +123,8 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
                     className="h-6 w-6 mb-2 text-lg text-basicallylight transition-all duration-500 ease-in-out"
                     onClick={toggleSidebar}
                     fontSize="large"
+                    onMouseEnter={() => isTTSEnabled && speak("Open sidebar button")}
+                    onMouseLeave={stop}
                     />
                 </div>
                 <div className={`h-1 hidden xsm:block transition-all duration-1000 ease-in-out ${isOpen ? "max-sm:hidden" : ""}`}></div>
@@ -143,7 +144,6 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
     </div>
 )}
         </>
-        </ColorblindFilterProvider>
     );
 };
 

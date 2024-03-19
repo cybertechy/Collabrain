@@ -195,7 +195,9 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, h
                 <FolderIcon sx={{ color: folder?.color }} fontSize="large" />
 
                 <span className='mx-5 w-24 text-lg font-semibold mr-10'>{truncateTitle(title)}</span>
-                <IconButton onClick={handleClick} color="inherit">
+                <IconButton onClick={handleClick} color="inherit"
+                onMouseEnter={() => isTTSEnabled && speak("Folder options")}
+                onMouseLeave={stop}>
                     <MoreVertIcon fontSize="large" />
                 </IconButton>
                 <Menu
@@ -229,7 +231,9 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, h
             </div>
               {/* Rename Overlay */}
               <Dialog open={renameOverlayOpen} onClose={() => setRenameOverlayOpen(false)} sx={dialogStyles}>
-  <DialogTitle>{t("rename_top")}</DialogTitle>
+  <DialogTitle
+  onMouseEnter={() => isTTSEnabled && speak("Rename folder")}
+  onMouseLeave={stop}>{t("rename_top")}</DialogTitle>
     <DialogContent>
         <TextField
             label={t("new_folder_name")}
@@ -237,13 +241,19 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, h
             fullWidth
             value={newFolderName}
             onChange={(e) => setNewFolderName(e.target.value)}
+            onMouseEnter={() => isTTSEnabled && speak("Type new folder name here")}
+            onMouseLeave={stop}
         />
     </DialogContent>
     <DialogActions>
-    <Button onClick={() => setRenameOverlayOpen(false)} sx={buttonStyles}>
+    <Button onClick={() => setRenameOverlayOpen(false)} sx={buttonStyles}
+    onMouseEnter={() => isTTSEnabled && speak("Cancel button")}
+    onMouseLeave={stop}>
     {t("cancel_button")}
         </Button>
-        <Button onClick={handleRename} sx={buttonStyles}>
+        <Button onClick={handleRename} sx={buttonStyles}
+        onMouseEnter={() => isTTSEnabled && speak("Rename button")}
+        onMouseLeave={stop}>
 
             {t("rename_button")}
         </Button>
@@ -252,16 +262,24 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, h
 
 {/* Delete Confirmation Overlay */}
 <Dialog open={deleteOverlayOpen} onClose={() => setDeleteOverlayOpen(false)} sx={dialogStyles}>
-    <DialogTitle>Confirm Delete</DialogTitle>
-    <DialogContent>
-        Are you sure you want to delete this folder and its contents?
+    <DialogTitle
+    onMouseEnter={() => isTTSEnabled && speak("Confirm deletion")}
+    onMouseLeave={stop}>{t('delete_top')}</DialogTitle>
+    <DialogContent
+    onMouseEnter={() => isTTSEnabled && speak("Are you sure you want to delete this folder and its contents?")}
+    onMouseLeave={stop}>
+        {t('delete_msg')}
     </DialogContent>
     <DialogActions>
-        <Button onClick={() => setDeleteOverlayOpen(false)} sx={buttonStyles}>
-            Cancel
+        <Button onClick={() => setDeleteOverlayOpen(false)} sx={buttonStyles}
+        onMouseEnter={() => isTTSEnabled && speak("Cancel button")}
+        onMouseLeave={stop}>
+            {t('cancel_button')}
         </Button>
-        <Button onClick={handleDelete} sx={buttonStyles}>
-            Delete
+        <Button onClick={handleDelete} sx={buttonStyles}
+        onMouseEnter={() => isTTSEnabled && speak("Delete button")}
+        onMouseLeave={stop}>
+            {t('delete_button')}
         </Button>
     </DialogActions>
 </Dialog>
