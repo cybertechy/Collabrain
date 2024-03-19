@@ -73,7 +73,7 @@ export default function FileToolbar(props)
 			<div className="text-lg font-bold">{props.name}</div>
 
 			{/* Save button */}
-			{(props.fileData.access[props.userID].role == "edit" || props.fileData.access[props.userID].role == "owner") &&
+			{props?.fileData?.access && (props.fileData.access[props.userID].role == "edit" || props.fileData.access[props.userID].role == "owner") &&
 				<div id="save" className="flex items-center gap-2 bg-basicallylight text-primary rounded-md px-2 py-1 ml-2 shadow-md">
 					<p className="lg:block ">{props.isSaved ? "Saved" : "Saving..."}</p>
 					{
@@ -87,7 +87,7 @@ export default function FileToolbar(props)
 			<div className="flex space-x-2 ml-auto"> {/* Added ml-auto to move the right side elements to the right */}
 				{/* Add comment button */}
 				{props.commentsEnabled && props.showCommentButton && (
-					<button className="bg-blue-500 hover:bg-blue-600 px-2 py-1 rounded text-white focus:outline-none">
+					<button className="bg-primary hover:bg-tertiary px-2 py-1 rounded text-white focus:outline-none">
 						{/* Reduced padding */}
 						<AddCommentIcon />
 					</button>
@@ -101,11 +101,12 @@ export default function FileToolbar(props)
 				)}
 
 				{/* Share button */}
-				<button id="share" onClick={() => setShare(Share => !Share)} className="bg-blue-500 hover:bg-blue-600 px-2 py-1 rounded text-white focus:outline-none">Share</button>
-				{Share && <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 bg-basicallylight rounded-md shadow-[0_0_10px_0_rgba(0,0,0,0.2)] p-2 flex flex-col gap-2 border border-primary">
-					<ShareComponent getData={getData} updatecontent={updateFileData}
+				<button id="share" onClick={() => setShare(Share => !Share)} className="bg-primary hover:bg-tertiary px-2 py-1 rounded text-white focus:outline-none">Share</button>
+				{props?.fileData?.access && Share && <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 bg-basicallylight rounded-md shadow-[0_0_10px_0_rgba(0,0,0,0.2)] p-2 flex flex-col gap-2 border border-primary">
+					<ShareComponent getdata={getData} updatecontent={updateFileData}
 						contentMapName={props.name} setShare={setShare}
-						sData={props.fileData.access} isOwner={props.fileData.access[props.userID].role == "owner"} />
+						sData={props.fileData.access} isOwner={props.fileData.access[props.userID].role == "owner"}
+						publicData={props.publicData} setpublicData={props.setpublicData} />
 				</div>}
 			</div>
 		</div>

@@ -65,6 +65,7 @@ const share = ({ contentMapName = "Content Map", sData, setShare, isOwner, updat
 
     const search = async (e) => {
         //search for users based on input
+       
         setSharewith(e.target.value);
         setSelected("");
         setNoresults(false);
@@ -73,6 +74,7 @@ const share = ({ contentMapName = "Content Map", sData, setShare, isOwner, updat
             try {
                 setNoresults(false);
                 setLoadingSearchResults(true);
+                console.log("searching");
                 let res = await getdata(`query=${e.target.value}`);
                 setLoadingSearchResults(false);
 

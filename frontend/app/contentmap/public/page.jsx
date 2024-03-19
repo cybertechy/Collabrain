@@ -4,20 +4,19 @@ import React from "react";
 import Image from "next/image";
 import LogoIcon from "../../../public/assets/images/logo_whitebackground.png";
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import {useSearchParams } from "next/navigation";
 import axios from "axios";
 import Link from "next/link";
-import { RefreshCcw, FilePenLine, HelpCircle } from 'lucide-react';
-import ShareComponent from "../../../components/ui/share";
+import {FilePenLine, HelpCircle } from 'lucide-react';
 const { useAuthState, getToken } = require("_firebase/firebase");
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer} from "react-toastify";
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 
-import SearchingJSON from "../../../public/assets/json/Searching.json";
-import LoadingJSON from "../../../public/assets/json/Loading.json";
-import ErrorJSON from "../../../public/assets/json/Error.json";
-import WorkingJSON from "../../../public/assets/json/Working.json";
+import SearchingJSON from "@/public/assets/json/Searching.json";
+import LoadingJSON from "@/public/assets/json/Loading.json";
+import ErrorJSON from "@/public/assets/json/Error.json";
+import WorkingJSON from "@/public/assets/json/Working.json";
 import Lottie from "lottie-react";
 
 
@@ -41,14 +40,6 @@ function page() {
     const [user, loading] = useAuthState();
     const [OverrideMessage, setOverrideMessage] = useState("");
     const [showSignInModal, setShowSignInModal] = useState(false);
-
-    /* UI states */
-    const [New, setNew] = useState(false);
-    const [Delete, setDelete] = useState(false);
-    const [Share, setShare] = useState(false);
-
-
-    const router = useRouter();
     const searchParms = useSearchParams();
 
     let Guide =   {
@@ -195,9 +186,6 @@ function page() {
                                     onChange={handleInputChange}
                                     onBlur={handleSaveClick}
                                 />
-                                <button className="text-basicallylight" onClick={() => setIsEditing(isEditing => !isEditing)}>
-                                    <FilePenLine tooltip="Edit content map name" width={20} height={20} />
-                                </button>
                             </div>
                         ) : (
                             <div id="ContentMapName" className=" flex items-center gap-2"><h1 className="text-basicallylight text-lg font-semibold" onClick={handleEditClick}>
