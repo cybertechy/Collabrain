@@ -96,6 +96,7 @@ const reportMessage = async ({ chatId, teamId, messageId, reason, source, sender
             source : source,
             chat: chatId,
             team: teamId,
+            policy: "message content violation"
         };
 
        
