@@ -24,14 +24,15 @@ const PieChart = () => {
   useEffect(() => {
     if (userMetrics) {
       const dataPie = {
-        labels: ["Score", "Monthly Message Count", "Time Spent"],
+        labels: ["Video Calling", "Messaging", "ContentMaps", "Documents"],
         datasets: [
           {
-            data: [userMetrics.score || 0, userMetrics.monthlyMessageCount || 0, userMetrics.timeSpent || 0],
+            data: [userMetrics.VideoCalling||0, userMetrics.Messaging||0, userMetrics.ContentMaps||0, userMetrics.Documents||0],
             backgroundColor: [
-              "rgb(133, 105, 241)",
-              "rgb(164, 101, 241)",
-              "rgb(101, 143, 241)",
+              "rgb(255, 99, 132)",
+              "rgb(54, 162, 235)",
+              "rgb(255, 205, 86)",
+              "rgb(101, 241, 133)"
             ],
             hoverOffset: 4,
           },

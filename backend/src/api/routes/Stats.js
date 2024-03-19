@@ -64,23 +64,18 @@ router.get('/active-users', async (req, res) => {
 // Endpoint to get metrics for a random user
 router.get('/random-user-metrics', async (req, res) => {
     try {
-      const userMetrics = await getUserMetrics();
-      if (!userMetrics) {
-        return res.status(404).send('User metrics not found');
-      }
-     
-      const response = {
-        userId: userMetrics.userId,
-        score: userMetrics.score || 0,
-        monthlyMessageCount: userMetrics.monthlyMessageCount || 0,
-        timeSpent: userMetrics.timeSpent || 0
-      };
-      res.json(response);
+        const response = {
+            VideoCalling: Math.floor(Math.random() * 1000),
+            Messaging: Math.floor(Math.random() * 2000),
+            ContentMaps: Math.floor(Math.random() * 1700),
+            Documents: Math.floor(Math.random() * 1500),
+        };
+        res.json(response);
     } catch (error) {
-      console.error('Failed to get random user metrics:', error);
-      res.status(500).send('Internal Server Error');
+        console.error('Failed to get random user metrics:', error);
+        res.status(500).send('Internal Server Error');
     }
-  });
+});
 
 
 // Endpoint to retrieve the number of active members in all teams
