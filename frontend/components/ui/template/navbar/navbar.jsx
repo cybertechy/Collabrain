@@ -17,7 +17,7 @@ import "../../../../app/utils/i18n"
 import { useTranslation } from 'next-i18next';
 
 const Navbar = ({ isOpen, toggleSidebar }) => {
-    const { t } = useTranslation('sidebar');
+    const { t } = useTranslation('navbar');
     const { speak, stop, isTTSEnabled } = useTTS();
     const [showLeaderboard, setShowLeaderboard] = useState(false);
     const leaderboardRef = useRef(null);

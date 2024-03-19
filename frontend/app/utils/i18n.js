@@ -197,6 +197,17 @@ i18n
           "font_size": "Font-size",
           "colorblind": "Colorblind Filters",
           "config": "Configure"
+        },
+
+        new_project: {
+          "project_top": "Choose the type of project you would like to create",
+          "map": "Content Map",
+          "doc": "Document",
+          "create_button": "Create Project"
+        },
+
+        dms: {
+          "chats": "Chats"
         }
       },
       ru: {
@@ -394,6 +405,17 @@ i18n
           "font_size": "Размер шрифта",
           "colorblind": "Фильтры для дальтоников",
           "config": "Настроить"
+        },
+
+        new_project: {
+          "project_top": "Выберите тип проекта, который вы хотите создать",
+          "map": "Контент Карта",
+          "doc": "Документ",
+          "create_button": "Создать Проект"
+        },
+
+        dms: {
+          "chats": "Чаты"
         }
       },
       // Add more languages here

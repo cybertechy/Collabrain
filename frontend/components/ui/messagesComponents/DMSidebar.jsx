@@ -5,8 +5,14 @@ import UserProfileBox from './userProfileBox'; // Corrected import
 import UserDMTile from './userDMTile'; // Corrected import
 import { IconButton } from '@mui/material';
 import ChatIcon from '@mui/icons-material/Chat';
+import { useTTS } from "../../../app/utils/tts/TTSContext";
+import "../../../app/utils/i18n"
+import { useTranslation } from 'next-i18next';
 
 const DMSidebar = ({ userData, onMute, onDeafen, onSettings, chatList, openChat }) => {
+    const { speak, stop, isTTSEnabled } = useTTS();
+    const { t } = useTranslation('dms');
+
     console.log(userData)
     return (
         <div className="flex flex-col h-full bg-white shadow-md z-20">
@@ -14,7 +20,9 @@ const DMSidebar = ({ userData, onMute, onDeafen, onSettings, chatList, openChat 
             <div className = "flex flex-col justify-between h-full">
             <div >
             <div className="flex items-center justify-center p-4 shadow-md bg-gray-100">
-                <h2 className="text-xl text-center font-semibold">Chats</h2>
+                <h2 className="text-xl text-center font-semibold"
+                onMouseEnter={() => isTTSEnabled && speak("Chats Sidebar")}
+                onMouseLeave={stop}>{t('chats')}</h2>
                 
             </div>
             

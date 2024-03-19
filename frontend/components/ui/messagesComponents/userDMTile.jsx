@@ -1,9 +1,25 @@
 import { ListItem, ListItemAvatar, ListItemText, Typography } from '@mui/material';
 import CustomAvatar from './avatar';
+import { useTTS } from "../../../app/utils/tts/TTSContext";
 
 const userDMTile = ({ message, avatar, openChat, username, data, chatID }) => {
+    const { speak, stop, isTTSEnabled } = useTTS();
     console.log(data);
     const formattedDate = data.lastMessage?.sentAt? new Date(data.lastMessage.sentAt._seconds * 1000 + data.lastMessage.sentAt._nanoseconds / 1000000).toLocaleDateString() : ""; 
+
+    const handleUsernameHover = () => {
+        if (isTTSEnabled) {
+            speak(`Chat with ${username}`);
+        }
+    };
+    const handleDateHover = () => {
+        if (isTTSEnabled) {
+            speak(`Date of the last message: ${formattedDate}`);
+        }
+    };
+    const handleLeave = () => {
+        stop();
+    };
 
     const truncateMessage = (message, maxLength = 20) => {
         // Truncate message if longer than maxLength
@@ -23,11 +39,13 @@ const userDMTile = ({ message, avatar, openChat, username, data, chatID }) => {
             <ListItemText 
                 primary={
                     <>
-                        <Typography component="span" variant="body1" color="textPrimary">
+                        <Typography component="span" variant="body1" color="textPrimary"
+                        onMouseEnter={handleUsernameHover} onMouseLeave={handleLeave}>
                             {username}
                         </Typography>
                         <br/>
-                        <Typography component="span" variant="caption" color="textSecondary">
+                        <Typography component="span" variant="caption" color="textSecondary"
+                        onMouseEnter={handleDateHover} onMouseLeave={handleLeave}>
                             {formattedDate}
                         </Typography>
                     </>

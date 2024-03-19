@@ -25,7 +25,13 @@ import EditIcon from '@mui/icons-material/Edit';
 import axios from 'axios';
 import { useAuthState } from '_firebase/firebase';
 import CustomAvatar from './avatar';
+import "../../../app/utils/i18n"
+import { useTranslation } from 'next-i18next';
+import { useTTS } from "../../../app/utils/tts/TTSContext";
+
 const FriendTile = ({ friendData, openChat, setRefreshList }) => {
+  const { t } = useTranslation('dashboard_folder');
+  const { speak, stop, isTTSEnabled } = useTTS();
   const [user, loading] = useAuthState();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
@@ -248,6 +254,22 @@ const FriendTile = ({ friendData, openChat, setRefreshList }) => {
     handleClose();
   };
 
+  const handleAlias = () => {
+    if (isTTSEnabled) {
+      speak('Set Alias button');
+    }
+  };
+
+  const handleBlock = () => {
+    if (isTTSEnabled) {
+      speak('Block User button');
+    }
+  };
+
+  const handleLeave = () => {
+    stop();
+};
+
   return (
     <ListItem
       sx={{
@@ -285,7 +307,8 @@ const FriendTile = ({ friendData, openChat, setRefreshList }) => {
         <DialogTitle>Select an Option</DialogTitle>
         <DialogContent>
           <List>
-            <ListItem button onClick={() => handleOptionClick('alias')}>
+            <ListItem button onClick={() => handleOptionClick('alias')}
+            onMouseEnter={handleAlias} onMouseLeave={handleLeave}>
               <ListItemIcon>
                 <EditIcon />
               </ListItemIcon>
