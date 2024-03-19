@@ -80,6 +80,10 @@ router.post("/sendCode", async (req, res) => {
 router.post("/verifyCode", async (req, res) => {
     if(!req.headers.authorization) return res.status(401).json({error: "Unauthorized"});
     if (!req.body.code) return res.status(400).json({error: "Invalid code"});
+
+    req.body.code = Number(req.body.code) ?  parseInt(req.body.code) : req.body.code;
+
+
     
     let token = req.headers.authorization.split(" ")[1];
     if(!token) return res.status(401).json({error: "Unauthorized"});
