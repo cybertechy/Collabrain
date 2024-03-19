@@ -396,10 +396,41 @@ async function listenToRealtimeDB(path, callback) {
 	realtimeDB.ref(path).on("value", (snapshot) => callback(snapshot.val()));
 }
 
+// Returns a random user's score, monthlyMessageCount, timeSpent and ID
+const getUserMetrics = async () => {
+    try {
+        // Get a reference to the users collection
+        const usersRef = db.collection('users');
+        
+        // Get all user documents
+        const snapshot = await usersRef.get();
+        const users = [];
+        snapshot.forEach(doc => users.push({ id: doc.id, ...doc.data() }));
+        
+        // Select a random user from the array
+        const randomUserIndex = Math.floor(Math.random() * users.length);
+        const randomUser = users[randomUserIndex];
+        
+        // Extract some user fields
+        const userData = {
+            userId: randomUser.id,
+            score: randomUser.score,
+            monthlyMessageCount: randomUser.monthlyMessageCount,
+            timeSpent: randomUser.timeSpent
+        };
+        
+        return userData;
+    } catch (error) {
+        console.error("Error retrieving user metrics: ", error);
+        return null;
+    }
+};
+
 
 module.exports = {
 	db,
 	admin,
+	getUserMetrics,
 	verifyUser,
 	createDoc,
 	removeDoc,
