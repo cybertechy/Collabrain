@@ -328,7 +328,7 @@ const router = useRouter();
     const handleEnable2FA = async () => {
         try {
             const token = await fb.getToken();
-            await axios.patch('http://localhost:8080/api/2FA/enable', null, {
+            await axios.patch(SERVERLOCATION+'/api/2FA/enable', null, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             alert('Two-factor authentication enabled successfully');
@@ -341,7 +341,7 @@ const router = useRouter();
     const handleDisable2FA = async () => {
         try {
             const token = await fb.getToken();
-            await axios.patch('http://localhost:8080/api/2FA/disable', null, {
+            await axios.patch(SERVERLOCATION+'/api/2FA/disable', null, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             alert('Two-factor authentication disabled successfully');

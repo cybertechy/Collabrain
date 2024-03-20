@@ -7,6 +7,7 @@ import ChartComponent from "./activeUsers";
 import axios from "axios";
 import Template from "@/components/ui/template/template";
 
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
 const UserStats = () => {
 
@@ -25,7 +26,7 @@ const UserStats = () => {
     useEffect(() => {
         const fetchScreenTimeData = async () => {
             try {
-                const response = await fetch('http://localhost:8080/api/stats/userinfo');
+                const response = await fetch(SERVERLOCATION + '/api/stats/userinfo');
                 if (!response.ok) {
                     throw new Error('Failed to fetch user data');
                 }
@@ -59,7 +60,7 @@ const UserStats = () => {
 
 
     useEffect(() => {
-        fetch('http://localhost:8080/api/stats/active-users')
+        fetch(SERVERLOCATION + '/api/stats/active-users')
             .then(response => response.json())
             .then(data => {
                 setWeeklyActiveUsers(data.weekly.activeUserCount);

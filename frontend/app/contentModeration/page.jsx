@@ -5,6 +5,7 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import CloseIcon from '@mui/icons-material/Close';
 const { useAuthState, getToken } = require("_firebase/firebase");
 import Template from '@/components/ui/template/template';
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 const Overlay = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
@@ -56,7 +57,7 @@ const Moderation = () => {
       if (!token) return;
       try {
         setdataLoading(true);
-        const response = await axios.get('http://localhost:8080/api/reports', {
+        const response = await axios.get(SERVERLOCATION + '/api/reports', {
           headers: {
             Authorization: `Bearer ${token}`
           }

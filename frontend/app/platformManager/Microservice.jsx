@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import Chart from 'chart.js/auto';
 
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 const PieChart = () => {
   const [userMetrics, setUserMetrics] = useState(null);
 
   useEffect(() => {
     const fetchUserMetrics = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/stats/random-user-metrics'); 
+        const response = await fetch(SERVERLOCATION + '/api/stats/random-user-metrics'); 
         if (!response.ok) {
           throw new Error('Failed to fetch user metrics');
         }

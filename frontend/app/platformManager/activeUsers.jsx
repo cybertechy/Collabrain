@@ -2,7 +2,8 @@ import dynamic from 'next/dynamic';
 import React, { useEffect, useState } from 'react';
  
 const ApexCharts = dynamic(() => import('react-apexcharts'), { ssr: false });
- 
+
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 const ChartComponent = ({ isMonthly }) => {
   const [monthlyActiveUsers, setMonthlyActiveUsers] = useState(0);
   const [weeklyActiveUsers, setWeeklyActiveUsers] = useState(0);
@@ -10,7 +11,7 @@ const ChartComponent = ({ isMonthly }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/stats/active-users');
+        const response = await fetch(SERVERLOCATION + '/api/stats/active-users');
         if (!response.ok) {
           throw new Error('Failed to fetch data');
         }

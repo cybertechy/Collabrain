@@ -3,13 +3,14 @@ import axios from 'axios';
 import dynamic from 'next/dynamic';
 
 const ApexCharts = dynamic(() => import('react-apexcharts'), { ssr: false });
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
 const DashboardCard = () => {
   const [dbUsage, setDbUsage] = useState(0);
 
   useEffect(() => {
 
-    axios.get('http://localhost:8080/api/dbUsage')
+    axios.get(SERVERLOCATION + '/api/dbUsage')
       .then(response => {
         setDbUsage(response.data.count);
       })

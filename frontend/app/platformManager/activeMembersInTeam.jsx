@@ -3,6 +3,7 @@ import { Card, CardBody, CardHeader } from "@material-tailwind/react";
 import dynamic from "next/dynamic";
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
 const LineChart = ({ teamId }) => {
   const [chartData, setChartData] = useState([]);
@@ -10,7 +11,7 @@ const LineChart = ({ teamId }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`http://localhost:8080/api/stats/active-members`);
+        const response = await fetch(`${SERVERLOCATION}/api/stats/active-members`);
         
         if (!response.ok) {
           throw new Error("Failed to fetch data");

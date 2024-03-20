@@ -8,6 +8,7 @@ import axios from 'axios';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import Link from 'next/link';
 const fb = require("_firebase/firebase");
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
 const OTPVerificationPage = () => {
   const router = useRouter();
@@ -26,7 +27,7 @@ const OTPVerificationPage = () => {
   const handleSendOTP = async () => {
     try {
       const token = await fb.getToken();
-      const response = await axios.post('http://localhost:8080/api/2FA/sendCode', null, {
+      const response = await axios.post(SERVERLOCATION + '/api/2FA/sendCode', null, {
         headers: { Authorization: `Bearer ${token}` },
       });
       console.log(response.data.message);
@@ -41,7 +42,7 @@ const OTPVerificationPage = () => {
     e.preventDefault();
     try {
       const token = await fb.getToken();
-      const response = await axios.post('http://localhost:8080/api/2FA/verifyCode', { code: input }, {
+      const response = await axios.post(SERVERLOCATION + '/api/2FA/verifyCode', { code: input }, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (response.status === 200) {

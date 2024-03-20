@@ -6,6 +6,7 @@ const fb = require("_firebase/firebase");
 import {useAuthState } from "@/app/_firebase/firebase";
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
  
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
  
 const Leaderboard = () => {
   // State for team data, search query, and joined teams
@@ -21,7 +22,7 @@ const Leaderboard = () => {
 const fetchTeams = async () => {
   try {
     const token = await fb.getToken();
-    const response = await axios.get(`http://localhost:8080/api/teams?sort=${sortBy}`, {
+    const response = await axios.get(`${SERVERLOCATION}/api/teams?sort=${sortBy}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     setTeamData(response.data.map((team, index) => ({ ...team, rank: index + 1  })));

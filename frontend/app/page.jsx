@@ -15,6 +15,8 @@ import { useEffect, useState } from 'react';
 import { hasUsername } from "./utils/user";
 import axios from 'axios';
 import Link from 'next/link';
+
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 export default function Home() {
     const [user, loading] = fb.useAuthState();
     const router = useRouter();
@@ -97,7 +99,7 @@ export default function Home() {
  
         // Check if user is enrolled in 2FA and redirect to OTP verification page
         const token = await fb.getToken();
-        const twoFAStatus = await axios.get('http://localhost:8080/api/2FA/status', {
+        const twoFAStatus = await axios.get(SERVERLOCATION+'/api/2FA/status', {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (twoFAStatus.data.twoFA) {
