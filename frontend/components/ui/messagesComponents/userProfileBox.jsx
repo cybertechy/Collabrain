@@ -38,17 +38,7 @@ const userProfileBox = ({ userData, onMute, onDeafen, onSettings }) => {
                 <CustomAvatar username={displayName} />
                 <span className="font-semibold">{formatDisplayName(displayName)}</span>
             </div>
-            <div className="flex mt-4 space-x-2">
-                <IconButton onClick={handleMute} className="hover:bg-primary-dark rounded-full">
-                    {isMuted ? <MicOffIcon className="text-white" /> : <MicIcon className="text-white" />}
-                </IconButton>
-                <IconButton onClick={handleDeafen} className="hover:bg-primary-dark rounded-full">
-                    {isDeafened ? <VolumeOffIcon className="text-white" /> : <VolumeUpIcon className="text-white" />}
-                </IconButton>
-                <IconButton onClick={onSettings} className="hover:bg-primary-dark rounded-full">
-                    <SettingsIcon className="text-white" />
-                </IconButton>
-            </div>
+           
         </div>
     );
 };
