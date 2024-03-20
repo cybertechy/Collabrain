@@ -80,7 +80,7 @@ const Moderation = () => {
 
   // {("ChatID: "+report.chatID) || ("TeamID:"+report.teamID)}
   return (
-    <Template>
+    <>
       <div className="">
         <p className="text-3xl pt-8 pl-20 font-medium text-primary">Content Moderation</p>
         <div className="flex pt-10">
@@ -159,7 +159,7 @@ const Moderation = () => {
         </div>
       </div>
       <Overlay isOpen={isOverlayOpen} onClose={closeOverlay} />
-    </Template>
+    </>
   );
 };
 
