@@ -20,7 +20,7 @@ import React, { useState } from 'react';
 const fb  = require("_firebase/firebase");
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
-const FriendTile = ({ friendData, onMoreOptions, id, setRefreshList, refreshList }) => {
+const FriendTile = ({ friendData, onMoreOptions, id, setRefreshList, refreshList ,  handleChatUpdate}) => {
   // Function to generate avatar with initials
   const [user, loading] = fb.useAuthState();
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -117,7 +117,7 @@ const FriendTile = ({ friendData, onMoreOptions, id, setRefreshList, refreshList
         });
   
         console.log(response.data.message); // Log the response message (e.g., "Chat created")
-  
+        handleChatUpdate();
         // Handle any UI updates or navigation to the newly created chat here
       } catch (error) {
         console.error('Error creating chat:', error);

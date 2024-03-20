@@ -36,7 +36,7 @@ export default function Messages() {
     const [withUserInfo, setWithUserInfo] = useState(null);
     const [showChat, setShowChat] = useState(false);
     const [replyTo, setReplyTo] = useState(null);
-
+    const [chatUpdates, setChatUpdates] = useState(0);  
     const withUser = params.get("user");
     const chatId = params.get("chatID");
 
@@ -248,7 +248,7 @@ export default function Messages() {
         };
 
         fetchData();
-    }, [user]);
+    }, [user, chatUpdates]);
 
     useEffect(() => {
         if (!user || !withUser) return;
@@ -544,7 +544,7 @@ export default function Messages() {
                         chatId = {chatId}
                     />
                 ) : (
-                    <FriendsWindow userInfo = {userInfo} handleAliasUpdate  = {handleAliasUpdate}/>
+                    <FriendsWindow userInfo = {userInfo} handleAliasUpdate  = {handleAliasUpdate} handleChatUpdate = {()=>{setChatUpdates(chatUpdates+1)}}/>
                 )}
             </div>
         </Template>

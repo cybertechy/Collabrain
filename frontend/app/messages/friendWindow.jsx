@@ -16,7 +16,7 @@ import Lottie from "lottie-react";
 
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
-const FriendsWindow = ({userInfo, handleAliasUpdate}) => {
+const FriendsWindow = ({userInfo, handleAliasUpdate, handleChatUpdate}) => {
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -26,6 +26,7 @@ const FriendsWindow = ({userInfo, handleAliasUpdate}) => {
   const [blockedUsers, setBlockedUsers] = useState([]);
   const [refreshList, setRefreshList] = useState(0);
   const [directMessages, setDirectMessages] = useState([]);
+  const [searching, setSearching] = useState(false);
   const [user, loading] = fb.useAuthState();
   const searchDelay = 500;
   const searchTimerRef = useRef(null);
@@ -55,28 +56,69 @@ const FriendsWindow = ({userInfo, handleAliasUpdate}) => {
     }
   };
   
+  const abortControllerRef = useRef(null);
+
   useEffect(() => {
     if (activeTab === 'addFriend' && searchQuery.trim() !== '') {
       if (searchTimerRef.current) {
         clearTimeout(searchTimerRef.current);
       }
-
+  
       searchTimerRef.current = setTimeout(() => {
+        // Check if a previous abortController is stored in the ref
+        if (abortControllerRef.current) {
+          abortControllerRef.current.abort(); // Abort the previous request
+        }
+  
+        // Create a new instance of AbortController for the new request
+        const abortController = new AbortController();
+        const { signal } = abortController;
+  
+        // Store the abortController in its own ref for potential future aborts
+        abortControllerRef.current = abortController;
+  
         const fetchSearchResults = async () => {
           try {
-            const results = await searchUsers(searchQuery);
-            setSearchResults(results);
-            console.log("Search results:", results);
+            setSearching(true);
+            const token = await fb.getToken();
+            const response = await axios.get(`${SERVERLOCATION}/api/users/search`, {
+              headers: {
+                authorization: `Bearer ${token}`,
+              },
+              params: {
+                username: searchQuery,
+              },
+              signal, // Pass the signal to axios to allow request cancellation
+            });
+  
+            const usersWithListType = response.data.map((user) => ({
+              ...user,
+              listType: 'addFriend',
+            }));
+  
+            // Only update the search results if the request was not aborted
+            if (!signal.aborted) {
+              setSearchResults(usersWithListType);
+              console.log("Search results:", usersWithListType);
+            }
+            setSearching(false);
           } catch (error) {
-            console.error("Error fetching search results:", error);
-            setSearchResults([]);
+            if (axios.isCancel(error)) {
+              console.log("Search request cancelled:", error);
+              setSearching(false);
+            } else {
+              console.error("Error fetching search results:", error);
+              setSearchResults([]);
+              setSearching(false);
+            }
           }
         };
-
+  
         fetchSearchResults();
       }, searchDelay);
     }
   }, [searchQuery, activeTab]);
+  
 
   const getFriends = async () => {
     try {
@@ -206,11 +248,18 @@ const FriendsWindow = ({userInfo, handleAliasUpdate}) => {
       if (searchQuery && searchResults.length > 0) {
         // Render search results
         return searchResults.map((user) => (
-          <FriendTile key={user.id} friendData={user} onMoreOptions={handleMoreOptions} />
+          <FriendTile key={user.id} friendData={user} onMoreOptions={handleMoreOptions}  handleChatUpdate={handleChatUpdate}/>
         ));
+      }else if (searchQuery && searchResults.length === 0) {
+        // Render a message indicating no results found for the search
+        return (
+          <p>
+            No results found for "{searchQuery}". Try a different search.
+          </p>
+        );
       } else {
         // Render a message to encourage searching
-        return <Typography variant="body1" sx={{ p: 2 }}>Start typing to search for friends to add.</Typography>;
+        return <p>Start typing to search for friends to add.</p>;
       }
     } else {
       // Render filtered friends for other tabs
@@ -222,7 +271,7 @@ const FriendsWindow = ({userInfo, handleAliasUpdate}) => {
 
       
   return filteredFriends.map((friend, index) => (
-    <FriendTile key={index} id = {friend.id} friendData={friend} onMoreOptions={handleMoreOptions} userInfo = {userInfo} handleAliasUpdate = {handleAliasUpdate} />
+    <FriendTile key={index} id = {friend.id} friendData={friend} onMoreOptions={handleMoreOptions} userInfo = {userInfo} handleAliasUpdate = {handleAliasUpdate}  handleChatUpdate={handleChatUpdate}/>
   ));
     }
   };
@@ -230,6 +279,7 @@ const FriendsWindow = ({userInfo, handleAliasUpdate}) => {
   const renderEmptyState = () => {
     let animationData;
     let message;
+    let searchingMessage = "Searching for friends...";
   
     switch (activeTab) {
       case 'all':
@@ -247,14 +297,18 @@ const FriendsWindow = ({userInfo, handleAliasUpdate}) => {
       case 'addFriend':
       default:
         animationData = addFriendLottie;
-        message = "Start typing to search for friends to add.";
+        if (searching) {
+          message = searchingMessage;
+        } else {
+          message = searchQuery && searchResults.length === 0 ? `No results found for "${searchQuery}". Try a different search.` : "Start typing to search for friends to add.";
+        }
         break;
     }
   
     return (
       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 4 }}>
         <Lottie animationData={animationData} style={{ width: 400, height: 400 }} />
-       <p className='font-sans text-xl font-light'>{message}</p>
+        <p className='font-sans text-xl font-light'>{message}</p>
       </Box>
     );
   };
@@ -272,7 +326,7 @@ const FriendsWindow = ({userInfo, handleAliasUpdate}) => {
       <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
         {visibleList.length > 0 ? (
           visibleList.map((friend, index) => (
-            <FriendTile key = {index} id={friend.id} friendData={friend} onMoreOptions={handleMoreOptions} handleAliasUpdate = {handleAliasUpdate}  userInfo = {userInfo} />
+            <FriendTile key = {index} id={friend.id} friendData={friend} onMoreOptions={handleMoreOptions} handleAliasUpdate = {handleAliasUpdate}  userInfo = {userInfo} handleChatUpdate={handleChatUpdate} />
           ))
         ) : (
           // <Typography variant="body1" sx={{ p: 2 }}>
