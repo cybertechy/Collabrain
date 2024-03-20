@@ -211,6 +211,11 @@ function init(server)
 			console.log(`### user ${id} joined call ${room} ###`);
 			socket.join(room);
 			socket.to(room).emit('user-joined-call', id);
+			socket.on('leave-call', () => { // Corrected syntax
+				socket.to(room).emit('user-left-call', id);
+				socket.leave(room);
+			});
+		
 			socket.on('disconnect', () => socket.to(room).emit('user-left-call', id));
 		});
 	});

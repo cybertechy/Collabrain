@@ -4,57 +4,57 @@ import VideocamIcon from "@mui/icons-material/VideocamRounded";
 import CallEndIcon from "@mui/icons-material/CallEndRounded";
 import MicOffIcon from '@mui/icons-material/MicOff';
 import VideocamOffIcon from '@mui/icons-material/VideocamOff';
+import CloseFullscreenIcon from '@mui/icons-material/CloseFullscreen';
 
 export default function CallScreen(props)
 {
-	const [micEnabled, setMicEnabled] = useState(true);
-	const [videoEnabled, setVideoEnabled] = useState(true);
 	const [gridCols, setGridCols] = useState(1);
 	const [maxGridHeight, setMaxGridHeight] = useState("100%");
 	const gridRef = useRef(null);
 
-	const toggleMic = () =>
-	{
-		setMicEnabled((prev) => !prev);
-		// You can add logic here to toggle microphone
-	};
-
-	const toggleVideo = () =>
-	{
-		setVideoEnabled((prev) => !prev);
-		// You can add logic here to toggle video
-	};
-
-	const exitCall = () =>
-	{
-		// Add logic to exit the call
-		console.log("Exiting call...");
-	};
+	const minimize = () => props.setShowCallScreen(false);
 
 	useEffect(() =>
 	{
-		console.log("### Adjusting grid... ###");
-		if (gridRef.current && gridRef.current.childElementCount >= 2)
+		if (!props.callVideoStreams)
+			return;
+
+		console.log("### video streams changed ###");
+
+		for (const [id, stream] of Object.entries(props.callVideoStreams))
 		{
-			setMaxGridHeight("fit-content");
-		} else
-		{
-			setMaxGridHeight("100%");
+			stream.playsInline = true;
+			stream.play();
+			if (gridRef.current)
+				gridRef.current.appendChild(stream);
 		}
+
+		console.log("numVids: ", gridRef.current.childElementCount); // Log here
+
+		if (gridRef.current && gridRef.current.childElementCount >= 1)
+			setMaxGridHeight("fit-content");
+		else
+			setMaxGridHeight("100%");
 
 		if (gridRef.current)
 		{
-			console.log(gridRef.current.childElementCount); // Log here
-			if (gridRef.current.childElementCount <= 3)
+			if (gridRef.current.childElementCount <= 2)
 				setGridCols(gridRef.current.childElementCount);
 
 			else
 				setGridCols(3);
 		}
-	}, [props.numUsers]);
+	}, [props.callVideoStreams]);
 
 	return (
 		<div className="relative w-full h-full bg-[#202124] p-4 gap-4">
+			{/* Minimize button */}
+			<button className="absolute top-4 right-4 p-2 bg-white rounded-full hover:bg-gray-700 transition duration-300 text-black hover:text-white"
+				onClick={() => minimize()}>
+				<CloseFullscreenIcon style={{ fontSize: 28 }} />
+			</button>
+
+			{/* Video grid */}
 			<div ref={gridRef} id="video-grid" className={"grid gap-4 w-full h-full place-items-center"}
 				style={{
 					gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))`,
@@ -66,24 +66,25 @@ export default function CallScreen(props)
 			{/* Toolbar */}
 			<div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex justify-center space-x-8 bg-white p-2 rounded-2xl shadow-2xl">
 				<button className={`bg-gray-800 rounded-full p-2 hover:bg-gray-700 transition duration-300`}
-					onClick={toggleMic}>
-					{micEnabled ?
-						<MicIcon style={{ fontSize: 28, color: "white" }} /> :
-						<MicOffIcon style={{ fontSize: 28, color: "red" }} />
+					onClick={props.toggleAudio}>
+					{
+						props.micEnabled ?
+							<MicIcon style={{ fontSize: 28, color: "white" }} /> :
+							<MicOffIcon style={{ fontSize: 28, color: "red" }} />
 					}
 				</button>
 
 				<button className={`bg-gray-800 rounded-full p-2 hover:bg-gray-700 transition duration-300`}
-					onClick={toggleVideo}>
+					onClick={props.toggleVideo}>
 					{
-						videoEnabled ?
+						props.videoEnabled ?
 							<VideocamIcon style={{ fontSize: 28, color: "white" }} /> :
 							<VideocamOffIcon style={{ fontSize: 28, color: "red" }} />
 					}
 				</button>
 
 				<button className="bg-red-500 rounded-full p-2 hover:bg-red-600 transition duration-300"
-					onClick={exitCall}>
+					onClick={() => props.leaveCall()}>
 					<CallEndIcon style={{ fontSize: 28, color: "white" }} />
 				</button>
 			</div>

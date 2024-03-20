@@ -10,9 +10,10 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { isSidebarOpen } from "../sidebar/sidebar";
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import SettingsOverlay from '../../overlays/settingsOverlay';
-import Template from '../template';
+import CallButton from "_components/ui/call/call";
 
-const Navbar = ({ isOpen, toggleSidebar }) =>
+const Navbar = ({ isOpen, toggleSidebar, setShowCallScreen, setCallVideoStreams, callVideoStreams, 
+				  toggleAudio, toggleVideo, leaveCall, micEnabled, videoEnabled, setLeaveCall }) =>
 {
 	const [showLeaderboard, setShowLeaderboard] = useState(false);
 	const leaderboardRef = useRef(null);
@@ -65,11 +66,13 @@ const Navbar = ({ isOpen, toggleSidebar }) =>
 	{
 		return (
 			<>
+				<CallButton setShowCallScreen={setShowCallScreen} setCallVideoStreams={setCallVideoStreams} callVideoStreams={callVideoStreams}
+							toggleAudio={toggleAudio} toggleVideo={toggleVideo} leaveCall={leaveCall} micEnabled={micEnabled} videoEnabled={videoEnabled} 
+							setLeaveCall={setLeaveCall} />
 				<Tooltip
 					title={"Leaderboard"}
 					enterDelay={1000}
 					leaveDelay={200}
-
 				>
 					<EmojiEventsIcon
 						ref={leaderboardToggleRef} // Attach the ref here
@@ -84,7 +87,6 @@ const Navbar = ({ isOpen, toggleSidebar }) =>
 					}
 					enterDelay={1000}
 					leaveDelay={200}
-
 				>
 					<NotificationsIcon
 						className="cursor-pointer"
@@ -95,7 +97,6 @@ const Navbar = ({ isOpen, toggleSidebar }) =>
 					title={"Profile Settings"}
 					enterDelay={1000}
 					leaveDelay={200}
-
 				>
 					<AccountCircleIcon
 						className="cursor-pointer"
@@ -119,7 +120,7 @@ const Navbar = ({ isOpen, toggleSidebar }) =>
 					/>
 				</div>
 				<div className="flex-grow">
-					<div className="flex justify-end space-x-4">
+					<div className="flex justify-end space-x-4 items-center">
 						{tooltips()}
 					</div>
 				</div>
