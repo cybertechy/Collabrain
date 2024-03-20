@@ -248,7 +248,7 @@ const FriendsWindow = ({userInfo, handleAliasUpdate, handleChatUpdate}) => {
       if (searchQuery && searchResults.length > 0) {
         // Render search results
         return searchResults.map((user) => (
-          <FriendTile key={user.id} friendData={user} onMoreOptions={handleMoreOptions}  handleChatUpdate={handleChatUpdate}/>
+          <FriendTile key={user.id} id={user.id} friendData={user} onMoreOptions={handleMoreOptions}  handleChatUpdate={handleChatUpdate}/>
         ));
       }else if (searchQuery && searchResults.length === 0) {
         // Render a message indicating no results found for the search
@@ -271,7 +271,7 @@ const FriendsWindow = ({userInfo, handleAliasUpdate, handleChatUpdate}) => {
 
       
   return filteredFriends.map((friend, index) => (
-    <FriendTile key={index} id = {friend.id} friendData={friend} onMoreOptions={handleMoreOptions} userInfo = {userInfo} handleAliasUpdate = {handleAliasUpdate}  handleChatUpdate={handleChatUpdate}/>
+    <FriendTile key={index} id ={friend.id} friendData={friend} onMoreOptions={handleMoreOptions} userInfo = {userInfo} handleAliasUpdate = {handleAliasUpdate}  handleChatUpdate={handleChatUpdate}/>
   ));
     }
   };
