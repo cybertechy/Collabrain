@@ -82,9 +82,9 @@ const Moderation = () => {
   return (
     <>
       <div className="">
-        <p className="text-3xl pt-8 pl-20 font-medium text-primary">Content Moderation</p>
+        <p className="text-3xl pt-8 pl-10 font-medium text-primary">Content Moderation</p>
         <div className="flex pt-10">
-          <div className="w-7/12 h-48 ml-20 border-gray-200 border-2 bg-white rounded-md drop-shadow-md">
+          <div className="w-7/12 h-48 ml-10 border-gray-200 border-2 bg-white rounded-md drop-shadow-md">
             <div className="flex pt-5 pl-5 pb-2 gap-2 ">
               <WarningAmberIcon className="text-red-500 h-24 w-24" />
               <p className="font-medium text-xl text-primary ">Warning!</p>
@@ -96,7 +96,7 @@ const Moderation = () => {
               </ul>
             </div>
           </div>
-          <div className="w-3/12 ml-5 h-48 border-gray-200 border-2 bg-white rounded-md drop-shadow-md ">
+          <div className="w-4/12 ml-5 h-48 border-gray-200 border-2 bg-white rounded-md drop-shadow-md ">
             <div className="flex pt-5 pl-5 pb-2 gap-2">
             </div>
             <div className="pl-5 text-primary">
@@ -112,8 +112,8 @@ const Moderation = () => {
           </div>
         </div>
 
-        <div className="flex pl-20 pt-6 ">
-          <div className="gap-1 border-gray-200 border-2 bg-white rounded-md drop-shadow-md w-11/12 text-primary ">
+        <div className="flex pl-10 pt-6 ">
+          <div className="gap-1 border-gray-200 border-2 bg-white rounded-md drop-shadow-md w-full text-primary mr-12">
             <div className="border-gray-200 w-11/12 ml-8 py-2 border-b-2 ">
               <p className="font-semibold text-lg pt-2">Reported Users </p>
             </div>
