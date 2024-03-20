@@ -5,6 +5,7 @@ import LineChart from "./activeMembersInTeam";
 import DashboardCard from "./Storage";
 import ChartComponent from "./activeUsers";
 import axios from "axios";
+import Template from "@/components/ui/template/template";
 
 
 const UserStats = () => {
@@ -71,6 +72,7 @@ const UserStats = () => {
 
 
     return(
+        <Template>
         <div className="h-screen">
             <div className="ml-48">
                 <p className='pt-12 pl-10 pb-8 font-medium text-3xl'>User Statistics</p>           
@@ -150,6 +152,7 @@ const UserStats = () => {
               
             </div>
         </div>
+        </Template>
     );
 };
 

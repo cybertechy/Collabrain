@@ -4,7 +4,7 @@ import axios from 'axios';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import CloseIcon from '@mui/icons-material/Close';
 const { useAuthState, getToken } = require("_firebase/firebase");
-
+import Template from '@/components/ui/template/template';
 const Overlay = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
@@ -79,7 +79,7 @@ const Moderation = () => {
 
   // {("ChatID: "+report.chatID) || ("TeamID:"+report.teamID)}
   return (
-    <>
+    <Template>
       <div className="ml-48">
         <p className="text-3xl pt-16 pl-24 font-medium">Content Moderation</p>
         <div className="flex pt-10">
@@ -158,7 +158,7 @@ const Moderation = () => {
         </div>
       </div>
       <Overlay isOpen={isOverlayOpen} onClose={closeOverlay} />
-    </>
+    </Template>
   );
 };
 
