@@ -57,9 +57,7 @@ function page() {
         popoverClass: "recommendation-popover",
         steps: [
             { element: "#excalidraw", popover: { title: "Bring ideas onto life", description: "This is the content map, you can create diagrams and much more here" } },
-            { element: "#ContentMapName", popover: { title: "Content Map Name", description: "You can edit the content map name by clicking on the icon" } },
-            { element: "#new", popover: { title: "New Content Map", description: "You can create a new content map or create a copy of the current content map by clicking on it" } },
-            { element: "#delete", popover: { title: "Delete Content Map", description: "You can delete the current content map by clicking on it" } },
+            { element: "#Name", popover: { title: "Content Map Name", description: "You can edit the content map name by clicking on the icon" } },
             { element: "#share", popover: { title: "Share Content Map with others", description: "You can share the current content map to others by clicking on it" } },
             { element: "#save", popover: { title: "Saved Status", description: "This icon shows the saving status of the content map" } },
         ]
