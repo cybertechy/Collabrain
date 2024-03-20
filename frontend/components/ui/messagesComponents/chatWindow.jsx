@@ -11,11 +11,10 @@ export default function ChatWindow({ messages, setMessages, sendPersonalMsg, wit
   const [avatar,setAvatar] = useState(withUserInfo?.username || 'User');
   const messagesEndRef = useRef(null); // Create a ref for the scrolling target
 
- console.log("userinfo", userInfo)
   useEffect(() => {
     if (withUserInfo && userInfo && userInfo.data) {
-      console.log("asdas",withUserInfo);
-      setTitle(userInfo?.data?.alias ? userInfo?.data?.alias[withUserId]: withUserInfo?.data?.username || 'User');
+      console.log("asdas",userInfo);
+      setTitle(userInfo?.data?.aliases[withUserId] ? userInfo?.data?.aliases[withUserId]: withUserInfo?.data?.username || 'User');
       setAvatar(withUserInfo?.data?.username || 'User');
     }
   }, [withUserInfo, userInfo]);
