@@ -4,7 +4,8 @@ import axios from 'axios';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import CloseIcon from '@mui/icons-material/Close';
 const { useAuthState, getToken } = require("_firebase/firebase");
-
+import Template from '@/components/ui/template/template';
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 const Overlay = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
@@ -56,7 +57,7 @@ const Moderation = () => {
       if (!token) return;
       try {
         setdataLoading(true);
-        const response = await axios.get('http://localhost:8080/api/reports', {
+        const response = await axios.get(SERVERLOCATION + '/api/reports', {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -79,17 +80,17 @@ const Moderation = () => {
 
   // {("ChatID: "+report.chatID) || ("TeamID:"+report.teamID)}
   return (
-    <>
-      <div className="ml-48">
-        <p className="text-3xl pt-16 pl-24 font-medium">Content Moderation</p>
+    <Template>
+      <div className="">
+        <p className="text-3xl pt-8 pl-20 font-medium text-primary">Content Moderation</p>
         <div className="flex pt-10">
-          <div className="w-7/12 h-48 ml-24 border-gray-200 border-2 bg-white rounded-md drop-shadow-md">
+          <div className="w-7/12 h-48 ml-20 border-gray-200 border-2 bg-white rounded-md drop-shadow-md">
             <div className="flex pt-5 pl-5 pb-2 gap-2 ">
               <WarningAmberIcon className="text-red-500 h-24 w-24" />
-              <p className="font-medium text-xl">Warning!</p>
+              <p className="font-medium text-xl text-primary ">Warning!</p>
             </div>
             <div className="ml-5 p-2 w-11/12 h-20 border-t-2 border-gray-200">
-              <ul className="list-disc pl-3">
+              <ul className="list-disc pl-3 text-primary">
                 <li>Users content was removed due to violation of our community guidelines</li>
                 <li><button onClick={openOverlay} className="text-blue-500 underline mt-2">View Community Guidelines</button></li>
               </ul>
@@ -98,7 +99,7 @@ const Moderation = () => {
           <div className="w-3/12 ml-5 h-48 border-gray-200 border-2 bg-white rounded-md drop-shadow-md ">
             <div className="flex pt-5 pl-5 pb-2 gap-2">
             </div>
-            <div className="pl-5">
+            <div className="pl-5 text-primary">
               <p className=" pb-2 text-xl font-medium ">Number of Users Reported</p>
 
               <div className="w-11/12 pt-2 h-20 border-t-2 border-gray-200">
@@ -111,18 +112,18 @@ const Moderation = () => {
           </div>
         </div>
 
-        <div className="flex pl-24 pt-6 ">
-          <div className="gap-1 border-gray-200 border-2 bg-white rounded-md drop-shadow-md w-11/12 ">
+        <div className="flex pl-20 pt-6 ">
+          <div className="gap-1 border-gray-200 border-2 bg-white rounded-md drop-shadow-md w-11/12 text-primary ">
             <div className="border-gray-200 w-11/12 ml-8 py-2 border-b-2 ">
               <p className="font-semibold text-lg pt-2">Reported Users </p>
             </div>
-            <div className="grid grid-cols-4 w-11/12 py-2 ml-8 border-b-2 border-gray-200">
+            <div className="grid grid-cols-4 w-11/12 py-2 ml-8 border-b-2 border-gray-200" style={{ overflow: 'auto', maxHeight: '400px' }}>
               <p className="font-medium">Username</p>
               <p className="font-medium pl-4">Content</p>
               <p className="font-medium pl-8">Policy</p>
               <p className="font-medium pl-12">Date</p>
             </div>
-            <div className="pl-8 pr-16 pb-5 pt-2">
+            <div className="pl-8 pr-16 pb-5 pt-2" style={{ overflow: 'auto', maxHeight: '400px' }}>
               {dataLoading && <p className='animate-pulse text-center text-lg font-semibold p-3'>Loading Data...</p>}
               {reports.map((report, index) => (
                 <div key={index} className="grid grid-cols-4 w-full py-2  border-b-2 border-gray-200">
@@ -158,7 +159,7 @@ const Moderation = () => {
         </div>
       </div>
       <Overlay isOpen={isOverlayOpen} onClose={closeOverlay} />
-    </>
+    </Template>
   );
 };
 
