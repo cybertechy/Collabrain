@@ -5,8 +5,13 @@ import Box from '@mui/material/Box';
 import SearchIcon from '@mui/icons-material/Search';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+import "../utils/i18n"
+import { useTranslation } from 'next-i18next';
+import { useTTS } from "../utils/tts/TTSContext";
 
 const SearchBar = ({ onSearch }) => {
+  const { t } = useTranslation('dms');
+  const { speak, stop, isTTSEnabled } = useTTS();
   const [searchValue, setSearchValue] = useState('');
 
   const handleClearSearch = () => {
@@ -42,12 +47,14 @@ const SearchBar = ({ onSearch }) => {
         fullWidth
         type="search"
         variant="outlined"
-        placeholder="Search"
+        placeholder={t('search')}
         value={searchValue}
         onChange={(e) => {
           setSearchValue(e.target.value);
           onSearch(e.target.value);
         }}
+        onMouseEnter={() => isTTSEnabled && speak("Enter your search request here")}
+        onMouseLeave={stop}
         InputProps={{
           startAdornment: (
             <SearchIcon sx={{ color: '#30475E', marginRight: 1 }} />

@@ -110,7 +110,7 @@ export default function Home() {
                     >
                         <EmailInput email={email} setEmail={setemail} placeholder={t('email')}/>
                         <br />
-                        <PasswordInput placeholder= "Password" password={password} setPassword={setpassword} />
+                        <PasswordInput placeholder= {t('password')} password={password} setPassword={setpassword} />
                      
                         
                         <p className="text-sm text-primary font-sans font-light text-left mt-2">

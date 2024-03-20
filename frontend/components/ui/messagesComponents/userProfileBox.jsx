@@ -48,13 +48,13 @@ const userProfileBox = ({ userData, onMute, onDeafen, onSettings }) => {
             </div>
             <div className="flex mt-4 space-x-2">
                 <IconButton onClick={handleMute} className="hover:bg-primary-dark rounded-full">
-                    {isMuted ? <MicOffIcon className="text-white" onMouseEnter={() => isTTSEnabled && speak("Unmute Microphone")}
-                onMouseLeave={stop} /> : <MicIcon className="text-white" onMouseEnter={() => isTTSEnabled && speak("Mute Microphone")}
+                    {isMuted ? <MicOffIcon className="text-white" onMouseEnter={() => isTTSEnabled && speak("Microphone currently muted. Click to unmute.")}
+                onMouseLeave={stop} /> : <MicIcon className="text-white" onMouseEnter={() => isTTSEnabled && speak("Microphone currently unmuted. Click to mute.")}
                 onMouseLeave={stop} />}
                 </IconButton>
                 <IconButton onClick={handleDeafen} className="hover:bg-primary-dark rounded-full">
-                    {isDeafened ? <VolumeOffIcon className="text-white" onMouseEnter={() => isTTSEnabled && speak("Turn the sound on")}
-                onMouseLeave={stop} /> : <VolumeUpIcon className="text-white" onMouseEnter={() => isTTSEnabled && speak("Turn the sound off")}
+                    {isDeafened ? <VolumeOffIcon className="text-white" onMouseEnter={() => isTTSEnabled && speak("Sound currently turned off. Click tp turn on")}
+                onMouseLeave={stop} /> : <VolumeUpIcon className="text-white" onMouseEnter={() => isTTSEnabled && speak("Sound currently turned on. Click to turn off")}
                 onMouseLeave={stop}/>}
                 </IconButton>
                 <IconButton onClick={onSettings} className="hover:bg-primary-dark rounded-full">

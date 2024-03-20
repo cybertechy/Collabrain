@@ -30,6 +30,21 @@ i18n
           "pass_req": "Password must contain at least 8 characters including uppercase letters, lowercase letters, and numbers."
         },
 
+        username: {
+          "usr_top": "Welcome! Let's Pick a Username",
+          "usr_msg": "Choose a unique username to represent you on our platform. It's the first step in creating your personal profile!",
+          "usr_type": "Enter your username",
+          "usr_available": "Username is available",
+          "usr_type_err": "Username must be at least 4 characters and alphanumeric (including underscores)",
+          "usr_taken": "Username is taken",
+          "checking": "Checking availability...",
+          "usr_err": "Error checking availability",
+          "upd_fail": "Failed to update username",
+          "upd_error": "Error updating username",
+          "sign_out_btn": "Sign out",
+          "lets_go_btn": "Let's Go!"
+        },
+
         dashboard: {
           "sort_by": "Sort By",
           "sort_name": "Name",
@@ -207,7 +222,12 @@ i18n
         },
 
         dms: {
-          "chats": "Chats"
+          "chats": "Chats",
+          "search": "Search",
+          "all": "This is where your friends can be found.",
+          "received": "You will find your received friend requests here.",
+          "blocked": "You will find your blocked users here.",
+          "search_friends": "Start typing to search for friends to add."
         }
       },
       ru: {
@@ -230,7 +250,21 @@ i18n
           "email_invalid": "Неверный адрес эл. почты",
           "pass_mismatch": "Введенные пароли не совпадают друг с другом.",
           "pass_req": "Пароль должен состоять из минимум 8 символов, включая заглавные и прописные буквы, а также цифры."
+        },
 
+        username: {
+          "usr_top": "Добро пожаловать! Выберите Свое Имя Пользователя",
+          "usr_msg": "Выберите уникальное имя пользователя для использования на нашей платформе. Это первый шаг в создании вашего личного профиля!",
+          "usr_type": "Введите имя пользователя",
+          "usr_available": "Имя пользователя свободно!",
+          "usr_type_err": "Имя пользователя должно состоять минимум из 4 символов (букв, цифр или подчеркиваний)",
+          "usr_taken": "Имя пользователя занято",
+          "checking": "Проверяем доступность...",
+          "usr_err": "Ошибка при проверке доступности",
+          "upd_fail": "Не получилось обновить имя пользователя",
+          "upd_error": "Ошибка при обновлении имени пользователя",
+          "sign_out_btn": "Выйти",
+          "lets_go_btn": "Погнали!"
         },
 
         dashboard: {
@@ -415,7 +449,12 @@ i18n
         },
 
         dms: {
-          "chats": "Чаты"
+          "chats": "Чаты",
+          "search": "Поиск",
+          "all": "Здесь вы можете найти своих друзей.",
+          "received": "Здесь вы найдете запросы на дружбу.",
+          "blocked": "Здесь вы найдете заблокированных пользователей.",
+          "search_friends": "Начните печатать, чтобы найти и добавить друзей."
         }
       },
       // Add more languages here
