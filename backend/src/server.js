@@ -80,6 +80,7 @@ app.use("/api/docs", docRoute);
 app.use("/api/storage", storageRoute);
 app.use("/api/stats", statsRoute);
 app.use("/api/ai", aiRoute);
+app.use("/api/2FA", twoFARoute);
 
 // Endpoint to display DB usage
 app.get("/api/dbUsage", (req, res) => {
