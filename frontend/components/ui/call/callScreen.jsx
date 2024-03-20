@@ -49,7 +49,7 @@ export default function CallScreen(props)
 	return (
 		<div className="relative w-full h-full bg-[#202124] p-4 gap-4">
 			{/* Minimize button */}
-			<button className="absolute top-4 right-4 p-2 bg-white rounded-full hover:bg-gray-700 transition duration-300 text-black hover:text-white"
+			<button className="absolute top-4 right-4 p-2 bg-white rounded-full hover:bg-gray-700 transition duration-300 text-black hover:text-white z-10"
 				onClick={() => minimize()}>
 				<CloseFullscreenIcon style={{ fontSize: 28 }} />
 			</button>
