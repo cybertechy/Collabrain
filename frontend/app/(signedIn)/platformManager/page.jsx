@@ -4,7 +4,6 @@ import PieChart from "./Microservice";
 import LineChart from "./activeMembersInTeam";
 import DashboardCard from "./Storage";
 import ChartComponent from "./activeUsers";
-import axios from "axios";
 import Template from "@/components/ui/template/template";
 
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
@@ -74,8 +73,8 @@ const UserStats = () => {
 
     return(
         <>
-        <div className="h-screen">
-            <div className="ml-48">
+        <div className="h-screen overflow-y-auto">
+            <div className="">
                 <p className='pt-12 pl-10 pb-8 font-medium text-3xl'>User Statistics</p>           
                 <div className="flex ">
                 <div className="w-2/3 h-96 border-gray-200 border-2 bg-white rounded-md drop-shadow-md  ml-10">
@@ -158,6 +157,3 @@ const UserStats = () => {
 };
 
 export default UserStats;
-
-
-
