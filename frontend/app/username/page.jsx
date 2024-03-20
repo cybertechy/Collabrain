@@ -149,7 +149,7 @@ const checkUsernameAvailability = async (enteredUsername) => {
 
   return (
     <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center z-50 bg-basicallylight bg-opacity-20 backdrop-blur-sm">
-      <div className="w-1/4 bg-basicallylight rounded-md shadow-lg">
+      <div className="w-11/12 sm:w-1/2 md:w-1/2 lg:w-1/3 bg-basicallylight rounded-md shadow-lg">
         <div className="p-8">
           <h2 className="text-2xl font-bold mb-4 text-basicallydark">Welcome! Let's Pick a Username</h2>
           <p className="mb-4 text-gray-600">Choose a unique username to represent you on our platform. It's the first step in creating your personal profile!</p>

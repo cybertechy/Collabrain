@@ -92,7 +92,8 @@ const ContentMapOverlay = ({ setOpenModal, switchToDocument }) =>
 	return (
 		<>
 			<div className="w-screen h-screen flex items-center justify-center">
-				<div className="w-2/4 h-3/5 shadow-lg bg-basicallylight rounded-md ">
+				{/* <div className="w-2/4 h-3/5 shadow-lg bg-basicallylight rounded-md "> */}
+				<div className="w-full h-10/12 max-xs:h-2/3 sm:h-2/3 sm:w-2/3 shadow-lg bg-basicallylight rounded-md ">
 					<div className="bg-[url('/assets/images/bgDesign.png')] w-full h-full bg-contain bg-no-repeat bg-left">
 						<div className="flex justify-end">
 							<button className=' bg-transparent border-none text-25 cursor-pointer pr-2 pt-2' onClick={setOpenModal}>
@@ -127,7 +128,7 @@ const DocumentOverlay = ({ setOpenModal, switchToContent }) =>
 	return (
 		<>
 			<div className="w-screen h-screen flex items-center justify-center">
-				<div className="w-2/4 h-3/5 shadow-lg bg-basicallylight rounded-md ">
+				<div className="w-full h-10/12 max-xs:h-1/4 sm:h-2/3 sm:w-2/3 shadow-lg bg-basicallylight rounded-md ">
 					<div className="flex justify-end">
 						<button className=' bg-transparent border-none text-25 cursor-pointer pr-2 pt-2' onClick={setOpenModal}>
 							<CloseIcon fontSize="large" />

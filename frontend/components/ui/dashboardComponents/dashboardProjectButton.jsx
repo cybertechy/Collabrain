@@ -47,21 +47,18 @@ const DashboardProjectButton = ({
     const handleClose = () => {
         setAnchorEl(null);
     };
-    const truncateTitle = (title, maxLength = 14, fixedWidthChar = "\u00A0") => {
-        let truncatedTitle = title;
+    const truncateTitle = (title, maxLength = 9) => {
         if (title.length > maxLength) {
-            truncatedTitle = title.substring(0, maxLength - 2) + "..";
-        } else {
-            truncatedTitle += fixedWidthChar.repeat(maxLength * 2 - title.length); // Pad with non-breaking spaces
+            return title.substring(0, maxLength - 3) + "..";
         }
-        return truncatedTitle;
+        return title;
     };
     const map = () => (
         <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
-            className="w-16 h-16"
+            className="w-10 h-10 sm:w-10 sm:h-10"
         >
             <path
                 fillRule="evenodd"
@@ -76,7 +73,7 @@ const DashboardProjectButton = ({
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
-            className="w-16 h-16"
+            className="w-10 h-10 sm:w-16 sm:h-16"
         >
             <path
                 fillRule="evenodd"
@@ -162,18 +159,19 @@ const DashboardProjectButton = ({
         <Tooltip title={title} enterDelay={1000} leaveDelay={200}>
             <div>
                 <div
-                    className="flex flex-wrap items-stretch justify-center bg-aliceBlue text-primary rounded-md hover:bg-columbiablue duration-300  pt-2 px-3  border border-unselected" // Added mb-2 for bottom spacing
+// className="flex flex-wrap items-stretch justify-center bg-aliceBlue text-primary rounded-md hover:bg-columbiablue duration-300  pt-2 px-3  border border-unselected" // Added mb-2 for bottom spacing
+                    className="flex flex-col items-center justify-center bg-aliceBlue text-primary rounded-md hover:bg-columbiablue duration-300 h-22 w-32 sm:h-28 shadow-md pt-3 pl-1 border border-unselected"
                     draggable="true"
                     onDragStart={(e) => handleDragStart(e, project.id, type)}
                 >
                     <div className="flex flex-col items-center justify-between h-full">
                         <div className="flex flex-col gap-2 items-center">
                             {/* Project type text (left-aligned) */}
-
-                            <div onClick={handleContentMapClick}>
-                                {type === "Document" ? doc() : map()}
-                            </div>
-
+                        
+                        <div onClick={handleContentMapClick}>
+                            {type === "Document" ? doc() : map()}
+                        </div>
+                        
 
                         </div>
                         <div className="flex flex-col w-full mt-2 ">
@@ -182,67 +180,67 @@ const DashboardProjectButton = ({
                             </div>
                             
                             <div className="flex flex-row justify-between items-center w-full">
-
+                            
                                 <span className="text-md font-bold overflow-hidden whitespace-nowrap">
-                                    {truncateTitle(title)}
-                                </span>
-                                <IconButton
-                                    color="inherit"
-                                    onClick={handleClick}
-                                    className="ml-auto" // Pushed to the right side
+                                {truncateTitle(title)}
+                            </span>
+                            <IconButton
+                                color="inherit"
+                                onClick={handleClick}
+                                className="sm:ml-2"
+                            >
+                                <MoreVertIcon fontSize="small" />
+                            </IconButton>
+                            <Menu
+                                anchorEl={anchorEl}
+                                open={open}
+                                onClose={handleClose}
+                            >
+                                <MenuItem
+                                    onClick={() => {
+                                        handleClose();
+                                        setRenameOverlayOpen(true);
+                                    }}
                                 >
-                                    <MoreVertIcon fontSize="small" />
-                                </IconButton>
-                                <Menu
-                                    anchorEl={anchorEl}
-                                    open={open}
-                                    onClose={handleClose}
+                                    <EditIcon
+                                        fontSize="small text-tertiary"
+                                        className="mr-2 text-tertiary flex justify-between gap-5"
+                                    />
+                                    <span className="text-tertiary">
+                                        Rename
+                                    </span>
+                                </MenuItem>
+                                <MenuItem onClick={handleClose}>
+                                    <ShareIcon
+                                        fontSize="small text-tertiary"
+                                        className="mr-2 text-tertiary flex justify-between gap-5"
+                                    />
+                                    <span className="text-tertiary">Share</span>
+                                </MenuItem>
+                                <MenuItem onClick={handleClose}>
+                                    <SortIcon
+                                        fontSize="small text-tertiary"
+                                        className="mr-2 text-tertiary flex justify-between gap-5"
+                                    />
+                                    <span className="text-tertiary">
+                                        Organize
+                                    </span>
+                                </MenuItem>
+                                <MenuItem
+                                    onClick={() => {
+                                        handleClose();
+                                        setDeleteOverlayOpen(true);
+                                    }}
                                 >
-                                    <MenuItem
-                                        onClick={() => {
-                                            handleClose();
-                                            setRenameOverlayOpen(true);
-                                        }}
-                                    >
-                                        <EditIcon
-                                            fontSize="small text-tertiary"
-                                            className="mr-2 text-tertiary flex justify-between gap-5"
-                                        />
-                                        <span className="text-tertiary">
-                                            Rename
-                                        </span>
-                                    </MenuItem>
-                                    <MenuItem onClick={handleClose}>
-                                        <ShareIcon
-                                            fontSize="small text-tertiary"
-                                            className="mr-2  text-tertiary flex justify-between gap-5"
-                                        />
-                                        <span className="text-tertiary">Share</span>
-                                    </MenuItem>
-                                    <MenuItem onClick={handleClose}>
-                                        <SortIcon
-                                            fontSize="small text-tertiary"
-                                            className="mr-2  text-tertiary flex justify-between gap-5"
-                                        />
-                                        <span className="text-tertiary">
-                                            Organize
-                                        </span>
-                                    </MenuItem>
-                                    <MenuItem
-                                        onClick={() => {
-                                            handleClose();
-                                            setDeleteOverlayOpen(true);
-                                        }}
-                                    >
-                                        <DeleteIcon
-                                            fontSize="small text-tertiary"
-                                            className="mr-2  text-tertiary flex justify-between gap-5"
-                                        />
-                                        <span className="text-tertiary">
-                                            Delete
-                                        </span>
-                                    </MenuItem>
-                                </Menu>
+                                    <DeleteIcon
+                                        fontSize="small text-tertiary"
+                                        className="mr-2 text-tertiary flex justify-between gap-5"
+                                    />
+                                    <span className="text-tertiary">
+                                        Delete
+                                    </span>
+                                </MenuItem>
+                            </Menu>
                             </div>
                         </div>
                     </div>
@@ -303,7 +301,6 @@ const DashboardProjectButton = ({
     );
 };
 
-
 DashboardProjectButton.propTypes = {
     title: PropTypes.string,
     project: PropTypes.object.isRequired,
@@ -314,7 +311,7 @@ DashboardProjectButton.propTypes = {
     createdAt: PropTypes.string,
     updatedAt: PropTypes.string,
 
-
+   
 };
 
 export default DashboardProjectButton;
