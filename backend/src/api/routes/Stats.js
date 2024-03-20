@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { db, getWeekNumber, getCurrentMonth, getUserMetrics } = require("../helpers/firebase");
-const dbUsageCount = require("../../../../backend/src/server.js");
+const { db, getWeekNumber, getCurrentMonth } = require("../helpers/firebase");
+
 
 // Endpoint to retrieve the total time spent by a specific user, as well as their monthly message count
 router.get('/userinfo', async (req, res) => {
