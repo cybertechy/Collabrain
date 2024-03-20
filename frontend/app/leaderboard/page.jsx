@@ -5,7 +5,10 @@ import axios from 'axios';
 const fb = require("_firebase/firebase");
 import {useAuthState } from "@/app/_firebase/firebase";
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import Template from "@/components/ui/template/template";
+import GroupsIcon from '@mui/icons-material/Groups';
  
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
  
 const Leaderboard = () => {
   // State for team data, search query, and joined teams
@@ -21,7 +24,8 @@ const Leaderboard = () => {
 const fetchTeams = async () => {
   try {
     const token = await fb.getToken();
-    const response = await axios.get(`http://localhost:8080/api/teams?sort=${sortBy}`, {
+    //const response = await axios.get(`${SERVERLOCATION}/api/teams?sort=${sortBy}`, {
+      const response = await axios.get(`http://localhost:8080/api/teams?sort=${sortBy}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     setTeamData(response.data.map((team, index) => ({ ...team, rank: index + 1  })));
@@ -30,10 +34,11 @@ const fetchTeams = async () => {
   }
 };
  
+ 
+ 
 useEffect(() => {
   fetchTeams();
 }, [user, sortBy]);
- 
  
  
  
@@ -69,15 +74,14 @@ const handleRowClick = (teamName) => {
     console.log("Searching for:", searchQuery);
   };
  
- 
-  // Function to handle join team button click
   const handleJoinTeam = (teamName) => {
-    // Add the selected team to the list of joined teams
-    setJoinedTeams([...joinedTeams, teamName]);
-    // Update teamJoined state to mark this team as joined
-    setTeamJoined({ ...teamJoined, [teamName]: true });
+    if (!joinedTeams.includes(teamName)) {
+      // Add the selected team to the list of joined teams
+      setJoinedTeams([...joinedTeams, teamName]);
+      // Update teamJoined state to mark this team as joined
+      setTeamJoined({ ...teamJoined, [teamName]: true });
+    }
   };
- 
   // Function to handle disconnect from team button click
   const handleDisconnectFromTeam = (teamName) => {
     // Remove the selected team from the list of joined teams
@@ -87,28 +91,49 @@ const handleRowClick = (teamName) => {
   };
  
   return (
+    <Template>
  
-    <div className="container mx-auto p-24">
-       
+    <div className="container mx-auto px-10 pt-8">
       <p className="text-3xl font-md text-start text-primary bg-white mb-4">Discover Teams</p>
+      <div className="mt-4">
+      <p className="text-xl font-bold text-primary">Joined Teams</p>
+      {joinedTeams.length > 0 ? (
+        <div className="flex text-white flex-wrap gap-2 mt-3 mb-5">
+          {joinedTeams.map((teamName, index) => (
+            <div
+              key={index}
+              className="bg-primary rounded-lg p-2 flex items-center"
+            >
+              <GroupsIcon className="mr-2 text-secondary" />
+              <span>{teamName}</span>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className='mt-3 mb-5 text-gray-400'>No teams joined yet.</p>
+      )}
+    </div>
+   
+ 
       <div className= "border-gray-300 inner-shadow border-2 bg-aliceBlue rounded-md drop-shadow-md overflow-visible">
         {/* Search bar */}
         <div className="p-4 flex justify-between">
+        <SearchIcon className='mt-1.5 mr-2 text-3xl text-primary' />
           <input
             type="text"
             value={searchQuery}
             onChange={handleSearchChange}
             onKeyDown={handleSearchKeyDown}
-            placeholder="Search team..."
+            placeholder=" Search team..."
             className="p-2 border border-gray-300 rounded-lg w-full"
            
           />
-          <button
+          {/* <button
             onClick={handleSearch}
             className="bg-blue-500 text-white px-4 py-2 rounded-lg ml-2"
           >
             <SearchIcon />
-          </button>
+          </button> */}
         </div>
  
         {/* Header row for team data */}
@@ -123,22 +148,22 @@ const handleRowClick = (teamName) => {
             <div
             key={index}
            
-            className={`h-20 flex items-center justify-start border-b  border-gray-200 py-2 px-4 cursor-pointer relative transform transition-all duration-300 ${
-              clickedRow === team.name ? 'scale-105 shadow-xl bg-secondary' : 'scale-100' ,'border-none' , 'rounded-md'
+            className={`h-16 flex items-center  justify-start border-b  border-gray-200 py-2 px-4 cursor-pointer relative transform transition-all duration-300 ${
+              clickedRow === team.name ? 'scale-100 shadow-xl bg-secondary' : 'scale-100' ,'border-none' , 'rounded-md'
             }`}
             onClick={() => handleRowClick(team.name)}
             onMouseEnter={() => setHoveredRow(team.name)}
             onMouseLeave={() => setHoveredRow(null)}
             style={{
               overflow: 'visible',
-              backgroundColor: clickedRow === team.name ? '#C9D6DF' : hoveredRow === team.name ? '#C9D6DF' : 'aliceblue',
-              transform: clickedRow === team.name ? 'scale(1.05)' : 'scale(1)',
+              backgroundColor: clickedRow === team.name ? '#81c3d7' : hoveredRow === team.name ? '#C9D6DF' : 'aliceblue',
+              transform: clickedRow === team.name ? 'scale(1)' : 'scale(1)',
             }}
           >
-              <span className="text-lg w-1/4 "># {team.rank}</span>
-              <span className="text-lg w-1/4 ">{team.name}</span>
-              <span className="text-lg w-1/4 ">{team.score}</span>
-              {teamJoined[team.name] ? (
+              <span className="text-lg w-1/4 text-primary "># {team.rank}</span>
+               <span className="text-lg w-1/4 text-primary">{team.name}</span>
+               <span className="text-lg w-1/4 text-primary">{team.score}</span>
+               {teamJoined[team.name] ? (
                 <React.Fragment>
                   <button
                     onClick={() => handleDisconnectFromTeam(team.name)}
@@ -167,16 +192,9 @@ const handleRowClick = (teamName) => {
       </div>
  
       {/* Joined teams section */}
-      <div className="mt-4">
-        <h2 className="text-xl font-bold">Joined Teams:</h2>
-        <ul>
-          {joinedTeams.map((teamName, index) => (
-            <li key={index}>{teamName}</li>
-          ))}
-        </ul>
-      </div>
+     
     </div>
- 
+</Template>
   );
 };
  
