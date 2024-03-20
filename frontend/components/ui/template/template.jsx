@@ -1,37 +1,54 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "./sidebar/sidebar";
 import Navbar from "./navbar/navbar";
+import CallScreen from "_components/ui/call/callScreen";
 
-const Template = ({ children }) => {
-    
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+const Template = ({ children }) =>
+{
+	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+	const [showCallScreen, setShowCallScreen] = useState(false);
+	const [callVideoStreams, setCallVideoStreams] = useState({});
+	const [micEnabled, setMicEnabled] = useState(true);
+	const [videoEnabled, setVideoEnabled] = useState(true);
+	const [leaveCall, setLeaveCall] = useState(null);
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
+	const toggleVideo = (video) => setVideoEnabled(!videoEnabled);
 
-  return (
-    <div className="flex flex-col h-screen bg-basicallylight">
-         
-        <div className="flex flex-grow overflow-hidden">
-    {/* <div className="flex h-screen bg-gray-100 overflow-hidden"> */}
-      <Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar}/>
-      <>
-      {/* <div className="flex flex-col flex-grow overflow-hidden">
-          <div className=" bg-primary h-screen">
+	const toggleAudio = (video) => setMicEnabled(!micEnabled);
 
-          </div>
-        </div> */}
-      
-      <div className={`flex flex-col flex-grow overflow-hidden  ${isSidebarOpen ? "max-xsm:hidden": ""}`}>
-        <Navbar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
-        {/* <div id="content" className="flex-grow flex flex-col items-center justify-center"> */}
-          {children}
-      </div>
-      </>
-        </div>
-    </div>
-  );
+	const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+
+	useEffect(() =>
+	{
+		console.log("### leaveCall changed ###");
+		console.log(leaveCall);
+	}, [leaveCall]);
+
+	return (
+		<div className="flex flex-col h-screen bg-basicallylight">
+
+			<div className="flex flex-grow overflow-hidden">
+				{/* <div className="flex h-screen bg-gray-100 overflow-hidden"> */}
+				<Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
+				<>
+
+					<div className={`flex flex-col flex-grow overflow-hidden  ${isSidebarOpen ? "max-xsm:hidden" : ""}`}>
+						<Navbar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} setShowCallScreen={setShowCallScreen}
+							setCallVideoStreams={setCallVideoStreams} callVideoStreams={callVideoStreams} toggleAudio={toggleAudio} toggleVideo={toggleVideo} leaveCall={leaveCall} 
+							micEnabled={micEnabled} videoEnabled={videoEnabled} setLeaveCall={setLeaveCall} />
+						{/* <div id="content" className="flex-grow flex flex-col items-center justify-center"> */}
+						{
+							showCallScreen ?
+								<CallScreen setShowCallScreen={setShowCallScreen} callVideoStreams={callVideoStreams}
+									toggleAudio={toggleAudio} toggleVideo={toggleVideo} leaveCall={leaveCall}
+									micEnabled={micEnabled} videoEnabled={videoEnabled} /> :
+								<>{children}</>
+						}
+					</div>
+				</>
+			</div>
+		</div>
+	);
 };
 
 export default Template;

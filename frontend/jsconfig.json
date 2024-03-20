@@ -5,6 +5,7 @@
 	  "_firebase/*": ["./app/_firebase/*"],
 	  "_socket/*": ["./app/_socket/*"],
 	  "_components/*": ["./components/*"],
+	  "_public/*": ["./public/*"],
     }
   }
 }

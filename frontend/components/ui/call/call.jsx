@@ -1,13 +1,28 @@
 import { useEffect, useState, useRef } from "react";
 import socket from "_socket/socket";
 import { Peer } from "peerjs";
+import CallIcon from '@mui/icons-material/Call';
+import { usePathname, useSearchParams } from 'next/navigation';
+import fb from "_firebase/firebase";
+import MicIcon from "@mui/icons-material/MicRounded";
+import VideocamIcon from "@mui/icons-material/VideocamRounded";
+import CallEndIcon from "@mui/icons-material/CallEndRounded";
+import MicOffIcon from '@mui/icons-material/MicOff';
+import VideocamOffIcon from '@mui/icons-material/VideocamOff';
+import LaunchIcon from '@mui/icons-material/Launch';
+import { set } from "react-hook-form";
 
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 export default function Call(props)
 {
+	const pathname = usePathname();
+	const searchParams = useSearchParams();
 	let myPeer = useRef(null);
 	let sockCli = useRef(null);
-	let [peers, setPeers] = useState({});
+	const [peers, setPeers] = useState({});
+	const [inCall, setInCall] = useState(false);
+	const [user, loading] = fb.useAuthState();
+	const [stream, setStream] = useState(null);
 
 	const connectToNewUser = (userId, stream) =>
 	{
@@ -16,26 +31,22 @@ export default function Call(props)
 		const video = document.createElement('video');
 		video.playsInline = true;
 		video.id = userId;
-		call.on('stream', userVideoStream => addVideoStream(video, userVideoStream));
+		call.on('stream', userVideoStream => addVideoStream(video, userVideoStream, userId));
 		call.on('close', () => { video.remove(); });
 		setPeers({ ...peers, [userId]: call });
 	};
 
-	const addVideoStream = (video, stream) =>
+	const addVideoStream = (video, stream, userID) =>
 	{
 		video.srcObject = stream;
 		video.className = "rounded-md aspect-video object-cover w-auto h-full";
 		video.addEventListener('loadedmetadata', () => { video.play(); });
-		// Increment numUsers
-		props.setNumUsers((prev) => prev + 1);
-		document.querySelector('#video-grid').append(video);
+		// document.querySelector('#video-grid').append(video);
+		props.setCallVideoStreams({ ...props.callVideoStreams, [userID]: video });
 	};
 
-	useEffect(() =>
+	const joinCall = (room) =>
 	{
-		// Setup socket
-		sockCli.current = socket.init(SERVERLOCATION) || {};
-
 		// Setup peer
 		if (myPeer.current)
 			return;
@@ -56,7 +67,8 @@ export default function Call(props)
 		navigator.mediaDevices.getUserMedia({ video: true, audio: true })
 			.then(stream =>
 			{
-				addVideoStream(myVideo, stream);
+				setStream(stream);
+				addVideoStream(myVideo, stream, "self");
 
 				myPeer.current.on('call', call =>
 				{
@@ -65,7 +77,7 @@ export default function Call(props)
 					const video = document.createElement('video');
 					video.playsInline = true;
 					video.id = call.peer;
-					call.on('stream', userVideoStream => { addVideoStream(video, userVideoStream); });
+					call.on('stream', userVideoStream => { addVideoStream(video, userVideoStream, call.peer); });
 				});
 
 				sockCli.current.on('user-joined-call', userId =>
@@ -80,18 +92,96 @@ export default function Call(props)
 			if (peers[userId])
 				peers[userId].close();
 
-			// Remove video
-			try { document.getElementById(userId).remove(); }
-			catch (e) { console.log(e); }
+			console.log("### user left call ###");
 
-			// Decrement numUsers
-			props.setNumUsers((prev) => prev - 1);
+			// Remove video from props.callVideoStreams by filtering out the user who left
+			const newCallVideoStreams = Object.keys(props.callVideoStreams).reduce((object, key) =>
+			{
+				if (key !== userId)
+					object[key] = props.callVideoStreams[key];
+				return object;
+			}, {});
+			props.setCallVideoStreams(newCallVideoStreams);
 		});
 
 		myPeer.current.on('open', id =>
 		{
 			console.log(`### user id: ${id} ###`);
-			sockCli.current.emit('join-call', "room1", id);
+			sockCli.current.emit('join-call', room, id);
 		});
-	}, []);
+
+		props.setShowCallScreen(true);
+		setInCall(true);
+	};
+
+	const leaveCall = () =>
+	{
+		props.setShowCallScreen(false);
+		if (myPeer.current)
+			myPeer.current.destroy();
+
+		myPeer.current = null;
+
+		props.setCallVideoStreams({});
+
+		sockCli.current.emit('leave-call');
+		if (stream)
+			stream.getTracks().forEach(track => track.stop());
+		setInCall(false);
+		setStream(null);
+	};
+
+	useEffect(() =>
+	{
+		if (!user || loading)
+			return;
+
+		// Setup socket
+		sockCli.current = socket.init(SERVERLOCATION) || {};
+
+		// Set leave call function pointer
+		props.setLeaveCall(() => leaveCall);
+	}, [user, loading]);
+
+	return (
+		<div>
+			{
+				!inCall ?
+					(pathname == "/messages" && (searchParams.get("chatID") != null)) || pathname === "/chat" ?
+						<button className="border border-white text-white hover:text-white hover:bg-green-500 hover:border-green-500 font-bold px-3 py-2 rounded"
+							onClick={() => { joinCall("room1"); }}>
+							<CallIcon />
+						</button> :
+						<></>
+					:
+					// Button to show call with mic, video and leave buttons
+					<div className="border border-white text-black bg-white font-bold p-1 rounded">
+						<button className="bg-green-500 hover:bg-green-600 p-2 rounded text-white"
+							onClick={() => props.setShowCallScreen(true)}>
+							<LaunchIcon />
+						</button>
+						<button className="p-2 rounded"
+							onClick={props.toggleAudio}>
+							{
+								props.micEnabled ?
+									<MicIcon style={{ fontSize: 28, color: "black" }} /> :
+									<MicOffIcon style={{ fontSize: 28, color: "red" }} />
+							}
+						</button>
+						<button className="p-2 rounded"
+							onClick={props.toggleVideo}>
+							{
+								props.videoEnabled ?
+									<VideocamIcon style={{ fontSize: 28, color: "black" }} /> :
+									<VideocamOffIcon style={{ fontSize: 28, color: "red" }} />
+							}
+						</button>
+						<button className="bg-red-500 hover:bg-red-600 p-2 rounded text-white"
+							onClick={() => leaveCall()}>
+							<CallEndIcon />
+						</button>
+					</div>
+			}
+		</div>
+	);
 }
