@@ -96,11 +96,13 @@ async function serviceSignIn(service)
 			}
 			else
 			{
-				alert(err.message);
+				console.log(err.message);
 				return;
 			}
 
 		});
+
+	if (!result) return;
 
 	const userInfo = getAdditionalUserInfo(result);
 	// Add user to database if new user
@@ -114,10 +116,7 @@ async function serviceSignIn(service)
 			username: null,
 			photo: (result.user.photoURL) ? result.user.photoURL : null
 		})
-			.catch(err =>
-			{
-				alert(err.message);
-			});
+			.catch(err => console.log(err));
 	}
 }
 
