@@ -43,7 +43,10 @@ export default function Call(props)
 		video.className = "rounded-md aspect-video object-cover w-auto h-full";
 		video.addEventListener('loadedmetadata', () => { video.play(); });
 		// document.querySelector('#video-grid').append(video);
-		props.setCallVideoStreams({ ...props.callVideoStreams, [userID]: video });
+		props.setCallVideoStreams(prevState => ({
+			...prevState,
+			[userID]: stream
+		}));
 	};
 
 	const joinCall = (room) =>
@@ -95,14 +98,12 @@ export default function Call(props)
 
 			console.log("### user left call ###");
 
-			// Remove video from props.callVideoStreams by filtering out the user who left
-			const newCallVideoStreams = Object.keys(props.callVideoStreams).reduce((object, key) =>
+			props.setCallVideoStreams(prevState =>
 			{
-				if (key !== userId)
-					object[key] = props.callVideoStreams[key];
-				return object;
-			}, {});
-			props.setCallVideoStreams(newCallVideoStreams);
+				const newStreams = { ...prevState };
+				delete newStreams[userId];
+				return newStreams;
+			});
 		});
 
 		myPeer.current.on('open', id =>

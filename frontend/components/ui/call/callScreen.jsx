@@ -14,21 +14,40 @@ export default function CallScreen(props)
 
 	const minimize = () => props.setShowCallScreen(false);
 
+	const addVideoElementsToGrid = () =>
+	{
+		if (!props.callVideoStreams || !gridRef.current) return;
+
+		for (const [id, stream] of Object.entries(props.callVideoStreams))
+		{
+			const video = document.createElement('video');
+			video.srcObject = stream;
+			video.playsInline = true;
+			video.autoplay = true;
+			video.className = "rounded-md aspect-video object-cover w-auto h-full";
+			video.id = id;
+			gridRef.current.appendChild(video);
+		}
+	};
+
 	useEffect(() =>
 	{
 		if (!props.callVideoStreams)
 			return;
 
-		console.log("### video streams changed ###");
+		console.log("stream: ", props.callVideoStreams);
 
-		for (const [id, stream] of Object.entries(props.callVideoStreams))
-		{
-			stream.playsInline = true;
-			stream.play();
-			if (gridRef.current)
-				gridRef.current.appendChild(stream);
-		}
+		// console.log("### video streams changed ###");
 
+		// for (const [id, stream] of Object.entries(props.callVideoStreams))
+		// {
+		// 	stream.playsInline = true;
+		// 	stream.play();
+		// 	if (gridRef.current)
+		// 		gridRef.current.appendChild(stream);
+		// }
+
+		addVideoElementsToGrid();
 		console.log("numVids: ", gridRef.current.childElementCount); // Log here
 
 		if (gridRef.current && gridRef.current.childElementCount >= 1)
@@ -44,6 +63,12 @@ export default function CallScreen(props)
 			else
 				setGridCols(3);
 		}
+
+		return () =>
+		{
+			if (gridRef.current)
+				gridRef.current.innerHTML = '';
+		};
 	}, [props.callVideoStreams]);
 
 	return (
