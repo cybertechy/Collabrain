@@ -25,10 +25,10 @@ const TopBar = ({ activeTab, onTabChange }) => {
   return (
     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 2 }}>
       <Box>
-        <Button sx={tabButtonStyle('all')} onClick={() => onTabChange('all')}>All</Button>
-        <Button sx={tabButtonStyle('Recieved')} onClick={() => onTabChange('Recieved')}>Received</Button>
-        <Button sx={tabButtonStyle('blocked')} onClick={() => onTabChange('blocked')}>Blocked</Button>
-        <Button sx={tabButtonStyle('addFriend')} onClick={() => onTabChange('addFriend')}>Add Friend</Button>
+        <Button id="all" sx={tabButtonStyle('all')} onClick={() => onTabChange('all')}>All</Button>
+        <Button id="received" sx={tabButtonStyle('Recieved')} onClick={() => onTabChange('Recieved')}>Received</Button>
+        <Button id="blocked" sx={tabButtonStyle('blocked')} onClick={() => onTabChange('blocked')}>Blocked</Button>
+        <Button id="addFriend" sx={tabButtonStyle('addFriend')} onClick={() => onTabChange('addFriend')}>Add Friend</Button>
 
       </Box>
     </Box>

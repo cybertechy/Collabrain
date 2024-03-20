@@ -12,7 +12,7 @@ const DMSidebar = ({ userData, onMute, onDeafen, onSettings, chatList, openChat 
         <div className="flex flex-col h-full bg-white shadow-md z-20">
             {/* Chat Header */}
             <div className = "flex flex-col justify-between h-full">
-            <div >
+            <div id= "chats" >
             <div className="flex items-center justify-center p-4 shadow-md bg-gray-100">
                 <h2 className="text-xl text-center font-semibold">Chats</h2>
                 
