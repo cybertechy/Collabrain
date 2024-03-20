@@ -27,9 +27,10 @@ import axios from 'axios';
 import { useAuthState } from '_firebase/firebase';
 import CustomAvatar from './avatar';
 import { updateFriendAlias,blockUser } from '@/app/utils/user';
+const fb = require("_firebase/firebase");
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
-const FriendTile = ({ friendData, openChat, setRefreshList , userInfo, handleAliasUpdate}) => {
+const FriendTile = ({ friendData, openChat, setRefreshList , userInfo,id, handleAliasUpdate, handleChatUpdate}) => {
   const [user, loading] = useAuthState();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
@@ -100,8 +101,8 @@ const FriendTile = ({ friendData, openChat, setRefreshList , userInfo, handleAli
           },
         });
   
-        console.log(response.data.message); // Log the response message (e.g., "Chat created")
-  
+        console.log(response.data); // Log the response message (e.g., "Chat created")
+                handleChatUpdate();
         // Handle any UI updates or navigation to the newly created chat here
       } catch (error) {
         console.error('Error creating chat:', error);
