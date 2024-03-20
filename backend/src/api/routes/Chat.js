@@ -73,9 +73,17 @@ router.get("/", async (req, res) => {
         // get chat info
 		let chatId = chats[i];
         let chatRef = await fb.db.doc(`chats/${chatId}`).get();
-        result.push({id: chatId, ...chatRef.data()});
+		
+		if (!chatRef.data()?.members) {
+			console.log("ChatID: ",chatId,"Chat has no members");
+			continue;
+		}
+        
+		result.push({id: chatId, ...chatRef.data()});
 	
         // get chat members info
+		
+
         let members = [];
         await Promise.all(chatRef.data().members.map(async member => {
 			if(member === user.uid) return; // Skip the user themselves
@@ -93,8 +101,10 @@ router.get("/", async (req, res) => {
 	
         // also get the last message
         let lastMessage = await fb.db.collection(`chats/${chatId}/messages`).orderBy("sentAt", "desc").limit(1).get();	
-        if (lastMessage.size > 0)
-            result[result.length-1].lastMessage = lastMessage.docs[0].data();
+        if (lastMessage.size > 0) {
+            result[result.length-1].lastMessage =  lastMessage.docs[0].data();
+			result[result.length-1].lastMessage.id = lastMessage.docs[0].id;
+		}
         else
             result[result.length-1].lastMessage = {};	
     }
@@ -195,11 +205,12 @@ router.get("/:chat/messages", async (req, res) =>
 
 	// Get messages
 	fb.db.collection(`chats/${req.params.chat}/messages`)
-		.orderBy("sentAt").limit(100).get()
+		.orderBy("sentAt","desc").limit(100).get()
 		.then(snapshot =>
 		{
 			let messages = [];
-			snapshot.forEach(doc => messages.push(doc.data()));
+			snapshot.forEach(doc => messages.push({... doc.data(), id: doc.id}));
+			messages.reverse();
 			return res.status(200).json(messages);
 		})
 		.catch(err => { return res.status(500).json({ error: err }); });

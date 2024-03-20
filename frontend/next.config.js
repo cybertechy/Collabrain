@@ -8,6 +8,7 @@ const nextConfig = {
   
       return config;
     },
+    transpilePackages: ['crypto-js'],
   };
   
   module.exports = nextConfig;

@@ -2,11 +2,11 @@
 
 import { useState, useEffect, useRef } from "react";
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import MessageBox from "./messageBox";
+import MessageBox from "@/components/ui/messagesComponents/messageBox";
 import Toolbar from '@mui/material/Toolbar';
 import { Timestamp } from "firebase/firestore";
 import ChannelBar from "../../components/ui/chatsComponents/channelBar";
-import MessageItem from "./messageItem";
+import MessageItem from "@/components/ui/messagesComponents/MessageItem";
 import Template from "../../components/ui/template/template";
 const { useRouter , useSearchParams} = require('next/navigation');
 const axios = require("axios");
@@ -14,6 +14,8 @@ const fb = require("_firebase/firebase");
 const socket = require("_socket/socket");
 import ShortTextIcon from '@mui/icons-material/ShortText'; // This can act as a hash
 import { set } from "lodash";
+
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
 export default function ChatRoom() {
    
@@ -38,7 +40,7 @@ const scrollToBottom = () => {
     useEffect(() => {
         if (!user) return;
 
-        sockCli.current = socket.init('https://collabrain-backend.cybertech13.eu.org') || {};
+        sockCli.current = socket.init(SERVERLOCATION) || {};
         sockCli.current.on('teamMsg', (data) => {
             console.log("Received message from server");
             setText((prevText) => [
@@ -59,7 +61,7 @@ const scrollToBottom = () => {
         if (!user) return;
 
         fb.getToken().then((token) => {
-            axios.get(`https://collabrain-backend.cybertech13.eu.org/api/teams/${teamId}/channels/${channelName}/messages`, {
+            axios.get(`${SERVERLOCATION}/api/teams/${teamId}/channels/${channelName}/messages`, {
                 headers: { "Authorization": "Bearer " + token }
             }).then((res) => {
                 console.log(res.data);
@@ -85,7 +87,7 @@ const scrollToBottom = () => {
 		const fetchUser = async () => {
 		  try {
 			const token = await fb.getToken();
-			const response = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/users/${user.uid}`, {
+			const response = await axios.get(`${SERVERLOCATION}/api/users/${user.uid}`, {
 			  headers: { "Authorization": "Bearer " + token }
 			});
 			// Set user info with the data obtained from the response
@@ -104,7 +106,7 @@ const scrollToBottom = () => {
             try {
                 // Make a GET request to retrieve information for the specified team
                 const token = await fb.getToken();
-                const response = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/teams/${teamId}`, {
+                const response = await axios.get(`${SERVERLOCATION}/api/teams/${teamId}`, {
                     headers: {
                         Authorization: `Bearer ${token}`, // Replace with the actual auth token
                     },
@@ -156,7 +158,7 @@ const scrollToBottom = () => {
 		}
 
 		let token = await fb.getToken();
-		let userData = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/users/${user.uid}`,
+		let userData = await axios.get(`${SERVERLOCATION}/api/users/${user.uid}`,
 			{ headers: { "Authorization": "Bearer " + token } });
 			
 		
@@ -190,22 +192,7 @@ const scrollToBottom = () => {
      useEffect(() => {
         scrollToBottom();
     }, [text]); 
-	if (loading|| !user )
-    return (
-        <div className="flex flex-col items-center justify-around min-h-screen">
-            <div className="flex flex-col items-center justify-center min-h-screen">
-                <h1 className="text-xl font-bold mb-5 text-primary">Trying to sign in</h1>
-                <div className="loader mb-5"></div>
-
-                <p className="text-lg font-bold text-primary mb-5 ">
-                    If you're not signed in, sign in&nbsp;
-                    <span className="underline cursor-pointer" onClick={() => router.push("/")}>
-                        here
-                    </span>
-                </p>
-            </div>
-        </div>
-    );
+	
 
 
 

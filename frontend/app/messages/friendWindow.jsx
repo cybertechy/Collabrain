@@ -4,12 +4,19 @@ import Box from '@mui/material/Box';
 import List from '@mui/material/List';
 import TopBar from './topBar';
 import SearchBar from './searchBar';
-import FriendTile from './friendTile';
+import FriendTile from '@/components/ui/messagesComponents/friendTile';
 import Typography from '@mui/material/Typography'; 
 import axios from 'axios';
 const fb = require("_firebase/firebase");
+import addFriendLottie from "@/public/assets/json/addFriendLottie.json";
+import allFriendsLottie from "@/public/assets/json/allFriendsLottie.json";
+import blockedLottie from "@/public/assets/json/blockedLottie.json";
+import recievedRequestsLottie from "@/public/assets/json/recievedRequestsLottie.json";
+import Lottie from "lottie-react";
 
-const FriendsWindow = () => {
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
+
+const FriendsWindow = ({userInfo, handleAliasUpdate}) => {
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -22,11 +29,12 @@ const FriendsWindow = () => {
   const [user, loading] = fb.useAuthState();
   const searchDelay = 500;
   const searchTimerRef = useRef(null);
+  
 
   const searchUsers = async (username) => {
     try {
       const token = await fb.getToken();
-      const response = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/users/search`, {
+      const response = await axios.get(`${SERVERLOCATION}/api/users/search`, {
         headers: {
           authorization: `Bearer ${token}`,
         },
@@ -73,7 +81,10 @@ const FriendsWindow = () => {
   const getFriends = async () => {
     try {
       const token = await fb.getToken();
-      const response = await axios.get("https://collabrain-backend.cybertech13.eu.org/api/users/f/friends", {
+      if (!token) {
+        return;
+      }
+      const response = await axios.get(`${SERVERLOCATION}/api/users/f/friends`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -83,7 +94,7 @@ const FriendsWindow = () => {
   
       // Create an array of promises to fetch detailed information for each friend
       const friendPromises = friends.map(async (friendId) => {
-        const friendResponse = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/users/${friendId}`, {
+        const friendResponse = await axios.get(`${SERVERLOCATION}/api/users/${friendId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -107,7 +118,7 @@ const FriendsWindow = () => {
   const getFriendRequests = async () => {
     try {
       const token = await fb.getToken();
-      const response = await axios.get("https://collabrain-backend.cybertech13.eu.org/api/users/friends/requests", {
+      const response = await axios.get(`${SERVERLOCATION}/api/users/friends/requests`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -115,7 +126,7 @@ const FriendsWindow = () => {
       console.log("friend Request recieved ", response.data);
       const friendRequests = response.data.map(async (friendRequest) => {
         // Fetch user data for each friend request by ID
-        const userResponse = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/users/${friendRequest}`, {
+        const userResponse = await axios.get(`${SERVERLOCATION}/api/users/${friendRequest}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -147,37 +158,36 @@ const FriendsWindow = () => {
     } else if (activeTab === 'Recieved') {
       getFriendRequests();
     }
-  }, [activeTab]);
+  }, [activeTab, user]);
 
+  
   useEffect(() => {
     let list = [];
     switch (activeTab) {
       case 'all':
-        list = Array.isArray(friendsList) ? friendsList : [];
+        list = friendsList;
         break;
       case 'Recieved':
-        list = Array.isArray(RecievedFriends) ? RecievedFriends : [];
+        list = RecievedFriends;
         break;
       case 'blocked':
-        list = Array.isArray(blockedUsers) ? blockedUsers : [];
+        list = blockedUsers;
         break;
       case 'addFriend':
-        // Only use searchResults if they are an array and not empty, otherwise default to an empty array
-        list = Array.isArray(searchResults) && searchResults.length > 0 ? searchResults : [];
+        list = searchResults;
         break;
       default:
-        list = [];
+        break;
     }
   
     if (searchQuery && activeTab !== 'addFriend') {
-      // Ensure list is an array before attempting to filter, to prevent "filter is not a function" errors
-      if (Array.isArray(list)) {
-        list = list.filter(friend => friend.name?.toLowerCase().includes(searchQuery.toLowerCase()));
-      }
+      list = list.filter(friend => friend.name?.toLowerCase().includes(searchQuery.toLowerCase()));
     }
   
     setVisibleList(list);
   }, [activeTab, friendsList, RecievedFriends, blockedUsers, searchResults, searchQuery]);
+  
+  
   
   const handleTabChange = (tab) => {
     setActiveTab(tab);
@@ -212,12 +222,49 @@ const FriendsWindow = () => {
 
       
   return filteredFriends.map((friend, index) => (
-    <FriendTile key={index} id = {friend.id} friendData={friend} onMoreOptions={handleMoreOptions} />
+    <FriendTile key={index} id = {friend.id} friendData={friend} onMoreOptions={handleMoreOptions} userInfo = {userInfo} handleAliasUpdate = {handleAliasUpdate} />
   ));
     }
   };
 
+  const renderEmptyState = () => {
+    let animationData;
+    let message;
   
+    switch (activeTab) {
+      case 'all':
+        animationData = allFriendsLottie;
+        message = "This is where your friends can be found.";
+        break;
+      case 'Recieved':
+        animationData = recievedRequestsLottie;
+        message = "You will find your received friend requests here.";
+        break;
+      case 'blocked':
+        animationData = blockedLottie;
+        message = "You will find your blocked users here.";
+        break;
+      case 'addFriend':
+      default:
+        animationData = addFriendLottie;
+        message = "Start typing to search for friends to add.";
+        break;
+    }
+  
+    return (
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', p: 4 }}>
+        <Lottie animationData={animationData} style={{ width: 400, height: 400 }} />
+       <p className='font-sans text-xl font-light'>{message}</p>
+      </Box>
+    );
+  };
+  
+  // Inside the return statement of the FriendsWindow component, replace the old "No friends found" messages with:
+  // {visibleList.length > 0 ? (
+  //   visibleList.map((friend, index) => (
+  //     <FriendTile key={index} id={friend.id} friendData={friend} onMoreOptions={handleMoreOptions} />
+  //   ))
+  // ) : renderEmptyState()}
     return (
       <Box sx={{ width: '100%' }}>
       <TopBar activeTab={activeTab} onTabChange={handleTabChange} />
@@ -225,12 +272,14 @@ const FriendsWindow = () => {
       <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
         {visibleList.length > 0 ? (
           visibleList.map((friend, index) => (
-            <FriendTile key = {index} id={friend.id} friendData={friend} onMoreOptions={handleMoreOptions} />
+            <FriendTile key = {index} id={friend.id} friendData={friend} onMoreOptions={handleMoreOptions} handleAliasUpdate = {handleAliasUpdate}  userInfo = {userInfo} />
           ))
         ) : (
-          <Typography variant="body1" sx={{ p: 2 }}>
-            {activeTab === 'addFriend' ? 'Start typing to search for friends to add.' : 'No friends found.'}
-          </Typography>
+          // <Typography variant="body1" sx={{ p: 2 }}>
+          <div>
+          {renderEmptyState()}
+          </div>
+          // </Typography>
         )}
       </List>
     </Box>

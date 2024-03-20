@@ -7,6 +7,8 @@ import TeamChannelOptionsMenu from './teamChannelOptionsMenu';
 import AddChannelOverlay from '../overlays/addChannelOverlay'
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
+
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 const ChannelBar = ({ user,  teamData,  userUID , onUpdated}) => {
   // State and handlers for channel categories
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -71,7 +73,7 @@ const router  = useRouter();
     // The team ID to delete
     const teamId = teamData.teamId;
 
-    axios.delete(`https://collabrain-backend.cybertech13.eu.org/api/teams/${teamId}`, {
+    axios.delete(`${SERVERLOCATION}/api/teams/${teamId}`, {
         headers: {
             'Authorization': `Bearer ${token}`
         }

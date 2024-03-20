@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 const fb = require("_firebase/firebase");
 import axios from 'axios';
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 const AddChannelOverlay = ({ isOpen, onClose, onChannelAdded, teamData }) => {
     const [channelName, setChannelName] = useState('');
     
@@ -9,7 +10,7 @@ const AddChannelOverlay = ({ isOpen, onClose, onChannelAdded, teamData }) => {
 
         const token = await fb.getToken(); // Get the auth token
       
-        axios.post(`https://collabrain-backend.cybertech13.eu.org/api/teams/${teamData.teamId}/channels`, {
+        axios.post(`${SERVERLOCATION}/api/teams/${teamData.teamId}/channels`, {
           name: channelName,
         }, {
           headers: {

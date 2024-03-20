@@ -132,5 +132,5 @@ const deleteFile = async (bucketName, fileName) =>
 }
 
 module.exports = {
-	getBuckets, addData, getData, getFileBucket, generateStreamFromString, generateStringFromStream, deleteData: deleteFile
+	getBuckets, addData, getData, getFileBucket, generateStreamFromString, generateStringFromStream,deleteFile ,deleteData: deleteFile
 };

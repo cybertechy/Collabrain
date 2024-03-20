@@ -8,7 +8,7 @@ import axios from "axios";
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import jsPDF from 'jspdf';
-
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 const fb = require("_firebase/firebase");
 
 const BadBehaviorStrikes = ({ strikes }) => {
@@ -283,7 +283,7 @@ const router = useRouter();
         const fetchUser = async () => {
             try {
                 const token = await fb.getToken();
-                const response = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/users/${user.uid}`, {
+                const response = await axios.get(`${SERVERLOCATION}/api/users/${user.uid}`, {
                     headers: { "Authorization": "Bearer " + token }
                 });
                 
@@ -307,7 +307,7 @@ const router = useRouter();
     const handleDeleteUser = async () => {
         try {
             const token = await fb.getToken(); // Assuming fb.getToken() gets the current user's token
-            await axios.delete(`https://collabrain-backend.cybertech13.eu.org/api/users/${user.uid}`, {
+            await axios.delete(`${SERVERLOCATION}/api/users/${user.uid}`, {
                 headers: { "Authorization": "Bearer " + token }
             });
             router.push('/'); 
@@ -324,10 +324,37 @@ const router = useRouter();
     const handleClose = () => {
         setOpenDialog(false);
     };
+//for enabling 2fa
+    const handleEnable2FA = async () => {
+        try {
+            const token = await fb.getToken();
+            await axios.patch('http://localhost:8080/api/2FA/enable', null, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            alert('Two-factor authentication enabled successfully');
+        } catch (error) {
+            console.error('Error enabling 2FA:', error);
+            alert('Error enabling two-factor authentication. Please try again later.');
+        }
+    };
+ //for disabling 2fa
+    const handleDisable2FA = async () => {
+        try {
+            const token = await fb.getToken();
+            await axios.patch('http://localhost:8080/api/2FA/disable', null, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            alert('Two-factor authentication disabled successfully');
+        } catch (error) {
+            console.error('Error disabling 2FA:', error);
+            alert('Error disabling two-factor authentication. Please try again later.');
+        }
+    };
+
     return (
         <>
         <div className="w-full h-5/6 flex ">
-            <div className=" bg-basicallylight p-5 rounded-md flex overflow-y-scroll scrollbar-thin scrollbar-thumb-primary ">
+            <div className=" bg-basicallylight p-5 rounded-md flex overflow-y-auto scrollbar-thin scrollbar-thumb-primary ">
                 <div className="w-full h-full">
 
                     <div className="w-11/12 h-96  bg-basicallylight rounded-md">
@@ -358,9 +385,13 @@ const router = useRouter();
                                             Protect your Collabrain account with
                                             an extra layer of security.
                                         </p>
-                                        <button className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 ">
-                                            Enable
-                                        </button>
+                                        <div className="flex space-x-5">
+                                        <button onClick={handleEnable2FA} className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 ">
+                                             Enable</button>
+                                        <button onClick={handleDisable2FA} className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3">
+                                            Disable</button>
+                                            </div>
+
                                     </div>
                                 </div>
                                 <div className="  w-11/12 h-48  bg-basicallylight rounded-md">
@@ -452,7 +483,7 @@ const GeneralOverlay = () => {
     return (
       <>
         <div className="w-full h-5/6 flex justify-center items-start">
-          <div className="bg-basicallylight  rounded-md flex w-full p-5 overflow-y-scroll scrollbar-thin scrollbar-thumb-primary">
+          <div className="bg-basicallylight  rounded-md flex w-full p-5 overflow-y-auto scrollbar-thin scrollbar-thumb-primary">
             <div className="flex flex-col w-full">
               <p className="mb-2 text-2xl text-left text-basicallydark md:text-lg sm:text-sm lg:text-2xl">
                 Change Appearance
@@ -540,7 +571,7 @@ const SoundOverlay = () => {
 
     return (
         <div className="w-full h-5/6 flex justify-center items-start">
-            <div className="bg-basicallylight rounded-md flex h-full w-full p-5 overflow-y-scroll scrollbar-thin scrollbar-thumb-primary">
+            <div className="bg-basicallylight rounded-md flex h-full w-full p-5 overflow-y-auto scrollbar-thin scrollbar-thumb-primary">
                 <div className="flex flex-col w-full">
                     <div className="mb-4">
                         <p className="text-2xl text-left text-basicallydark mb-2">
@@ -589,7 +620,7 @@ const PrivacyOverlay = (user) => {
         const fetchUser = async () => {
             try {
                 const token = await fb.getToken();
-                const response = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/users/${user.user.uid}`, {
+                const response = await axios.get(`${SERVERLOCATION}/api/users/${user.user.uid}`, {
                     headers: { "Authorization": "Bearer " + token }
                 });
              
@@ -604,68 +635,31 @@ const PrivacyOverlay = (user) => {
     }, [user]);
   
     const handleExportData = () => {
-        console.log("in handle export data")
-      if (!userInfo) return;
-
-  console.log("handle export data continued", userInfo, user)
-      // Create a new jsPDF instance
-      const pdf = new jsPDF();
-        
-      // Define the content for the PDF
-      const content = `
-      ---------User Information---------
-      Username: ${userInfo.username}
-      Name: ${userInfo.fname + " " + userInfo.lname}
-      Email: ${userInfo.email}
-      Bio: ${userInfo.bio}
-      Achievements: ${userInfo.achievements}
-      Aliases: ${userInfo.aliases}
-
-
-
-      -------------Education--------------
-      Courses: ${userInfo.courses}
-      Education: ${userInfo.education}
-      Learning Material: ${userInfo.learningMaterial}
-
-
-
-      -----------Accessibility------------
-      Color Blind Filter: ${userInfo.colorBlindFilter}
-      Preferred Font Size: ${userInfo.fontSize}
-      Language: ${userInfo.language}
-      Theme: ${userInfo.theme}
-
-
-
-      -------------Security--------------
-      Two Factor Authentication: ${userInfo.twoFA}
-
-
-
-      -------------Socials--------------
-      Friend Requests: ${userInfo.friendRequests}
-      Friends: ${userInfo.friends}
-      Team Invites: ${userInfo.teamInvites}
-      Teams: ${userInfo.teams}
-      Blocked: ${userInfo.blocked}
-
-
-
-      -------------Projects--------------
-      Content Maps: ${userInfo.contentMaps}
-      Documents: ${userInfo.documents}
-      `;
-  
-      // Add the content to the PDF
-      pdf.text(content, 10, 10); // Adjust coordinates as needed
-  
-      // Save the PDF with a specific filename
-      pdf.save('user_information.pdf');
+        console.log("in handle export data");
+        if (!userInfo) return;
+    
+        // Convert userInfo object to JSON string
+        const dataStr = JSON.stringify(userInfo, null, 2); // pretty print with indentation
+        // Create a Blob with JSON content
+        const blob = new Blob([dataStr], {type: "application/json"});
+        // Create a URL for the blob
+        const url = URL.createObjectURL(blob);
+    
+        // Create a temporary anchor element and trigger download
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = "userInfo.json"; // File name for download
+        document.body.appendChild(link); // Required for Firefox
+        link.click(); // Trigger download
+    
+        // Clean up
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
     };
+    
     return (
         <div className="w-full h-5/6 flex justify-center items-start">
-            <div className="bg-basicallylight rounded-md flex w-full p-5 overflow-y-scroll scrollbar-thin scrollbar-thumb-primary">
+            <div className="bg-basicallylight rounded-md flex w-full p-5 overflow-y-auto scrollbar-thin scrollbar-thumb-primary">
                 <div className="flex flex-col w-full space-y-5">
                     <div className="mb-4 flex justify-between">
                         <p className="text-2xl text-basicallydark">

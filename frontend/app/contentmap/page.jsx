@@ -14,14 +14,17 @@ import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 import Socket from "_socket/socket";
 
-import SearchingJSON from "../../public/assets/json/Searching.json";
-import LoadingJSON from "../../public/assets/json/Loading.json";
-import ErrorJSON from "../../public/assets/json/Error.json";
-import WorkingJSON from "../../public/assets/json/Working.json";
+import SearchingJSON from "@/public/assets/json/Searching.json";
+import LoadingJSON from "@/public/assets/json/Loading.json";
+import ErrorJSON from "@/public/assets/json/Error.json";
+import WorkingJSON from "@/public/assets/json/Working.json";
 import Lottie from "lottie-react";
+import FileToolbar from "@/components/ui/FileToolbar/fileToolbar";
 
 const SOCKET_DEBUG = false;
-const POINTER_DEBUG = true;
+const POINTER_DEBUG = false;
+
+const Serverlocation = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
 function page() {
     const [token, setToken] = useState(null);
@@ -40,17 +43,12 @@ function page() {
     const [user, loading] = useAuthState();
     const [OverrideMessage, setOverrideMessage] = useState("");
     const [ConcurrencyStop, setConcurrencyStop] = useState(false);
-    
+
 
     /* UI states */
     const [New, setNew] = useState(false);
     const [Delete, setDelete] = useState(false);
     const [Share, setShare] = useState(false);
-
-    const Serverlocation = "https://collabrain-backend.cybertech13.eu.org";
-
-
-
 
     let Guide = {
         showProgress: true,
@@ -117,25 +115,69 @@ function page() {
             else setCollabaration(false);
 
             // filter out collabortors that have button up
-            try{
-            updateInfo.collaborators = updateInfo?.collaborators?.filter((collaborator) => collaborator.button === "down" && collaborator.id !== user.uid);
+            try {
+                updateInfo.collaborators = updateInfo?.collaborators?.filter((collaborator) => collaborator.button === "down" && collaborator.id !== user.uid);
             } catch (err) {
                 console.log(err);
                 updateInfo.collaborators = [];
             }
-           
+
 
             // abort any ongoing requests
-            if(updateInfo?.collaborators?.length > 0){
+            if (updateInfo?.collaborators?.length > 0) {
                 abortController.abort();
                 setConcurrencyStop(true);
             }
-           
 
-            ExcalidrawAPI.updateScene({ elements: updateInfo.elements, collaborators: updateInfo.collaborators, appState: { files: updateInfo.files } });
+            if (updateInfo?.BroadcasterID === user.uid) return;
+
+
+            let appElements = ExcalidrawAPI.getSceneElements();
+            let mergeElements = []
+            if (updateInfo?.elements) {
+                mergeElements = updateInfo?.elements?.map((element) => {
+                    let index = appElements.findIndex((appElement) => appElement.id === element.id);
+                    if (index === -1) return element;
+                    return { ...appElements[index], ...element };
+                });
+            } else {
+                mergeElements = appElements;
+            }
+
+            // unlock the elements
+            if (updateInfo?.unLockElement?.length > 0) {
+                mergeElements = mergeElements.map((element) => {
+                    if (updateInfo?.unLockElement?.includes(element.id)) {
+                        element.isLocked = false;
+                        element.locked = false;
+                    }
+                    return element;
+                });
+            }
+
+            // Lock the selected elements
+            if (updateInfo?.selectedElementIds?.length > 0) {
+                mergeElements = mergeElements.map((element) => {
+                    if (updateInfo?.selectedElementIds?.includes(element.id)) {
+                        element.isLocked = true;
+                        element.locked = true;
+                    }
+                    return element;
+                });
+            }
+
+
+            let updateData = {
+                elements: mergeElements,
+                appState: { ...ExcalidrawAPI.getAppState(), ...updateInfo.appState },
+                collaborators: updateInfo.collaborators
+            }
+
+
+            ExcalidrawAPI.updateScene(updateData);
 
             //timeout to prevent concurrency
-            if(updateInfo?.collaborators?.length > 0) setTimeout(() => {
+            if (updateInfo?.collaborators?.length > 0) setTimeout(() => {
                 setConcurrencyStop(false);
             }, 1000);
         });
@@ -149,7 +191,8 @@ function page() {
                 elements: ExcalidrawAPI.getSceneElements(),
                 appState: appState,
                 files: ExcalidrawAPI.getFiles(),
-                collaborators: { ...appState.collaborators }
+                collaborators: { ...appState.collaborators },
+                BroadcasterID: user.uid
             }
 
             sockCli.current.emit('collabData', { id: id, user: user.uid, data: appdata });
@@ -163,18 +206,18 @@ function page() {
         if (!Collabaration) return;
 
         let appState = ExcalidrawAPI.getAppState();
-        if(!appState) return;
-        if(!appState.collaborators) return;
+        if (!appState) return;
+        if (!appState.collaborators) return;
         // find the index (if exists) of the user in the collaborators array
         let index = -1;
 
         try {
-        index = appState?.collaborators?.findIndex((collaborator) => collaborator.id === user.uid);
+            index = appState?.collaborators?.findIndex((collaborator) => collaborator.id === user.uid);
         } catch (err) {
             console.log(err);
             return;
         }
-        if(index === null) index = -1;
+        if (index === null) index = -1;
         if (index === -1) index = appState.collaborators.length;
         let mstate = appState.collaborators[index];
         mstate = {
@@ -187,13 +230,20 @@ function page() {
             id: user.uid,
             selectedElementIds: appState.selectedElementIds,
         }
+        let ShareData = {
+            id: id,
+            user: user.uid,
+            data: { collaborators: [...appState.collaborators.slice(0, index), mstate, ...appState.collaborators.slice(index + 1)] },
+            BroadcasterID: user.uid
+        }
 
         // TEMP : send the current user mstate to the room
-        if(POINTER_DEBUG) {
-            console.log("Sending mstate");
-            console.log({ id: id, user: user.uid, data: { collaborators: [...appState.collaborators.slice(0, index), mstate, ...appState.collaborators.slice(index + 1)] } });
+        if (POINTER_DEBUG) {
+            console.log("Sending Ponter State: ", ShareData);
+            console.log("AppState: ", appState);
         }
-        if (sockCli.current && mstate.button==="down" ) sockCli.current.emit('collabData', { id: id, user: user.uid, data: { collaborators: [...appState.collaborators.slice(0, index), mstate, ...appState.collaborators.slice(index + 1)] } });
+
+        if (sockCli.current && mstate.button === "down") sockCli.current.emit('collabData', ShareData);
 
 
     }, [pointerState, ExcalidrawAPI, Collabaration]);
@@ -263,6 +313,8 @@ function page() {
             setisSaved(true);
             setisOwner(res.data.userAccess === "owner");
             setContentMapName(res.data.name);
+            console.log(res.data);
+            console.log(user)
             return res.data;
         }
         catch (err) {
@@ -285,7 +337,9 @@ function page() {
         try {
             const res = await axios.post(`${Serverlocation}/api/maps`, {
                 name: "New Content Map",
-                data: ""
+                data: "",
+                path: "/"
+
             }, {
                 headers: {
                     authorization: `Bearer ${token}`,
@@ -335,7 +389,8 @@ function page() {
         try {
             const res = await axios.post(`${Serverlocation}/api/maps`, {
                 name: ContentMapName + " (copy)",
-                data: appdata
+                data: appdata,
+                path: "/"
             }, {
                 headers: {
                     authorization: `Bearer ${token}`,
@@ -464,7 +519,7 @@ function page() {
             return;
         }
 
-        
+
 
         setPointerState(data);
         setisSaved(false);
@@ -475,6 +530,7 @@ function page() {
         }
 
         let appState = ExcalidrawAPI.getAppState();
+
         let appdata = {
             elements: ExcalidrawAPI.getSceneElements(),
             appState: {
@@ -482,10 +538,12 @@ function page() {
                 penMode: appState.penMode,
                 ViewModeEnabled: appState.ViewModeEnabled,
                 viewBackgroundColor: appState.viewBackgroundColor,
-                zoom: appState.zoom,
+
             },
             files: ExcalidrawAPI.getFiles(),
-            collaborators: appState.collaborators
+            collaborators: appState.collaborators,
+            unLockElement: Object.keys(appState.selectedElementIds).filter((id) => appState.selectedElementIds[id]),
+            BroadcasterID: user.uid
         }
 
         if (SOCKET_DEBUG) {
@@ -496,9 +554,9 @@ function page() {
 
         appdata.appState.collaborators = [];
 
-        if(ConcurrencyStop) {
+        if (ConcurrencyStop) {
             setisSaved(false);
-            
+
             return;
         }
 
@@ -522,134 +580,60 @@ function page() {
         }
     }
 
-    const setpublic= (data) => setIntialData({ ...IntialData, public: data });
+    const setpublic = (data) => setIntialData({ ...IntialData, public: data });
 
-    if (!user) return <div className="flex flex-col justify-center items-center text-basicallydark">
-        <h1>You're not signed in</h1>
-    </div>
+    if (loading || !user ) {
+		return (
+				<div className="bg-[#F3F3F3] w-screen h-full flex flex-col justify-center items-center text-basicallydark">
+					<Lottie animationData={LoadingJSON} style={{ width: 300, height: 300 }} />
+					<h1 className="text-2xl font-bold text-primary px-10">Loading...</h1>
+				</div>
+		);
+	}
 
-    if (loading) return <div className="flex flex-col justify-center items-center text-basicallydark">
-        <h1>Loading...</h1>
-    </div>
+    return <div>
+        {id && user && IntialData?.Access && <FileToolbar publicData={IntialData?.public} setpublicData={setpublic} isSaved={isSaved} commentsEnabled={false} fileID={id} fileData={{ access: IntialData?.Access }} fileType="map" name={ContentMapName} userID={user.uid}></FileToolbar>}
+        <div className="flex justify-center items-center flex-col h-[85vh] w-[100vw] md:w-[88vw] lg:w-[94vw] overflow-hidden">
+            <ToastContainer />
+            <div id="excalidraw" className=" h-[100%] w-[100%] flex justify-center items-center text-basicallydark">
+                {id && IntialData && Excalidraw && <Excalidraw
+                    key={id}
+                    ViewModeEnabled={ViewMode}
+                    isCollaborating={Collabaration}
+                    excalidrawAPI={(api) => setExcalidrawAPI(api)}
+                    initialData={IntialData?.data ? JSON.parse(IntialData?.data) : null}
+                    onPointerUpdate={updatecontentmap}
+                    libraryReturnUrl={window.location.origin + window.location.pathname + `?id=${id}&`}
+                >
+                </Excalidraw>
 
-
-    return <div className="flex justify-center items-center flex-col h-screen w-screen">
-        <ToastContainer />
-        <div className="flex justify-between items-center w-screen h-[12%]  bg-primary px-3  ">
-            <div className="flex w-screen h-[100%]">
-                {/* Left side of navbar */}
-                <div className="flex items-center">
-                    <Link tooltip="help" className="" href="/dashboard">
-                        <Image src={LogoIcon} alt="Collabrain logo" width={75} height={50} />
-                    </Link>
+                }
+                {!id && <div className="flex items-center flex-col w-screen h-[88%]">
+                    <Lottie animationData={SearchingJSON} style={{ width: 300, height: 300 }} />
+                    <h1 className="text-2xl font-bold text-primary px-10 text-center"> Searching the cloud, Please wait ...</h1>
                 </div>
-                {/* Right side of navbar */}
-                <div className="grid grid-rows-2 grid-cols-1 ml-8 w-[100%] pt-3 ">
-                    {/* upper part of navbar */}
-                    <div className=" flex items-center justify-between h-[50%] pt-1 lg:pt-0">
-                        {isEditing ? (
-                            <div className="flex items-center gap-2">
-                                <input
-                                    className="text-basicallylight bg-transparent border-b-2 border-basicallylight outline-none p-1 no-underline"
-                                    type="text"
-                                    value={ContentMapName}
-                                    onChange={handleInputChange}
-                                    onBlur={handleSaveClick}
-                                />
-                                <button className="text-basicallylight" onClick={() => setIsEditing(isEditing => !isEditing)}>
-                                    <FilePenLine tooltip="Edit content map name" width={20} height={20} />
-                                </button>
-                            </div>
-                        ) : (
-                            <div id="ContentMapName" className=" flex items-center gap-2"><h1 className="text-basicallylight text-lg font-semibold" onClick={handleEditClick}>
-                                {ContentMapName}
-                            </h1>
-                                <button disabled={!isOwner} className="text-basicallylight" onClick={() => setIsEditing(isEditing => !isEditing)}>
-                                    <FilePenLine width={20} height={20} />
-                                </button>
-
-                            </div>
-                        )}
-                        <button className="flex justify-center items-center gap-3" onClick={() => driverObj.drive()} >
-                            <HelpCircle className="text-basicallylight" width={20} height={20} />
-                            <p className="hidden lg:block text-basicallylight"> Help </p>
-                        </button>
-                    </div>
-
-                    {/* Lower part of navbar */}
-                    <div className="flex items-center gap-4 p-0 h-[50%]">
-                        <button id="new" onClick={() => setNew(New => !New)} className=" text-basicallylight rounded-md ">New</button>
-                        { /* New button dropdown containing first new content map, second new doument, It should be right below the new button*/
-                            New && <div className="absolute z-10 top-[12%] left-[80px] bg-basicallylight rounded-md shadow-md p-2 flex flex-col gap-2">
-                                <button onClick={NewContentMap} className="text-primary">New Content Map</button>
-                                <button onClick={duplicateContentMap} className="text-primary">Create a copy</button>
-                            </div>
-                        }
-                        <button id="delete" disabled={!(id && IntialData && Excalidraw) || !isOwner} onClick={() => setDelete(Delete => !Delete)} className=" text-basicallylight rounded-md ">Delete</button>
-                        { /* Ask for confirmation before deleting the content map in the center of screen as pop out*/
-                            id && IntialData && Excalidraw && Delete && <div className="absolute z-10 top-[50%] lg:left-[40%] md:left-[30%] left-[15%] w-72 bg-basicallylight rounded-md shadow-md py-2 px-4 flex flex-col gap-2 border border-primary">
-                                <h1 className="text-xl text-primary">Are you sure you want to delete this content map?</h1>
-                                <hr className="border-primary" />
-                                <div className="flex gap-8">
-                                    <button onClick={DeleteContentMap} className="text-basicallylight text-xl bg-primary rounded-lg px-3 py-1">Yes</button>
-                                    <button onClick={() => setDelete(Delete => !Delete)} className="text-primary text-xl">No</button>
-                                </div>
-                            </div>
-                        }
-                        <button disabled={!(id && IntialData && Excalidraw)} id="share" onClick={() => setShare(Share => !Share)} className="rounded-lg text-basicallylight">Share</button>
-                        {Share && <div className="absolute z-10 top-[13%] lg:left-[200px] left-[10px] md:left-[100px] bg-basicallylight rounded-md shadow-md p-2 flex flex-col gap-2 border border-primary">
-                            <ShareComponent getdata={getdata} updatecontent={updatecontent} contentMapName={IntialData?.name} setShare={setShare} sData={IntialData?.Access} isOwner={isOwner} />
-                        </div>}
-
-                        {(IntialData?.userAccess === "edit" || IntialData?.userAccess === "owner") && <div id="save" className="flex items-center gap-2 bg-basicallylight text-primary rounded-md  px-2 py-1 ">
-                            <p className={`rounded-t-lg `}> <RefreshCcw width={20} height={20} className={`${!isSaved && "animate-spin"}`} />  </p>
-                            <p className="lg:block hidden  "> {isSaved ? "Saved" : "Saving..."}</p>
-                        </div>}
-                    </div>
+                }
+                {id && !Excalidraw && <div className="flex items-center flex-col w-screen h-[88%]">
+                    <Lottie animationData={LoadingJSON} style={{ width: 300, height: 300 }} />
+                    <h1 className="text-2xl font-bold text-primary px-10">Loading...</h1>
                 </div>
+                }
+                {id && Excalidraw && !IntialData && !Error && !OverrideMessage && <div className="flex items-center flex-col w-screen h-[88%]">
+                    <Lottie animationData={WorkingJSON} style={{ width: 300, height: 300 }} />
+                    <h1 className="text-2xl font-bold text-primary px-10 text-center"> Working to load the Map ... </h1>
+                </div>
+                }
+                {id && Excalidraw && !IntialData && Error && !OverrideMessage && <div className="flex items-center flex-col w-screen h-[88%]">
+                    <Lottie animationData={ErrorJSON} style={{ width: 300, height: 300 }} />
+                    <h1 className="text-2xl font-bold text-primary px-10 text-center"> {Error.error} </h1>
+                </div>
+                }
+                {id && Excalidraw && !IntialData && !Error && OverrideMessage && <div className="flex items-center flex-col w-screen h-[88%]">
+                    <Lottie animationData={WorkingJSON} style={{ width: 300, height: 300 }} />
+                    <h1 className="text-2xl font-bold text-primary px-10 text-center"> {OverrideMessage} </h1>
+                </div>
+                }
             </div>
-
-
-        </div>
-        <div id="excalidraw" className="w-screen h-[88%] flex justify-center items-center text-basicallydark">
-            {id && IntialData && Excalidraw && <Excalidraw
-                key={id}
-
-                ViewModeEnabled={ViewMode}
-                isCollaborating={Collabaration}
-                excalidrawAPI={(api) => setExcalidrawAPI(api)}
-                initialData={IntialData?.data ? JSON.parse(IntialData?.data) : null}
-                onPointerUpdate={updatecontentmap}
-                libraryReturnUrl={window.location.origin + window.location.pathname + `?id=${id}&`}
-            >
-            </Excalidraw>
-
-            }
-            {!id && <div className="flex items-center flex-col w-screen h-[88%]">
-                <Lottie animationData={SearchingJSON} style={{ width: 300, height: 300 }} />
-                <h1 className="text-2xl font-bold text-primary px-10 text-center"> Searching the cloud, Please wait ...</h1>
-            </div>
-            }
-            {id && !Excalidraw && <div className="flex items-center flex-col w-screen h-[88%]">
-                <Lottie animationData={LoadingJSON} style={{ width: 300, height: 300 }} />
-                <h1 className="text-2xl font-bold text-primary px-10">Loading...</h1>
-            </div>
-            }
-            {id && Excalidraw && !IntialData && !Error && !OverrideMessage && <div className="flex items-center flex-col w-screen h-[88%]">
-                <Lottie animationData={WorkingJSON} style={{ width: 300, height: 300 }} />
-                <h1 className="text-2xl font-bold text-primary px-10 text-center"> Working to load the Map ... </h1>
-            </div>
-            }
-            {id && Excalidraw && !IntialData && Error && !OverrideMessage && <div className="flex items-center flex-col w-screen h-[88%]">
-                <Lottie animationData={ErrorJSON} style={{ width: 300, height: 300 }} />
-                <h1 className="text-2xl font-bold text-primary px-10 text-center"> {Error.error} </h1>
-            </div>
-            }
-            {id && Excalidraw && !IntialData && !Error && OverrideMessage && <div className="flex items-center flex-col w-screen h-[88%]">
-                <Lottie animationData={WorkingJSON} style={{ width: 300, height: 300 }} />
-                <h1 className="text-2xl font-bold text-primary px-10 text-center"> {OverrideMessage} </h1>
-            </div>
-            }
         </div>
     </div>
 }

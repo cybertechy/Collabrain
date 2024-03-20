@@ -3,6 +3,7 @@ const fb = require("../../../app/_firebase/firebase");
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 const UsernameOverlay = ({ onClose, hasUserUsername, setHasUserUsername }) =>
 {
 	const [username, setUsername] = useState('');
@@ -24,7 +25,7 @@ const UsernameOverlay = ({ onClose, hasUserUsername, setHasUserUsername }) =>
 
 		try
 		{
-			const response = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/users/username/${enteredUsername}`);
+			const response = await axios.get(`${SERVERLOCATION}/api/users/username/${enteredUsername}`);
 			if (response.status === 200)
 			{
 				setError("Username is available");
@@ -76,7 +77,7 @@ const UsernameOverlay = ({ onClose, hasUserUsername, setHasUserUsername }) =>
 			if (user) {
 				token = await fb.getToken();
 			}
-			const response = await axios.patch('https://collabrain-backend.cybertech13.eu.org/api/users/', { username: username }, {
+			const response = await axios.patch(`${SERVERLOCATION}/api/users/`, { username: username }, {
 				headers: {
 					authorization: `Bearer ${token}`
 				}

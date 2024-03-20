@@ -18,6 +18,8 @@ import axios from 'axios';
 import {Dialog ,DialogTitle,DialogContent,DialogActions,Button,ListItemIcon,List} from '@mui/material';
 import React, { useState } from 'react';
 const fb  = require("_firebase/firebase");
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
+
 const FriendTile = ({ friendData, onMoreOptions, id, setRefreshList, refreshList }) => {
   // Function to generate avatar with initials
   const [user, loading] = fb.useAuthState();
@@ -106,7 +108,7 @@ const FriendTile = ({ friendData, onMoreOptions, id, setRefreshList, refreshList
         const token = await fb.getToken();
         
         // Replace 'your_server_url' with your actual server URL
-        const response = await axios.post('https://collabrain-backend.cybertech13.eu.org/api/chats/', {
+        const response = await axios.post(`${SERVERLOCATION}/api/chats/`, {
           members: [id], // Include the current user and the friend in the chat
         }, {
           headers: {
@@ -131,7 +133,7 @@ const FriendTile = ({ friendData, onMoreOptions, id, setRefreshList, refreshList
         const token = await fb.getToken();
         
         console.log(id);
-        const response = await axios.post(`https://collabrain-backend.cybertech13.eu.org/api/users/friends/request/${id}`, null, {
+        const response = await axios.post(`${SERVERLOCATION}/api/users/friends/request/${id}`, null, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -155,7 +157,7 @@ const FriendTile = ({ friendData, onMoreOptions, id, setRefreshList, refreshList
         const token = await fb.getToken();
 
         console.log(token);
-        const response = await axios.post(`https://collabrain-backend.cybertech13.eu.org/api/users/friends/${friendData.id}`, null, {
+        const response = await axios.post(`${SERVERLOCATION}/api/users/friends/${friendData.id}`, null, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -180,7 +182,7 @@ const FriendTile = ({ friendData, onMoreOptions, id, setRefreshList, refreshList
 
         // Replace 'your_server_url' with your actual server URL
         console.log(friendData)
-        const response = await axios.delete(`https://collabrain-backend.cybertech13.eu.org/api/users/friends/request/${friendData.id}`, {
+        const response = await axios.delete(`${SERVERLOCATION}/api/users/friends/request/${friendData.id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

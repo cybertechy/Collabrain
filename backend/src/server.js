@@ -4,8 +4,7 @@ const cors = require("cors");
 
 const bodyParser = require('body-parser');
 const http = require('http');
-const treblle = require('@treblle/express');
-
+const fb = require('./api/helpers/firebase');
 
 // Routes
 const chatRoute = require("./api/routes/Chat");
@@ -15,7 +14,11 @@ const dashboardRoute = require("./api/routes/Dashboard");
 const mapRoute = require("./api/routes/ContentMap");
 const reportReport = require("./api/routes/Report");
 const notificationsRoute = require("./api/routes/Notifications");
+const docRoute = require("./api/routes/Doc");
 const storageRoute = require("./api/routes/Storage");
+const aiRoute = require("./api/routes/AI");
+const statsRoute = require("./api/routes/Stats");
+const twoFARoute = require("./api/routes/twoFA");
 
 // Helpers
 const sockServer = require("./api/helpers/socket");
@@ -26,13 +29,18 @@ const app = express();
 const port = process.env.PORT || 8080;
 const server = http.createServer(app);
 
-app.use(
-	treblle({
-		apiKey: "FWAsJIjJ9SUC48XJ52CmWPzrH5V5dDn7",
-		projectId: "4n251kwdeS2Q4FUt",
-		additionalFieldsToMask: [],
-	})
-);
+// Database usage counter
+let APIUsageCount = fb.getObjectFromRealtimeDB("usageCount").then((data) => { return data || 0; });
+fb.listenToRealtimeDB("usageCount", (data) => {
+	if(Number.isInteger(data)) APIUsageCount = data || 0;
+});
+
+// Middleware to increment database usage count
+app.use((req, res, next) => {
+    APIUsageCount++;
+	fb.addObjectToRealtimeDB("usageCount", APIUsageCount);
+    next();
+});
 
 // Set headers 
 app.use(function(req, res, next) {
@@ -53,12 +61,7 @@ app.use(function(req, res, next) {
 	res.setHeader("X-WebKit-CSP", "default-src 'self'");
 
 	// Content type
-	res.setHeader('Content-Type', 'application/json');
-
-	// // Cache the data
-	// res.setHeader('Cache-Control', 'public, max-age=31557600');
-
-	
+	res.setHeader('Content-Type', 'application/json');	
 	next();
 });
 
@@ -73,10 +76,16 @@ app.use("/api/dashboard", dashboardRoute);
 app.use("/api/maps", mapRoute);
 app.use("/api/reports", reportReport);
 app.use("/api/notifications", notificationsRoute);
+app.use("/api/docs", docRoute); 
 app.use("/api/storage", storageRoute);
+app.use("/api/stats", statsRoute);
+app.use("/api/ai", aiRoute);
+app.use("/api/2FA", twoFARoute);
 
-
-
+// Endpoint to display DB usage
+app.get("/api/dbUsage", (req, res) => {
+    res.json({ message: "Database Usage", count: APIUsageCount });
+});
 app.get("/api/home", (req, res) =>
 {
 	res.json({ message: "Running" });

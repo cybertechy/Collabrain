@@ -1,92 +1,91 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { ArrowCircleUp, ArrowCircleDown, ChevronRight } from '@mui/icons-material';
 import DropdownDashboard from './dropdownDashboard';
-import { useRouter } from 'next/navigation'; 
+import { useRouter } from 'next/navigation';
+import axios from 'axios';
+const DashboardInfoBar = ({ currentPath, onSort, sortCriteria, moveProjectToPath }) => {
+  const router = useRouter();
 
-const DashboardInfoBar = ({ sortName, setSortName, sortDate, setSortDate, isAscending, setIsAscending, currentPath }) => {
-  // const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-  const router = useRouter(); // Initialize useRouter
+  const toggleAscending = () => {
+    onSort({ ...sortCriteria, isAscending: !sortCriteria.isAscending });
+  };
 
-  // useEffect(() => {
-  //   const handleResize = () => {
-  //     setWindowWidth(window.innerWidth);
-  //   };
-
-  //   window.addEventListener('resize', handleResize);
-  //   return () => window.removeEventListener('resize', handleResize);
-  // }, []);
-
-  const toggleSortOrder = (sortBy) => {
-    setIsAscending(!isAscending);
-
-    if (sortBy === 'name') {
-      setSortName(isAscending);
-      setSortDate(false);
-    } else if (sortBy === 'date') {
-      setSortDate(isAscending);
-      setSortName(false);
+  const toggleSortOrder = (criteria) => {
+    if (criteria === 'name') {
+      onSort({ sortName: true, sortDate: false, isAscending: sortCriteria.isAscending });
+    } else if (criteria === 'date') {
+      onSort({ sortName: false, sortDate: true, isAscending: sortCriteria.isAscending });
     }
   };
 
-  // Split the currentPath by '/' and map each part with chevron icons and links
-  const pathParts = currentPath.split('/');
+  const pathParts = currentPath.split('/').filter(part => part);
+
+  const navigateToPath = (part, index) => {
+    if (part === 'Shared with Me') {
+      router.push('/shared-with-me');
+    } else if (index === 0) {
+      router.push('/dashboard');
+    } else {
+      console.log("Navigating to ", part, index);
+      const pathToNavigate = `/${pathParts.slice(1, index+1).join('/')}`;
+      console.log("Path to navigate: ", pathToNavigate, "pathParts", pathParts)
+      router.push(`/dashboard?path=${pathToNavigate}`);
+    }
+  };
+
+  // Handling the drop event to move the project to the dropped path
+  const handleDrop = (e, part, index) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const projectId = e.dataTransfer.getData("projectId");
+    const type = e.dataTransfer.getData("type") === "Content Map" ? "contentMap": "documents";
+    if (projectId) {
+      if(index === 0 ){
+        moveProjectToPath(projectId, "/", type);
+      }else{
+        const pathToNavigate = `/${pathParts.slice(1, index+1).join('/')}`;
+        moveProjectToPath(projectId, pathToNavigate, type);
+      }
+     
+    }
+  };
+
+
+  // Allowing the drop by preventing the default behavior
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
 
   return (
     <div className="flex items-center justify-between bg-aliceBlue p-4 w-full drop-shadow-md mb-3">
       <div className="flex items-center">
-
-      {pathParts.map((part, index) => (
-  <React.Fragment key={index}>
-    {index === 0 ? (
-      <p
-        className='text-xl font-bold font-poppins text-primary cursor-pointer underline'
-        onClick={() => router.push('/dashboard')}
-      >
-        {part}
-      </p>
-    ) : (
-      <p
-        className='text-xl font-bold font-poppins text-primary cursor-pointer'
-        onClick={() => router.push(`/dashboard?path=/${pathParts.slice(1, index + 1).join('/')}`)}
-        // Use pathParts.slice(1, index + 1) to include "MyBrain" as the initial slash
-      >
-        {part}
-      </p>
-    )}
-    {index < pathParts.length - 1 && <ChevronRight fontSize="large" className="text-primary mx-2" />}
-  </React.Fragment>
-))}
+        {pathParts.map((part, index) => (
+          <React.Fragment key={index}>
+            <p
+              className='text-xl font-bold font-poppins text-primary cursor-pointer underline'
+              onClick={() => navigateToPath(part, index)}
+              onDragOver={handleDragOver}
+            onDrop={(e) => handleDrop(e, part, index)}
+            >
+              {part}
+            </p>
+            {index < pathParts.length - 1 && <ChevronRight fontSize="large" className="text-primary mx-2" />}
+          </React.Fragment>
+        ))}
       </div>
       <div className="flex items-center">
         <DropdownDashboard
-          title="Sort By"
+          title={sortCriteria ? (sortCriteria.sortName ? "Name" : "Date Modified") : "Sort By"}
           items={[
-            {
-              name: "Name",
-              onClick: () => {
-                toggleSortOrder('name');
-              },
-            },
-            {
-              name: "Date Modified",
-              onClick: () => {
-                toggleSortOrder('date');
-              },
-            },
+            { name: "Name", onClick: () => toggleSortOrder('name') },
+            { name: "Date Modified", onClick: () => toggleSortOrder('date') },
           ]}
         />
-        {isAscending ? (
-          <ArrowCircleUp
-            className="text-primary cursor-pointer"
-            fontSize="large"
-            onClick={() => toggleSortOrder('name')} // You can set a default sortBy value here
-          />
+        {sortCriteria.isAscending ? (
+          <ArrowCircleUp className="text-primary cursor-pointer" fontSize="large" onClick={toggleAscending} />
         ) : (
-          <ArrowCircleDown
-            className="text-primary cursor-pointer"
-            fontSize="large"
-            onClick={() => toggleSortOrder('name')} // You can set a default sortBy value here
-          />
+          <ArrowCircleDown className="text-primary cursor-pointer" fontSize="large" onClick={toggleAscending} />
         )}
       </div>
     </div>

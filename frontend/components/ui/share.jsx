@@ -11,7 +11,9 @@ const share = ({ contentMapName = "Content Map", sData, setShare, isOwner, updat
     const [newShare, setnewShare] = useState("View");
     const [LoadingSearchResults, setLoadingSearchResults] = useState(null);
     const [Noresults, setNoresults] = useState(false);
-    const [publicShare, setpublicShare] = useState(publicData==="Yes" ? "Yes" : "No");    
+    const [publicShare, setpublicShare] = useState(publicData===true ? "Yes" : "No");    
+
+    console.log("publicData", publicData);
 
 
     const select = (userid, type) => {
@@ -63,6 +65,7 @@ const share = ({ contentMapName = "Content Map", sData, setShare, isOwner, updat
 
     const search = async (e) => {
         //search for users based on input
+       
         setSharewith(e.target.value);
         setSelected("");
         setNoresults(false);
@@ -71,6 +74,7 @@ const share = ({ contentMapName = "Content Map", sData, setShare, isOwner, updat
             try {
                 setNoresults(false);
                 setLoadingSearchResults(true);
+                console.log("searching");
                 let res = await getdata(`query=${e.target.value}`);
                 setLoadingSearchResults(false);
 
@@ -100,8 +104,8 @@ const share = ({ contentMapName = "Content Map", sData, setShare, isOwner, updat
         setShare(false);
         setpublicShare(value);
         try {
-            let res = await updatecontent({ public: value });
-            toast.success(`Public Share ${value==="Yes"?"Enabled":"Disabled"} `, {
+            let res = await updatecontent({ public: value==="Yes" ? true:false });
+            if(res) toast.success(`Public Share ${value==="Yes"?"Enabled":"Disabled"} `, {
                 position: "bottom-right",
                 autoClose: 2000,
                 hideProgressBar: false,
@@ -109,8 +113,9 @@ const share = ({ contentMapName = "Content Map", sData, setShare, isOwner, updat
                 pauseOnHover: true,
                 theme: "colored",
             });
-            setpublicData(value);
+            setpublicData(value === "Yes" ? true : false);
         } catch (err) {
+           
             setpublicShare(value==="Yes"?"No":"Yes");
             toast.error("Failed to set public share, Try again!", {
                 position: "bottom-right",
