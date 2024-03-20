@@ -40,9 +40,9 @@ const FriendTile = ({ friendData, openChat, setRefreshList , userInfo,id, handle
   useEffect(() => {
     // This checks if user and friendData.alias are defined to safely access user.uid
     console.log("Userinfo, ",userInfo);
-    if (user && userInfo.alias && userInfo.alias[friendData.id]) {
+    if (user && userInfo.aliases && userInfo.aliases[friendData.id]) {
     
-      setAlias(userInfo.alias[friendData.id]);
+      setAlias(userInfo.aliases[friendData.id]);
     } else {
       setAlias('');
     }
@@ -56,7 +56,7 @@ const FriendTile = ({ friendData, openChat, setRefreshList , userInfo,id, handle
     setDialogOpen(false);
     setSelectedOption('');
     // Resetting alias to the current value in userInfo
-    setAlias(userInfo?.alias?.[friendData.id] || '');
+    setAlias(userInfo?.aliases?.[friendData.id] || '');
   };
   
   
@@ -294,8 +294,8 @@ console.log("Friend Data in friend tile" , friendData);
         </ListItemAvatar>
         <ListItemText
   primary={
-    userInfo.data&& userInfo.data.alias && userInfo.data.alias[friendData.id]
-      ? `${userInfo.data.alias[friendData.id]}`
+    userInfo.data&& userInfo.data.aliases && userInfo.data.aliases[friendData.id]
+      ? `${userInfo.data.aliases[friendData.id]}`
       : friendData.username
   }
   secondary={friendData.email}

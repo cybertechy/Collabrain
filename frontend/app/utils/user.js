@@ -68,7 +68,7 @@ const updateFriendAlias = async (friendId, newAlias) => {
     try {
         // Assuming newAlias is a string for a single friend's new alias
         console.log("Sending request with", friendId, newAlias)
-        await axios.patch(`${SERVERLOCATION}/api/users/friends/${friendId}`, { alias: newAlias }, {
+        await axios.patch(`${SERVERLOCATION}/api/users/friends/${friendId}`, { aliases: newAlias }, {
             headers: { "Authorization": `Bearer ${token}` },
         });
         return true;
