@@ -1,24 +1,25 @@
+
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import MessageBox from "./messageBox";
+import MessageBox from "@/components/ui/messagesComponents/messageBox";
 import Toolbar from '@mui/material/Toolbar';
 import { Timestamp } from "firebase/firestore";
-import ChannelBar from "_components/ui/chatsComponents/channelBar";
-import MessageItem from "_components/ui/messagesComponents/MessageItem";
-import Template from "_components/ui/template/template";
+import ChannelBar from "@/components/ui/chatsComponents/channelBar";
+import MessageItem from "@/components/ui/messagesComponents/MessageItem";
+import Template from "@/components/ui/template/template";
 const { useRouter, useSearchParams } = require('next/navigation');
 const axios = require("axios");
 const fb = require("_firebase/firebase");
 const socket = require("_socket/socket");
-import ShortTextIcon from '@mui/icons-material/ShortText'; // This can act as a hash
-import { set } from "lodash";
+import ShortTextIcon from '@mui/icons-material/ShortText'; 
+import Lottie from "lottie-react";
+import LoadingJSON from "@/public/assets/json/loading.json";
+
 
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
-export default function ChatRoom()
-{
+export default function ChatRoom() {
 
 	const router = useRouter();
 	const params = useSearchParams();
@@ -34,18 +35,15 @@ export default function ChatRoom()
 	const messagesEndRef = useRef(null); // Create a reference to the message container
 
 	// Function to scroll to the bottom
-	const scrollToBottom = () =>
-	{
+	const scrollToBottom = () => {
 		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
 	};
 	let sockCli = useRef(null);
-	useEffect(() =>
-	{
+	useEffect(() => {
 		if (!user) return;
 
 		sockCli.current = socket.init(SERVERLOCATION) || {};
-		sockCli.current.on('teamMsg', (data) =>
-		{
+		sockCli.current.on('teamMsg', (data) => {
 			console.log("Received message from server");
 			setText((prevText) => [
 				...prevText,
@@ -57,21 +55,17 @@ export default function ChatRoom()
 	}, [user]);
 
 
-	useEffect(() =>
-	{
+	useEffect(() => {
 		setTeamId(params.get('teamId'));
 		setChannelName(params.get('channelName'));
 	}, [params.get('teamId'), params.get('channelName')]);
-	useEffect(() =>
-	{
+	useEffect(() => {
 		if (!user) return;
 
-		fb.getToken().then((token) =>
-		{
+		fb.getToken().then((token) => {
 			axios.get(`${SERVERLOCATION}/api/teams/${teamId}/channels/${channelName}/messages`, {
 				headers: { "Authorization": "Bearer " + token }
-			}).then((res) =>
-			{
+			}).then((res) => {
 				console.log(res.data);
 				let data = res.data;
 				let msgs = data.map((messageData, i) => (
@@ -89,22 +83,18 @@ export default function ChatRoom()
 			}).catch((err) => console.log(err));
 		});
 	}, [user, teamId, channelName]);
-	useEffect(() =>
-	{
+	useEffect(() => {
 		if (!user) return;
 
-		const fetchUser = async () =>
-		{
-			try
-			{
+		const fetchUser = async () => {
+			try {
 				const token = await fb.getToken();
 				const response = await axios.get(`${SERVERLOCATION}/api/users/${user.uid}`, {
 					headers: { "Authorization": "Bearer " + token }
 				});
 				// Set user info with the data obtained from the response
 				setUserInfo({ data: response.data });
-			} catch (error)
-			{
+			} catch (error) {
 				console.error('Error fetching user data:', error);
 				// Handle error, for example by setting a default user info
 				setUserInfo({ data: { username: "User" } });
@@ -113,12 +103,10 @@ export default function ChatRoom()
 
 		fetchUser();
 	}, [user]);
-	useEffect(() =>
-	{
-		const fetchTeamInformation = async (teamId) =>
-		{
-			try
-			{
+	useEffect(() => {
+		if (!user) return;
+		const fetchTeamInformation = async (teamId) => {
+			try {
 				// Make a GET request to retrieve information for the specified team
 				const token = await fb.getToken();
 				const response = await axios.get(`${SERVERLOCATION}/api/teams/${teamId}`, {
@@ -128,8 +116,7 @@ export default function ChatRoom()
 				});
 
 				// Check if the request was successful
-				if (response.status === 200)
-				{
+				if (response.status === 200) {
 					const teamData = {
 						teamId,
 						...response.data
@@ -138,13 +125,11 @@ export default function ChatRoom()
 					// Update the userTeams state with the team information
 					setTeamData(teamData);
 					console.log("Team data:", teamData);
-				} else
-				{
+				} else {
 					console.error('Failed to fetch team information:', response.statusText);
 					// Handle the error and provide user feedback here
 				}
-			} catch (error)
-			{
+			} catch (error) {
 				console.error('Error fetching team information:', error);
 				// Handle errors and provide user feedback here
 			}
@@ -156,12 +141,10 @@ export default function ChatRoom()
 		fetchTeamInformation(teamId);
 	}, [user, teamId, channelName, channelsUpdated]);
 
-	const handleUpdated = () =>
-	{
+	const handleUpdated = () => {
 		setChannelsUpdated(channelsUpdated + 1);
-	};
-	useEffect(() =>
-	{
+	}
+	useEffect(() => {
 		// Your update logic here, e.g., updating local state or refetching data
 		console.log('Team data or user changed, update component:', teamData);
 		// Update component state or perform actions based on the new props
@@ -169,10 +152,8 @@ export default function ChatRoom()
 	}, [teamData]); // React to changes in these props
 
 	const [text, setText] = useState([]);
-	const sendTeamMsg = async (msg) =>
-	{
-		if (!sockCli.current)
-		{
+	const sendTeamMsg = async (msg) => {
+		if (!sockCli.current) {
 			console.log('Socket is not initialized yet.');
 			return;
 		}
@@ -209,27 +190,19 @@ export default function ChatRoom()
 
 		sockCli.current.emit('teamMsg', messageData); // Send the message to the server
 	};
-	useEffect(() =>
-	{
+	useEffect(() => {
 		scrollToBottom();
 	}, [text]);
-	if (loading || !user)
+
+
+	if (loading || !user ) {
 		return (
-			<div className="flex flex-col items-center justify-around min-h-screen">
-				<div className="flex flex-col items-center justify-center min-h-screen">
-					<h1 className="text-xl font-bold mb-5 text-primary">Trying to sign in</h1>
-					<div className="loader mb-5"></div>
-
-					<p className="text-lg font-bold text-primary mb-5 ">
-						If you're not signed in, sign in&nbsp;
-						<span className="underline cursor-pointer" onClick={() => router.push("/")}>
-							here
-						</span>
-					</p>
+				<div className="bg-[#F3F3F3] w-screen h-full flex flex-col justify-center items-center text-basicallydark">
+					<Lottie animationData={LoadingJSON} style={{ width: 300, height: 300 }} />
+					<h1 className="text-2xl font-bold text-primary px-10">Loading...</h1>
 				</div>
-			</div>
 		);
-
+	}
 
 
 	return (
@@ -264,12 +237,13 @@ export default function ChatRoom()
 					</div>
 
 					<div className="absolute z-10 inset-x-0 bottom-5 mx-5 text-white bg-baiscallylight">
-						<MessageBox callback={sendTeamMsg} />
+						<MessageBox onSendMessage={sendTeamMsg}  callback={sendTeamMsg} />
 					</div>
 				</div>
 
 			</div>
 			{/* <ChannelBar /> */}
 		</>
-	);
+	)
+	{/* </div> */ }
 }

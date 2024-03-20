@@ -148,7 +148,7 @@ function MessageItem({ sender, senderId, title,timestamp, message, messageId, at
         <CustomAvatar username={sender} />
         <div className="flex flex-col">
           <div className="flex items-baseline gap-2">
-            <span className="font-semibold">{sender == userInfo.data.username? sender:title}</span>
+            <span className="font-semibold">{sender == (userInfo?.data?.username)? sender:title}</span>
             <span className="text-xs text-gray-500">{timestamp}</span>
           </div>
           <Linkify componentDecorator={(decoratedHref, decoratedText, key) => (

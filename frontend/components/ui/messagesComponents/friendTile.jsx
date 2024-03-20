@@ -27,6 +27,7 @@ import axios from 'axios';
 import { useAuthState } from '_firebase/firebase';
 import CustomAvatar from './avatar';
 import { updateFriendAlias,blockUser } from '@/app/utils/user';
+const fb = require("_firebase/firebase");
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
 const FriendTile = ({ friendData, openChat, setRefreshList , userInfo, handleAliasUpdate}) => {

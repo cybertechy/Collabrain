@@ -1,4 +1,4 @@
-// components/FriendTile.js
+"use client";
 
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
@@ -227,7 +227,10 @@ const FriendTile = ({ friendData, onMoreOptions, id, setRefreshList, refreshList
           </IconButton>
         </>
       );
-    } else if (friendData.listType === 'blocked') {
+    } else if (!fb) {
+      return <p> Firebase not defined </p>
+    }
+     else if (friendData.listType === 'blocked') {
       // Render nothing for blocked friends
       return null;
     } else if (friendData.listType === 'addFriend') {

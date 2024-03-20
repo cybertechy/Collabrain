@@ -1,6 +1,5 @@
 import { useEffect, useState, useRef } from "react";
 import socket from "_socket/socket";
-import { Peer } from "peerjs";
 import CallIcon from '@mui/icons-material/Call';
 import { usePathname, useSearchParams } from 'next/navigation';
 import fb from "_firebase/firebase";
@@ -10,7 +9,9 @@ import CallEndIcon from "@mui/icons-material/CallEndRounded";
 import MicOffIcon from '@mui/icons-material/MicOff';
 import VideocamOffIcon from '@mui/icons-material/VideocamOff';
 import LaunchIcon from '@mui/icons-material/Launch';
-import { set } from "react-hook-form";
+
+//dynamic import for peerjs
+const { Peer } = require('peerjs');
 
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 export default function Call(props)

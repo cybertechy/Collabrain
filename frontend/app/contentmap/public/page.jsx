@@ -9,14 +9,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
 import Link from "next/link";
 import { RefreshCcw, FilePenLine, HelpCircle } from 'lucide-react';
-import ShareComponent from "_components/ui/share";
 const { useAuthState, getToken } = require("_firebase/firebase");
 import { ToastContainer, toast } from "react-toastify";
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 
 import SearchingJSON from "_public/assets/json/Searching.json";
-import LoadingJSON from "_public/assets/json/Loading.json";
+import LoadingJSON from "_public/assets/json/loading.json";
 import ErrorJSON from "_public/assets/json/Error.json";
 import WorkingJSON from "_public/assets/json/Working.json";
 import Lottie from "lottie-react";

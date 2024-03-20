@@ -13,7 +13,7 @@ export default function MessageBox(props) {
       message: '',
     },
   });
-  const inputMsg = useRef();  
+  const inputMsg = useRef();
   const message = watch('message');
   const [emojiPickerAnchorEl, setEmojiPickerAnchorEl] = useState(null);
 
@@ -41,13 +41,13 @@ export default function MessageBox(props) {
       const cursorPosition = inputMsg.current.selectionStart || 0;
       const currentValue = inputMsg.current.value;
       const newText = currentValue.slice(0, cursorPosition) + emoji + currentValue.slice(cursorPosition);
-      
+
       // Update the form state
       setValue('message', newText, { shouldValidate: true });
-  
+
       // Manually update the input's displayed value
       inputMsg.current.value = newText;
-  
+
       // Optionally, focus the input and set the cursor position right after the inserted emoji
       inputMsg.current.focus();
       const newCursorPosition = cursorPosition + emoji.length;
@@ -60,12 +60,12 @@ export default function MessageBox(props) {
     props.callback(inputMsg.current.value);
     inputMsg.current.value = ""; // clear input
   };
-  
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex items-center w-3/4 p-3 rounded-lg bg-[#30475E] relative">
-     <IconButton ref={emojiButtonRef} onClick={handleEmojiPickerOpen} size="small" className="absolute left-4 z-10 text-white">
-  <EmojiEmotionsIcon className='text-basicallylight' />
-</IconButton>
+      <IconButton ref={emojiButtonRef} onClick={handleEmojiPickerOpen} size="small" className="absolute left-4 z-10 text-white">
+        <EmojiEmotionsIcon className='text-basicallylight' />
+      </IconButton>
       <IconButton size="small" className="absolute left-12 z-10 text-white">
         <AttachFileIcon className='text-basicallylight' />
       </IconButton>
@@ -82,23 +82,23 @@ export default function MessageBox(props) {
         }}
       />
       <IconButton type="submit" onClick={handleSendButtonClick} size="small" className="absolute right-4 z-10 text-white">
-        <SendIcon className='text-basicallylight'/>
+        <SendIcon className='text-basicallylight' />
       </IconButton>
       <Popover
-  open={isEmojiPickerOpen}
-  anchorEl={emojiPickerAnchorEl}
-  onClose={handleEmojiPickerClose}
-  anchorOrigin={{
-    vertical: 'top', // This positions the anchor point at the top of the anchorEl
-    horizontal: 'left',
-  }}
-  transformOrigin={{
-    vertical: 'bottom', // This will make the Popover "grow" upwards from the bottom
-    horizontal: 'left',
-  }}
->
-  <EmojiPicker onSelect={addEmoji} />
-</Popover>
+        open={isEmojiPickerOpen}
+        anchorEl={emojiPickerAnchorEl}
+        onClose={handleEmojiPickerClose}
+        anchorOrigin={{
+          vertical: 'top', // This positions the anchor point at the top of the anchorEl
+          horizontal: 'left',
+        }}
+        transformOrigin={{
+          vertical: 'bottom', // This will make the Popover "grow" upwards from the bottom
+          horizontal: 'left',
+        }}
+      >
+        <EmojiPicker onSelect={addEmoji} />
+      </Popover>
 
     </form>
   );

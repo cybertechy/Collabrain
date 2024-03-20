@@ -10,12 +10,11 @@ import Lottie from "lottie-react";
 
 const fb = require("_firebase/firebase");
 const socket = require("_socket/socket");
-import Template from "_components/ui/template/template";
 import FileToolbar from "_components/ui/FileToolbar/fileToolbar";
 const Quill = dynamic(() => import("./quill"), { ssr: false });
 import "./quillStyle.css";
 
-import LoadingJSON from "_public/assets/json/Loading.json";
+import LoadingJSON from "_public/assets/json/loading.json";
 import ErrorJSON from "_public/assets/json/Error.json";
 import WorkingJSON from "_public/assets/json/Working.json";
 
