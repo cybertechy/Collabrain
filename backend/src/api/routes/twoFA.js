@@ -65,6 +65,8 @@ router.post("/sendCode", async (req, res) => {
     // send code to user's email
     // generate code
     let code = Math.floor(100000 + Math.random() * 900000);
+    //let code = 536278;
+  
 
     // send code to user's email
     let msg = `Your two-factor authentication code is: ${code}`;
@@ -77,30 +79,58 @@ router.post("/sendCode", async (req, res) => {
     return res.status(200).json({message: "Code sent"});
 });
 
-router.post("/verifyCode", async (req, res) => {
-    if(!req.headers.authorization) return res.status(401).json({error: "Unauthorized"});
-    if (!req.body.code) return res.status(400).json({error: "Invalid code"});
-
-    req.body.code = Number(req.body.code) ?  parseInt(req.body.code) : req.body.code;
-
-
+// router.post("/verifyCode", async (req, res) => {
+//     if(!req.headers.authorization) return res.status(401).json({error: "Unauthorized"});
+//     if (!req.body.code) return res.status(400).json({error: "Invalid code"});
     
+//     let token = req.headers.authorization.split(" ")[1];
+//     if(!token) return res.status(401).json({error: "Unauthorized"});
+
+//     let user = await fb.verifyUser(token);
+//     if(!user) return res.status(401).json({error: "Unauthorized"});
+
+//     // verify code
+//     let doc = await fb.db.collection("users").doc(user.uid).get();
+//     let data = doc.data();
+
+//     if(data?.twoFACode !== req.body.code) return res.status(400).json({error: "Invalid code"});
+ 
+   
+
+
+//     // delete code from user's doc
+//     await fb.db.collection("users").doc(user.uid).update({twoFACode: null});
+
+//     return res.status(200).json({message: "Code verified"});
+// });
+
+router.post("/verifyCode", async (req, res) => {
+    if (!req.headers.authorization) return res.status(401).json({ error: "Unauthorized" });
+    if (!req.body.code) return res.status(400).json({ error: "Invalid code" });
+
     let token = req.headers.authorization.split(" ")[1];
-    if(!token) return res.status(401).json({error: "Unauthorized"});
+    if (!token) return res.status(401).json({ error: "Unauthorized" });
 
     let user = await fb.verifyUser(token);
-    if(!user) return res.status(401).json({error: "Unauthorized"});
+    if (!user) return res.status(401).json({ error: "Unauthorized" });
 
-    // verify code
+    // Verify code
     let doc = await fb.db.collection("users").doc(user.uid).get();
     let data = doc.data();
-    if(data?.twoFACode !== req.body.code) return res.status(400).json({error: "Invalid code"});
 
-    // delete code from user's doc
-    await fb.db.collection("users").doc(user.uid).update({twoFACode: null});
+    // Ensure code is an integer
+    let code = parseInt(req.body.code);
 
-    return res.status(200).json({message: "Code verified"});
+    if (data?.twoFACode !== code) return res.status(400).json({ error: "Invalid code" });
+
+    // Optionally, implement code expiry logic here if needed
+
+    // Delete code from user's doc
+    await fb.db.collection("users").doc(user.uid).update({ twoFACode: null });
+
+    return res.status(200).json({ message: "Code verified" });
 });
+
     
 
 module.exports = router;

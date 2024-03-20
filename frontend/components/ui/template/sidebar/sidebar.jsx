@@ -236,22 +236,22 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
                     />
                 ))} */}
 
-                                       <SidebarButtonIcon
-                        key={"Discover Teams"}
-                        text={"Discover Teams"}
-                        color="primary"
-                        withShadow={true}
-                        onClick={() => router.push("/new-project")}
-                        Icon={() => (
-                            <ExploreIcon fontSize = "medium"className=" text-basicallylight"></ExploreIcon>
-                        )}
-                        isExpanded={isOpen}
-                    />
-                      <div className={`h-full scrollbar-thin scrollbar-thumb-primary ${isOpen ? "overflow-y-auto overflow-x-hidden" : "overflow-hidden"}`}>
-    {userTeams ? userTeams?.map((team, index) => (
-        <TeamSidebarItem key={index} team={team} isExpanded={isOpen}  isSelected={pathname === `chat?teamId=${team.teamId}`} />
-    )):null}
-</div>
+					<SidebarButtonIcon
+						key={"Discover Teams"}
+						text={"Discover Teams"}
+						color="primary"
+						withShadow={true}
+						onClick={() => router.push("/leaderboard")}
+						Icon={() => (
+							<ExploreIcon fontSize="medium" className=" text-basicallylight"></ExploreIcon>
+						)}
+						isExpanded={isOpen}
+					/>
+					<div className={`h-full scrollbar-thin scrollbar-thumb-primary ${isOpen ? "overflow-y-auto overflow-x-hidden" : "overflow-hidden"}`}>
+						{userTeams ? userTeams?.map((team, index) => (
+							<TeamSidebarItem key={index} team={team} isExpanded={isOpen} isSelected={pathname === `chat?teamId=${team.teamId}`} />
+						)) : null}
+					</div>
 
                 </nav>
             </div>
