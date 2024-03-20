@@ -246,7 +246,7 @@ router.get("/", async (req, res) =>
 	if (req.query.sort == "score" || req.query.sort == "size")
 	{
 		let limit = 100;
-		let results = fb.db.collection("teams").orderBy(req.query.sort, "desc").offset((req.query.page) ? req.query.page * limit : 0).limit(limit);
+		let results = fb.db.collection("teams").orderBy(req.query.sort, "desc").offset((req.query.page) ? req.query.page * limit : 0).limit(limit).where("visibility", "==", "public");
 		results.get()
 			.then(snapshot =>
 			{

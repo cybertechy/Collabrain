@@ -221,7 +221,7 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
 						text={"Discover Teams"}
 						color="primary"
 						withShadow={true}
-						onClick={() => router.push("/new-project")}
+						onClick={() => router.push("/leaderboard")}
 						Icon={() => (
 							<ExploreIcon fontSize="medium" className=" text-basicallylight"></ExploreIcon>
 						)}
