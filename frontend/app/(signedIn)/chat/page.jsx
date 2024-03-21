@@ -7,7 +7,6 @@ import Toolbar from '@mui/material/Toolbar';
 import { Timestamp } from "firebase/firestore";
 import ChannelBar from "@/components/ui/chatsComponents/channelBar";
 import MessageItem from "@/components/ui/messagesComponents/MessageItem";
-import Template from "@/components/ui/template/template";
 const { useRouter, useSearchParams } = require('next/navigation');
 const axios = require("axios");
 const fb = require("_firebase/firebase");
@@ -15,6 +14,10 @@ const socket = require("_socket/socket");
 import ShortTextIcon from '@mui/icons-material/ShortText'; 
 import Lottie from "lottie-react";
 import LoadingJSON from "@/public/assets/json/loading.json";
+import enc from "crypto-js/enc-utf8";
+import { AES } from "crypto-js";
+const uuid = require("uuid");
+import { maskProfanity, containsProfanity } from "@/app/utils/textmoderator";
 
 
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
@@ -60,7 +63,7 @@ export default function ChatRoom() {
 		setChannelName(params.get('channelName'));
 	}, [params.get('teamId'), params.get('channelName')]);
 	useEffect(() => {
-		if (!user) return;
+		if (!user || !channelName) return;
 
 		fb.getToken().then((token) => {
 			axios.get(`${SERVERLOCATION}/api/teams/${teamId}/channels/${channelName}/messages`, {
@@ -73,7 +76,7 @@ export default function ChatRoom() {
 						key={i}
 						sender={messageData.username}
 						timestamp={fb.fromFbTimestamp(new Timestamp(messageData.sentAt.seconds, messageData.sentAt.nanoseconds)).toLocaleTimeString()}
-						message={messageData.message}
+						message={ (messageData.username !== "System") ? AES.decrypt(messageData.message, channelName).toString(enc) : messageData.message}
 						reactions={{}}
 						userId={messageData.senderID}
 					/>
@@ -158,22 +161,33 @@ export default function ChatRoom() {
 			return;
 		}
 
-		let token = await fb.getToken();
-		let userData = await axios.get(`${SERVERLOCATION}/api/users/${user.uid}`,
-			{ headers: { "Authorization": "Bearer " + token } });
-
+		 // Check and mask profanity in message
+		 if (typeof msg === "string" && msg.trim() !== "") {
+            msg = maskProfanity(msg, "*");
+        } else if (
+            typeof msg === "string" &&
+            msg.trim() !== "" &&
+            containsProfanity(msg, true)
+        ) {
+            console.error("Message contains profanity.");
+            return;
+        }
 
 		let sentAt = new Date();
+        let msgId = uuid.v4() + "D" + sentAt.getTime();
+
+
 		const messageData = {
-			senderID: fb.getUserID(),
+			id: msgId,
+			senderID: user.uid,
 			sender: userInfo.data.username,
 			team: teamId,
 			channel: channelName,
-			msg: msg,
-			sentAt: fb.toFbTimestamp(sentAt),
+			msg: AES.encrypt(msg, channelName).toString(),
+			sentAt: sentAt.toISOString(),
+			reactions: [],
 		};
-		const sentAtDate = messageData.sentAt.toDate();
-
+``
 
 		// Add the message to the real-time socket chat
 		setText((prevText) => [
@@ -181,8 +195,8 @@ export default function ChatRoom() {
 			<MessageItem
 				key={prevText.length}
 				sender={messageData.sender}
-				timestamp={sentAtDate.toLocaleTimeString()}
-				message={messageData.msg}
+				timestamp={sentAt.toLocaleTimeString()}
+				message={msg}
 				reactions={{}} // Add reactions if you have them
 				userData={userInfo.data}
 			/>,

@@ -22,7 +22,7 @@ import "driver.js/dist/driver.css";
 
 import { addMedia } from "@/app/utils/storage";
 import { ToastContainer, toast } from "react-toastify";
-import { search } from "homoglyph-search";
+
 export default function Messages() {
     const router = useRouter();
     const [user, loading] = fb.useAuthState();

@@ -65,6 +65,7 @@ async function getTeamMembers(teamID) {
 			return []; // Return an empty array or null if the team doesn't exist
 		}
 		const teamData = teamDoc.data();
+		teamData.members = Object.keys(teamData.members)
 		return teamData.members || []; // Return members or an empty array if members field is missing
 	} catch (error) {
 		console.error("Error getting team members:", error);
