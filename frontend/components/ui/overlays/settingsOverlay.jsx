@@ -9,7 +9,6 @@ import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, B
     List, ListItem, ListItemText, Radio, RadioGroup, FormControlLabel} from '@mui/material';
 import { useRouter } from 'next/navigation';
 import jsPDF from 'jspdf';
-import { useColorblindFilter } from '../../../app/utils/colorblind/ColorblindFilterContext';
 import { TTSProvider, useTTS } from "../../../app/utils/tts/TTSContext";
 import "../../../app/utils/i18n"
 import { useTranslation } from 'next-i18next';
@@ -898,15 +897,8 @@ const NotificationsOverlay = () => {
 // ACCESSIBILITY SETTINGS PAGE
 const AccessibilityOverlay = () => {
     const { t } = useTranslation('access_overlay');
-    const [colorblindDialogOpen, setColorblindDialogOpen] = useState(false);
-    const [selectedFilter, setSelectedFilter] = useState('None');
-    const { setColorblindFilter } = useColorblindFilter();
     const { speak, stop, isTTSEnabled, toggleTTS } = useTTS();
 
-    const colorblindOptions = [
-        'None', 'Achromatopsia', 'Achromatomaly', 'Deuteranomaly', 'Deuteranopia', 
-        'Protanomaly', 'Protanopia', 'Tritanomaly', 'Tritanopia'
-    ];
     // Functions to handle configuration can be added here
     // For example:
     const handleConfigureTTS = () => {
@@ -919,16 +911,6 @@ const AccessibilityOverlay = () => {
 
     const handleConfigureColorblindFilters = () => {
         // Implement Colorblind Filters configuration logic
-        setColorblindDialogOpen(true);
-    };
-
-    const handleClose = () => {
-        setColorblindDialogOpen(false);
-    };
-
-    const handleFilterChange = (event) => {
-        setSelectedFilter(event.target.value);
-        setColorblindFilter(event.target.value); // This updates the global filter state
     };
 
     return (
@@ -978,24 +960,6 @@ const AccessibilityOverlay = () => {
                             {t('config')}
                         </button>
                     </div>
-
-                    <Dialog onClose={handleClose} open={colorblindDialogOpen}>
-                        <DialogTitle>Configure Colorblind Filters</DialogTitle>
-                        <List>
-                            <RadioGroup value={selectedFilter} onChange={handleFilterChange}>
-                                {colorblindOptions.map((option) => (
-                                    <ListItem key={option} button onClick={() => setSelectedFilter(option)}>
-                                        <FormControlLabel
-                                            value={option}
-                                            control={<Radio />}
-                                            label={option}
-                                        />
-                                    </ListItem>
-                                ))}
-                            </RadioGroup>
-                        </List>
-                        <Button onClick={handleClose}>Done</Button>
-                    </Dialog>
                 </div>
             </div>
         </div>

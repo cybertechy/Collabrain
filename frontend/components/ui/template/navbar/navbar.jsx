@@ -11,7 +11,6 @@ import { isSidebarOpen } from "../sidebar/sidebar";
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import SettingsOverlay from '../../overlays/settingsOverlay';
 import Template from '../template';
-import { ColorblindFilterProvider } from '../../../../app/utils/colorblind/ColorblindFilterContext';
 import { useTTS } from "../../../../app/utils/tts/TTSContext";
 import "../../../../app/utils/i18n"
 import { useTranslation } from 'next-i18next';
@@ -66,7 +65,6 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
 
     const tooltips = () => {
         return (
-            <ColorblindFilterProvider>
             <>
             <Tooltip
             title={t('leaderboard')}
@@ -110,7 +108,6 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
                     />
                      </Tooltip>
                      </>
-                     </ColorblindFilterProvider>
 
         )
     }
