@@ -10,7 +10,6 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { isSidebarOpen } from "../sidebar/sidebar";
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import SettingsOverlay from '../../overlays/settingsOverlay';
-import CallButton from "_components/ui/call/call";
 
 const Navbar = ({ isOpen, toggleSidebar, setShowCallScreen, setCallVideoStreams, callVideoStreams, 
 				  toggleAudio, toggleVideo, leaveCall, micEnabled, videoEnabled, setLeaveCall }) =>
@@ -66,9 +65,6 @@ const Navbar = ({ isOpen, toggleSidebar, setShowCallScreen, setCallVideoStreams,
 	{
 		return (
 			<>
-				<CallButton setShowCallScreen={setShowCallScreen} setCallVideoStreams={setCallVideoStreams} callVideoStreams={callVideoStreams}
-							toggleAudio={toggleAudio} toggleVideo={toggleVideo} leaveCall={leaveCall} micEnabled={micEnabled} videoEnabled={videoEnabled} 
-							setLeaveCall={setLeaveCall} />
 				<Tooltip
 					title={"Leaderboard"}
 					enterDelay={1000}

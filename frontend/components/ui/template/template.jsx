@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "./sidebar/sidebar";
 import Navbar from "./navbar/navbar";
-import CallScreen from "_components/ui/call/callScreen";
+
 
 const Template = ({ children }) =>
 {
@@ -37,14 +37,9 @@ const Template = ({ children }) =>
 							setCallVideoStreams={setCallVideoStreams} callVideoStreams={callVideoStreams} toggleAudio={toggleAudio} toggleVideo={toggleVideo} leaveCall={leaveCall} 
 							micEnabled={micEnabled} videoEnabled={videoEnabled} setLeaveCall={setLeaveCall} />
 						{/* <div id="content" className="flex-grow flex flex-col items-center justify-center"> */}
-						{
-							showCallScreen ?
-								<CallScreen setShowCallScreen={setShowCallScreen} callVideoStreams={callVideoStreams}
-									toggleAudio={toggleAudio} toggleVideo={toggleVideo} leaveCall={leaveCall}
-									micEnabled={micEnabled} videoEnabled={videoEnabled} /> :
-								<>{children}</>
-						}
+						{children}
 					</div>
+					
 				</>
 			</div>
 		</div>
