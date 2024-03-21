@@ -87,7 +87,7 @@ export default function Call(props)
 				sockCli.current.on('user-joined-call', userId =>
 				{
 					console.log(`### user ${userId} joined call ###`);
-					setTimeout(connectToNewUser, 1000, userId, stream);
+					connectToNewUser(userId, stream);
 				});
 			});
 
@@ -97,6 +97,9 @@ export default function Call(props)
 				peers[userId].close();
 
 			console.log("### user left call ###");
+
+			// Remove video stream
+			document.querySelector(`#${userId}`).remove();
 
 			props.setCallVideoStreams(prevState =>
 			{
