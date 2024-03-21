@@ -15,7 +15,7 @@ import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 
 import SearchingJSON from "_public/assets/json/Searching.json";
-import LoadingJSON from "_public/assets/json/loading.json";
+import LoadingJSON from "_public/assets/json/Loading.json";
 import ErrorJSON from "_public/assets/json/Error.json";
 import WorkingJSON from "_public/assets/json/Working.json";
 import Lottie from "lottie-react";

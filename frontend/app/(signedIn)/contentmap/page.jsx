@@ -10,7 +10,7 @@ import "driver.js/dist/driver.css";
 import Socket from "_socket/socket";
 
 import SearchingJSON from "@/public/assets/json/Searching.json";
-import LoadingJSON from "@/public/assets/json/loading.json";
+import LoadingJSON from "@/public/assets/json/Loading.json";
 import ErrorJSON from "@/public/assets/json/Error.json";
 import WorkingJSON from "@/public/assets/json/Working.json";
 import Lottie from "lottie-react";

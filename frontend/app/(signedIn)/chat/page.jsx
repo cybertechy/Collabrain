@@ -13,7 +13,7 @@ const fb = require("_firebase/firebase");
 const socket = require("_socket/socket");
 import ShortTextIcon from '@mui/icons-material/ShortText'; 
 import Lottie from "lottie-react";
-import LoadingJSON from "@/public/assets/json/loading.json";
+import LoadingJSON from "@/public/assets/json/Loading.json";
 import enc from "crypto-js/enc-utf8";
 import { AES } from "crypto-js";
 const uuid = require("uuid");

@@ -14,7 +14,7 @@ import FileToolbar from "_components/ui/FileToolbar/fileToolbar";
 const Quill = dynamic(() => import("./quill"), { ssr: false });
 import "./quillStyle.css";
 
-import LoadingJSON from "_public/assets/json/loading.json";
+import LoadingJSON from "_public/assets/json/Loading.json";
 import ErrorJSON from "_public/assets/json/Error.json";
 import WorkingJSON from "_public/assets/json/Working.json";
 
