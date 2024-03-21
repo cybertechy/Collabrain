@@ -27,7 +27,7 @@ export default function Call(props)
 
 	const connectToNewUser = (userId, stream) =>
 	{
-		console.log(`### Calling user... ###`);
+		console.log(`### Calling user... ${userId} ###`);
 		const call = myPeer.current.call(userId, stream);
 		const video = document.createElement('video');
 		video.playsInline = true;
@@ -97,9 +97,6 @@ export default function Call(props)
 				peers[userId].close();
 
 			console.log("### user left call ###");
-
-			// Remove video stream
-			document.querySelector(`#${userId}`).remove();
 
 			props.setCallVideoStreams(prevState =>
 			{
