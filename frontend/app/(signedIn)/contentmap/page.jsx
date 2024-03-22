@@ -40,12 +40,6 @@ function page() {
     const [OverrideMessage, setOverrideMessage] = useState("");
     const [ConcurrencyStop, setConcurrencyStop] = useState(false);
 
-
-    /* UI states */
-    const [New, setNew] = useState(false);
-    const [Delete, setDelete] = useState(false);
-    const [Share, setShare] = useState(false);
-
     let Guide = {
         showProgress: true,
         animate: true,
