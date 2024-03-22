@@ -4,7 +4,7 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { useState, useEffect } from "react";
 import { Tooltip } from '@mui/material';
 
-const SidebarItem = ({ href, icon: Icon, text = "", isSelected = false, isExpanded = true }) => {
+const SidebarItem = ({ href, icon: Icon, text = "", isSelected = false, isExpanded = true,  toggleSidebar  }) => {
     const itemClasses = isSelected ? "text-primary" : "text-unselected hover:text-primary";
     const [showChevron, setShowChevron] = useState(false);
     // const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -40,6 +40,7 @@ const SidebarItem = ({ href, icon: Icon, text = "", isSelected = false, isExpand
             <Link href={href}
             // >
                 // <div
+                onClick={toggleSidebar}
                     className={`flex items-center p-2 my-2 transition-colors duration-200 justify-start cursor-pointer ${isExpanded ? "hover:bg-gray-200" : ""} ${itemClasses} hover:text-primary`}
                     style={{ 
                         maxWidth: isExpanded ? "100%" : "0",
@@ -76,6 +77,7 @@ SidebarItem.propTypes = {
     text: PropTypes.string.isRequired,
     isSelected: PropTypes.bool,
     isExpanded: PropTypes.bool,
+    toggleSidebar: PropTypes.func.isRequired,
 };
 
 export default SidebarItem;
