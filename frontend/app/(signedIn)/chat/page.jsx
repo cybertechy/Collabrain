@@ -13,7 +13,8 @@ const axios = require("axios");
 const fb = require("_firebase/firebase");
 const socket = require("_socket/socket");
 import ShortTextIcon from '@mui/icons-material/ShortText'; 
-import Lottie from "lottie-react";
+import dynamic from 'next/dynamic';
+const Lottie = dynamic(() => import('lottie-react'), { ssr: false }); 
 import LoadingJSON from "@/public/assets/json/loading.json";
 
 

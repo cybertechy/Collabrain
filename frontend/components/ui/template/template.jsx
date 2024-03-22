@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "./sidebar/sidebar";
 import Navbar from "./navbar/navbar";
-import CallScreen from "_components/ui/call/callScreen";
+import dynamic from "next/dynamic";
+const CallScreen = dynamic(() => import("../call/callScreen"), { ssr: false });
 
 const Template = ({ children }) =>
 {
