@@ -26,6 +26,8 @@ export default function CallScreen(props)
 			video.autoplay = true;
 			video.className = "rounded-md aspect-video object-cover w-auto h-full";
 			video.id = id;
+			if (id === "self")
+				video.muted = true;
 			gridRef.current.appendChild(video);
 		}
 	};
