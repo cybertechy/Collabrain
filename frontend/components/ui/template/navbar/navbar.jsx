@@ -110,7 +110,7 @@ const Navbar = ({ isOpen, toggleSidebar, setShowCallScreen, setCallVideoStreams,
 		<>
 			<nav className="bg-primary p-4 flex items-center justify-between">
 				{/* Only show MenuIcon on small screens */}
-				<div className="md:hidden">
+				<div className="sm:hidden">
 					<MenuIcon
 						className="h-6 w-6 text-white cursor-pointer"
 						onClick={toggleSidebar}
