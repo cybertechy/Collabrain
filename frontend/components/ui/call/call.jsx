@@ -9,9 +9,8 @@ import CallEndIcon from "@mui/icons-material/CallEndRounded";
 import MicOffIcon from '@mui/icons-material/MicOff';
 import VideocamOffIcon from '@mui/icons-material/VideocamOff';
 import LaunchIcon from '@mui/icons-material/Launch';
-
-//dynamic import for peerjs
 const { Peer } = require('peerjs');
+// import SimplePeer from 'simple-peer';
 
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 export default function Call(props)
@@ -49,7 +48,7 @@ export default function Call(props)
 		}));
 	};
 
-	const joinCall = (room) =>
+	const joinCall = async (room) =>
 	{
 		// Setup peer
 		if (myPeer.current)
@@ -57,58 +56,65 @@ export default function Call(props)
 
 		myPeer.current = new Peer();
 
-		// if peerjs fails, try to reconnect
 		myPeer.current.on('error', err =>
 		{
-			alert(`### PeerJS error: ${err} ###`);
-			myPeer.current.reconnect();
+			console.log("### Peer error ###", err);
+		});
+
+		myPeer.current.on('disconnected', () =>
+		{
+			console.log("### Peer disconnected ###");
+			if (stream)
+				stream.getTracks().forEach(track => track.stop());
 		});
 
 		// Add video stream
 		const myVideo = document.createElement('video');
 		myVideo.muted = true;
 		myVideo.playsInline = true;
-		navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-			.then(stream =>
-			{
-				setStream(stream);
-				addVideoStream(myVideo, stream, "self");
 
-				myPeer.current.on('call', call =>
-				{
-					console.log(`### Answering call... ###`);
-					call.answer(stream);
-					const video = document.createElement('video');
-					video.playsInline = true;
-					video.id = call.peer;
-					call.on('stream', userVideoStream => { addVideoStream(video, userVideoStream, call.peer); });
-				});
-
-				sockCli.current.on('user-joined-call', userId =>
-				{
-					console.log(`### user ${userId} joined call ###`);
-					connectToNewUser(userId, stream);
-				});
-			});
-
-		sockCli.current.on('user-left-call', userId =>
-		{
-			if (peers[userId])
-				peers[userId].close();
-
-			console.log("### user left call ###");
-
-			props.setCallVideoStreams(prevState =>
-			{
-				const newStreams = { ...prevState };
-				delete newStreams[userId];
-				return newStreams;
-			});
-		});
-
-		myPeer.current.on('open', id =>
+		myPeer.current.on('open', async id =>
 		{
 			console.log(`### user id: ${id} ###`);
+
+			await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+				.then(stream =>
+				{
+					setStream(stream);
+					addVideoStream(myVideo, stream, "self");
+
+					myPeer.current.on('call', call =>
+					{
+						console.log(`### Answering call... ###`);
+						call.answer(stream);
+						const video = document.createElement('video');
+						video.playsInline = true;
+						video.id = call.peer;
+						call.on('stream', userVideoStream => { addVideoStream(video, userVideoStream, call.peer); });
+					});
+
+					sockCli.current.on('user-joined-call', userId =>
+					{
+						console.log(`### user ${userId} joined call ###`);
+						connectToNewUser(userId, stream);
+					});
+
+					sockCli.current.on('user-left-call', userId =>
+					{
+						if (peers[userId])
+							peers[userId].close();
+
+						console.log("### user left call ###");
+
+						props.setCallVideoStreams(prevState =>
+						{
+							const newStreams = { ...prevState };
+							delete newStreams[userId];
+							return newStreams;
+						});
+					});
+				});
+
 			sockCli.current.emit('join-call', room, id);
 		});
 
