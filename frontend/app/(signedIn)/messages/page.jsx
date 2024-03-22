@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import dynamic from "next/dynamic";
 import DMSideBar from "@/components/ui/messagesComponents/DMSidebar";
 import MessageItem from "@/components/ui/messagesComponents/MessageItem";
 const { useRouter, useSearchParams } = require("next/navigation");
@@ -11,10 +12,10 @@ import enc from "crypto-js/enc-utf8";
 const fb = require("_firebase/firebase");
 const socket = require("_socket/socket");
 import ChatWindow from "@/components/ui/messagesComponents/chatWindow";
-import FriendsWindow from "./friendWindow";
+const FriendsWindow = dynamic(() => import("./friendWindow"), { ssr: false });
 import { fetchUser } from "@/app/utils/user";
 import { fetchMessages, fetchDirectMessages } from "@/app/utils/messages";
-import LoaderComponent from "@/components/ui/loader/loaderComponent";
+const  LoaderComponent = dynamic(() => import('@/components/ui/loader/loaderComponent'), { ssr: false });
 const uuid = require("uuid");
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 import { driver } from "driver.js";

@@ -18,7 +18,8 @@ import SearchingJSON from "_public/assets/json/Searching.json";
 import LoadingJSON from "_public/assets/json/Loading.json";
 import ErrorJSON from "_public/assets/json/Error.json";
 import WorkingJSON from "_public/assets/json/Working.json";
-import Lottie from "lottie-react";
+import dynamic from 'next/dynamic';
+const Lottie = dynamic(() => import('lottie-react'), { ssr: false }); 
 
 
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;

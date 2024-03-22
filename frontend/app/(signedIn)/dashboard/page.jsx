@@ -12,7 +12,8 @@ import FolderIcon from "@mui/icons-material/Folder";
 import MapIcon from "@mui/icons-material/Map";
 import ContextMenu from "@/components/ui/contextMenu/contextMenu";
 import CreateFolderOverlay from "@/components/ui/overlays/CreateFolderOverlay";
-import Lottie from "lottie-react";
+import dynamic from 'next/dynamic';
+const Lottie = dynamic(() => import('lottie-react'), { ssr: false }); 
 import smallLoader from '@/public/assets/json/smallLoaderLottie.json';
 import axios from "axios";
 import {
@@ -21,7 +22,7 @@ import {
     newContentMap,
 } from "@/app/utils/filesAndFolders";
 import { hasUsername } from "@/app/utils/user";
-import LoaderComponent from "@/components/ui/loader/loaderComponent";
+const  LoaderComponent = dynamic(() => import('@/components/ui/loader/loaderComponent'), { ssr: false });
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 export default function Dashboard() {
     const [user, loading] = fb.useAuthState();

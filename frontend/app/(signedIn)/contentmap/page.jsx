@@ -13,7 +13,8 @@ import SearchingJSON from "@/public/assets/json/Searching.json";
 import LoadingJSON from "@/public/assets/json/Loading.json";
 import ErrorJSON from "@/public/assets/json/Error.json";
 import WorkingJSON from "@/public/assets/json/Working.json";
-import Lottie from "lottie-react";
+import dynamic from 'next/dynamic';
+const Lottie = dynamic(() => import('lottie-react'), { ssr: false }); 
 import FileToolbar from "@/components/ui/FileToolbar/fileToolbar";
 
 const SOCKET_DEBUG = false;

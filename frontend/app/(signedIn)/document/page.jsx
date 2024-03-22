@@ -6,7 +6,7 @@ const { useSearchParams } = require("next/navigation");
 import { useRouter } from "next/navigation";
 
 import axios from 'axios';
-import Lottie from "lottie-react";
+const Lottie = dynamic(() => import('lottie-react'), { ssr: false }); 
 
 const fb = require("_firebase/firebase");
 const socket = require("_socket/socket");

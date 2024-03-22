@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useState, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Lottie from "lottie-react";
+import dynamic from 'next/dynamic';
+const Lottie = dynamic(() => import('lottie-react'), { ssr: false }); 
 import smallLoader from "_public/assets/json/smallLoaderLottie.json";
 import {
   fetchSharedProjects,
@@ -11,7 +12,7 @@ import DashboardInfoBar from "_components/ui/dashboardComponents/dashboardInfoBa
 import DashboardProjectButton from "_components/ui/dashboardComponents/dashboardProjectButton";
 import ContextMenu from "_components/ui/contextMenu/contextMenu";
 import Template from "@/components/ui/template/template";
-import LoaderComponent from "_components/ui/loader/loaderComponent";
+const  LoaderComponent = dynamic(() => import('@/components/ui/loader/loaderComponent'), { ssr: false });
 import { useAuthState } from "_firebase/firebase"; // Adjust based on actual path to useAuthState
 
 export default function SharedWithMe() {
