@@ -1,4 +1,4 @@
-import React, { useState , useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import UploadButton from "../button/uploadButton";
 import PersonIcon from "@mui/icons-material/Person";
@@ -8,6 +8,7 @@ import axios from "axios";
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import jsPDF from 'jspdf';
+import { toast } from "react-toastify";
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 const fb = require("_firebase/firebase");
 
@@ -100,127 +101,119 @@ const ToggleButtonExample = () => {
     return (
         <div>
             <button
-                className={`relative w-12 h-6 rounded-full focus:outline-none transition-colors duration-300 ease-in-out ${
-                    isToggled ? "bg-primary" : "bg-gray-400"
-                }`}
+                className={`relative w-12 h-6 rounded-full focus:outline-none transition-colors duration-300 ease-in-out ${isToggled ? "bg-primary" : "bg-gray-400"
+                    }`}
                 onClick={handleToggle}
             >
                 <span
-                    className={`absolute left-0 top-0 w-6 h-6 rounded-full bg-basicallylight shadow-md transform transition-transform duration-300 ease-in-out ${
-                        isToggled ? "translate-x-full" : "translate-x-0"
-                    }`}
+                    className={`absolute left-0 top-0 w-6 h-6 rounded-full bg-basicallylight shadow-md transform transition-transform duration-300 ease-in-out ${isToggled ? "translate-x-full" : "translate-x-0"
+                        }`}
                 />
             </button>
         </div>
     );
 };
 const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
-   
-  
-    const handleButtonClick = (screen) => {
-      setCurrentScreen(screen);
-    };
-  
- 
-        return (
-            <div className=" h-full w-1/4 bg-basicallylight shadow-md rounded-bl-xl rounded-tl-xl z-50">
-             <div className="p-4">
-          <h2 className="text-2xl font-bold">Settings</h2>
-          <ul className="mt-4">
-            <li>
-              <button
-                className={`w-full p-2 text-left ${
-                  currentScreen === "profile" ? "bg-primary text-basicallylight" : ""
-                }`}
-                onClick={() => handleButtonClick("profile")}
-              >
-                Profile
-              </button>
-            </li>
-            <li>
-              <button
-                className={`w-full p-2 text-left ${
-                  currentScreen === "general" ? "bg-primary text-basicallylight" : ""
-                }`}
-                onClick={() => handleButtonClick("general")}
-              >
-                General
-              </button>
-            </li>
-            <li>
-              <button
-                className={`w-full p-2 text-left ${
-                  currentScreen === "sound" ? "bg-primary text-basicallylight" : ""
-                }`}
-                onClick={() => handleButtonClick("sound")}
-              >
-                Sound
-              </button>
-            </li>
-            <li>
-              <button
-                className={`w-full p-2 text-left ${
-                  currentScreen === "privacy" ? "bg-primary text-basicallylight" : ""
-                }`}
-                onClick={() => handleButtonClick("privacy")}
-              >
-                Privacy
-              </button>
-            </li>
-            <li>
-              <button
-                className={`w-full p-2 text-left ${
-                  currentScreen === "notifications"
-                    ? "bg-primary text-basicallylight"
-                    : ""
-                }`}
-                onClick={() => handleButtonClick("notifications")}
-              >
-                Notifications
-              </button>
-            </li>
-            <li>
-              <button
-                className={`w-full p-2 text-left ${
-                  currentScreen === "accessibility"
-                    ? "bg-primary text-basicallylight"
-                    : ""
-                }`}
-                onClick={() => handleButtonClick("accessibility")}
-              >
-                Accessibility
-              </button>
-            </li>
-          </ul>
-        </div>
-      </div>
-    );
-  };
-  
-  const SettingsOverlay = ({ onClose }) => {
-    const [currentScreen, setCurrentScreen] = useState("profile");
-    const [user, loading] = fb.useAuthState();
-    if (loading|| !user )
-    return (
-        <div className="flex flex-col items-center justify-around min-h-screen">
-            <div className="flex flex-col items-center justify-center min-h-screen">
-               
-                <div className="loader mb-5"></div>
 
-             
+
+    const handleButtonClick = (screen) => {
+        setCurrentScreen(screen);
+    };
+
+
+    return (
+        <div className=" h-full w-1/4 bg-basicallylight shadow-md rounded-bl-xl rounded-tl-xl z-50">
+            <div className="p-4">
+                <h2 className="text-2xl font-bold">Settings</h2>
+                <ul className="mt-4">
+                    <li>
+                        <button
+                            className={`w-full p-2 text-left ${currentScreen === "profile" ? "bg-primary text-basicallylight" : ""
+                                }`}
+                            onClick={() => handleButtonClick("profile")}
+                        >
+                            Profile
+                        </button>
+                    </li>
+                    <li>
+                        <button
+                            className={`w-full p-2 text-left ${currentScreen === "general" ? "bg-primary text-basicallylight" : ""
+                                }`}
+                            onClick={() => handleButtonClick("general")}
+                        >
+                            General
+                        </button>
+                    </li>
+                    <li>
+                        <button
+                            className={`w-full p-2 text-left ${currentScreen === "sound" ? "bg-primary text-basicallylight" : ""
+                                }`}
+                            onClick={() => handleButtonClick("sound")}
+                        >
+                            Sound
+                        </button>
+                    </li>
+                    <li>
+                        <button
+                            className={`w-full p-2 text-left ${currentScreen === "privacy" ? "bg-primary text-basicallylight" : ""
+                                }`}
+                            onClick={() => handleButtonClick("privacy")}
+                        >
+                            Privacy
+                        </button>
+                    </li>
+                    <li>
+                        <button
+                            className={`w-full p-2 text-left ${currentScreen === "notifications"
+                                    ? "bg-primary text-basicallylight"
+                                    : ""
+                                }`}
+                            onClick={() => handleButtonClick("notifications")}
+                        >
+                            Notifications
+                        </button>
+                    </li>
+                    <li>
+                        <button
+                            className={`w-full p-2 text-left ${currentScreen === "accessibility"
+                                    ? "bg-primary text-basicallylight"
+                                    : ""
+                                }`}
+                            onClick={() => handleButtonClick("accessibility")}
+                        >
+                            Accessibility
+                        </button>
+                    </li>
+                </ul>
             </div>
         </div>
     );
+};
+
+const SettingsOverlay = ({ onClose }) => {
+    const [currentScreen, setCurrentScreen] = useState("profile");
+    const [user, loading] = fb.useAuthState();
+    if (loading || !user)
+        return (
+            <div className="flex flex-col items-center justify-around min-h-screen">
+                <div className="flex flex-col items-center justify-center min-h-screen">
+
+                    <div className="loader mb-5"></div>
+
+
+                </div>
+            </div>
+        );
     return (
-        
-      <div className="flex flex-row fixed top-0 left-0 w-full h-full items-center justify-center z-50 text-basicallydark bg-basicallylight bg-opacity-20 backdrop-blur-sm">
-        <div className="bg-basicallylight w-3/6 h-5/6 bg-opacity-100 flex flex-row  shadow-lg rounded-xl border-2 border-gray-300">
-        <OverlaySidebar
-          currentScreen={currentScreen}
-          setCurrentScreen={setCurrentScreen}
-        />
-        <div className="w-full">
-        <button
+
+        <div className="flex flex-row fixed top-0 left-0 w-full h-full items-center justify-center z-50 text-basicallydark bg-basicallylight bg-opacity-20 backdrop-blur-sm">
+            <div className="bg-basicallylight w-3/6 h-5/6 bg-opacity-100 flex flex-row  shadow-lg rounded-xl border-2 border-gray-300">
+                <OverlaySidebar
+                    currentScreen={currentScreen}
+                    setCurrentScreen={setCurrentScreen}
+                />
+                <div className="w-full">
+                    <button
                         className="bg-transparent border-none text-25 cursor-pointer pr-4 pt-2 flex justify-end w-full"
                         onClick={onClose}
                     >
@@ -230,32 +223,32 @@ const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
                         />
                     </button>
 
-            {currentScreen === "profile" && (
-              <ProfileOverlay  user = {user}/>
-            )}
-            {currentScreen === "general" && (
-              <GeneralOverlay  />
-            )}
-            {currentScreen === "sound" && (
-              <SoundOverlay />
-            )}
-            {currentScreen === "privacy" && (
-              <PrivacyOverlay user = {user}/>
-            )}
-            {currentScreen === "notifications" && (
-              <NotificationsOverlay />
-            )}
-            {currentScreen === "accessibility" && (
-              <AccessibilityOverlay />
-            )}
-          </div>
+                    {currentScreen === "profile" && (
+                        <ProfileOverlay Close={onClose} user={user} />
+                    )}
+                    {currentScreen === "general" && (
+                        <GeneralOverlay />
+                    )}
+                    {currentScreen === "sound" && (
+                        <SoundOverlay />
+                    )}
+                    {currentScreen === "privacy" && (
+                        <PrivacyOverlay user={user} />
+                    )}
+                    {currentScreen === "notifications" && (
+                        <NotificationsOverlay />
+                    )}
+                    {currentScreen === "accessibility" && (
+                        <AccessibilityOverlay />
+                    )}
+                </div>
+            </div>
         </div>
-        </div>
-      
+
     );
-  };
+};
 //  PROFILE SETTINGS PAGE
-const ProfileOverlay = ({ user }) => {
+const ProfileOverlay = ({ user , Close }) => {
     const [name, setName] = useState("");
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
@@ -264,7 +257,7 @@ const ProfileOverlay = ({ user }) => {
     const [isEmailEditMode, setIsEmailEditMode] = useState(false);
     const [userInfo, setUserInfo] = useState(null);
     const [openDialog, setOpenDialog] = useState(false); // State to control dialog visibility
-const router = useRouter();
+    const router = useRouter();
     const handleNameEditClick = () => {
         setIsNameEditMode(!isNameEditMode);
     };
@@ -276,7 +269,7 @@ const router = useRouter();
     const handleEmailEditClick = () => {
         setIsEmailEditMode(!isEmailEditMode);
     };
-    
+
     useEffect(() => {
         if (!user) return;
         console.log(user, " exists")
@@ -286,12 +279,12 @@ const router = useRouter();
                 const response = await axios.get(`${SERVERLOCATION}/api/users/${user.uid}`, {
                     headers: { "Authorization": "Bearer " + token }
                 });
-                
-                setUserInfo(response.data );
+
+                setUserInfo(response.data);
                 console.log(userInfo);
             } catch (error) {
                 console.error('Error fetching user data:', error);
-              
+
             }
         };
 
@@ -310,7 +303,7 @@ const router = useRouter();
             await axios.delete(`${SERVERLOCATION}/api/users/${user.uid}`, {
                 headers: { "Authorization": "Bearer " + token }
             });
-            router.push('/'); 
+            router.push('/');
         } catch (error) {
             console.error('Error deleting user:', error);
             // Optionally, handle error (e.g., show an error message)
@@ -324,48 +317,64 @@ const router = useRouter();
     const handleClose = () => {
         setOpenDialog(false);
     };
-//for enabling 2fa
+    //for enabling 2fa
     const handleEnable2FA = async () => {
         try {
             const token = await fb.getToken();
-            await axios.patch(SERVERLOCATION+'/api/2FA/enable', null, {
+            await axios.patch(SERVERLOCATION + '/api/2FA/enable', null, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            alert('Two-factor authentication enabled successfully');
+            toast.success('Two-factor authentication enabled successfully', {
+                position: "bottom-right",
+                theme: "colored",
+            });
         } catch (error) {
             console.error('Error enabling 2FA:', error);
-            alert('Error enabling two-factor authentication. Please try again later.');
+            toast.error('Error enabling two-factor authentication. Please try again later.', {
+                position: "bottom-right",
+                theme: "colored",
+            });
         }
     };
- //for disabling 2fa
+    //for disabling 2fa
     const handleDisable2FA = async () => {
         try {
             const token = await fb.getToken();
-            await axios.patch(SERVERLOCATION+'/api/2FA/disable', null, {
+            await axios.patch(SERVERLOCATION + '/api/2FA/disable', null, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            alert('Two-factor authentication disabled successfully');
+            toast.success('Two-factor authentication disabled successfully', {
+                position: "bottom-right",
+                theme: "colored",
+            });
         } catch (error) {
             console.error('Error disabling 2FA:', error);
-            alert('Error disabling two-factor authentication. Please try again later.');
+            toast.error('Error disabling two-factor authentication. Please try again later.', {
+                position: "bottom-right",
+                theme: "colored",
+            });
         }
     };
 
     return (
         <>
-        <div className="w-full h-5/6 flex ">
-            <div className=" bg-basicallylight p-5 rounded-md flex overflow-y-auto scrollbar-thin scrollbar-thumb-primary ">
-                <div className="w-full h-full">
+            <div className="w-full h-5/6 flex ">
+                <div className=" bg-basicallylight p-5 rounded-md flex overflow-y-auto scrollbar-thin scrollbar-thumb-primary ">
+                    <div className="w-full h-full">
 
-                    <div className="w-11/12 h-96  bg-basicallylight rounded-md">
-                        <div className="flex flex-col justify-start h-full">
-                            
+                        <div className="w-11/12 h-96  bg-basicallylight rounded-md">
+                            <div className="flex flex-col justify-start h-full">
 
-                            <div className="w-11/12 h-11/12 bg-basicallylight rounded-md justify-center">
-                            <div className="mb-4">
-                                        
+
+                                <div className="w-11/12 h-11/12 bg-basicallylight rounded-md justify-center">
+                                    <div className="mb-4">
+
                                         <button className="justify-center w-full font-semibold inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 rounded-full"
-                                        onClick= {() => router.push('/profile')}>
+                                            onClick={() => { router.push('/profile'); 
+                                            setTimeout(() => {
+                                                Close();
+                                            }, 1500);
+                                            }}>
                                             View your Profile
                                         </button>
                                     </div>
@@ -386,11 +395,13 @@ const router = useRouter();
                                             an extra layer of security.
                                         </p>
                                         <div className="flex space-x-5">
-                                        <button onClick={handleEnable2FA} className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 ">
-                                             Enable</button>
-                                        <button onClick={handleDisable2FA} className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3">
-                                            Disable</button>
-                                            </div>
+                                            <button onClick={handleEnable2FA} className={`text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 ${userInfo?.twoFA === true && "bg-primary text-white"} `}>
+                                                {userInfo?.twoFA === true ? "Enabled" : "Enable"}
+                                                </button>
+                                            <button onClick={handleDisable2FA} className={`text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 ${userInfo?.twoFA === false && "bg-primary text-white"} `}>
+                                                {userInfo?.twoFA === true ? "Disable" : "Disabled"}
+                                            </button>
+                                        </div>
 
                                     </div>
                                 </div>
@@ -405,28 +416,28 @@ const router = useRouter();
                                             this action
                                         </p>
                                         <div className="flex space-x-5">
-                                        <button className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 " onClick={handleClickOpen}>
-                Delete
-            </button>
-            {/* Dialog for confirmation */}
-            <Dialog open={openDialog} onClose={handleClose}>
-                <DialogTitle>{"Confirm Account Deletion"}</DialogTitle>
-                <DialogContent>
-                    <DialogContentText>
-                        Are you sure you want to delete your account? This action cannot be undone.
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleClose}>Cancel</Button>
-                    <Button onClick={() => {
-                        handleDeleteUser();
-                        handleClose();
-                    }} autoFocus>
-                        Confirm
-                    </Button>
-                </DialogActions>
-            </Dialog>
-                                            <button  onClick  = {fb.signOut} className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 ">
+                                            <button className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 " onClick={handleClickOpen}>
+                                                Delete
+                                            </button>
+                                            {/* Dialog for confirmation */}
+                                            <Dialog open={openDialog} onClose={handleClose}>
+                                                <DialogTitle>{"Confirm Account Deletion"}</DialogTitle>
+                                                <DialogContent>
+                                                    <DialogContentText>
+                                                        Are you sure you want to delete your account? This action cannot be undone.
+                                                    </DialogContentText>
+                                                </DialogContent>
+                                                <DialogActions>
+                                                    <Button onClick={handleClose}>Cancel</Button>
+                                                    <Button onClick={() => {
+                                                        handleDeleteUser();
+                                                        handleClose();
+                                                    }} autoFocus>
+                                                        Confirm
+                                                    </Button>
+                                                </DialogActions>
+                                            </Dialog>
+                                            <button onClick={fb.signOut} className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 ">
                                                 Sign Out
                                             </button>
                                         </div>
@@ -444,108 +455,106 @@ const router = useRouter();
 const GeneralOverlay = () => {
     const [selectedLangLabel, setSelectedLangLabel] = useState("Select your language");
     const [selectedAppearance, setSelectedAppearance] = useState(null);
-    const [badBehaviorStrikes, setBadBehaviorStrikes] = useState(3);
-  
+    const [badBehaviorStrikes, setBadBehaviorStrikes] = useState(1);
+
     useEffect(() => {
         // Check if dark mode is enabled on component mount
         const isDarkMode = document.documentElement.classList.contains('dark');
         setSelectedAppearance(isDarkMode ? 0 : 1);
-      }, []);
-    
-      const handleLangSelect = (label) => {
+    }, []);
+
+    const handleLangSelect = (label) => {
         setSelectedLangLabel(label);
-      };
-    
-      const handleAppearanceSelect = (index) => {
+    };
+
+    const handleAppearanceSelect = (index) => {
         setSelectedAppearance(index);
         // Toggle dark mode based on selection
         if (appearanceOptions[index].darkMode) {
-          document.documentElement.classList.add('dark');
+            document.documentElement.classList.add('dark');
         } else {
-          document.documentElement.classList.remove('dark');
+            document.documentElement.classList.remove('dark');
         }
-      };
-  
-    const handleStrikeChange = (newStrikes) => {
-      setBadBehaviorStrikes(newStrikes);
     };
-  
+
+    const handleStrikeChange = (newStrikes) => {
+        setBadBehaviorStrikes(newStrikes);
+    };
+
     const appearanceOptions = [
         { label: "Dark Background", colorClass: "bg-basicallydark", darkMode: true },
         { label: "Default Background", colorClass: "bg-basicallylight", darkMode: false },
-      ];
-  
-    const dropdownItems4 = [
-      { label: "Arabic", link: "/option1" },
-      { label: "English (US)", link: "/option2" },
     ];
-  
+
+    const dropdownItems4 = [
+        { label: "Arabic", link: "/option1" },
+        { label: "English (US)", link: "/option2" },
+    ];
+
     return (
-      <>
-        <div className="w-full h-5/6 flex justify-center items-start">
-          <div className="bg-basicallylight  rounded-md flex w-full p-5 overflow-y-auto scrollbar-thin scrollbar-thumb-primary">
-            <div className="flex flex-col w-full">
-              <p className="mb-2 text-2xl text-left text-basicallydark md:text-lg sm:text-sm lg:text-2xl">
-                Change Appearance
-              </p>
-              <div className="flex flex-wrap sm:flex-nowrap space-y-2 sm:space-x-5 sm:space-y-0 mb-4">
-              {appearanceOptions.map((option, index) => (
-                option.darkMode ? (
-                // Render button for dark mode
-                <button
-                  key={index}
-                  className={`h-16 w-16 lg:w-32 lg:h-32 flex justify-center items-center relative ${
-                    selectedAppearance === index ? "border-4 border-secondary" : ""
-                  }`}
-                  onClick={() => handleAppearanceSelect(index)}
-                >
-                  <div className={`w-full h-full ${option.colorClass} flex justify-center items-center`}>
-                    <div className="w-12 h-12 bg-basicallylight"></div>
-                  </div>
-                </button>
-              ) : (
-                // Render button for light mode
-                <button
-                  key={index}
-                  className={`h-16 w-16 lg:w-32 lg:h-32 flex justify-center items-center relative border-primary border-4 ${
-                    selectedAppearance === index ? "border-4 border-secondary" : ""
-                  }`}
-                  onClick={() => handleAppearanceSelect(index)}
-                >
-                  <div className={`w-full h-full ${option.colorClass} flex justify-center items-center`}>
-                    <div className="w-12 h-12 bg-primary"></div>
-                  </div>
-                </button>
-              )
-            ))
-          }
-             
-            </div>
-              <div className="mb-4">
-                <p className="mb-2 text-2xl text-left text-basicallydark md:text-lg sm:text-sm lg:text-2xl">
-                  Language
-                </p>
-                <Dropdown
-                  buttonLabel={selectedLangLabel}
-                  dropdownItems={dropdownItems4}
-                  onSelect={handleLangSelect}
-                />
-              </div>
-              <div className="mb-4">
-                <p className="text-2xl pb-2 text-left text-basicallydark md:text-lg sm:text-sm lg:text-2xl">
-                  Bad behavior strikes
-                </p>
-                <div className="flex flex-row justify-start items-center">
-                  <BadBehaviorStrikes strikes={badBehaviorStrikes} onChange={handleStrikeChange} />
+        <>
+            <div className="w-full h-5/6 flex justify-center items-start">
+                <div className="bg-basicallylight  rounded-md flex w-full p-5 overflow-y-auto scrollbar-thin scrollbar-thumb-primary">
+                    <div className="flex flex-col w-full">
+                        <p className="mb-2 text-2xl text-left text-basicallydark md:text-lg sm:text-sm lg:text-2xl">
+                            Change Appearance
+                        </p>
+                        <div className="flex flex-wrap sm:flex-nowrap space-y-2 sm:space-x-5 sm:space-y-0 mb-4">
+                            {appearanceOptions.map((option, index) => (
+                                option.darkMode ? (
+                                    // Render button for dark mode
+                                    <button
+                                        key={index}
+                                        className={`h-16 w-16 lg:w-32 lg:h-32 flex justify-center items-center relative ${selectedAppearance === index ? "border-4 border-secondary" : ""
+                                            }`}
+                                        onClick={() => handleAppearanceSelect(index)}
+                                    >
+                                        <div className={`w-full h-full ${option.colorClass} flex justify-center items-center`}>
+                                            <div className="w-12 h-12 bg-basicallylight"></div>
+                                        </div>
+                                    </button>
+                                ) : (
+                                    // Render button for light mode
+                                    <button
+                                        key={index}
+                                        className={`h-16 w-16 lg:w-32 lg:h-32 flex justify-center items-center relative border-primary border-4 ${selectedAppearance === index ? "border-4 border-secondary" : ""
+                                            }`}
+                                        onClick={() => handleAppearanceSelect(index)}
+                                    >
+                                        <div className={`w-full h-full ${option.colorClass} flex justify-center items-center`}>
+                                            <div className="w-12 h-12 bg-primary"></div>
+                                        </div>
+                                    </button>
+                                )
+                            ))
+                            }
+
+                        </div>
+                        <div className="mb-4">
+                            <p className="mb-2 text-2xl text-left text-basicallydark md:text-lg sm:text-sm lg:text-2xl">
+                                Language
+                            </p>
+                            <Dropdown
+                                buttonLabel={selectedLangLabel}
+                                dropdownItems={dropdownItems4}
+                                onSelect={handleLangSelect}
+                            />
+                        </div>
+                        <div className="mb-4">
+                            <p className="text-2xl pb-2 text-left text-basicallydark md:text-lg sm:text-sm lg:text-2xl">
+                                Bad behavior strikes
+                            </p>
+                            <div className="flex flex-row justify-start items-center">
+                                <BadBehaviorStrikes strikes={badBehaviorStrikes} onChange={handleStrikeChange} />
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
-        </div>
-      </>
+        </>
     );
-  };
-  
+};
+
 //  SOUND SETTINGS PAGE
 const SoundOverlay = () => {
     const [selectedSpeakerLabel, setSelectedSpeakerLabel] = useState("Default Speaker");
@@ -607,13 +616,13 @@ const PrivacyOverlay = (user) => {
         setIsDndToggled(!isDndToggled);
     };
 
- 
+
 
 
     const handleDeleteData = () => {
         // Implement delete data logic
     };
-    
+
     useEffect(() => {
         if (!user) return;
         console.log(user, " exists")
@@ -623,40 +632,40 @@ const PrivacyOverlay = (user) => {
                 const response = await axios.get(`${SERVERLOCATION}/api/users/${user.user.uid}`, {
                     headers: { "Authorization": "Bearer " + token }
                 });
-             
-                setUserInfo(response.data );
+
+                setUserInfo(response.data);
             } catch (error) {
                 console.error('Error fetching user data:', error);
-              
+
             }
         };
 
         fetchUser();
     }, [user]);
-  
+
     const handleExportData = () => {
         console.log("in handle export data");
         if (!userInfo) return;
-    
+
         // Convert userInfo object to JSON string
         const dataStr = JSON.stringify(userInfo, null, 2); // pretty print with indentation
         // Create a Blob with JSON content
-        const blob = new Blob([dataStr], {type: "application/json"});
+        const blob = new Blob([dataStr], { type: "application/json" });
         // Create a URL for the blob
         const url = URL.createObjectURL(blob);
-    
+
         // Create a temporary anchor element and trigger download
         const link = document.createElement('a');
         link.href = url;
         link.download = "userInfo.json"; // File name for download
         document.body.appendChild(link); // Required for Firefox
         link.click(); // Trigger download
-    
+
         // Clean up
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
     };
-    
+
     return (
         <div className="w-full h-5/6 flex justify-center items-start">
             <div className="bg-basicallylight rounded-md flex w-full p-5 overflow-y-auto scrollbar-thin scrollbar-thumb-primary">
@@ -674,19 +683,19 @@ const PrivacyOverlay = (user) => {
                         <p className="text-2xl text-basicallydark">
                             Export my data
                         </p>
-                        <button 
+                        <button
                             className="text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3"
                             onClick={handleExportData}
                         >
-                           &nbsp;&nbsp;Export&nbsp;
+                            &nbsp;&nbsp;Export&nbsp;
                         </button>
                     </div>
-                    
+
                     <div className="mb-4 flex justify-between">
                         <p className="text-2xl text-basicallydark">
                             Delete my data
                         </p>
-                        <button 
+                        <button
                             className="text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-9 py-3"
                             onClick={handleDeleteData}
                         >
@@ -750,7 +759,7 @@ const NotificationsOverlay = () => {
                         <p className="text-2xl text-basicallydark">
                             Choose Notification Sound
                         </p>
-                        <button 
+                        <button
                             className="text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3"
                             onClick={handleConfigureNotificationSound}
                         >
@@ -780,14 +789,14 @@ const AccessibilityOverlay = () => {
 
     return (
         <div className="w-full h-5/6 flex justify-center items-start">
-        <div className="w-full h-full p-5  bg-basicallylight flex overflow-auto">
-           {/* RIGHT SIDE */}
+            <div className="w-full h-full p-5  bg-basicallylight flex overflow-auto">
+                {/* RIGHT SIDE */}
                 <div className="  w-full overflow-auto ">
                     <div className="mb-4 flex justify-between">
                         <p className="text-2xl text-basicallydark">
                             Text-to-speech (TTS)
                         </p>
-                        <button 
+                        <button
                             className="text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3"
                             onClick={handleConfigureTTS}
                         >
@@ -798,7 +807,7 @@ const AccessibilityOverlay = () => {
                         <p className="text-2xl text-basicallydark">
                             Font-size
                         </p>
-                        <button 
+                        <button
                             className="text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3"
                             onClick={handleConfigureFontSize}
                         >
@@ -809,7 +818,7 @@ const AccessibilityOverlay = () => {
                         <p className="text-2xl text-basicallydark">
                             Colorblind Filters
                         </p>
-                        <button 
+                        <button
                             className="text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3"
                             onClick={handleConfigureColorblindFilters}
                         >
