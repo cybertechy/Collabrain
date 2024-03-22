@@ -7,7 +7,7 @@ import { useTTS } from "../../../../../app/utils/tts/TTSContext";
 import "../../../../../app/utils/i18n"
 import { useTranslation } from 'next-i18next';
 
-const SidebarItem = ({ href, icon: Icon, text = "", isSelected = false, isExpanded = true }) => {
+const SidebarItem = ({ href, icon: Icon, text = "", isSelected = false, isExpanded = true,  toggleSidebar  }) => {
     const { t } = useTranslation('sidebar');
     const { speak, stop, isTTSEnabled } = useTTS();
     const itemClasses = isSelected ? "text-primary" : "text-unselected hover:text-primary";
@@ -66,6 +66,7 @@ const SidebarItem = ({ href, icon: Icon, text = "", isSelected = false, isExpand
             <Link href={href}
             // >
                 // <div
+                onClick={toggleSidebar}
                     className={`flex items-center p-2 my-2 transition-colors duration-200 justify-start cursor-pointer ${isExpanded ? "hover:bg-gray-200" : ""} ${itemClasses} hover:text-primary`}
                     style={{ 
                         maxWidth: isExpanded ? "100%" : "0",
@@ -104,6 +105,7 @@ SidebarItem.propTypes = {
     text: PropTypes.string.isRequired,
     isSelected: PropTypes.bool,
     isExpanded: PropTypes.bool,
+    toggleSidebar: PropTypes.func.isRequired,
 };
 
 export default SidebarItem;

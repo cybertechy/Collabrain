@@ -20,6 +20,7 @@ import fb from "../../../app/_firebase/firebase";
 import "../../../app/utils/i18n"
 import { useTranslation } from 'next-i18next';
 import { useTTS } from "../../../app/utils/tts/TTSContext";
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 const DashboardProjectButton = ({
     title,
     project,
@@ -67,7 +68,7 @@ const DashboardProjectButton = ({
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
-            className="w-16 h-16"
+            className="w-10 h-10 sm:w-10 sm:h-10"
         >
             <path
                 fillRule="evenodd"
@@ -82,7 +83,7 @@ const DashboardProjectButton = ({
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
-            className="w-16 h-16"
+            className="w-10 h-10 sm:w-16 sm:h-16"
         >
             <path
                 fillRule="evenodd"
@@ -105,7 +106,7 @@ const DashboardProjectButton = ({
         let token = await fb.getToken();
         await axios
             .put(
-                "http://localhost:8080/api/maps/" + contentMapId,
+                `${SERVERLOCATION}/api/maps/` + contentMapId,
                 {
                     name: newName,
                 },
@@ -127,7 +128,7 @@ const DashboardProjectButton = ({
     async function deleteContentMap(contentMapId) {
         let token = await fb.getToken();
         await axios
-            .delete("http://localhost:8080/api/maps/" + contentMapId, {
+            .delete(`${SERVERLOCATION}/api/maps/` + contentMapId, {
                 headers: {
                     Authorization: `Bearer ${token}`, // Replace <UserToken> with actual token
                 },
@@ -168,24 +169,36 @@ const DashboardProjectButton = ({
         <div onMouseEnter={handleMouseEnter} onMouseLeave={stop}>
         <Tooltip title={title} enterDelay={1000} leaveDelay={200}>
             <div>
-                {" "}
                 <div
-                    className="flex flex-col items-center justify-center bg-aliceBlue text-primary rounded-md hover:bg-columbiablue duration-300 w-32 h-28 pt-3 pl-1"
+// className="flex flex-wrap items-stretch justify-center bg-aliceBlue text-primary rounded-md hover:bg-columbiablue duration-300  pt-2 px-3  border border-unselected" // Added mb-2 for bottom spacing
+                    className="flex flex-col items-center justify-center bg-aliceBlue text-primary rounded-md hover:bg-columbiablue duration-300 h-22 w-32 sm:h-28 shadow-md pt-3 pl-1 border border-unselected"
                     draggable="true"
                     onDragStart={(e) => handleDragStart(e, project.id, type)}
                 >
-                    <div className="flex flex-col items-center justify-center h-full">
+                    <div className="flex flex-col items-center justify-between h-full">
+                        <div className="flex flex-col gap-2 items-center">
+                            {/* Project type text (left-aligned) */}
+                        
                         <div onClick={handleContentMapClick}>
                             {type === "Document" ? doc() : map()}
                         </div>
-                        <div className="flex flex-row justify-between items-center w-full mt-2">
-                            <span className="text-md font-semibold">
+                        
+
+                        </div>
+                        <div className="flex flex-col w-full mt-2 ">
+                            <div className="text-xs font-medium text-left justify-start flex items-start">
+                                <p className="">{type === "Document" ? "Document" : "Content Map"}</p>
+                            </div>
+                            
+                            <div className="flex flex-row justify-between items-center w-full">
+                            
+                                <span className="text-md font-bold overflow-hidden whitespace-nowrap">
                                 {truncateTitle(title)}
                             </span>
                             <IconButton
                                 color="inherit"
                                 onClick={handleClick}
-                                className="ml-2"
+                                className="sm:ml-2"
                                 onMouseEnter={() => isTTSEnabled && speak("Project options")}
                                 onMouseLeave={stop}
                             >
@@ -217,7 +230,7 @@ const DashboardProjectButton = ({
                                 onMouseLeave={stop}>
                                     <ShareIcon
                                         fontSize="small text-tertiary"
-                                        className="mr-2  text-tertiary flex justify-between gap-5"
+                                        className="mr-2 text-tertiary flex justify-between gap-5"
                                     />
                                     <span className="text-tertiary">
                                         {t('share_button')}
@@ -228,7 +241,7 @@ const DashboardProjectButton = ({
                                 onMouseLeave={stop}>
                                     <SortIcon
                                         fontSize="small text-tertiary"
-                                        className="mr-2  text-tertiary flex justify-between gap-5"
+                                        className="mr-2 text-tertiary flex justify-between gap-5"
                                     />
                                     <span className="text-tertiary">
                                         {t('organize_button')}
@@ -244,13 +257,14 @@ const DashboardProjectButton = ({
                                 >
                                     <DeleteIcon
                                         fontSize="small text-tertiary"
-                                        className="mr-2  text-tertiary flex justify-between gap-5"
+                                        className="mr-2 text-tertiary flex justify-between gap-5"
                                     />
                                     <span className="text-tertiary">
                                         {t('delete_button')}
                                     </span>
                                 </MenuItem>
                             </Menu>
+                            </div>
                         </div>
                     </div>
                 </div>

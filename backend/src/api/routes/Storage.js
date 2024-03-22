@@ -94,19 +94,13 @@ router.get("/media/:mediaId", async (req, res) =>
 		return res.status(400).json({ code: "GM103", error: "Invalid mediaID" });
 	}
 
-	const bucketName = "B1";
+	const bucketName = (req.query?.team === true) ? "B2" : "B1";
 
 	const response = await ociOjectStorage.getData(bucketName, mediaId);
 
 	if (response.code && response.code !== 200)
 	{
 		return res.status(404).json({ code: "GM105", message: "Data not found" });
-	}
-
-	if (response.opcMeta["opc-meta-userid"] !== user.uid && response.opcMeta["opc-meta-user"] !== user.uid)
-	{
-
-		return res.status(403).json({ code: "GM104", message: "Validation Failed", data: response.data });
 	}
 
 	if (!response.eTag)

@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 import { useTTS } from "../../../app/utils/tts/TTSContext";
 import "../../../app/utils/i18n"
 import { useTranslation } from 'next-i18next';
-
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 const ContentMapBackground = () => (
 	<svg width="597" height="519" viewBox="0 0 597 519" fill="none" xmlns="http://www.w3.org/2000/svg">
 <line x1="196.083" y1="462.442" x2="105.083" y2="397.061" stroke="#30475E" stroke-width="10"/>
@@ -62,7 +62,7 @@ const ContentMapOverlay = ({ setOpenModal, switchToDocument }) =>
 
 		try
 		{
-			const res = await axios.post(`https://collabrain-backend.cybertech13.eu.org/api/maps`, {
+			const res = await axios.post(`${SERVERLOCATION}/api/maps`, {
 				name: "New Content Map",
 				data: ""
 			}, {
@@ -97,7 +97,8 @@ const ContentMapOverlay = ({ setOpenModal, switchToDocument }) =>
 	return (
 		<>
 			<div className="w-screen h-screen flex items-center justify-center">
-				<div className="w-2/4 h-3/5 shadow-lg bg-basicallylight rounded-md ">
+				{/* <div className="w-2/4 h-3/5 shadow-lg bg-basicallylight rounded-md "> */}
+				<div className="w-full h-10/12 max-xs:h-2/3 sm:h-2/3 sm:w-2/3 shadow-lg bg-basicallylight rounded-md ">
 					<div className="bg-[url('/assets/images/bgDesign.png')] w-full h-full bg-contain bg-no-repeat bg-left">
 						<div className="flex justify-end">
 							<button className=' bg-transparent border-none text-25 cursor-pointer pr-2 pt-2' onClick={setOpenModal}>
@@ -138,7 +139,7 @@ const DocumentOverlay = ({ setOpenModal, switchToContent }) =>
 	return (
 		<>
 			<div className="w-screen h-screen flex items-center justify-center">
-				<div className="w-2/4 h-3/5 shadow-lg bg-basicallylight rounded-md ">
+				<div className="w-full h-10/12 max-xs:h-1/4 sm:h-2/3 sm:w-2/3 shadow-lg bg-basicallylight rounded-md ">
 					<div className="flex justify-end">
 						<button className=' bg-transparent border-none text-25 cursor-pointer pr-2 pt-2' onClick={setOpenModal}>
 							<CloseIcon fontSize="large" />

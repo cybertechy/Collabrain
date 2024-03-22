@@ -15,6 +15,7 @@ import {useRouter} from 'next/navigation';
 import "../../../app/utils/i18n"
 import { useTranslation } from 'next-i18next';
 import { useTTS } from "../../../app/utils/tts/TTSContext";
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
 const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, handleProjectDeleted}) => {
     const { t } = useTranslation('dashboard_folder');
@@ -67,7 +68,7 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, h
         try {
             const token = await fb.getToken();
             const response = await axios.patch(
-                `https://collabrain-backend.cybertech13.eu.org/api/dashboard/folder/${folder.id}`,
+                `${SERVERLOCATION}/api/dashboard/folder/${folder.id}`,
                 {
                     name: newFolderName,
                 },
@@ -102,7 +103,7 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, h
             try {
                 const token = await fb.getToken();
                 const response = await axios.delete(
-                    `https://collabrain-backend.cybertech13.eu.org/api/dashboard/folder/${folder.id}`,
+                    `${SERVERLOCATION}/api/dashboard/folder/${folder.id}`,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`,
@@ -128,7 +129,7 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, h
         try {
           const token = await fb.getToken(); // Assuming you have a function to get the user's token
           const response = await axios.patch(
-            `https://collabrain-backend.cybertech13.eu.org/api/dashboard/moveFile/${projectId}`, // Adjust the endpoint URL
+            `${SERVERLOCATION}/api/dashboard/moveFile/${projectId}`, // Adjust the endpoint URL
             {
               to: folderPath, // Specify the folder path you want to move the file to
               fileType: type, // Specify the file type ('contentMap' or 'document')
@@ -194,7 +195,8 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, h
             onDrop={(e) => handleDrop(e, folder.path)}>
                 <FolderIcon sx={{ color: folder?.color }} fontSize="large" />
 
-                <span className='mx-5 w-24 text-lg font-semibold mr-10'>{truncateTitle(title)}</span>
+                {/* <span className='mx-5 w-24 text-lg font-semibold mr-10'>{truncateTitle(title)}</span> */}
+                <span className='ml-5 w-24 text-lg font-semibold sm:mr-10'>{truncateTitle(title)}</span>                
                 <IconButton onClick={handleClick} color="inherit"
                 onMouseEnter={() => isTTSEnabled && speak("Folder options")}
                 onMouseLeave={stop}>

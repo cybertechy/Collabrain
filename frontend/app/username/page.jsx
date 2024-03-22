@@ -9,6 +9,9 @@ import { useTranslation } from 'next-i18next';
 import { useTTS } from "../utils/tts/TTSContext";
 const fb = require("_firebase/firebase");
 import { hasUsername } from "../utils/user";
+
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
+
 const UsernameSetting = () => {
   const { t } = useTranslation('username');
   const { speak, stop, isTTSEnabled } = useTTS();
@@ -71,7 +74,7 @@ const checkUsernameAvailability = async (enteredUsername) => {
     setError('');
 
     try {
-        const response = await axios.get(`http://localhost:8080/api/users/username/${enteredUsername}`);
+        const response = await axios.get(`${SERVERLOCATION}/api/users/username/${enteredUsername}`);
         if (response.status === 200) {
             setError(t('usr_available'));
             setUsername(enteredUsername);
@@ -124,7 +127,7 @@ const checkUsernameAvailability = async (enteredUsername) => {
         if (user) {
             token = await fb.getToken();
         }
-        const response = await axios.patch('http://localhost:8080/api/users/', { username: username }, {
+        const response = await axios.patch(`${SERVERLOCATION}/api/users/`, { username: username }, {
             headers: {
                 authorization: `Bearer ${token}`
             }
@@ -151,7 +154,7 @@ const checkUsernameAvailability = async (enteredUsername) => {
 
   return (
     <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center z-50 bg-basicallylight bg-opacity-20 backdrop-blur-sm">
-      <div className="w-1/4 bg-basicallylight rounded-md shadow-lg">
+      <div className="w-11/12 sm:w-1/2 md:w-1/2 lg:w-1/3 bg-basicallylight rounded-md shadow-lg">
         <div className="p-8">
           <h2 className="text-2xl font-bold mb-4 text-basicallydark">{t('usr_top')}</h2>
           <p className="mb-4 text-gray-600">{t('usr_msg')}</p>

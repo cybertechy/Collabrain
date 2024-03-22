@@ -70,7 +70,6 @@ router.post("/", async (req, res) =>
 	// Team data
 	let data = {
 		name: req.body.name,
-		// teamImageID: (teamImage && MIMEtype) ? ImageID : null,
 		teamImageID: (imageID) ? imageID : null,
 		owner: uid,
 		members: {
@@ -80,6 +79,7 @@ router.post("/", async (req, res) =>
 		},
 		visibility: req.body.visibility,
 		score: 0,
+		size: 1,
 	};
 
 	// Create team
@@ -241,6 +241,23 @@ router.get("/", async (req, res) =>
 	res.setHeader('Content-Type', 'application/json');
 	res.setHeader('Cache-Control', 's-max-age=1, stale-while-revalidate');
 
+	// If a sort query is present, return all teams instead of user's teams
+	// Use pagination to limit the number of teams returned by the page query
+	if (req.query.sort == "score" || req.query.sort == "size")
+	{
+		let limit = 100;
+		let results = fb.db.collection("teams").orderBy(req.query.sort, "desc").offset((req.query.page) ? req.query.page * limit : 0).limit(limit).where("visibility", "==", "public");
+		results.get()
+			.then(snapshot =>
+			{
+				let teams = [];
+				snapshot.forEach(doc => teams.push(doc.data()));
+				return res.status(200).json(teams);
+			})
+			.catch(err => { return res.status(500).json({ error: err }); });
+		return;
+	}
+
 	// Get user's teams
 	fb.db.doc(`users/${user.uid}`).get()
 		.then(doc => { return res.status(200).json(doc.data().teams); })
@@ -381,7 +398,8 @@ router.post("/:team/users", async (req, res) =>
 		fb.db.doc(`teams/${req.params.team}`).update({
 			[`members.${user.uid}`]: {
 				role: "member"
-			}
+			},
+			size: fb.admin.firestore.FieldValue.increment(1)
 		});
 
 		// Add team to user's teams list
@@ -430,7 +448,8 @@ router.delete("/:team/users", async (req, res) =>
 	try
 	{
 		fb.db.doc(`teams/${req.params.team}`).update({
-			[`members.${user.uid}`]: fb.admin.firestore.FieldValue.delete()
+			[`members.${user.uid}`]: fb.admin.firestore.FieldValue.delete(),
+			size: fb.admin.firestore.FieldValue.increment(-1)
 		});
 
 		// Remove team from user's teams list

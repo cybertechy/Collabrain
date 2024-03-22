@@ -9,34 +9,44 @@ import { useTTS } from "../../../app/utils/tts/TTSContext";
 import "../../../app/utils/i18n"
 import { useTranslation } from 'next-i18next';
 
-const DMSidebar = ({ userData, onMute, onDeafen, onSettings, chatList, openChat }) => {
+const DMSidebar = ({ userData, onMute, onDeafen, onSettings, chatList, openChat, showChat, setShowFriends, showFriends, openFriends }) => {
     const { speak, stop, isTTSEnabled } = useTTS();
     const { t } = useTranslation('dms');
-
-    console.log(userData)
+    console.log("UserData informtion", userData)
     return (
-        <div className="flex flex-col h-full bg-white shadow-md z-20">
+        <div className={`flex flex-col h-full ${showFriends ? 'max-sm:hidden' : `${showChat ? 'max-sm:hidden' : 'max-sm:w-full'}`}  bg-white shadow-md z-20`}>
             {/* Chat Header */}
             <div className = "flex flex-col justify-between h-full">
-            <div >
-            <div className="flex items-center justify-center p-4 shadow-md bg-gray-100">
-                <h2 className="text-xl text-center font-semibold"
+            <div id= "chats" >
+            {/* <div className="flex items-center justify-center p-4 shadow-md bg-gray-100"> */}
+            <div className="flex flex-col items-center justify-center p-4 shadow-md bg-gray-100">
+                <h2 className="text-xl text-center font-semibold"                
                 onMouseEnter={() => isTTSEnabled && speak("Chats Sidebar")}
                 onMouseLeave={stop}>{t('chats')}</h2>
-                
+                <button 
+                className='hidden max-sm:block ml-auto'
+                onClick={() => {
+        // Toggles the display between ChatWindow and FriendsWindow
+                    openFriends;
+                    setShowFriends(true); // Toggle showChat state
+                    console.log("showFriends",showFriends);
+                }}>Friends</button>
             </div>
             
             {/* Chat List */}
             <List className="overflow-auto flex flex-col">
 
                 {chatList?.map((chat, index) => (
-                   
+                   console.log("chat member",chat.members[1]),
                     <UserDMTile // Corrected usage
                         key={index}
                         message={chat.lastMessage.message}
                         avatar={chat.avatar}
                         openChat={openChat}
-                        username={chat.members[1].username}
+                        username={ userData.data && userData.data.alias && userData.data.alias[chat.members[1].id]
+                            ? `${userData.data.alias[chat.members[1].id]}`
+                            :  chat.members[1].username}
+                        actualUsername = {chat.members[1].username}
                         data={chat}
                         chatID={chat.id}
                     />

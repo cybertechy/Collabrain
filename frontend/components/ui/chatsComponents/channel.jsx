@@ -34,7 +34,6 @@ const Channel = ({ channelName, onChannelSelect }) => {
 
     return (
         <StyledListItem
-            button
             isSelected={isSelected}
             onClick={() => onChannelSelect(channelName)}
         >

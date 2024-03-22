@@ -12,6 +12,7 @@
     import { hasUsername } from "../utils/user";
     import "../utils/i18n"
     import { useTranslation } from 'react-i18next';
+    const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
     export default function Register() {
         const router = useRouter();
         const [backgroundLoaded, setBackgroundLoaded] = useState(false);
@@ -53,7 +54,7 @@
         useEffect(() =>
         {
             if (user){
-                sock_cli = socket.init('https://collabrain-backend.cybertech13.eu.org');
+                sock_cli = socket.init(SERVERLOCATION) || {};
             console.log(sock_cli)
             }
         }, [user]);

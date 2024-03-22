@@ -6,45 +6,58 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CustomAvatar from "@/components/ui/messagesComponents/avatar";
 import MessageItem from "./MessageItem";
 
-export default function ChatWindow({ messages, setMessages, sendPersonalMsg, withUserInfo, switchToFriends ,onReact, onReply, replyTo }) {
+export default function ChatWindow({ messages, setMessages, sendPersonalMsg, withUserInfo,withUserId,userInfo, switchToFriends ,onReact, onReply, replyTo , onEdit, onDelete,chatId }) {
   const [title, setTitle] = useState(withUserInfo?.username || 'User');
+  const [avatar,setAvatar] = useState(withUserInfo?.username || 'User');
   const messagesEndRef = useRef(null); // Create a ref for the scrolling target
 
-
   useEffect(() => {
-    if (withUserInfo) {
-      setTitle(withUserInfo?.data?.username || 'User');
+    if (withUserInfo && userInfo && userInfo.data) {
+      console.log("asdas",userInfo);
+      setTitle(userInfo?.data?.aliases[withUserId] ? userInfo?.data?.aliases[withUserId]: withUserInfo?.data?.username || 'User');
+      setAvatar(withUserInfo?.data?.username || 'User');
     }
-  }, [withUserInfo]);
+  }, [withUserInfo, userInfo]);
 
   useEffect(() => {
     // Scroll to the bottom whenever the messages change
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  console.log("MESSAGES ARE ", messages);
-
+ 
+// console.log("Messages in Chat window", messages);
   return (
-    <div className="flex flex-col flex-grow h-full relative">
-      <div className="flex-none">
+    <div className="flex flex-col flex-grow relative">
+      <div className="flex items-center justify-between bg-gray-100 w-full mb-3 h-min">
         <Toolbar sx={{ backgroundColor: 'whitesmoke' }}>
           <IconButton onClick={switchToFriends}>
             <ArrowBackIcon />
           </IconButton>
-          <CustomAvatar username={title} />
+          <CustomAvatar username={avatar} />
           <span className="ml-2">{title}</span>
         </Toolbar>
       </div>
-      <div className="flex-auto overflow-y-scroll p-5 mb-[76px]  max-h-[calc(100vh-160px)] sm:max-h-[calc(100vh-180px)] md:max-h-[calc(100vh-200px)] lg:max-h-[calc(100vh-220px)] xl:max-h-[calc(100vh-240px)]">
+      
+      {/* <div className="flex-auto overflow-y-scroll p-5 mb-[76px]  max-h-[calc(100vh-160px)] sm:max-h-[calc(100vh-180px)] md:max-h-[calc(100vh-200px)] lg:max-h-[calc(100vh-220px)] xl:max-h-[calc(100vh-240px)]">
        <div className="mt-10"></div>
-        {messages?.map((message, index) => (
-          <MessageItem key={index} {...message.props} onReact = {onReact} onReply ={onReply}  messageId = {index}/>
+        {messages?.map((message) => (
+          <MessageItem key={message?.key} {...message?.props} title = {title} onReact = {onReact} onReply ={onReply} onEdit = {onEdit} onDelete = {onDelete}   userInfo={userInfo} chatId = {chatId}
+          />
         ))}
-        <div ref={messagesEndRef} /> {/* Invisible element at the end of messages */}
+        <div ref={messagesEndRef} /> {/* Invisible element at the end of messages 
       </div>
-      <div className="absolute bottom-0 left-0 right-0 p-3  bg-white" style={{ paddingLeft: '2rem', paddingRight: '2rem' }}>
+      {/* <div className="absolute bottom-0 left-0 right-0 p-3  bg-white" style={{ paddingLeft: '2rem', paddingRight: '2rem' }}> 
+      <div className="absolute bottom-0 left-0 right-0 p-3  bg-white" style={{ paddingRight: '2rem' }}>
         <MessageBox onSendMessage={sendPersonalMsg} replyTo = {replyTo} onReply = {onReply}/>
+      </div> */}
+      <div className="flex flex-col h-full">
+      <div className="p-5 w-full scrollbar-thin scrollbar-thumb-primary text-basicallydark h-[60%] overflow-y-scroll message-container">
+        {messages}
       </div>
+      <div className="z-10 inset-x-0 flex items-center justify-center text-basicallylight">
+        <MessageBox callback={sendPersonalMsg} />
+      </div>
+    </div>
     </div>
   );
 }

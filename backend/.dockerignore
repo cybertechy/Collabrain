@@ -1,2 +1,3 @@
 .kube
 yarn.lock
+node_modules

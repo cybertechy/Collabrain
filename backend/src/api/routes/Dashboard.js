@@ -21,11 +21,13 @@ router.post("/folder", async (req, res) => {
 	if (folder)
 		return res.status(400).json({ error: "Folder already exists" });
 
+	//if path contains spaces remove it
+	req.body.path = req.body.path.replace(/\s/g, "");
 
 	// Create new folder
 	fb.db.collection(`users/${user.uid}/folders/`).add({
 		name: req.body.name,
-		path: req.body.path + req.body.name,
+		path: req.body.path,
 		color: req.body.color,
 	})
 		.then(ref => res.status(200).json({ message: "Folder created", folderID: ref.id, path: req.body.path + req.body.name }))

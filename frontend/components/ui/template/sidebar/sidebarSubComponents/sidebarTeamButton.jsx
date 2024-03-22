@@ -1,12 +1,33 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Tooltip } from '@mui/material';
 import Link from 'next/link';
 import { useTTS } from "../../../../../app/utils/tts/TTSContext";
+import {getMedia} from '@/app/utils/storage'
 
 const TeamSidebarItem = ({ team, isSelected , isExpanded = true }) => {
+
     const { speak, stop, isTTSEnabled } = useTTS();
-    const { name, imageUrl , channels} = team;
+    const { name, teamImageID , channels} = team;
+    console.log("SIDEBAR TEAM",team);
+    const [teamImage, setTeamImage] = useState(null);
+    useEffect(() => {  
+        const fetchAttachments = async () => {
+            console.log("fetchAttachments");
+          
+            const imageData = await getMedia(teamImageID);
+            if (imageData) {
+              setTeamImage(imageData); // Directly use imageData, as getMedia returns response.data
+            } else {
+              console.error("Failed to fetch attachment or no data returned");
+            }
+          };
+          
+        if(teamImageID){
+          fetchAttachments();
+        }
+    }
+    , [teamImageID]);
     const itemClasses = isSelected ? "text-primary" : "text-unselected";
     const defaultImage = '/assets/images/imagenotFound.jpg';
     const selectedBorder = isSelected ? "border-primary border-2 border-solid" : "group-hover:border-primary group-hover:border-2";
@@ -28,7 +49,7 @@ const TeamSidebarItem = ({ team, isSelected , isExpanded = true }) => {
             onMouseEnter={handleHover}
             onMouseLeave={handleLeave}> 
                 <img
-                    src={defaultImage}
+                    src={teamImage?teamImage:defaultImage}
                     alt={name}
                     className={`w-14 h-14 rounded-lg mr-2  ${selectedBorder} transition-all duration-200 ease-in-out`}
                     />
@@ -51,7 +72,7 @@ const TeamSidebarItem = ({ team, isSelected , isExpanded = true }) => {
 TeamSidebarItem.propTypes = {
     team: PropTypes.shape({
         name: PropTypes.string.isRequired,
-        imageUrl: PropTypes.string,
+        teamImageID: PropTypes.string,
     }).isRequired,
     isSelected: PropTypes.bool,
     isExpanded: PropTypes.bool,

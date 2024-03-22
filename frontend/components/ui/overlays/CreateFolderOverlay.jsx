@@ -41,7 +41,8 @@ const CreateFolderOverlay = ( {isOpen, onClose, onFolderCreated}) => {
 
     return (
         <div className={`fixed top-0 left-0 w-full h-full flex items-center justify-center ${isOpen ? 'block' : 'hidden'} z-50 bg-basicallydark bg-opacity-50 backdrop-blur-sm`}>
-            <div className="w-1/4 bg-basicallylight rounded-md shadow-lg">
+            {/* <div className="w-1/4 bg-basicallylight rounded-md shadow-lg"> */}
+            <div className="w-3/4 sm:w-3/4 md:w-1/2 bg-basicallylight rounded-md shadow-lg">
                 <div className="p-8">
                     <h2 className="text-2xl font-bold mb-4 text-basicallydark"
                     onMouseEnter={() => isTTSEnabled && speak("Create a New Folder")}

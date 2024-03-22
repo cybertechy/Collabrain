@@ -6,6 +6,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import "../../../app/utils/i18n"
 import { useTranslation } from 'next-i18next';
 import { useTTS } from "../../../app/utils/tts/TTSContext";
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 const UsernameOverlay = ({ onClose, hasUserUsername, setHasUserUsername }) =>
 {
 	const { t } = useTranslation('username');
@@ -29,7 +30,7 @@ const UsernameOverlay = ({ onClose, hasUserUsername, setHasUserUsername }) =>
 
 		try
 		{
-			const response = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/users/username/${enteredUsername}`);
+			const response = await axios.get(`${SERVERLOCATION}/api/users/username/${enteredUsername}`);
 			if (response.status === 200)
 			{
 				setError("Username is available");
@@ -81,7 +82,7 @@ const UsernameOverlay = ({ onClose, hasUserUsername, setHasUserUsername }) =>
 			if (user) {
 				token = await fb.getToken();
 			}
-			const response = await axios.patch('https://collabrain-backend.cybertech13.eu.org/api/users/', { username: username }, {
+			const response = await axios.patch(`${SERVERLOCATION}/api/users/`, { username: username }, {
 				headers: {
 					authorization: `Bearer ${token}`
 				}

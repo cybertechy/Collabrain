@@ -15,8 +15,12 @@ import { useEffect, useState } from 'react';
 import { hasUsername } from "./utils/user";
 import "./utils/i18n"
 import { useTranslation } from 'next-i18next';
+import axios from 'axios';
+import Link from 'next/link';
+
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 export default function Home() {
-    const [user, loading]  = fb.useAuthState();
+    const [user, loading] = fb.useAuthState();
     const router = useRouter();
     const [backgroundLoaded, setBackgroundLoaded] = useState(false);
     const [email, setemail] = useState("");
@@ -39,25 +43,25 @@ export default function Home() {
     }, []);
 
 
-            useEffect(() => {
-            const checkUserUsername = async () => {
-                if (user) {
-                    const userHasUsername = await hasUsername();
-                    if (userHasUsername) {
-                        console.log("User has username", userHasUsername);
-                        router.push("/dashboard"); // Redirect to dashboard if user has username
-                    } else {
-                        console.log("userHasUsername is ",userHasUsername);
-                        console.log("User does not have a username");
-                        router.push("/username"); // Redirect to username page if user does not have username
-                        // setUsernameChecked(true); // Set state to indicate username check is completed
-                        // Now you can render a message or enable registration for username
-                    }
+    useEffect(() => {
+        const checkUserUsername = async () => {
+            if (user) {
+                const userHasUsername = await hasUsername();
+                if (userHasUsername) {
+                    console.log("User has username", userHasUsername);
+                    router.push("/dashboard"); // Redirect to dashboard if user has username
+                } else {
+                    console.log("userHasUsername is ", userHasUsername);
+                    console.log("User does not have a username");
+                    router.push("/username"); // Redirect to username page if user does not have username
+                    // setUsernameChecked(true); // Set state to indicate username check is completed
+                    // Now you can render a message or enable registration for username
                 }
-            };
-        
-            checkUserUsername();
-        }, [user]);
+            }
+        };
+
+        checkUserUsername();
+    }, [user]);
     if (!backgroundLoaded) {
         return (
             <div className="flex items-center justify-center min-h-screen">
@@ -65,26 +69,48 @@ export default function Home() {
             </div>
         );
     }
-    
+
     const handleFormSubmit = async (e) => {
         e.preventDefault();
-    
+
         // Create a custom event object that mimics the structure of a real event
         const customEvent = {
-            preventDefault: () => {}, //dummy function for preventDefault
+            preventDefault: () => { }, //dummy function for preventDefault
             target: {
                 elements: {
                     email: { value: email },
                     password: { value: password },
-                    
-                    
+
+
                 }
             }
         };
-       await fb.emailSignIn(customEvent);
-       
-        
-    };
+        let res = await fb.emailSignIn(customEvent);
+        if (res?.error) {
+            toast.error(res.error,{
+                theme: "colored",
+                position: "top-center",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+            });
+            return;
+        }
+ 
+        // Check if user is enrolled in 2FA and redirect to OTP verification page
+        const token = await fb.getToken();
+        const twoFAStatus = await axios.get(SERVERLOCATION+'/api/2FA/status', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (twoFAStatus.data.twoFA) {
+          router.push('/2fa'); // Redirect to OTP verification page
+          
+        }
+      };
+
+    
     return (
         <div className="max-sm:min-w-full md:w-3/4 lg:w-1/2 mx-auto max-w-md">
             <ToastContainer />
@@ -97,35 +123,33 @@ export default function Home() {
                     <h1 className="text-2xl text-primary font-sans font-bold mb-2">
                         {t('login_top')}
                     </h1>
-            <p className = "whitespace-normal break-words text-xs font-sans text-center font-thin">
-            {t('login_desc')}
+                    <p className="whitespace-normal break-words text-xs font-sans text-center font-thin">
+                    {t('login_desc')}
 
-            </p>
-                   
+                    </p>
+
 
                     <br />
                     <form
-                       onSubmit={handleFormSubmit}
+                        onSubmit={handleFormSubmit}
                         style={{ textAlign: "center" }}
                     >
                         <EmailInput email={email} setEmail={setemail} placeholder={t('email')}/>
                         <br />
-                        <PasswordInput placeholder= {t('password')} password={password} setPassword={setpassword} />
-                     
-                        
+                        <PasswordInput placeholder= "Password" password={password} setPassword={setpassword} />
                         <p className="text-sm text-primary font-sans font-light text-left mt-2">
-                            <a href="">{t('forgot_password')}</a>
+                            <Link href="/forgotPassword">{t('forgot_password')}</Link>
                         </p>
                         <Button
                             text={t('login_button')}
                             color="primary"
-                            type = "submit"
+                            type="submit"
                         />
-                      <div className="line-with-text">
-  <span className="linesep"></span>
-  <span className="textsep font-bold">{t('or')}</span>
-  <span className="linesep"></span>
-</div>
+                        <div className="line-with-text">
+                            <span className="linesep"></span>
+                            <span className="textsep font-bold">{t('or')}</span>
+                            <span className="linesep"></span>
+                        </div>
                     </form>
 
                     <span className="items-center justify-center flex flex-row">
@@ -141,7 +165,7 @@ export default function Home() {
                         >
                             <MicrosoftIcon className="h-8 w-8"></MicrosoftIcon>
                         </button>
-                      
+
                     </span>
                     <p className="text-xs text-primary font-sans font-light text-left ml-2">
                         {t('make_acc_q')}

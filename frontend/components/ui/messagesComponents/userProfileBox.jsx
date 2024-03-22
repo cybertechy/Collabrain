@@ -15,7 +15,7 @@ const userProfileBox = ({ userData, onMute, onDeafen, onSettings }) => {
     const [displayName, setDisplayName] = useState("User");
     const [avatarName, setAvatarName] = useState("User");
     useEffect(() => {
-        console.log("USER DATA IN PROFILE BOX",userData)
+      
        userData?.data?.username ? setDisplayName(userData.data?.username) : setDisplayName("User");
          userData?.data?.fname ? setAvatarName(`${userData.data?.fname} ${userData.data?.lname}`) : setAvatarName("User");
     }, [userData]);
@@ -39,29 +39,21 @@ const userProfileBox = ({ userData, onMute, onDeafen, onSettings }) => {
         stop();
     };
 
+    const formatDisplayName = (name) => {
+        if (name.length > 14) {
+            return name.substring(0, 11) + '...';
+        }
+        return name;
+    };
+
     return (
-        <div className="bg-primary w-full text-white p-4 flex flex-col h-full items-center shadow-xl rounded-t-lg">
-            <div className="flex items-center flex-row mt-2 space-x-2">
+        <div className="bg-primary w-64 text-white p-4 flex flex-col h-full items-center shadow-xl rounded-t-lg">
+            <div className="flex items-center flex-row mt-2 space-x-2 ">
                 <CustomAvatar username={displayName} />
                 <span className="font-semibold"
-                onMouseEnter={handleHover} onMouseLeave={handleLeave}>{displayName}</span>
+                onMouseEnter={handleHover} onMouseLeave={handleLeave}>{formatDisplayName(displayName)}</span>
             </div>
-            <div className="flex mt-4 space-x-2">
-                <IconButton onClick={handleMute} className="hover:bg-primary-dark rounded-full">
-                    {isMuted ? <MicOffIcon className="text-white" onMouseEnter={() => isTTSEnabled && speak("Microphone currently muted. Click to unmute.")}
-                onMouseLeave={stop} /> : <MicIcon className="text-white" onMouseEnter={() => isTTSEnabled && speak("Microphone currently unmuted. Click to mute.")}
-                onMouseLeave={stop} />}
-                </IconButton>
-                <IconButton onClick={handleDeafen} className="hover:bg-primary-dark rounded-full">
-                    {isDeafened ? <VolumeOffIcon className="text-white" onMouseEnter={() => isTTSEnabled && speak("Sound currently turned off. Click tp turn on")}
-                onMouseLeave={stop} /> : <VolumeUpIcon className="text-white" onMouseEnter={() => isTTSEnabled && speak("Sound currently turned on. Click to turn off")}
-                onMouseLeave={stop}/>}
-                </IconButton>
-                <IconButton onClick={onSettings} className="hover:bg-primary-dark rounded-full">
-                    <SettingsIcon className="text-white" onMouseEnter={() => isTTSEnabled && speak("Settings")}
-                onMouseLeave={stop} />
-                </IconButton>
-            </div>
+ 
         </div>
     );
 };

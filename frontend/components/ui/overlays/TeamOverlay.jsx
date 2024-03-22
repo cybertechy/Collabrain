@@ -8,6 +8,7 @@ import { useTTS } from "../../../app/utils/tts/TTSContext";
 import "../../../app/utils/i18n"
 import { useTranslation } from 'next-i18next';
 
+const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 const TeamOverlay = ({ toggleModal, modalVisible }) => {
   
   // const [modalVisible, setModalVisible] = useState(true); // Set to false initially
@@ -50,7 +51,8 @@ const CreateJoinTeamScreen = ({ switchToCreateTeam, switchToJoinTeam , toggleMod
   const { speak, stop, isTTSEnabled } = useTTS();
   return (
       <div className='w-screen h-screen flex items-center justify-center'>
-        <div className='w-2/4 h-3/5 shadow-lg bg-basicallylight rounded-md flex flex-col'> {/* Make sure this is a flex container with column direction */}
+        {/* <div className='w-2/4 h-3/5 shadow-lg bg-basicallylight rounded-md flex flex-col'> Make sure this is a flex container with column direction */}
+        <div className='w-full h-4/5 xs:h-3/5 xs:w-3/4 shadow-lg bg-basicallylight rounded-md flex flex-col md:w-3/5 lg:w-2/3 2xl:w-1/3'>
           <div className="flex justify-end">
           <button
   className='bg-transparent border-none text-25 cursor-pointer pr-2 mt-4 mr-4 text-basicallydark pt-2'
@@ -97,48 +99,46 @@ const CreateTeamOverlay = ({ switchToHome , toggleModal}) => {
   const { t } = useTranslation('create_team');
   const { speak, stop, isTTSEnabled } = useTTS();
   const [image, setImage] = useState(null);
+  const [imageType, setImageType] = useState('');
   const [teamName, setTeamName] = useState('');
-  const handleUpload = async (file) => {
-   
-};
+  const [visibility, setVisibility] = useState('public'); // Default to 'public'
 
-const handleCreateTeam = async () => {
+  const handleUpload = async (file,  fileType) => {
+    
+      setImage(file); // reader.result contains the base64 string
+      setImageType(fileType)
+  };
+
+  const handleCreateTeam = async () => {
     try {
-        // Check if a team name is provided
         if (!teamName.trim()) {
             throw new Error('Team name cannot be empty');
         }
 
-        // Call the function to create a team with the provided team name and image URL
-        // const imageUrl = await handleUpload(image); // Get the image URL from the image upload
-
-        // Define your team data with the team name and image URL
+        // Prepare the data for the request
         const teamData = {
-            name: teamName, // Use the team name entered by the user
-            // image: imageUrl, // Image URL received from image upload
-            visibility: 'public', // Replace with the actual visibility
+            name: teamName,
+            image: image, // This now includes the base64 image string
+            MIMEtype: imageType,
+            visibility: visibility, // Adjust as needed
         };
 
         const token = await fb.getToken();
-        // Make a POST request to create the team
-        const response = await axios.post('https://collabrain-backend.cybertech13.eu.org/api/teams', teamData, {
+        const response = await axios.post(`${SERVERLOCATION}/api/teams`, teamData, {
             headers: {
-                Authorization: `Bearer ${token}`, // Replace with the actual auth token
+                Authorization: `Bearer ${token}`,
             },
         });
 
-        // Check if the team creation was successful
         if (response.status === 200) {
             const teamId = response.data.teamID;
-            // Handle team creation success (e.g., navigate to the team page)
             console.log('Team created with ID:', teamId);
-            toggleModal();
+            toggleModal(); // Assuming this closes the overlay
         } else {
             throw new Error('Team creation failed');
         }
     } catch (error) {
         console.error('Error during team creation:', error);
-        // You can handle errors and provide user feedback here
     }
 };
   return (
@@ -162,6 +162,25 @@ const handleCreateTeam = async () => {
             onMouseLeave={stop}>{t('team_name')}</label>
             <input id="team-name" className="bg-gray-200 w-full h-16 px-4 mb-4" type='text' placeholder={t('enter_name')} onChange={(e) => setTeamName(e.target.value)}
             onMouseEnter={() => isTTSEnabled && speak("Type team name here")} onMouseLeave={stop}/> {/* Increased height */}
+            <div className="flex items-center justify-start mb-4">
+  <label htmlFor="visibility-toggle" className="flex items-center cursor-pointer">
+    <div className="relative">
+      {/* Hidden checkbox input to toggle state */}
+      <input type="checkbox" id="visibility-toggle" className="sr-only" 
+             checked={visibility === 'private'} 
+             onChange={() => setVisibility(visibility === 'public' ? 'private' : 'public')} />
+      {/* Line behind the switch */}
+      <div className="block bg-gray-600 w-14 h-8 rounded-full"></div>
+      {/* Dot on the switch */}
+      <div className={`dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition-transform transform ${visibility === 'private' ? 'translate-x-full' : 'translate-x-0'}`}></div>
+    </div>
+    {/* Label text */}
+    <div className="ml-3 text-gray-700 font-medium">
+      {visibility === 'public' ? 'Public Team' : 'Private Team'}
+    </div>
+  </label>
+</div>
+
           </div>
           <p className="text-xs font-light mb-8 text-basicallydark text-poppins" onMouseEnter={() => isTTSEnabled && speak("By creating a team, you agree to Collabrain's Community Guidelines")}
             onMouseLeave={stop}>{t('guidelines1')} <b>{t('guidelines2')}</b></p> {/* Adjusted margin */}

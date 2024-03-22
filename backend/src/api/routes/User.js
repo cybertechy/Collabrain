@@ -61,12 +61,8 @@ router.get("/search", async (req, res) => {
 			users.push({id:doc.id,...doc.data()}); 
 		});
 		return res.status(200).json(users);
-	  })
-	  .catch((err) => {
-		return res.status(500).json({ error: err });
-	  });
-  });
-  
+	}).catch(err => { return res.status(500).json({ error: err }); });
+})
 
 // Get user from ID
 router.get("/:user", async (req, res) => {

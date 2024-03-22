@@ -2,9 +2,8 @@ import { ListItem, ListItemAvatar, ListItemText, Typography } from '@mui/materia
 import CustomAvatar from './avatar';
 import { useTTS } from "../../../app/utils/tts/TTSContext";
 
-const userDMTile = ({ message, avatar, openChat, username, data, chatID }) => {
+const userDMTile = ({ message, avatar, openChat, username, data, chatID , actualUsername}) => {
     const { speak, stop, isTTSEnabled } = useTTS();
-    console.log(data);
     const formattedDate = data.lastMessage?.sentAt? new Date(data.lastMessage.sentAt._seconds * 1000 + data.lastMessage.sentAt._nanoseconds / 1000000).toLocaleDateString() : ""; 
 
     const handleUsernameHover = () => {
@@ -34,7 +33,7 @@ const userDMTile = ({ message, avatar, openChat, username, data, chatID }) => {
     return (
         <ListItem onClick={() => openChat(data.members[1].id,chatID)} className="border-b border-gray-200">
             <ListItemAvatar>
-                <CustomAvatar username={username} />
+                <CustomAvatar username={actualUsername} />
             </ListItemAvatar>
             <ListItemText 
                 primary={
