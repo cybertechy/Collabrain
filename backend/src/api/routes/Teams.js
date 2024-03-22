@@ -259,9 +259,22 @@ router.get("/", async (req, res) =>
 	}
 
 	// Get user's teams
-	fb.db.doc(`users/${user.uid}`).get()
-		.then(doc => { return res.status(200).json(doc.data().teams); })
-		.catch(err => { return res.status(500).json({ error: err }); });
+	let userRef = await fb.db.doc(`users/${user.uid}`).get()
+	let teams = userRef?.data()?.teams;
+
+	if(!teams) return res.status(200).json([]);
+
+	if(req.query.names) {
+		let teamData = [];
+		for (let i = 0; i < teams.length; i++) {
+			let team = await fb.db.doc(`teams/${teams[i]}`).get();
+			teamData.push(team.data().name);
+		}
+		return res.status(200).json(teamData);
+	}
+
+	return res.status(200).json(teams);
+		
 });
 
 /************************************************************/
