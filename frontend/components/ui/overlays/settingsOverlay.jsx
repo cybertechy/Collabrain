@@ -44,7 +44,7 @@ const Dropdown = ({ buttonLabel, dropdownItems, onSelect }) => {
             <button
                 id="dropdownDefaultButton"
                 onClick={toggleDropdown}
-                className="text-center text-xl sm:text-sm md:text-base lg:text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight sm:px-8 md:px-12 lg:px-16 xl:px-20 py-3 rounded"
+                className="text-center text-sm md:text-base lg:text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 rounded"
                 type="button"
             >
                 {buttonLabel}{" "}
@@ -79,7 +79,7 @@ const Dropdown = ({ buttonLabel, dropdownItems, onSelect }) => {
                                 <button
                                     href={item.link}
                                     onClick={() => handleItemClick(item.label)}
-                                    className="block text-center px-20 py-3 text-xl hover:bg-primary hover:text-basicallylight dark:hover:bg-primary dark:hover:text-basicallylight text-primary w-full "
+                                    className="block text-center px-20 py-3 text-lg md:text-base lg:text-xl items-center hover:bg-primary hover:text-basicallylight dark:hover:bg-primary dark:hover:text-basicallylight text-primary w-full "
                                 >
                                     {item.label}
                                 </button>
@@ -123,7 +123,7 @@ const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
   
  
         return (
-            <div className=" h-full w-1/4 bg-basicallylight shadow-md rounded-bl-xl rounded-tl-xl z-50">
+            <div className=" h-full w-1/3 sm:w-1/3 md:w-1/3 bg-basicallylight shadow-md rounded-bl-xl rounded-tl-xl z-50">
              <div className="p-4">
           <h2 className="text-2xl font-bold">Settings</h2>
           <ul className="mt-4">
@@ -214,7 +214,7 @@ const OverlaySidebar = ({ currentScreen, setCurrentScreen }) => {
     return (
         
       <div className="flex flex-row fixed top-0 left-0 w-full h-full items-center justify-center z-50 text-basicallydark bg-basicallylight bg-opacity-20 backdrop-blur-sm">
-        <div className="bg-basicallylight w-3/6 h-5/6 bg-opacity-100 flex flex-row  shadow-lg rounded-xl border-2 border-gray-300">
+        <div className="bg-basicallylight w-full sm:w-4/6 md:w-1/2 lg:w-1/2 h-full sm:h-4/6 bg-opacity-100 flex flex-row  shadow-lg rounded-xl border-2 border-gray-300 overflow-hidden">
         <OverlaySidebar
           currentScreen={currentScreen}
           setCurrentScreen={setCurrentScreen}
@@ -353,12 +353,12 @@ const router = useRouter();
 
     return (
         <>
-        <div className="w-full h-5/6 flex ">
+        <div className="w-full h-full flex pb-10">
             <div className=" bg-basicallylight p-5 rounded-md flex overflow-y-auto scrollbar-thin scrollbar-thumb-primary ">
                 <div className="w-full h-full">
 
-                    <div className="w-11/12 h-96  bg-basicallylight rounded-md">
-                        <div className="flex flex-col justify-start h-full">
+                    {/* <div className="w-11/12 h-96 bg-basicallylight rounded-md">
+                        <div className="flex flex-col justify-start h-full"> */}
                             
 
                             <div className="w-11/12 h-11/12 bg-basicallylight rounded-md justify-center">
@@ -373,7 +373,9 @@ const router = useRouter();
                                         <p className="mb-2 text-xl  text-basicallydark ">
                                             Password and Authentication
                                         </p>
-                                        <button className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 ">
+                                        <button 
+                                        // className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 ">
+                                        className="justify-center w-fit font-semibold inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3">
                                             Change Password
                                         </button>
                                     </div>
@@ -386,26 +388,26 @@ const router = useRouter();
                                             an extra layer of security.
                                         </p>
                                         <div className="flex space-x-5">
-                                        <button onClick={handleEnable2FA} className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 ">
+                                        <button onClick={handleEnable2FA} className="justify-center w-fit font-semibold inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3">
                                              Enable</button>
-                                        <button onClick={handleDisable2FA} className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3">
+                                        <button onClick={handleDisable2FA} className="justify-center w-fit font-semibold inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3">
                                             Disable</button>
                                             </div>
 
                                     </div>
                                 </div>
-                                <div className="  w-11/12 h-48  bg-basicallylight rounded-md">
+                                <div className="  w-full h-48  bg-basicallylight rounded-md">
                                     <div className="mb-6 ">
-                                        <p className="mb-2 text-xl text-basicallydark   ">
+                                        <p className="mb-2 text-xl text-basicallydark">
                                             Account Removal
                                         </p>
-                                        <p className="mb-2 text-basicallydark  ">
+                                        <p className="mb-2 text-basicallydark">
                                             Disabling your account means you can
                                             recover it at any time after taking
                                             this action
                                         </p>
                                         <div className="flex space-x-5">
-                                        <button className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 " onClick={handleClickOpen}>
+                                        <button className="justify-center w-fit font-semibold inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3" onClick={handleClickOpen}>
                 Delete
             </button>
             {/* Dialog for confirmation */}
@@ -426,13 +428,13 @@ const router = useRouter();
                     </Button>
                 </DialogActions>
             </Dialog>
-                                            <button  onClick  = {fb.signOut} className="text-center inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 ">
+                                            <button  onClick  = {fb.signOut} className="justify-center w-fit font-semibold inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3">
                                                 Sign Out
                                             </button>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
+                                {/* </div> */}
+                            {/* </div> */}
                         </div>
                     </div>
                 </div>
@@ -482,13 +484,14 @@ const GeneralOverlay = () => {
   
     return (
       <>
-        <div className="w-full h-5/6 flex justify-center items-start">
-          <div className="bg-basicallylight  rounded-md flex w-full p-5 overflow-y-auto scrollbar-thin scrollbar-thumb-primary">
-            <div className="flex flex-col w-full">
-              <p className="mb-2 text-2xl text-left text-basicallydark md:text-lg sm:text-sm lg:text-2xl">
+      <div className="h-full flex flex-col pb-10">
+            <div className=" bg-basicallylight p-5 rounded-md flex overflow-y-auto scrollbar-thin scrollbar-thumb-primary ">
+                    <div className="bg-basicallylight rounded-md justify-center">
+                            <div className="mb-4">
+              <p className="mb-2 text-lg text-basicallydark lg:text-xl">
                 Change Appearance
               </p>
-              <div className="flex flex-wrap sm:flex-nowrap space-y-2 sm:space-x-5 sm:space-y-0 mb-4">
+              <div className="flex flex-nowrap space-x-5 sm:space-y-0 mb-4">
               {appearanceOptions.map((option, index) => (
                 option.darkMode ? (
                 // Render button for dark mode
@@ -522,21 +525,23 @@ const GeneralOverlay = () => {
              
             </div>
               <div className="mb-4">
-                <p className="mb-2 text-2xl text-left text-basicallydark md:text-lg sm:text-sm lg:text-2xl">
+                <p className="mb-2 text-lg text-basicallydark lg:text-xl">
                   Language
                 </p>
                 <Dropdown
+                className="w-full"
                   buttonLabel={selectedLangLabel}
                   dropdownItems={dropdownItems4}
                   onSelect={handleLangSelect}
                 />
               </div>
               <div className="mb-4">
-                <p className="text-2xl pb-2 text-left text-basicallydark md:text-lg sm:text-sm lg:text-2xl">
+                <p className="text-lg pb-2 text-left text-basicallydark md:text-lg sm:text-sm lg:text-xl">
                   Bad behavior strikes
                 </p>
                 <div className="flex flex-row justify-start items-center">
                   <BadBehaviorStrikes strikes={badBehaviorStrikes} onChange={handleStrikeChange} />
+                </div>
                 </div>
               </div>
             </div>
@@ -574,7 +579,7 @@ const SoundOverlay = () => {
             <div className="bg-basicallylight rounded-md flex h-full w-full p-5 overflow-y-auto scrollbar-thin scrollbar-thumb-primary">
                 <div className="flex flex-col w-full">
                     <div className="mb-4">
-                        <p className="text-2xl text-left text-basicallydark mb-2">
+                        <p className="mb-2 text-lg text-basicallydark lg:text-xl">
                             Speaker Device
                         </p>
                         <Dropdown
@@ -584,7 +589,7 @@ const SoundOverlay = () => {
                         />
                     </div>
                     <div className="mb-4">
-                        <p className="text-2xl text-left text-basicallydark mb-2">
+                        <p className="mb-2 text-lg text-basicallydark lg:text-xl">
                             Microphone
                         </p>
                         <Dropdown
@@ -658,36 +663,39 @@ const PrivacyOverlay = (user) => {
     };
     
     return (
-        <div className="w-full h-5/6 flex justify-center items-start">
-            <div className="bg-basicallylight rounded-md flex w-full p-5 overflow-y-auto scrollbar-thin scrollbar-thumb-primary">
-                <div className="flex flex-col w-full space-y-5">
-                    <div className="mb-4 flex justify-between">
-                        <p className="text-2xl text-basicallydark">
+        <div className="h-full flex flex-col pb-10">
+            <div className=" bg-basicallylight p-5 rounded-md flex overflow-y-auto scrollbar-thin scrollbar-thumb-primary ">
+                    <div className="bg-basicallylight rounded-md justify-center">
+                            <div className="mb-4 flex justify-between items-center space-x-10">
+                        <p className="mb-2 text-lg text-basicallydark lg:text-xl">
                             Do not disturb
                         </p>
+                        <div className="flex">
                         <ToggleButtonExample
+                        // className= "flex"
                             isToggled={isDndToggled}
                             handleToggle={handleDndToggle}
                         />
+                        </div>
                     </div>
-                    <div className="mb-4 flex justify-between">
-                        <p className="text-2xl text-basicallydark">
+                    <div className="mb-4 flex flex-col justify-between">
+                        <p className="mb-2 text-lg text-left text-basicallydark lg:text-xl">
                             Export my data
                         </p>
                         <button 
-                            className="text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3"
+                            className="w-fit text-lg inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3"
                             onClick={handleExportData}
                         >
                            &nbsp;&nbsp;Export&nbsp;
                         </button>
                     </div>
                     
-                    <div className="mb-4 flex justify-between">
-                        <p className="text-2xl text-basicallydark">
+                    <div className="mb-4 flex flex-col justify-between">
+                        <p className="mb-2 text-lg text-left text-basicallydark lg:text-xl">
                             Delete my data
                         </p>
                         <button 
-                            className="text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-9 py-3"
+                            className="w-fit text-lg inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-9 py-3 mb-4"
                             onClick={handleDeleteData}
                         >
                             Delete
@@ -723,12 +731,15 @@ const NotificationsOverlay = () => {
     ];
 
     return (
-        <div className="w-full h-5/6 flex justify-center items-start">
-            <div className="w-full h-full p-5  bg-basicallylight flex overflow-auto">
-                {/* RIGHT SIDE */}
-                <div className="  w-full h-full space-y-5">
+        // <div className="w-full h-5/6 flex justify-center items-start">
+        //     <div className="w-full h-full p-5  bg-basicallylight flex overflow-auto">
+        //         {/* RIGHT SIDE */}
+        //         <div className="  w-full h-full space-y-5">
+        <div className="h-full flex flex-col pb-10">
+            <div className=" bg-basicallylight p-5 rounded-md flex overflow-y-auto scrollbar-thin scrollbar-thumb-primary ">
+                    <div className="bg-basicallylight rounded-md justify-center">
                     <div className="mb-4">
-                        <p className="mb-2 text-2xl text-basicallydark">
+                        <p className="mb-2 text-lg text-left text-basicallydark md:text-lg sm:text-md lg:text-xl">
                             Receive Notifications from
                         </p>
                         <Dropdown
@@ -738,7 +749,7 @@ const NotificationsOverlay = () => {
                         />
                     </div>
                     <div className="mb-4 flex justify-between">
-                        <p className="text-2xl text-basicallydark">
+                        <p className="mb-2 text-lg text-left text-basicallydark md:text-lg sm:text-md lg:text-xl">
                             Notification Sound
                         </p>
                         <ToggleButtonExample
@@ -746,12 +757,12 @@ const NotificationsOverlay = () => {
                             handleToggle={handleNotiSoundToggle}
                         />
                     </div>
-                    <div className="mb-4 flex justify-between">
-                        <p className="text-2xl text-basicallydark">
+                    <div className="mb-4 flex flex-col justify-between">
+                        <p className="mb-2 text-lg text-left text-basicallydark md:text-lg sm:text-md lg:text-xl">
                             Choose Notification Sound
                         </p>
                         <button 
-                            className="text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3"
+                            className="w-fit text-lg inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 mb-5"
                             onClick={handleConfigureNotificationSound}
                         >
                             Configure
@@ -779,38 +790,37 @@ const AccessibilityOverlay = () => {
     };
 
     return (
-        <div className="w-full h-5/6 flex justify-center items-start">
-        <div className="w-full h-full p-5  bg-basicallylight flex overflow-auto">
-           {/* RIGHT SIDE */}
-                <div className="  w-full overflow-auto ">
-                    <div className="mb-4 flex justify-between">
-                        <p className="text-2xl text-basicallydark">
+        <div className="h-full flex flex-col pb-10">
+        <div className=" bg-basicallylight p-5 rounded-md flex overflow-y-auto scrollbar-thin scrollbar-thumb-primary ">
+                <div className="bg-basicallylight rounded-md justify-center">
+                    <div className="mb-4 flex flex-col justify-between">
+                        <p className="text-lg text-basicallydark">
                             Text-to-speech (TTS)
                         </p>
                         <button 
-                            className="text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3"
+                            className="w-fit text-lg inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-2"
                             onClick={handleConfigureTTS}
                         >
                             Configure
                         </button>
                     </div>
-                    <div className="mb-4 flex justify-between">
-                        <p className="text-2xl text-basicallydark">
+                    <div className="mb-4 flex flex-col justify-between">
+                        <p className="text-lg text-basicallydark">
                             Font-size
                         </p>
                         <button 
-                            className="text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3"
+                            className="w-fit text-lg inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-2"
                             onClick={handleConfigureFontSize}
                         >
                             Configure
                         </button>
                     </div>
-                    <div className="mb-4 flex justify-between">
-                        <p className="text-2xl text-basicallydark">
+                    <div className="mb-4 flex flex-col justify-between">
+                        <p className="text-lg text-basicallydark">
                             Colorblind Filters
                         </p>
                         <button 
-                            className="text-xl inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3"
+                            className="w-fit text-lg inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-2 mb-4"
                             onClick={handleConfigureColorblindFilters}
                         >
                             Configure
