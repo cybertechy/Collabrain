@@ -5,9 +5,9 @@ import Box from '@mui/material/Box';
 import SearchIcon from '@mui/icons-material/Search';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
-import "../utils/i18n"
+import "@/app/utils/i18n"
 import { useTranslation } from 'next-i18next';
-import { useTTS } from "../utils/tts/TTSContext";
+import { useTTS } from "@/app/utils/tts/TTSContext";
 
 const SearchBar = ({ onSearch }) => {
   const { t } = useTranslation('dms');
