@@ -1,30 +1,122 @@
 "use client";
 import React from "react";
 import { useState, useEffect, useRef } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import axios from "axios";
 const { useAuthState, getToken } = require("_firebase/firebase");
 import { ToastContainer, toast } from "react-toastify";
 import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 import Socket from "_socket/socket";
-
+import { TriangleAlert } from "lucide-react";
 import SearchingJSON from "@/public/assets/json/Searching.json";
 import LoadingJSON from "@/public/assets/json/Loading.json";
 import ErrorJSON from "@/public/assets/json/Error.json";
 import WorkingJSON from "@/public/assets/json/Working.json";
 import dynamic from 'next/dynamic';
-const Lottie = dynamic(() => import('lottie-react'), { ssr: false }); 
+const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
 import FileToolbar from "@/components/ui/FileToolbar/fileToolbar";
+import logo from "@/public/assets/images/logo_whitebackground.png";
+import Image from "next/image";
+import { parseMermaidToExcalidraw } from "@excalidraw/mermaid-to-excalidraw";
 
 const SOCKET_DEBUG = false;
 const POINTER_DEBUG = false;
 
 const Serverlocation = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
+const AIoverlay = ({ OverlayDisplay, updateExcalidraw , ExcalidrawData , UpdateScene}) => {
+
+    const [Prompt, setPrompt] = useState("");
+    const [loadingResult, setloadingResult] = useState(false);
+    const [Error, setError] = useState("");
+
+    const askAI = async () => {
+        if (!Prompt) return;
+        setError("");
+        setloadingResult(true);
+        let res = await axios.get(`${Serverlocation}/api/ai`, {
+            params: {
+                query: Prompt
+            }
+        })
+        if (res.status === 200) {
+            try {
+                console.log(res.data)
+                if(!res.data.mermaid) {
+                    setError("Sorry, we could not convert the topic into a Diagram. Please try again with a different prompt.")
+                    setloadingResult(false);
+                    return;
+                }
+
+                parseMermaidToExcalidraw(res.data.mermaid).then((elements, files) => {
+                    console.log("Parse: ", elements, files);
+                   
+                    if (!elements && !files && !("elements" in elements) && !("files" in files)) {
+                        setError("Sorry, we could not convert the topic into a Diagram. Please try again with a different prompt.")
+                    } else {
+                        elements = elements.elements;
+                        const ExcalidrawElements =  updateExcalidraw(elements);
+                        console.log("Excalidraw elements: ",ExcalidrawElements);
+
+                        // Generate a random id for the Excalidraw elements
+                        let randomId = Math.random().toString(36).substring(7);
+
+                        //Assign a group id to the Excalidraw elements
+                        ExcalidrawElements.forEach((element) => {
+                            element.groupIds = [randomId];
+                        });
+
+                        let current_elements = ExcalidrawData();
+                        UpdateScene({
+                            elements: [...current_elements, ...ExcalidrawElements]
+                        })
+                        OverlayDisplay(false);
+                    }
+                }).catch((err) => {
+                    console.log(err);
+                    setError("Sorry, we could not convert the topic into diagram. Please try again with a different prompt.");
+                });
+            } catch (err) {
+                console.log(err);
+                setError("Sorry, we could not convert the topic into diagram. Please try again with a different prompt.");
+            }
+        } else {
+            setError("Error in fetching the result");
+        }
+        setloadingResult(false);
+    }
+
+    return (
+        <div className="absolute top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center z-20">
+            <div className="bg-white w-[80%] h-[80%] flex flex-col rounded-xl">
+                <div className="w-full h-[10%] bg-primary text-white flex items-center justify-between py-2 px-3" >
+                    <p className="text-xl text-center">Text to Diagram</p>
+                    {/* Close Button */}
+                    <button onClick={() => OverlayDisplay(false)} className="text-white bg-primary px-2 md:px-4 lg:px-6  py-1 rounded-md border">Close</button>
+                </div>
+                <div className="w-full h-[4%] flex flex-row  items-center mt-8">
+                   <p className=" ml-2 lg:ml-6">  <span className="text-red-600 font-semibold">Beta:</span>  Kindly note this is an AI based exprimental feature and may or may not show valid result</p>
+                </div>
+                <div className="w-full h-[85%] flex flex-col items-center gap-3 pt-10">
+                    <p className="text-lg font-semibold text-primary"> Enter the topic </p>
+                    <textarea value={Prompt} onChange={(e) => setPrompt(e.target.value)} rows={3} className="w-[90%] h-[50%] border-2 border-primary rounded-md p-2" />
+                    <button onClick={askAI} className="text-white bg-primary px-2 md:px-4 lg:px-6  py-1 rounded-md border">Convert</button>
+                    {loadingResult && <Lottie animationData={LoadingJSON} style={{ width: 50, height: 50 }} />}
+                    {loadingResult && <p className="text-primary animate-pulse font-semibold">Loading...</p>}
+                    {Error && <p className="text-red-800 font-semibold px-2">{Error}</p>}
+                </div>
+
+            </div>
+        </div>
+    )
+}
+
+
 function page() {
     const [token, setToken] = useState(null);
     const [Excalidraw, setExcalidraw] = useState(null);
+    const [ExcalidrawOtherComponents, setExcalidrawOtherComponents] = useState(null);
     const [ExcalidrawAPI, setExcalidrawAPI] = useState(null);
     const [Collabaration, setCollabaration] = useState(false);
     const [ViewMode, setViewMode] = useState(false);
@@ -39,6 +131,8 @@ function page() {
     const [user, loading] = useAuthState();
     const [OverrideMessage, setOverrideMessage] = useState("");
     const [ConcurrencyStop, setConcurrencyStop] = useState(false);
+    const [AI, setAI] = useState(false);
+
 
     let Guide = {
         showProgress: true,
@@ -58,8 +152,6 @@ function page() {
         ]
     };
 
-
-    const router = useRouter();
     const searchParms = useSearchParams();
     const driverObj = driver(Guide);
     let sockCli = useRef(null);
@@ -69,7 +161,10 @@ function page() {
     useEffect(() => {
         import("@excalidraw/excalidraw").then((comp) => {
             setExcalidraw(comp.Excalidraw)
+            setExcalidrawOtherComponents(comp)
+            console.log(comp)
         });
+
     }, []);
 
     // load excalidraw Data
@@ -281,8 +376,6 @@ function page() {
     }, [IntialData, ExcalidrawAPI, ContentMapName, sockCli.current]);
 
 
-
-
     const getInitialData = async (token) => {
         let id = searchParms.get("id");
         if (!token || !id) return null;
@@ -313,175 +406,6 @@ function page() {
         }
     }
 
-    const NewContentMap = async () => {
-        let token = await getToken();
-        if (!token) return null;
-
-        let backup = IntialData;
-        setIntialData(null);
-        setOverrideMessage("Creating new content map, Please wait ...");
-        setNew(false);
-
-        try {
-            const res = await axios.post(`${Serverlocation}/api/maps`, {
-                name: "New Content Map",
-                data: "",
-                path: "/"
-
-            }, {
-                headers: {
-                    authorization: `Bearer ${token}`,
-                },
-            });
-
-            setNew(false);
-            if (res.status !== 200) return null;
-
-            setid(res.data.id);
-            setIntialData({ name: "New Content Map", data: "", userAccess: "owner" });
-            setContentMapName("New Content Map");
-            setisOwner(true);
-            setOverrideMessage("");
-
-            router.push(`/contentmap?id=${res.data.id}`);
-        }
-        catch (err) {
-            console.log(err);
-            toast.error("Error creating new content map", {
-                position: "bottom-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                theme: "colored"
-            });
-            setIntialData(backup);
-            return null;
-        }
-    }
-
-    const duplicateContentMap = async () => {
-        let token = await getToken();
-        if (!token) return null;
-
-        let appdata = {
-            elements: ExcalidrawAPI.getSceneElements(),
-            appState: ExcalidrawAPI.getAppState(),
-            files: ExcalidrawAPI.getFiles(),
-        }
-
-        setIntialData(null);
-        setOverrideMessage("Creating new content map, Please wait ...");
-        setNew(false);
-
-        try {
-            const res = await axios.post(`${Serverlocation}/api/maps`, {
-                name: ContentMapName + " (copy)",
-                data: appdata,
-                path: "/"
-            }, {
-                headers: {
-                    authorization: `Bearer ${token}`,
-                },
-            });
-
-            setNew(false);
-            if (res.status !== 200) return null;
-
-            setid(res.data.id);
-            setIntialData({ name: ContentMapName + " (copy)", data: JSON.stringify(appdata), userAccess: "owner" });
-            setContentMapName(ContentMapName + " (copy)");
-            setisOwner(true);
-            setOverrideMessage("");
-
-            router.push(`/contentmap?&id=${res.data.id}`);
-
-        }
-        catch (err) {
-            console.log(err);
-            toast.error("Error creating new content map", {
-                position: "bottom-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                theme: "colored"
-            });
-            setIntialData(backup);
-            return null;
-        }
-
-    }
-
-    const DeleteContentMap = async () => {
-        let token = await getToken();
-        if (!token) return null;
-        driverObj.destroy();
-
-        let backup = IntialData;
-        setIntialData(null);
-        setOverrideMessage("Deleting content map, Please wait ...");
-        setDelete(false);
-
-        try {
-            const res = await axios.delete(`${Serverlocation}/api/maps/${id}`, {
-                headers: {
-                    authorization: `Bearer ${token}`,
-                },
-            });
-
-            setDelete(false);
-            if (res.status !== 200) return null;
-
-
-            setid(null);
-            setIntialData(null);
-            setContentMapName("New Content Map");
-            setisOwner(false);
-            setOverrideMessage("");
-            router.push(`/dashboard`);
-        }
-        catch (err) {
-            console.log(err);
-            toast.error("Error deleting content map", {
-                position: "bottom-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                theme: "colored"
-            });
-
-            setIntialData(backup);
-            return null;
-        }
-    }
-
-    const handleInputChange = (e) => {
-        setContentMapName(e.target.value);
-    };
-
-    const handleEditClick = () => {
-        setIsEditing(true);
-    };
-
-    const handleSaveClick = async () => {
-        setisSaved(false);
-
-
-        let token = await getToken();
-        if (!token) return null;
-
-        // make axois put rquest with token in header to update the content map, pass data (appState) in body
-        axios.put(`${Serverlocation}/api/maps/${id}`, { name: ContentMapName }, {
-            headers: {
-                authorization: `Bearer ${token}`,
-            },
-        }).then((res) => {
-            setIsEditing(false);
-            setisSaved(true);
-        })
-    };
 
     const updatecontent = async (data) => {
         try {
@@ -554,30 +478,16 @@ function page() {
         if (res?.status === 200) setisSaved(true);
     }
 
-    const getdata = async (query) => {
-        try {
-            let res = await axios.get(`${Serverlocation}/api/maps/ut/search?${query}`, {
-                headers: {
-                    authorization: `Bearer ${token}`,
-                },
-            })
-
-            return res;
-        } catch (err) {
-            return null;
-        }
-    }
-
     const setpublic = (data) => setIntialData({ ...IntialData, public: data });
 
-    if (loading || !user ) {
-		return (
-				<div className="bg-[#F3F3F3] w-screen h-full flex flex-col justify-center items-center text-basicallydark">
-					<Lottie animationData={LoadingJSON} style={{ width: 300, height: 300 }} />
-					<h1 className="text-2xl font-bold text-primary px-10">Loading...</h1>
-				</div>
-		);
-	}
+    if (loading || !user) {
+        return (
+            <div className="bg-[#F3F3F3] w-screen h-full flex flex-col justify-center items-center text-basicallydark">
+                <Lottie animationData={LoadingJSON} style={{ width: 300, height: 300 }} />
+                <h1 className="text-2xl font-bold text-primary px-10">Loading...</h1>
+            </div>
+        );
+    }
 
     return <div>
         {id && user && IntialData?.Access && <FileToolbar publicData={IntialData?.public} setpublicData={setpublic} isSaved={isSaved} commentsEnabled={false} fileID={id} fileData={{ access: IntialData?.Access }} fileType="map" name={ContentMapName} userID={user.uid}></FileToolbar>}
@@ -592,10 +502,31 @@ function page() {
                     initialData={IntialData?.data ? JSON.parse(IntialData?.data) : null}
                     onPointerUpdate={updatecontentmap}
                     libraryReturnUrl={window.location.origin + window.location.pathname + `?id=${id}&`}
+                    renderTopRightUI={() => {
+                        return (
+                            <button
+                                className="text-white bg-primary px-2 md:px-4 lg:px-6  py-1 rounded-md"
+                                onClick={() => setAI(AI => !AI)}
+                            >
+                                AI
+                            </button>
+                        );
+                    }}
                 >
+                    <ExcalidrawOtherComponents.WelcomeScreen>
+                        <ExcalidrawOtherComponents.WelcomeScreen.Center>
+                            <ExcalidrawOtherComponents.WelcomeScreen.Center.Logo>
+                                <Image src={logo} alt="logo" width={200} height={200} />
+                            </ExcalidrawOtherComponents.WelcomeScreen.Center.Logo>
+                            <ExcalidrawOtherComponents.WelcomeScreen.Center.Heading>
+                                <h1 className="text-2xl font-bold text-primary">Welcome to Collabrain Content Map</h1>
+                            </ExcalidrawOtherComponents.WelcomeScreen.Center.Heading>
+                        </ExcalidrawOtherComponents.WelcomeScreen.Center>
+                    </ExcalidrawOtherComponents.WelcomeScreen>
                 </Excalidraw>
-
                 }
+
+                {AI && <AIoverlay ExcalidrawData={ExcalidrawAPI.getSceneElements} updateExcalidraw={ExcalidrawOtherComponents.convertToExcalidrawElements} OverlayDisplay={setAI} UpdateScene={ExcalidrawAPI.updateScene} />}
                 {!id && <div className="flex items-center flex-col w-screen h-[88%]">
                     <Lottie animationData={SearchingJSON} style={{ width: 300, height: 300 }} />
                     <h1 className="text-2xl font-bold text-primary px-10 text-center"> Searching the cloud, Please wait ...</h1>
