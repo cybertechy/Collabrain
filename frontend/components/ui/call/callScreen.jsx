@@ -17,7 +17,7 @@ export default function CallScreen(props)
 	const [maxGridHeight, setMaxGridHeight] = useState("100%");
 	const gridRef = useRef(null);
 
-	const minimize = () => props.setShowCallScreen(false);
+	const minimize = () => setShowCallScreen(false);
 
 	const addVideoElementsToGrid = () =>
 	{

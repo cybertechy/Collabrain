@@ -10,9 +10,9 @@ const Navbar = () => {
   const [user, loading] = fb.useAuthState();
   
   return (
-    <div className='mx-auto '>
+    <div className='mx-auto  '>
         
-        <div className="container flex flex-col lg:flex-row py-2 justify-between items-center">
+        <div className="container flex flex-col lg:flex-row py-2 justify-between items-center overflow-x-hidden">
             
             <Image src={logo}
             alt="logo" 

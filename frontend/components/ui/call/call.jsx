@@ -181,7 +181,7 @@ export default function Call(props)
 					// Button to show call with mic, video and leave buttons
 					<div className="border border-white text-black bg-white font-bold p-1 rounded">
 						<button className="bg-green-500 hover:bg-green-600 p-2 rounded text-white"
-							onClick={() => props.setShowCallScreen(true)}>
+							onClick={() => setShowCallScreen(true)}>
 							<LaunchIcon />
 						</button>
 						<button className="p-2 rounded"
