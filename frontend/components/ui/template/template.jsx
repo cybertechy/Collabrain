@@ -1,30 +1,16 @@
-
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, use } from "react";
 import Sidebar from "./sidebar/sidebar";
 import Navbar from "./navbar/navbar";
 import dynamic from "next/dynamic";
 const CallScreen = dynamic(() => import("_components/ui/call/callScreen"), { ssr: false });
+import { useVideoCall } from "_components/ui/call/zustand";
 
 const Template = ({ children }) =>
 {
+	const { showCallScreen } = useVideoCall();
 	const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-	const [showCallScreen, setShowCallScreen] = useState(false);
-	const [callVideoStreams, setCallVideoStreams] = useState({});
-	const [micEnabled, setMicEnabled] = useState(true);
-	const [videoEnabled, setVideoEnabled] = useState(true);
-	const [leaveCall, setLeaveCall] = useState(null);
-
-	const toggleVideo = (video) => setVideoEnabled(!videoEnabled);
-
-	const toggleAudio = (video) => setMicEnabled(!micEnabled);
 
 	const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
-
-	useEffect(() =>
-	{
-		console.log("### leaveCall changed ###");
-		console.log(leaveCall);
-	}, [leaveCall]);
 
 	return (
 		<div className="flex flex-col h-screen bg-basicallylight">
@@ -34,16 +20,12 @@ const Template = ({ children }) =>
 				<Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 				<>
 
-					<div className={`flex flex-col flex-grow overflow-hidden  ${isSidebarOpen ? "max-sm:hidden" : ""}`}>
-						<Navbar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} setShowCallScreen={setShowCallScreen}
-							setCallVideoStreams={setCallVideoStreams} callVideoStreams={callVideoStreams} toggleAudio={toggleAudio} toggleVideo={toggleVideo} leaveCall={leaveCall} 
-							micEnabled={micEnabled} videoEnabled={videoEnabled} setLeaveCall={setLeaveCall} />
+					<div className={`flex flex-col flex-grow overflow-hidden  ${isSidebarOpen ? "max-xsm:hidden" : ""}`}>
+						<Navbar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 						{/* <div id="content" className="flex-grow flex flex-col items-center justify-center"> */}
 						{
 							showCallScreen ?
-								<CallScreen setShowCallScreen={setShowCallScreen} callVideoStreams={callVideoStreams}
-									toggleAudio={toggleAudio} toggleVideo={toggleVideo} leaveCall={leaveCall}
-									micEnabled={micEnabled} videoEnabled={videoEnabled} /> :
+								<CallScreen /> :
 								<>{children}</>
 						}
 					</div>
