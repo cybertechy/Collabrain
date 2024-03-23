@@ -47,7 +47,7 @@ const userProfileBox = ({ userData, onMute, onDeafen, onSettings }) => {
     };
 
     return (
-        <div className="bg-primary w-64 text-white p-4 flex flex-col h-full items-center shadow-xl rounded-t-lg">
+        <div className="bg-primary w-full text-white p-4 flex flex-col h-full items-center shadow-xl rounded-t-lg">
             <div className="flex items-center flex-row mt-2 space-x-2 ">
                 <CustomAvatar username={displayName} />
                 <span className="font-semibold"
