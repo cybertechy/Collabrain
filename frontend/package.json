@@ -56,7 +56,8 @@
     "simple-peer": "^9.11.1",
     "socket.io-client": "^4.7.3",
     "tailwind-scrollbar": "^3.0.5",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "zustand": "^4.5.2"
   },
   "devDependencies": {
     "@svgr/webpack": "^8.1.0",

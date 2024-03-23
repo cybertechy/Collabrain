@@ -5,9 +5,14 @@ import CallEndIcon from "@mui/icons-material/CallEndRounded";
 import MicOffIcon from '@mui/icons-material/MicOff';
 import VideocamOffIcon from '@mui/icons-material/VideocamOff';
 import CloseFullscreenIcon from '@mui/icons-material/CloseFullscreen';
+import { useVideoCall } from "./zustand";
 
 export default function CallScreen(props)
 {
+	const { callVideoStreams, myPeer, micEnabled, videoEnabled, showCallScreen,
+		setMyPeer, setShowCallScreen, setCallVideoStreams, addCallVideoStream, removeCallVideoStream,
+		toggleAudio, toggleVideo, room, setRoom, leaveCallFunc, stream, setStream,
+		inCall, setInCall, sockCli, setSockCli } = useVideoCall();
 	const [gridCols, setGridCols] = useState(1);
 	const [maxGridHeight, setMaxGridHeight] = useState("100%");
 	const gridRef = useRef(null);
@@ -16,9 +21,9 @@ export default function CallScreen(props)
 
 	const addVideoElementsToGrid = () =>
 	{
-		if (!props.callVideoStreams || !gridRef.current) return;
+		if (!callVideoStreams || !gridRef.current) return;
 
-		for (const [id, stream] of Object.entries(props.callVideoStreams))
+		for (const [id, stream] of Object.entries(callVideoStreams))
 		{
 			const video = document.createElement('video');
 			video.srcObject = stream;
@@ -34,20 +39,8 @@ export default function CallScreen(props)
 
 	useEffect(() =>
 	{
-		if (!props.callVideoStreams)
+		if (!callVideoStreams)
 			return;
-
-		console.log("stream: ", props.callVideoStreams);
-
-		// console.log("### video streams changed ###");
-
-		// for (const [id, stream] of Object.entries(props.callVideoStreams))
-		// {
-		// 	stream.playsInline = true;
-		// 	stream.play();
-		// 	if (gridRef.current)
-		// 		gridRef.current.appendChild(stream);
-		// }
 
 		addVideoElementsToGrid();
 		console.log("numVids: ", gridRef.current.childElementCount); // Log here
@@ -71,7 +64,7 @@ export default function CallScreen(props)
 			if (gridRef.current)
 				gridRef.current.innerHTML = '';
 		};
-	}, [props.callVideoStreams]);
+	}, [callVideoStreams]);
 
 	return (
 		<div className="relative w-full h-full bg-[#202124] p-4 gap-4">
@@ -93,25 +86,25 @@ export default function CallScreen(props)
 			{/* Toolbar */}
 			<div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex justify-center space-x-8 bg-white p-2 rounded-2xl shadow-2xl">
 				<button className={`bg-gray-800 rounded-full p-2 hover:bg-gray-700 transition duration-300`}
-					onClick={props.toggleAudio}>
+					onClick={toggleAudio}>
 					{
-						props.micEnabled ?
+						micEnabled ?
 							<MicIcon style={{ fontSize: 28, color: "white" }} /> :
 							<MicOffIcon style={{ fontSize: 28, color: "red" }} />
 					}
 				</button>
 
 				<button className={`bg-gray-800 rounded-full p-2 hover:bg-gray-700 transition duration-300`}
-					onClick={props.toggleVideo}>
+					onClick={toggleVideo}>
 					{
-						props.videoEnabled ?
+						videoEnabled ?
 							<VideocamIcon style={{ fontSize: 28, color: "white" }} /> :
 							<VideocamOffIcon style={{ fontSize: 28, color: "red" }} />
 					}
 				</button>
 
 				<button className="bg-red-500 rounded-full p-2 hover:bg-red-600 transition duration-300"
-					onClick={() => props.leaveCall()}>
+					onClick={() => leaveCallFunc()}>
 					<CallEndIcon style={{ fontSize: 28, color: "white" }} />
 				</button>
 			</div>

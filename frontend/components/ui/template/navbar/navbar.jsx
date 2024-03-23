@@ -13,8 +13,7 @@ import SettingsOverlay from '../../overlays/settingsOverlay';
 import dynamic from 'next/dynamic';
 const CallButton = dynamic(() => import("_components/ui/call/call"), { ssr: false });
 
-const Navbar = ({ isOpen, toggleSidebar, setShowCallScreen, setCallVideoStreams, callVideoStreams, 
-				  toggleAudio, toggleVideo, leaveCall, micEnabled, videoEnabled, setLeaveCall }) =>
+const Navbar = ({ isOpen, toggleSidebar }) =>
 {
 	const [showLeaderboard, setShowLeaderboard] = useState(false);
 	const leaderboardRef = useRef(null);
@@ -67,9 +66,7 @@ const Navbar = ({ isOpen, toggleSidebar, setShowCallScreen, setCallVideoStreams,
 	{
 		return (
 			<>
-				<CallButton setShowCallScreen={setShowCallScreen} setCallVideoStreams={setCallVideoStreams} callVideoStreams={callVideoStreams}
-							toggleAudio={toggleAudio} toggleVideo={toggleVideo} leaveCall={leaveCall} micEnabled={micEnabled} videoEnabled={videoEnabled} 
-							setLeaveCall={setLeaveCall} />
+				<CallButton />
 				<Tooltip
 					title={"Leaderboard"}
 					enterDelay={1000}
