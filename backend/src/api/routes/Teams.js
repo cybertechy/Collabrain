@@ -254,6 +254,7 @@ router.get("/", async (req, res) =>
 /* Endpoint for sending team invite */
 router.post("/:team/invite/:user", async (req, res) =>
 {
+	
 	// Make sure all required fields are present
 	if (!req.headers.authorization)
 		return res.status(400).json({ error: "Missing required data" });
@@ -275,11 +276,11 @@ router.post("/:team/invite/:user", async (req, res) =>
 
 	// Send invite
 	fb.db.doc(`users/${req.params.user}`).update({
-		invites: fb.admin.firestore.FieldValue.arrayUnion({
-			team: req.params.team
-		})
-			.catch(err => { return res.status(500).json({ error: err }); })
-	});
+		teamInvites: fb.admin.firestore.FieldValue.arrayUnion(
+		req.params.team
+		)
+			
+	}).catch(err => { return res.status(500).json({ error: err }); })
 });
 
 /* Endpoint for getting user's invites */
@@ -298,7 +299,7 @@ router.get("/:team/invite", async (req, res) =>
 	fb.db.doc(`users/${user.uid}`).get()
 		.then(doc =>
 		{
-			return res.status(200).json(doc.data().invites);
+			return res.status(200).json(doc.data().teamInvites);
 		})
 		.catch(err => { return res.status(500).json({ error: err }); });
 });
@@ -322,9 +323,9 @@ router.delete("/:team/invite/:user", async (req, res) =>
 
 	// Cancel invite
 	fb.db.doc(`users/${req.params.user}`).update({
-		invites: fb.admin.firestore.FieldValue.arrayRemove({
-			team: req.params.team
-		})
+		teamInvites: fb.admin.firestore.FieldValue.arrayRemove(
+		req.params.team
+		)
 	})
 		.catch(err => { return res.status(500).json({ error: err }); });
 
@@ -345,9 +346,9 @@ router.delete("/:team/invite", async (req, res) =>
 
 	// Decline invite
 	fb.db.doc(`users/${user.uid}`).update({
-		invites: fb.admin.firestore.FieldValue.arrayRemove({
-			team: req.params.team
-		})
+		teamInvites: fb.admin.firestore.FieldValue.arrayRemove(
+		req.params.team
+		)
 	})
 		.then(() => { return res.status(200).json({ message: "Invite declined" }); })
 		.catch(err => { return res.status(500).json({ error: err }); });

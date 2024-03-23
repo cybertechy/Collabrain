@@ -22,8 +22,8 @@ const commonReactions = [
   { emoji: '😢', label: 'sad' },
 ];
 
-function MessageItem({ sender, senderId, title,timestamp, message, messageId, attachmentIds, reactions = {}, onReact, onEdit, onDelete, userInfo, chatId }) {
-  const [attachments, setAttachments] = useState([]);
+function MessageItem({ sender, senderId, title,timestamp, message, messageId, attachmentIds, reactions = {}, onReact, onEdit, onDelete, userInfo, chatId , source, teamId}) {
+   const [attachments, setAttachments] = useState([]);
   const [loadingAttachments, setLoadingAttachments] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
@@ -46,11 +46,15 @@ function MessageItem({ sender, senderId, title,timestamp, message, messageId, at
   };
   const handleReport = async () => {
     // Assuming you have the necessary information like chatId or teamId
-    const reportDetails = {
-      chatId: chatId, // You need to pass the correct chatId or teamId based on your app's context
+    const isTeamMessage = source === "team";
+  
+  const reportDetails = {
+    // Use either chatId or teamId based on the source
+    chatId: isTeamMessage ? undefined : chatId,
+    teamId: isTeamMessage ? chatId : undefined, // If it's a team message, chatId will act as teamId
       messageId: messageId,
       reason: reportReason + additionalComments? `: ${additionalComments}` : "",
-      source: "user", // or "team", depending on your context
+      source: source, // or "team", depending on your context
       sender: senderId,
       message: editedMessage,
       image: attachmentIds.length > 0 ? attachmentIds : null,
@@ -148,8 +152,8 @@ function MessageItem({ sender, senderId, title,timestamp, message, messageId, at
         <CustomAvatar username={sender} />
         <div className="flex flex-col">
           <div className="flex items-baseline gap-2">
-            <span className="font-semibold">{sender == userInfo.data.username? sender:title}</span>
-            <span className="text-xs text-gray-500">{timestamp}</span>
+            <span className="font-semibold">{sender == userInfo.data.username? sender:sender =="System"? "System":title}</span>
+            <span className="text-xs text-gray-500">{timestamp == "Invalid Date"? "":timestamp}</span>
           </div>
           <Linkify componentDecorator={(decoratedHref, decoratedText, key) => (
             <CustomLink href={decoratedHref} key={key}>{decoratedText}</CustomLink>

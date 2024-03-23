@@ -8,8 +8,8 @@ import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import DeleteIcon from '@mui/icons-material/Delete';
-
-const TeamChannelOptionsMenu = ({ teamName, onOptionSelect, isOwner }) => {
+import InfoIcon from '@mui/icons-material/Info';
+const TeamChannelOptionsMenu = ({ teamName, onOptionSelect, isOwner, isAdmin }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
 
@@ -55,33 +55,45 @@ const TeamChannelOptionsMenu = ({ teamName, onOptionSelect, isOwner }) => {
                     horizontal: 'center',
                 }}
             >
-                <MenuItem onClick={() => handleClose('invite')}>
-                    <ListItemIcon>
-                        <GroupAddIcon style={{ color: '#30475E' }} />
-                    </ListItemIcon>
-                   <span className='text-primary'>Invite People</span> 
-                </MenuItem>
-                <MenuItem onClick={() => handleClose('settings')}>
-                    <ListItemIcon>
-                        <SettingsIcon style={{ color: '#30475E' }} />
-                    </ListItemIcon>
-                    <span className='text-primary'>Team Settings</span>  
-                </MenuItem>
-                {isOwner ? (
+                {(isOwner || isAdmin) && (
+                    <MenuItem onClick={() => handleClose('invite')}>
+                        <ListItemIcon>
+                            <GroupAddIcon style={{ color: '#30475E' }} />
+                        </ListItemIcon>
+                        <span className='text-primary'>Invite People</span>
+                    </MenuItem>
+                )}
+                {(isOwner || isAdmin) && (
+                    <MenuItem onClick={() => handleClose('settings')}>
+                        <ListItemIcon>
+                            <SettingsIcon style={{ color: '#30475E' }} />
+                        </ListItemIcon>
+                        <span className='text-primary'>Team Settings</span>
+                    </MenuItem>
+                )}
+                {isOwner && (
                     <MenuItem onClick={() => handleClose('delete')}>
                         <ListItemIcon>
                             <DeleteIcon style={{ color: '#30475E' }} />
                         </ListItemIcon>
-                        <span className='text-primary'>Delete Team</span> 
+                        <span className='text-primary'>Delete Team</span>
                     </MenuItem>
-                ) :  <MenuItem onClick={() => handleClose('leave')}>
-                <ListItemIcon>
-                    <ExitToAppIcon style={{ color: '#30475E' }} />
-                </ListItemIcon>
-                <span className='text-primary'>Leave Team</span> 
-            </MenuItem>}
-               
-                {/* You can add more options with icons here as needed */}
+                )}
+                {!isOwner && (
+                    <MenuItem onClick={() => handleClose('leave')}>
+                        <ListItemIcon>
+                            <ExitToAppIcon style={{ color: '#30475E' }} />
+                        </ListItemIcon>
+                        <span className='text-primary'>Leave Team</span>
+                    </MenuItem>
+                )}
+                {/* View Team Details - Available for all roles */}
+                <MenuItem onClick={() => handleClose('viewDetails')}>
+                    <ListItemIcon>
+                        <InfoIcon style={{ color: '#30475E' }} />
+                    </ListItemIcon>
+                    <span className='text-primary'>View Team Details</span>
+                </MenuItem>
             </Menu>
         </div>
     );

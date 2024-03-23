@@ -38,7 +38,7 @@ export default function ChatWindow({ messages, setMessages, sendPersonalMsg, wit
         </Toolbar>
       </div>
       <div className="flex-auto overflow-y-scroll p-5 mb-[76px]  max-h-[calc(100vh-160px)] sm:max-h-[calc(100vh-180px)] md:max-h-[calc(100vh-200px)] lg:max-h-[calc(100vh-220px)] xl:max-h-[calc(100vh-240px)]">
-       <div className="mt-10"></div>
+       <div className="mt-6"></div>
         {messages?.map((message) => (
           <MessageItem key={message?.key} {...message?.props} title = {title} onReact = {onReact} onReply ={onReply} onEdit = {onEdit} onDelete = {onDelete}   userInfo={userInfo} chatId = {chatId}
           />

@@ -106,6 +106,7 @@ export default function Messages() {
                     replyTo={data.replyTo}
                     userInfo={userInfo}
                     chatId={chatId}
+                    source = {"user"}
                 />,
             ]);
         });
@@ -149,6 +150,8 @@ export default function Messages() {
                                         : messageComponent.props.attachmentIds
                                 }
                                 userInfo={messageComponent.props.userInfo}
+                                chatId={messageComponent.props.chatId}
+                                source = {"user"}
                             />
                         );
                     }
@@ -472,6 +475,7 @@ export default function Messages() {
                 messageId={msgId}
                 userInfo={userInfo}
                 chatId={chatId}
+                source = {"user"}
             />,
         ]);
 
