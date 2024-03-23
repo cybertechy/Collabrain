@@ -53,7 +53,8 @@ function MessageItem({ sender, senderId, title,timestamp, message, messageId, at
     chatId: isTeamMessage ? undefined : chatId,
     teamId: isTeamMessage ? chatId : undefined, // If it's a team message, chatId will act as teamId
       messageId: messageId,
-      reason: reportReason + additionalComments? `: ${additionalComments}` : "",
+      policy: reportReason,
+      reason: additionalComments? `: ${additionalComments}` : "",
       source: source, // or "team", depending on your context
       sender: senderId,
       message: editedMessage,
@@ -259,28 +260,35 @@ function MessageItem({ sender, senderId, title,timestamp, message, messageId, at
       className="w-full mt-2 border-gray-300 rounded-md shadow-sm"
       value={reportReason}
       onChange={(e) => setReportReason(e.target.value)}
+      required // Ensures that the select must have a value
     >
-      <option value="">Select a reason</option>
+      <option value="" disabled>Select a policy</option> {/* Disabled placeholder option */}
       <option value="spam">Spam</option>
-      <option value="abuse">Abuse</option>
-      <option value="other">Other</option>
+      <option value="graphic-violence">Graphic Violence</option>
+      <option value="privacy-violation">Privacy Violation</option> {/* Corrected value */}
+      <option value="hate-speech">Hate Speech</option>
     </select>
-    {reportReason === 'other' && (
-      <textarea
-        className="w-full mt-2 border-gray-300 rounded-md shadow-sm"
-        placeholder="Please provide additional comments"
-        value={additionalComments}
-        onChange={(e) => setAdditionalComments(e.target.value)}
-      ></textarea>
-    )}
+   
+    <textarea
+      className="w-full mt-2 border-gray-300 rounded-md shadow-sm"
+      placeholder="Please provide additional comments"
+      value={additionalComments}
+      onChange={(e) => setAdditionalComments(e.target.value)}
+      required // Makes input required
+    ></textarea>
   </DialogContent>
   <DialogActions>
     <Button onClick={() => setShowReportDialog(false)}>Cancel</Button>
-    <Button onClick={() => handleReport()} color="primary">
+    <Button 
+      onClick={() => handleReport()} 
+      color="primary"
+      disabled={!reportReason || !additionalComments} // Button is disabled if either field is empty
+    >
       Report
     </Button>
   </DialogActions>
 </Dialog>
+
 
           <Dialog open={showDeleteConfirm} onClose={() => setShowDeleteConfirm(false)}>
             <DialogTitle>{"Delete Message?"}</DialogTitle>
