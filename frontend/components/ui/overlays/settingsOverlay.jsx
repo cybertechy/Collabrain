@@ -533,9 +533,9 @@ const router = useRouter();
 const GeneralOverlay = () => {
     const { t } = useTranslation('general_overlay');
     const { speak, stop, isTTSEnabled, toggleTTS } = useTTS();
-    const [selectedLangLabel, setSelectedLangLabel] = useState(t('lang_menu'));
     const [selectedAppearance, setSelectedAppearance] = useState(null);
     const [badBehaviorStrikes, setBadBehaviorStrikes] = useState(3);
+    const router = useRouter();
   
     useEffect(() => {
         // Check if dark mode is enabled on component mount
@@ -543,9 +543,9 @@ const GeneralOverlay = () => {
         setSelectedAppearance(isDarkMode ? 0 : 1);
       }, []);
     
-      const handleLangSelect = (label) => {
-        setSelectedLangLabel(label);
-      };
+      const handleLanguageChange = (lang) => {
+        window.location.assign(`/dashboard?lng=${lang}`);
+    };
     
       const handleAppearanceSelect = (index) => {
         setSelectedAppearance(index);
@@ -565,11 +565,6 @@ const GeneralOverlay = () => {
         { label: "Dark Background", colorClass: "bg-basicallydark", darkMode: true },
         { label: "Default Background", colorClass: "bg-basicallylight", darkMode: false },
       ];
-  
-    const dropdownItems4 = [
-      { label: t('english_us'), link: "/option1" },
-      { label: t('russian'), link: "/option2" },
-    ];
   
     return (
       <>
@@ -625,12 +620,20 @@ const GeneralOverlay = () => {
                 onMouseLeave={stop}>
                   {t('lang')}
                 </p>
-                <Dropdown
-                className="w-full"
-                  buttonLabel={selectedLangLabel}
-                  dropdownItems={dropdownItems4}
-                  onSelect={handleLangSelect}
-                />
+                <div className="flex space-x-2">
+                    <button className="text-primary hover:bg-primary hover:text-basicallylight px-4 py-2 rounded"
+                        onClick={() => handleLanguageChange('en')}
+                        onMouseEnter={() => isTTSEnabled && speak("English")}
+                        onMouseLeave={stop}>
+                        English
+                    </button>
+                    <button className="text-primary hover:bg-primary hover:text-basicallylight px-4 py-2 rounded"
+                        onClick={() => handleLanguageChange('ru')}
+                        onMouseEnter={() => isTTSEnabled && speak("Russian")}
+                        onMouseLeave={stop}>
+                        Русский
+                    </button>
+                </div>
               </div>
               <div className="mb-4">
                 <p className="text-lg pb-2 text-left text-basicallydark md:text-lg sm:text-sm lg:text-xl"

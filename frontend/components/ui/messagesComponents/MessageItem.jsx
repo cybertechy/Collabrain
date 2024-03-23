@@ -12,6 +12,9 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { getMedia } from '@/app/utils/storage';
 import {reportMessage} from '@/app/utils/messages';
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
+import { useTranslation } from 'next-i18next';
 const commonReactions = [
   { emoji: '👍', label: 'thumbs up' },
   { emoji: '👎', label: 'thumbs down' },
@@ -23,6 +26,8 @@ const commonReactions = [
 ];
 
 function MessageItem({ sender, senderId, title,timestamp, message, messageId, attachmentIds, reactions = {}, onReact, onEdit, onDelete, userInfo, chatId }) {
+  const { t } = useTranslation('msg_item');
+  const { speak, stop, isTTSEnabled } = useTTS();
   const [attachments, setAttachments] = useState([]);
   const [loadingAttachments, setLoadingAttachments] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -164,7 +169,8 @@ function MessageItem({ sender, senderId, title,timestamp, message, messageId, at
           />
           <button
             className="ml-2 bg-primary  text-white font-bold py-2 px-4 rounded"
-            onClick={handleEditSave}>
+            onClick={handleEditSave} onMouseEnter={() => isTTSEnabled && speak("Save button")}
+            onMouseLeave={stop}>
             Save
           </button>
         </div>
@@ -236,30 +242,34 @@ function MessageItem({ sender, senderId, title,timestamp, message, messageId, at
                 <ul>
                 {(sender == userInfo?.data?.username) && (
                   <div>   
-                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={() => setEditMode(true)}>Edit Message</li>
-                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={() => setShowDeleteConfirm(true)}>Delete Message</li>
+                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={() => setEditMode(true)}
+                  onMouseEnter={() => isTTSEnabled && speak("Edit Message button")} onMouseLeave={stop}>{t('edit')}</li>
+                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={() => setShowDeleteConfirm(true)}
+                  onMouseEnter={() => isTTSEnabled && speak("Delete Message button")} onMouseLeave={stop}>{t('delete')}</li>
                   </div>
                   )}
-                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={(onReport)}>Report Message</li>
+                  <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={(onReport)}
+                  onMouseEnter={() => isTTSEnabled && speak("Report Message button")} onMouseLeave={stop}>{t('report')}</li>
                 </ul>
               </div>
             )}
           </div>
           <Dialog open={showReportDialog} onClose={() => setShowReportDialog(false)}>
-  <DialogTitle>{"Report Message"}</DialogTitle>
+  <DialogTitle onMouseEnter={() => isTTSEnabled && speak("Report Message")}
+  onMouseLeave={stop}>{t('report')}</DialogTitle>
   <DialogContent>
-    <DialogContentText>
-      Please select a reason for reporting this message.
+    <DialogContentText onMouseEnter={() => isTTSEnabled && speak("Please select a reason for reporting this message.")} onMouseLeave={stop}>
+      {t('report_rsn')}
     </DialogContentText>
     <select
       className="w-full mt-2 border-gray-300 rounded-md shadow-sm"
       value={reportReason}
       onChange={(e) => setReportReason(e.target.value)}
     >
-      <option value="">Select a reason</option>
-      <option value="spam">Spam</option>
-      <option value="abuse">Abuse</option>
-      <option value="other">Other</option>
+      <option value="" onMouseEnter={() => isTTSEnabled && speak("Select a reason")} onMouseLeave={stop}>{t('select_rsn')}</option>
+      <option value="spam" onMouseEnter={() => isTTSEnabled && speak("Spam")} onMouseLeave={stop}>{t('spam')}</option>
+      <option value="abuse" onMouseEnter={() => isTTSEnabled && speak("Abuse")} onMouseLeave={stop}>{t('abuse')}</option>
+      <option value="other" onMouseEnter={() => isTTSEnabled && speak("Other")} onMouseLeave={stop}>{t('other')}</option>
     </select>
     {reportReason === 'other' && (
       <textarea
@@ -271,9 +281,11 @@ function MessageItem({ sender, senderId, title,timestamp, message, messageId, at
     )}
   </DialogContent>
   <DialogActions>
-    <Button onClick={() => setShowReportDialog(false)}>Cancel</Button>
-    <Button onClick={() => handleReport()} color="primary">
-      Report
+    <Button onClick={() => setShowReportDialog(false)} onMouseEnter={() => isTTSEnabled && speak("Cancel button")}
+      onMouseLeave={stop}>{t('cancel')}</Button>
+    <Button onClick={() => handleReport()} color="primary" onMouseEnter={() => isTTSEnabled && speak("Report button")}
+      onMouseLeave={stop}>
+      {t('report_btn')}
     </Button>
   </DialogActions>
 </Dialog>
@@ -281,14 +293,17 @@ function MessageItem({ sender, senderId, title,timestamp, message, messageId, at
           <Dialog open={showDeleteConfirm} onClose={() => setShowDeleteConfirm(false)}>
             <DialogTitle>{"Delete Message?"}</DialogTitle>
             <DialogContent>
-              <DialogContentText>
-                Are you sure you want to delete this message? This action cannot be undone.
+              <DialogContentText onMouseEnter={() => isTTSEnabled && speak("Are you sure you want to delete this message? This action cannot be undone.")}
+                  onMouseLeave={stop}>
+                {t('del_msg')}
               </DialogContentText>
             </DialogContent>
             <DialogActions>
-              <Button onClick={() => setShowDeleteConfirm(false)}>Cancel</Button>
-              <Button onClick={handleDelete} color="primary" autoFocus>
-                Delete
+              <Button onClick={() => setShowDeleteConfirm(false)} onMouseEnter={() => isTTSEnabled && speak("Cancel button")}
+                onMouseLeave={stop}>{t('cancel')}</Button>
+              <Button onClick={handleDelete} color="primary" autoFocus onMouseEnter={() => isTTSEnabled && speak("Delete button")}
+                onMouseLeave={stop}>
+                {t('delete')}
               </Button>
             </DialogActions>
           </Dialog>

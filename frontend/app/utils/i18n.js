@@ -266,7 +266,8 @@ i18n
         },
 
         msg_box: {
-          "enter_msg": "Enter a Message..."
+          "enter_msg": "Enter a Message...",
+          "files_attached": "file(s) attached"
         },
 
         content_map: {
@@ -295,6 +296,32 @@ i18n
           "joined": "Joined", 
           "join": "Join Team",
           "joined_teams": "Joined Teams:"
+        },
+
+        team: {
+          "invite": "Invite People",
+          "team_settings": "Team Settings",
+          "del_team": "Delete Team",
+          "leave_team": "Leave Team",
+          "del_msg": "Are you sure you want to delete this team?",
+          "yes": "Yes",
+          "no": "No"
+        },
+
+        msg_item: {
+          "save": "Save", 
+          "edit": "Edit Message",
+          "delete": "Delete Message",
+          "report": "Report Message",
+          "report_btn": "Report",
+          "report_rsn": "Please select a reason for reporting this message.",
+          "select_rsn": "Select a reason", 
+          "spam": "Spam",          
+          "abuse": "Abuse",
+          "other": "Other",
+          "del_msg": "Are you sure you want to delete this message? This action cannot be undone.",
+          "cancel": "Cancel",
+          "delete": "Delete"
         }
       },
       ru: {
@@ -560,7 +587,8 @@ i18n
         },
 
         msg_box: {
-          "enter_msg": "Введите сообщение..."
+          "enter_msg": "Введите сообщение...",
+          "files_attached": "файл(а/ов) прикреплен(о/ы)",
         },
 
         content_map: {
@@ -589,6 +617,32 @@ i18n
           "joined": "Успех", 
           "join": "Присоединиться",
           "joined_teams": "Присоединился к:"
+        },
+
+        team: {
+          "invite": "Пригласить Людей",
+          "team_settings": "Настройки Команды",
+          "del_team": "Удалить Команду",
+          "leave_team": "Покинуть Команду",
+          "del_msg": "Вы уверены, что хотите удалить эту команду?",
+          "yes": "Да",
+          "no": "Нет"
+        },
+
+        msg_item: {
+          "save": "Сохранить", 
+          "edit": "Изменить",
+          "delete": "Удалить",
+          "report": "Пожаловаться",
+          "report_btn": "Пожаловаться",
+          "report_rsn": "Пожалуйста, укажите причину жалобы",
+          "select_rsn": "Выберите причину", 
+          "spam": "Спам",          
+          "abuse": "Оскорбление",
+          "other": "Другое",
+          "del_msg": "Вы уверены что хотите удалить это сообщение? Данное действие необратимо.",
+          "cancel": "Отмена",
+          "delete": "Удалить"
         }
       },
       // Add more languages here

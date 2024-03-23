@@ -134,7 +134,7 @@ export default function MessageBox({ onSendMessage, replyTo, onReply }) {
       />
       {attachments.length > 0 && (
         <span className="absolute right-20 z-10 text-white text-sm">
-          {attachments.length} file(s) attached
+          {attachments.length} {t('files_attached')}
         </span>
       )}
       <IconButton type="submit" size="small" className="absolute right-4 z-10 text-white"
