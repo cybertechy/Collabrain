@@ -453,11 +453,11 @@ const router = useRouter();
                                         <button onClick={handleEnable2FA} className="justify-center w-fit font-semibold inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3"
                                         onMouseEnter={() => isTTSEnabled && speak("Enable two-factor authentication button")}
                                         onMouseLeave={stop}>
-                                             Enable</button>
+                                             {t('2fa_enable')}</button>
                                         <button onClick={handleDisable2FA} className="justify-center w-fit font-semibold inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3"
                                         onMouseEnter={() => isTTSEnabled && speak("Disable two-factor authentication button")}
                                         onMouseLeave={stop}>
-                                            Disable</button>
+                                            {t('2fa_disable')}</button>
                                             </div>
 
                                     </div>

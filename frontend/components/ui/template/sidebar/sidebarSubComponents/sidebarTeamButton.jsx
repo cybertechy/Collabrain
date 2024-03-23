@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Tooltip } from '@mui/material';
 import Link from 'next/link';
-import { useTTS } from "../../../../../app/utils/tts/TTSContext";
+import { useTTS } from "@/app/utils/tts/TTSContext";
 import {getMedia} from '@/app/utils/storage'
 
 const TeamSidebarItem = ({ team, isSelected , isExpanded = true }) => {

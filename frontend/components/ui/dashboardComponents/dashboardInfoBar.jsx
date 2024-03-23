@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { ArrowCircleUp, ArrowCircleDown, ChevronRight } from '@mui/icons-material';
 import DropdownDashboard from './dropdownDashboard';
 import { useRouter } from 'next/navigation'; 
-import { useTTS } from "../../../app/utils/tts/TTSContext";
-import "../../../app/utils/i18n"
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
 import { useTranslation } from 'next-i18next';
 import axios from 'axios';
 const DashboardInfoBar = ({ currentPath, onSort, sortCriteria, moveProjectToPath }) => {
@@ -106,10 +106,10 @@ const DashboardInfoBar = ({ currentPath, onSort, sortCriteria, moveProjectToPath
         />
         {sortCriteria.isAscending ? (
           <ArrowCircleUp className="text-primary cursor-pointer" fontSize="large" onClick={toggleAscending}
-          onClick={toggleAscending} onMouseEnter={() => isTTSEnabled && speak("Ascending Order")} onMouseLeave={stop}/>
+          onMouseEnter={() => isTTSEnabled && speak("Ascending Order")} onMouseLeave={stop}/>
         ) : (
           <ArrowCircleDown className="text-primary cursor-pointer" fontSize="large" onClick={toggleAscending}
-          onClick={toggleAscending} onMouseEnter={() => isTTSEnabled && speak("Descending Order")} onMouseLeave={stop}/>
+          onMouseEnter={() => isTTSEnabled && speak("Descending Order")} onMouseLeave={stop}/>
         )}
       </div>
     </div>

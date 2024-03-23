@@ -3,8 +3,8 @@ import PropTypes from "prop-types";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { useState, useEffect } from "react";
 import { Tooltip } from '@mui/material';
-import { useTTS } from "../../../../../app/utils/tts/TTSContext";
-import "../../../../../app/utils/i18n"
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
 import { useTranslation } from 'next-i18next';
 
 const SidebarItem = ({ href, icon: Icon, text = "", isSelected = false, isExpanded = true,  toggleSidebar  }) => {

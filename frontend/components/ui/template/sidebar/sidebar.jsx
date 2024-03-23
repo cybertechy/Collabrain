@@ -22,8 +22,8 @@ import TeamSidebarItem from "./sidebarSubComponents/sidebarTeamButton"
 import { usePathname } from "next/navigation";
 import NewProjectOverlay from "../../overlays/NewProjectOverlay";
 import axios from "axios";
-import { useTTS } from "../../../../app/utils/tts/TTSContext";
-import "../../../../app/utils/i18n"
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
 import { useTranslation } from 'next-i18next';
 
 const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {

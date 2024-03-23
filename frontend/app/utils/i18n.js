@@ -157,7 +157,8 @@ i18n
           "change_pass": "Change Password",
           "2fa": "Two-factor Authentication",
           "2fa_desc": "Protect your Collabrain account with an extra layer of security.",
-          "2fa_button": "Enable",
+          "2fa_enable": "Enable",
+          "2fa_disable": "Disable",
           "remove_acc": "Account Removal",
           "remove_acc_desc": "Disabling your account means you can recover it at any time after taking this action",
           "delete_button": "Delete",
@@ -227,7 +228,45 @@ i18n
           "all": "This is where your friends can be found.",
           "received": "You will find your received friend requests here.",
           "blocked": "You will find your blocked users here.",
-          "search_friends": "Start typing to search for friends to add."
+          "search_friends": "Start typing to search for friends to add.",
+          "all_btn": "All",
+          "received_btn": "Received",
+          "blocked_btn": "Blocked",
+          "add_friend": "Add Friend",
+          "friend_settings": "Select an Option",
+          "block": "Block User",
+          "alias": "Set Alias",
+          "confirm": "Confirm",
+          "cancel": "Cancel"
+        },
+
+        my_profile: {
+          "top": "Edit your information here",
+          "bio": "Biography",
+          "edu": "Education", 
+          "school_name": "School name...",
+          "degree": "Degree...", 
+          "start_yr": "Start Year...",
+          "end_yr": "End Year...",
+          "lic_cert": "Licenses & Certifications",
+          "cert_title": "Certification title...",
+          "date_obt": "Date obtained...",
+          "obt_on": "obtained on ",
+          "teams": "Your Teams",
+          "name_ent": "Enter your name",
+          "email_ent": "Enter your updated email",
+          "from": " from ",
+          "your_bio": "Your biography here"
+        },
+
+        shared: {
+          "shrd_projects": "Shared Projects",
+          "no_projects": "No shared projects available.",
+          "shared_top": "Shared with Me"
+        },
+
+        msg_box: {
+          "enter_msg": "Enter a Message..."
         }
       },
       ru: {
@@ -383,7 +422,8 @@ i18n
           "change_pass": "Смена Пароля",
           "2fa": "Двухэтапная Аутентификация",
           "2fa_desc": "Защитите свой аккаунт Collabrain дополнительным слоем защиты.",
-          "2fa_button": "Включить",
+          "2fa_enable": "Включить",
+          "2fa_disable": "Выключить",
           "remove_acc": "Удаление Аккаунта",
           "remove_acc_desc": "После удаления аккаунта, вы сможете восстановить его в будущем.",
           "delete_button": "Удалить",
@@ -454,7 +494,45 @@ i18n
           "all": "Здесь вы можете найти своих друзей.",
           "received": "Здесь вы найдете запросы на дружбу.",
           "blocked": "Здесь вы найдете заблокированных пользователей.",
-          "search_friends": "Начните печатать, чтобы найти и добавить друзей."
+          "search_friends": "Начните печатать, чтобы найти и добавить друзей.",
+          "all_btn": "Все",
+          "received_btn": "Запросы",
+          "blocked_btn": "Заблокированы",
+          "add_friend": "Добавить Друга",
+          "friend_settings": "Выберите Действие",
+          "block": "Заблокировать пользователя",
+          "alias": "Дать Прозвище",
+          "confirm": "Подтвердить",
+          "cancel": "Отмена"
+        },
+
+        my_profile: {
+          "top": "Измените информацию о себе,",
+          "bio": "Обо мне",
+          "edu": "Образование", 
+          "school_name": "Название учебного заведения...",
+          "degree": "Степень...", 
+          "start_yr": "Год начала...",
+          "end_yr": "Год конца...",
+          "lic_cert": "Лицензии и Сертификаты",
+          "cert_title": "Назв. сертификата...",
+          "date_obt": "Дата получения...",
+          "obt_on": "получен ",
+          "teams": "Ваши Команды",
+          "name_ent": "Введите свое имя",
+          "email_ent": "Введите новую почту",
+          "from": " получен в ",
+          "your_bio": "Здесь будет ваша биография"
+        },
+
+        shared: {
+          "shrd_projects": "Общие Проекты",
+          "no_projects": "У вас нет общих проектов.",
+          "shared_top": "Общие Файлы"
+        },
+
+        msg_box: {
+          "enter_msg": "Введите сообщение..."
         }
       },
       // Add more languages here

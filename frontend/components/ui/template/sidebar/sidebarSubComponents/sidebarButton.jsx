@@ -1,7 +1,7 @@
 import PropTypes from "prop-types";
 import { Tooltip } from '@mui/material';
-import { useTTS } from "../../../../../app/utils/tts/TTSContext";
-import "../../../../../app/utils/i18n"
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
 import { useTranslation } from 'next-i18next';
 
 const colorClasses = {

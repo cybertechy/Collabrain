@@ -14,8 +14,13 @@ import ContextMenu from "_components/ui/contextMenu/contextMenu";
 import Template from "@/components/ui/template/template";
 const  LoaderComponent = dynamic(() => import('@/components/ui/loader/loaderComponent'), { ssr: false });
 import { useAuthState } from "_firebase/firebase"; // Adjust based on actual path to useAuthState
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
+import { useTranslation } from 'next-i18next';
 
 export default function SharedWithMe() {
+  const { t } = useTranslation('shared');
+  const { speak, stop, isTTSEnabled } = useTTS();
   const [user, loading] = useAuthState();
   const [isLoading, setIsLoading] = useState(true);
   const [loadingState, setLoadingState] = useState("LOGGING_IN");
@@ -92,7 +97,7 @@ export default function SharedWithMe() {
       />
 
       <DashboardInfoBar
-        currentPath={searchParams.get("path") ? "Shared with Me" + searchParams.get("path") : "Shared with Me"}
+        currentPath={searchParams.get("path") ? t('shared_top') + searchParams.get("path") : t('shared_top')}
         onSort={handleSort}
         sortCriteria={sortCriteria}
       />
@@ -112,7 +117,7 @@ export default function SharedWithMe() {
           <Lottie animationData={smallLoader} play loop style={{ width: 100, height: 100 }} />
         ) : (
           <div>
-            <p className="text-2xl text-left text-primary ml-4 mb-4">Shared Projects</p>
+            <p className="text-2xl text-left text-primary ml-4 mb-4">{t('shrd_projects')}</p>
             <div className="flex flex-wrap gap-4 ml-4 justify-start">
               {sortedProjects.length > 0 ? sortedProjects.map((project) => (
                 <DashboardProjectButton
@@ -125,7 +130,7 @@ export default function SharedWithMe() {
                 />
               )) : (
                 <div className="text-primary font-poppins text-xl italic">
-                  No shared projects available.
+                  {t('no_projects')}
                 </div>
               )}
             </div>

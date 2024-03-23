@@ -26,9 +26,9 @@ import EditIcon from '@mui/icons-material/Edit';
 import axios from 'axios';
 import { useAuthState } from '_firebase/firebase';
 import CustomAvatar from './avatar';
-import "../../../app/utils/i18n"
+import "@/app/utils/i18n"
 import { useTranslation } from 'next-i18next';
-import { useTTS } from "../../../app/utils/tts/TTSContext";
+import { useTTS } from "@/app/utils/tts/TTSContext";
 import { updateFriendAlias,blockUser } from '@/app/utils/user';
 const fb = require("_firebase/firebase");
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;

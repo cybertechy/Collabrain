@@ -6,8 +6,8 @@ import { Tooltip } from '@mui/material';
 import MenuIcon from "@mui/icons-material/Menu";
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import SettingsOverlay from '../../overlays/settingsOverlay';
-import { useTTS } from "../../../../app/utils/tts/TTSContext";
-import "../../../../app/utils/i18n"
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
 import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
 const CallButton = dynamic(() => import("_components/ui/call/call"), { ssr: false });
@@ -87,10 +87,12 @@ const Navbar = ({ isOpen, toggleSidebar, setShowCallScreen, setCallVideoStreams,
                 </Tooltip>
                 <Tooltip
             		title={
-                		"Notifications"
+                		t('notifications')
             		}
             		enterDelay={1000}
             		leaveDelay={200}
+					onMouseEnter={() => isTTSEnabled && speak("Notifications")}
+					onMouseLeave={stop}
           
         > 
                     <NotificationsIcon
