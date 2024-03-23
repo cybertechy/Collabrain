@@ -59,9 +59,6 @@ function init(server)
 		connectionTimes = data || {};
 	});
 
-
-
-
 	io.on('connection', (socket) => {
 		socket.on('user', (msg) => {
 			if (DEBUG) console.log(`user ${msg.id} connected`);
@@ -159,7 +156,6 @@ function init(server)
 
 		socket.on('save-doc', data => oci.addData("B3", data.ociID, "application/json", JSON.stringify(data.data)));
 
-
 		//Join a collab room
 		socket.on('startCollab', (data) =>
 		{
@@ -208,6 +204,7 @@ function init(server)
 
 		socket.on('join-call', (room, id) => 
 		{
+			// Broadcast to all members in the room
 			console.log(`### user ${id} joined call ${room} ###`);
 			socket.join(room);
 			socket.to(room).emit('user-joined-call', id);
@@ -272,8 +269,6 @@ async function broadcastMessage(data, type = "team", newMessage = false, deleteM
 
 }
 
-
-
 function connectToRedis(io) {
 
 	let reconnectToRedis = () => connectToRedis(io);
@@ -333,7 +328,6 @@ function connectToRedis(io) {
 		}
 	});
 }
-
 
 module.exports = {
 	init,

@@ -9,6 +9,7 @@ export const useVideoCall = create((set) => ({
 	room: null,
 	stream: null,
 	inCall: false,
+	receivingCall: false,
 	sockCli: null,
 	setMyPeer: (peer) => set({ myPeer: peer }),
 	setShowCallScreen: (show) => set({ showCallScreen: show }),
@@ -57,4 +58,5 @@ export const useVideoCall = create((set) => ({
 	setStream: (stream) => set({ stream: stream }),
 	setInCall: (inCall) => set({ inCall: inCall }),
 	setSockCli: (sockCli) => set({ sockCli: sockCli }),
+	setReceivingCall: (receivingCall) => set({ receivingCall: receivingCall })
 }));

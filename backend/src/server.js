@@ -19,6 +19,7 @@ const storageRoute = require("./api/routes/Storage");
 const aiRoute = require("./api/routes/AI");
 const statsRoute = require("./api/routes/Stats");
 const twoFARoute = require("./api/routes/twoFA");
+const callRoute = require("./api/routes/Call");
 
 // Helpers
 const sockServer = require("./api/helpers/socket");
@@ -81,6 +82,7 @@ app.use("/api/storage", storageRoute);
 app.use("/api/stats", statsRoute);
 app.use("/api/ai", aiRoute);
 app.use("/api/2FA", twoFARoute);
+app.use("/api/calls", callRoute);
 
 // Endpoint to display DB usage
 app.get("/api/dbUsage", (req, res) => {

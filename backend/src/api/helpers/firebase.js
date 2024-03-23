@@ -400,6 +400,7 @@ async function listenToRealtimeDB(path, callback) {
 
 module.exports = {
 	db,
+	realtimeDB,
 	admin,
 	verifyUser,
 	createDoc,

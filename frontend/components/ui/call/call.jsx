@@ -11,6 +11,8 @@ import VideocamOffIcon from '@mui/icons-material/VideocamOff';
 import LaunchIcon from '@mui/icons-material/Launch';
 const { Peer } = require('peerjs');
 import { useVideoCall } from "./zustand";
+import { v4 as uuidv4 } from 'uuid';
+import axios from 'axios';
 
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 export default function Call(props)
@@ -18,7 +20,7 @@ export default function Call(props)
 	const { callVideoStreams, myPeer, micEnabled, videoEnabled, showCallScreen,
 		setMyPeer, setShowCallScreen, setCallVideoStreams, addCallVideoStream, removeCallVideoStream,
 		toggleAudio, toggleVideo, room, setRoom, stream, setStream,
-		inCall, setInCall, sockCli, setSockCli, receivingCall } = useVideoCall();
+		inCall, setInCall, sockCli, setSockCli, receivingCall, setReceivingCall } = useVideoCall();
 
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
@@ -50,14 +52,52 @@ export default function Call(props)
 		addCallVideoStream(userID, stream);
 	};
 
-	const joinCall = async (room) =>
+	const startCall = async () =>
 	{
 		// Setup peer
 		if (myPeer)
 			return;
 
-		setMyPeer(new Peer({ host: 'peer-server.cybertech13.eu.org', secure: true, port: 443}));
-		setRoom(room);
+		setMyPeer(new Peer({ host: 'peer-server.cybertech13.eu.org', secure: true, port: 443 }));
+		// Create room with random uid
+		const roomID = uuidv4();
+		setRoom(roomID);
+
+		const token = await fb.getToken();
+		let target = null;
+		let targetID = null;
+
+		// Get target
+		if (pathname === "/chat") // For teams
+		{
+			target = "team";
+			targetID = searchParams.get("teamId");
+		}
+		else if (pathname === "/messages") // For direct messages
+		{
+			target = "chat";
+			targetID = searchParams.get("chatID");
+		}
+
+		// Create call on db
+		const res = await axios.post(`${SERVERLOCATION}/api/calls`, {
+			room: roomID,
+			target: target,
+			targetID: targetID
+		}, {
+			headers: {
+				authorization: `Bearer ${token}`,
+			},
+		});
+	};
+
+	const joinCall = async () =>
+	{
+		// Setup peer
+		if (myPeer)
+			return;
+
+		setMyPeer(new Peer({ host: 'peer-server.cybertech13.eu.org', secure: true, port: 443 }));
 	};
 
 	useEffect(() =>
@@ -167,6 +207,39 @@ export default function Call(props)
 		console.log("call video streams: ", callVideoStreams);
 	}, [callVideoStreams]);
 
+	useEffect(() =>
+	{
+		if (!user)
+			return;
+
+		fb.getToken().then(token =>
+		{
+			const targetID = searchParams.get("teamId") || searchParams.get("chatID");
+			let target = null;
+			if (pathname === "/chat")
+				target = "team";
+			else if (pathname === "/messages")
+				target = "chat";
+
+			// Chek if a call is ongoing
+			axios.get(`${SERVERLOCATION}/api/calls/${target}/${targetID}`, {
+				headers
+					: {
+					authorization: `Bearer ${token}`
+				}
+			})
+				.then(res =>
+				{
+					if (!res.data)
+						return;
+
+					setReceivingCall(true);
+					console.log(res);
+					setRoom(res.data.room);
+				});
+		});
+	}, [user]);
+
 	return (
 		<div>
 			{
@@ -175,14 +248,14 @@ export default function Call(props)
 						(
 							!receivingCall ?
 								<button className="border border-white text-white hover:text-white hover:bg-green-500 hover:border-green-500 font-bold px-3 py-2 rounded"
-									onClick={() => { joinCall("room1"); }}>
+									onClick={() => { startCall("room1"); }}>
 									<CallIcon />
 								</button>
 								:
 								<button className="font-normal border border-green-500 bg-green-500 text-white hover:text-white hover:bg-green-600 hover:border-green-600 font-bold px-3 py-2 rounded"
 									onClick={() => { joinCall("room1"); }}>
-										Join Call
-									<CallIcon className="ml-2"/>
+									Join Call
+									<CallIcon className="ml-2" />
 								</button>
 						)
 						:
