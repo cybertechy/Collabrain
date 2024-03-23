@@ -603,7 +603,7 @@ export default function Messages() {
 
             <div className="flex flex-row flex-grow">
                 <DMSideBar
-                    userData={userInfo}
+                    userData={{...userInfo, id: user?.uid}}
                     friendsHandler={() => setShowChat(false)}
                     chatList={directMessages}
                     openChat={openChat}
@@ -612,6 +612,7 @@ export default function Messages() {
                     chatHandler={(id, user) => {
                         router.push(`/messages?chatID=${id}&user=${user}`);
                     }}
+                    
                 />
                 {withUser ? (
                     <ChatWindow

@@ -13,7 +13,7 @@ import allFriendsLottie from "@/public/assets/json/allFriendsLottie.json";
 import blockedLottie from "@/public/assets/json/blockedLottie.json";
 import recievedRequestsLottie from "@/public/assets/json/recievedRequestsLottie.json";
 import Lottie from "lottie-react";
-
+import { getBlockedUsers } from '../utils/user';
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
 const FriendsWindow = ({userInfo, handleAliasUpdate, handleChatUpdate}) => {
@@ -194,11 +194,22 @@ const FriendsWindow = ({userInfo, handleAliasUpdate, handleChatUpdate}) => {
     }
   };
 
+  const getBlocked = async () => {
+    try {
+      const response = await getBlockedUsers();
+      setBlockedUsers(response);
+    } catch (error) {
+      console.error("Error fetching blocked users:", error);
+    }
+  };
+
   useEffect(() => {
     if (activeTab === 'all') {
       getFriends();
     } else if (activeTab === 'Recieved') {
       getFriendRequests();
+    }else if (activeTab === 'blocked') {
+      getBlocked();
     }
   }, [activeTab, user]);
 

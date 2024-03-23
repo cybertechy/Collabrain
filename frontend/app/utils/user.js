@@ -108,7 +108,10 @@ const getBlockedUsers = async () => {
         const response = await axios.get(`${SERVERLOCATION}/api/users/blocked/users`, {
             headers: { "Authorization": `Bearer ${token}` },
         });
-        return response.data;
+        return response.data.map(user => ({
+            ...user,
+            listType: 'blocked'
+        }));;
     } catch (error) {
         console.error('Error fetching blocked users:', error);
         return null;

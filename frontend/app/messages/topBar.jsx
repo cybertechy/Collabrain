@@ -28,7 +28,7 @@ const TopBar = ({ activeTab, onTabChange }) => {
         <Button id="all" sx={tabButtonStyle('all')} onClick={() => onTabChange('all')}>All</Button>
         <Button id="received" sx={tabButtonStyle('Recieved')} onClick={() => onTabChange('Recieved')}>Received</Button>
         <Button id="blocked" sx={tabButtonStyle('blocked')} onClick={() => onTabChange('blocked')}>Blocked</Button>
-        <Button id="addFriend" sx={tabButtonStyle('addFriend')} onClick={() => onTabChange('addFriend')}>Add Friend</Button>
+        <Button id="addFriend" sx={tabButtonStyle('addFriend')} onClick={() => onTabChange('addFriend')}>Search Users</Button>
 
       </Box>
     </Box>
