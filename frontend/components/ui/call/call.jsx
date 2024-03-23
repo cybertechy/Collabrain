@@ -11,10 +11,12 @@ import VideocamOffIcon from '@mui/icons-material/VideocamOff';
 import LaunchIcon from '@mui/icons-material/Launch';
 const { Peer } = require('peerjs');
 // import SimplePeer from 'simple-peer';
+import { useTTS } from "@/app/utils/tts/TTSContext";
 
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 export default function Call(props)
 {
+	const { speak, stop, isTTSEnabled } = useTTS();
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
 	let myPeer = useRef(null);
@@ -157,7 +159,9 @@ export default function Call(props)
 				!inCall ?
 					(pathname == "/messages" && (searchParams.get("chatID") != null)) || pathname === "/chat" ?
 						<button className="border border-white text-white hover:text-white hover:bg-green-500 hover:border-green-500 font-bold px-3 py-2 rounded"
-							onClick={() => { joinCall("room1"); }}>
+							onClick={() => { joinCall("room1"); }}
+							onMouseEnter={() => isTTSEnabled && speak("Call button")}
+                        	onMouseLeave={stop}>
 							<CallIcon />
 						</button> :
 						<></>

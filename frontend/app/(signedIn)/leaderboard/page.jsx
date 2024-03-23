@@ -5,6 +5,9 @@ import axios from 'axios';
 const fb = require("_firebase/firebase");
 import {useAuthState } from "@/app/_firebase/firebase";
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
+import { useTranslation } from 'next-i18next';
  
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
  
@@ -18,6 +21,8 @@ const Leaderboard = () => {
   const [user, loading] = useAuthState();
   const [clickedRow, setClickedRow] = useState(null);
   const [hoveredRow, setHoveredRow] = useState(null);
+  const { t } = useTranslation('discover');
+  const { speak, stop, isTTSEnabled } = useTTS();
  
 const fetchTeams = async () => {
   try {
@@ -91,7 +96,8 @@ const handleRowClick = (teamName) => {
  
     <div className="container mx-auto p-24">
        
-      <p className="text-3xl font-md text-start text-primary bg-white mb-4">Discover Teams</p>
+      <p className="text-3xl font-md text-start text-primary bg-white mb-4" 
+      onMouseEnter={() => isTTSEnabled && speak("Discover Teams")} onMouseLeave={stop}>{t('top')}</p>
       <div className= "border-gray-300 inner-shadow border-2 bg-aliceBlue rounded-md drop-shadow-md overflow-visible">
         {/* Search bar */}
         <div className="p-4 flex justify-between">
@@ -100,13 +106,16 @@ const handleRowClick = (teamName) => {
             value={searchQuery}
             onChange={handleSearchChange}
             onKeyDown={handleSearchKeyDown}
-            placeholder="Search team..."
+            placeholder={t('search')}
             className="p-2 border border-gray-300 rounded-lg w-full"
-           
+            onMouseEnter={() => isTTSEnabled && speak("Type a team's name here to search")}
+            onMouseLeave={stop}
           />
           <button
             onClick={handleSearch}
             className="bg-blue-500 text-white px-4 py-2 rounded-lg ml-2"
+            onMouseEnter={() => isTTSEnabled && speak("Search Button")}
+            onMouseLeave={stop}
           >
             <SearchIcon />
           </button>
@@ -114,10 +123,14 @@ const handleRowClick = (teamName) => {
  
         {/* Header row for team data */}
         <div className="flex text-start justify-center bg-primary font-bold px-4 py-2">
-          <span className="text-lg text-white w-1/4 ">Rank<EmojiEventsIcon className='pl-2 text-3xl'/></span>
-          <span className="text-lg text-white w-1/4">Name</span>
-          <span className="text-lg text-white w-1/4">Score</span>
-          <span className="text-lg text-white w-1/4">Actions</span> {/* New column for actions */}
+          <span className="text-lg text-white w-1/4 " onMouseEnter={() => isTTSEnabled && speak("Team Rank")}
+          onMouseLeave={stop}>{t('rank')}<EmojiEventsIcon className='pl-2 text-3xl'/></span>
+          <span className="text-lg text-white w-1/4" onMouseEnter={() => isTTSEnabled && speak("Team Name")}
+          onMouseLeave={stop}>{t('name')}</span>
+          <span className="text-lg text-white w-1/4" onMouseEnter={() => isTTSEnabled && speak("Team Score")}
+          onMouseLeave={stop}>{t('score')}</span>
+          <span className="text-lg text-white w-1/4" onMouseEnter={() => isTTSEnabled && speak("Actions")}
+          onMouseLeave={stop}>{t('actions')}</span> {/* New column for actions */}
         </div>
              <div className="flex flex-col overflow-visible ">
           {teamData.map((team, index) => (
@@ -136,30 +149,40 @@ const handleRowClick = (teamName) => {
               transform: clickedRow === team.name ? 'scale(1.05)' : 'scale(1)',
             }}
           >
-              <span className="text-lg w-1/4 "># {team.rank}</span>
-              <span className="text-lg w-1/4 ">{team.name}</span>
-              <span className="text-lg w-1/4 ">{team.score}</span>
+              <span className="text-lg w-1/4" 
+                    onMouseEnter={() => isTTSEnabled && speak(`Rank number ${team.rank}`)}
+                    onMouseLeave={stop}># {team.rank}</span>
+              <span className="text-lg w-1/4"
+                    onMouseEnter={() => isTTSEnabled && speak(`Team ${team.name}`)}
+                    onMouseLeave={stop}>{team.name}</span>
+              <span className="text-lg w-1/4"
+                    onMouseEnter={() => isTTSEnabled && speak(`Score ${team.score}`)}
+                    onMouseLeave={stop}>{team.score}</span>
               {teamJoined[team.name] ? (
                 <React.Fragment>
                   <button
                     onClick={() => handleDisconnectFromTeam(team.name)}
                     className="bg-red-500 text-white px-4 py-2 rounded-lg ml-2"
+                    onMouseEnter={() => isTTSEnabled && speak("Leave Team button")}
+                    onMouseLeave={stop}
                   >
-                    Leave Team
+                    {t('leave')}
                   </button>
                   <button
                     className=" text-green-500 px-4 py-2 rounded-lg ml-2 cursor-default"
                     disabled
                   >
-                    Joined
+                    {t('joined')}
                   </button>
                 </React.Fragment>
               ) : (
                 <button
                   onClick={() => handleJoinTeam(team.name)}
                   className="bg-green-500 text-white px-4 py-2 rounded-lg ml-2"
+                  onMouseEnter={() => isTTSEnabled && speak("Join Team button")}
+                  onMouseLeave={stop}
                 >
-                  Join Team
+                  {t('join')}
                 </button>
               )}
             </div>
@@ -169,7 +192,9 @@ const handleRowClick = (teamName) => {
  
       {/* Joined teams section */}
       <div className="mt-4">
-        <h2 className="text-xl font-bold">Joined Teams:</h2>
+        <h2 className="text-xl font-bold"
+        onMouseEnter={() => isTTSEnabled && speak("Joined Teams")}
+        onMouseLeave={stop}>{t('joined_teams')}</h2>
         <ul>
           {joinedTeams.map((teamName, index) => (
             <li key={index}>{teamName}</li>

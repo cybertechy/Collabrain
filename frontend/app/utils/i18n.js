@@ -282,6 +282,19 @@ i18n
           "closeBtn": "Close",
           "nextBtn": "Next",
           "prevBtn": "Previous",
+        },
+
+        discover: {
+          "top": "Discover Teams",
+          "rank": "Rank",
+          "name": "Name",
+          "score": "Score",
+          "actions": "Actions",
+          "search": "Search team...",
+          "leave": "Leave",
+          "joined": "Joined", 
+          "join": "Join Team",
+          "joined_teams": "Joined Teams:"
         }
       },
       ru: {
@@ -563,6 +576,19 @@ i18n
           "closeBtn": "Закрыть",
           "nextBtn": "Вперед",
           "prevBtn": "Назад",
+        },
+
+        discover: {
+          "top": "Найти Команды",
+          "rank": "Место",
+          "name": "Название",
+          "score": "Кол-во очков",
+          "actions": "Действия",
+          "search": "Найдите команду...",
+          "leave": "Покинуть",
+          "joined": "Успех", 
+          "join": "Присоединиться",
+          "joined_teams": "Присоединился к:"
         }
       },
       // Add more languages here

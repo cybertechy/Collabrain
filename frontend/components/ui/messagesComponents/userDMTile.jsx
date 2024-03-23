@@ -1,6 +1,6 @@
 import { ListItem, ListItemAvatar, ListItemText, Typography } from '@mui/material';
 import CustomAvatar from './avatar';
-import { useTTS } from "../../../app/utils/tts/TTSContext";
+import { useTTS } from "@/app/utils/tts/TTSContext";
 
 const userDMTile = ({ message, avatar, openChat, username, data, chatID , actualUsername}) => {
     const { speak, stop, isTTSEnabled } = useTTS();
