@@ -19,8 +19,20 @@ export const useVideoCall = create((set) => ({
 		const { [userId]: _, ...rest } = state.callVideoStreams;
 		return { callVideoStreams: rest };
 	}),
-	toggleAudio: () => set((state) => ({ micEnabled: !state.micEnabled })),
-	toggleVideo: () => set((state) => ({ videoEnabled: !state.videoEnabled })),
+	toggleAudio: () => set((state) => {
+		state.stream.getTracks().forEach(track => {
+			if (track.kind === 'audio')
+				track.enabled = !track.enabled;
+		});
+		return { micEnabled: !state.micEnabled };
+	}),
+	toggleVideo: () => set((state) => {
+		state.stream.getTracks().forEach(track => {
+			if (track.kind === 'video')
+				track.enabled = !track.enabled;
+		});
+		return { videoEnabled: !state.videoEnabled };
+	}),
 	setRoom: (room) => set({ room: room }),
 	leaveCallFunc: () => set((state) =>
 	{
