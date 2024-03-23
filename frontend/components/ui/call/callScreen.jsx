@@ -9,10 +9,7 @@ import { useVideoCall } from "./zustand";
 
 export default function CallScreen(props)
 {
-	const { callVideoStreams, myPeer, micEnabled, videoEnabled, showCallScreen,
-		setMyPeer, setShowCallScreen, setCallVideoStreams, addCallVideoStream, removeCallVideoStream,
-		toggleAudio, toggleVideo, room, setRoom, leaveCallFunc, stream, setStream,
-		inCall, setInCall, sockCli, setSockCli } = useVideoCall();
+	const { callVideoStreams, micEnabled, videoEnabled, toggleAudio, toggleVideo} = useVideoCall();
 	const [gridCols, setGridCols] = useState(1);
 	const [maxGridHeight, setMaxGridHeight] = useState("100%");
 	const gridRef = useRef(null);
