@@ -34,7 +34,7 @@ const Template = ({ children }) =>
 				<Sidebar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} />
 				<>
 
-					<div className={`flex flex-col flex-grow overflow-hidden  ${isSidebarOpen ? "max-xsm:hidden" : ""}`}>
+					<div className={`flex flex-col flex-grow overflow-hidden  ${isSidebarOpen ? "max-sm:hidden" : ""}`}>
 						<Navbar isOpen={isSidebarOpen} toggleSidebar={toggleSidebar} setShowCallScreen={setShowCallScreen}
 							setCallVideoStreams={setCallVideoStreams} callVideoStreams={callVideoStreams} toggleAudio={toggleAudio} toggleVideo={toggleVideo} leaveCall={leaveCall} 
 							micEnabled={micEnabled} videoEnabled={videoEnabled} setLeaveCall={setLeaveCall} />
