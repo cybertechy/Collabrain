@@ -397,7 +397,7 @@ const ProfileOverlay = ({ user , Close }) => {
                                             an extra layer of security.
                                         </p>
                                         <div className="flex space-x-5">
-                                            <button onClick={handleEnable2FA} className={`justify-center w-fit font-semibold inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3${userInfo?.twoFA === true && "bg-primary text-white"} `}>
+                                            <button onClick={handleEnable2FA} className={`justify-center w-fit font-semibold inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 ${userInfo?.twoFA === true && "bg-primary text-white"} `}>
                                                 {userInfo?.twoFA === true ? "Enabled" : "Enable"}
                                                 </button>
                                             <button onClick={handleDisable2FA} className={`justify-center w-fit font-semibold inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 ${userInfo?.twoFA === false && "bg-primary text-white"} `}>
@@ -699,7 +699,7 @@ const PrivacyOverlay = (user) => {
                         </button>
                     </div>
                     
-                    <div className="mb-4 flex justify-between">
+                    <div className="mb-4 flex flex-col justify-between">
                         <p className="text-2xl text-basicallydark">
                             Delete my data
                         </p>
