@@ -5,9 +5,9 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import LeaderboardIcon from '@mui/icons-material/Leaderboard';
 import { List, ListItem, ListItemText, ListItemAvatar } from '@mui/material';
 import CustomAvatar from '../messagesComponents/avatar'; 
-const TeamOverviewOverlay = ({ onClose }) => {
+const TeamOverviewOverlay = ({ onClose,teamData, members }) => {
   const [subPage, setSubPage] = useState('description'); // State for managing subpage
-
+console.log("Team Data",teamData, members, "members")
   const handleSubPageChange = (page) => {
     setSubPage(page);
   };
@@ -45,46 +45,25 @@ const TeamOverviewOverlay = ({ onClose }) => {
           {/* Render different content based on selected subpage */}
           {subPage === 'description' && (
        <DescriptionContent 
-       teamData={{ name: "Awesome Team", description: "This is the best team ever!", members: [
-         { name: "John Doe", role: "Admin" },
-         { name: "Jane Doe", role: "Member" },
-         { name: "John Doe", role: "Admin" },
-         { name: "Jane Doe", role: "Member" },
-         { name: "John Doe", role: "Admin" },
-         { name: "Jane Doe", role: "Member" },
-         { name: "John Doe", role: "Admin" },
-         { name: "Jane Doe", role: "Member" },
-       ]}}
+       teamData={teamData}
+       members = {members}
      />
           )}
           {subPage === 'leaderboard' && (
-            <LeaderboardContent   teamData={{ name: "Awesome Team", description: "This is the best team ever!", members: [
-                { name: "Johdd Doe", role: "Admin" , score: 100},
-                { name: "Jane Doe", role: "Member" , score: 90},
-                { name: "John Doe", role: "Admin" , score: 80},
-                { name: "Jane Doe", role: "Member", score: 70 },
-                { name: "John Doe", role: "Admin", score: 70 },
-                { name: "Jane Doe", role: "Member", score: 70 },
-                { name: "John Doe", role: "Admin", score: 70 },
-               
-                { name: "Jane Doe", role: "Member", score: 70 },
-                { name: "Jane Doe", role: "Member", score: 70 },
-                { name: "Jane Doe", role: "Member", score: 70 },
-              ]}} />
-          )}
-        </div>
+            <LeaderboardContent   teamData = {teamData} members = {members}/>
+                  )}        </div>
       </div>
     </div>
   );
 };
 
-const DescriptionContent = ({ teamData }) => {
+const DescriptionContent = ({ teamData, members }) => {
     return (
         <div>
             {/* Centered team name with larger text */}
             <h3 className="text-4xl font-semibold mb-2 text-center">{teamData.name}</h3>
             <div className="text-center mb-4">
-                <p>{teamData.description}</p>
+          
                 {/* Divider under the team description */}
                 <hr className="my-4 border-t border-gray-300 mx-auto w-3/4" />
             </div>
@@ -94,12 +73,12 @@ const DescriptionContent = ({ teamData }) => {
                 {/* Fixed height for the scrollable list of team members */}
                 <div className="max-h-96 overflow-auto mx-auto" style={{ width: '90%' }}>
                     <List>
-                        {teamData.members.map((member, index) => (
+                        {members.map((member, index) => (
                             <ListItem key={index} divider className="justify-center">
                                 <ListItemAvatar>
-                                    <CustomAvatar username={member.name.split(' ')[0]} /> {/* Assuming avatar based on name */}
+                                    <CustomAvatar username={member.username} /> {/* Assuming avatar based on name */}
                                 </ListItemAvatar>
-                                <ListItemText primary={member.name} secondary={member.role} />
+                                <ListItemText primary={member.username} secondary={member.role} />
                             </ListItem>
                         ))}
                     </List>
@@ -110,13 +89,13 @@ const DescriptionContent = ({ teamData }) => {
 };
 
 
-const LeaderboardContent = ({ teamData }) => {
+const LeaderboardContent = ({ teamData, members }) => {
     // Sort members by score in descending order if not already sorted
-    const sortedMembers = [...teamData.members].sort((a, b) => b.score - a.score);
-
+    const sortedMembers = [members].sort((a, b) => b.score - a.score);
+    console.log("SORTED MEMBERS", sortedMembers, "members", members)
     const podiumMembers = sortedMembers.slice(0, 3); // Top 3 members for the podium
     const otherMembers = sortedMembers.slice(3); // The rest of the members
-
+console.log("PODIUM MEMBERS", podiumMembers, "OTHER MEMBERS", otherMembers)
     // Colors for the podium places
     const colors = {
         0: 'bg-[#ffd700]', // First place: Gold
@@ -131,27 +110,27 @@ const LeaderboardContent = ({ teamData }) => {
           {/* Second place (left side) */}
           <div className={`flex flex-col items-center mb-4`}>
             <div className={`${colors[1]} w-24 h-24 flex items-center justify-center rounded-full shadow-lg`}>
-              <span className="text-xl font-bold text-primary text-center" style={{ padding: '0 10px' }}>{podiumMembers[1].name}</span>
+              <span className="text-xl font-bold text-primary text-center" style={{ padding: '0 10px' }}>{podiumMembers[0][1]?.username}</span>
             </div>
-            <span className="mt-2">{podiumMembers[1].score} Points</span>
+            <span className="mt-2">{podiumMembers[0][1]?.score} Points</span>
             <span className="text-sm mt-1  font-sans font-semibold bg-primary p-2 rounded-xl text-white">2nd</span>
           </div>
           
           {/* First place (center, higher) */}
           <div className={`flex flex-col items-center mb-10`}>
             <div className={`${colors[0]} w-28 h-28 flex items-center justify-center rounded-full shadow-lg`}>
-              <span className="text-xl font-bold  text-primary text-center" style={{ padding: '0 10px' }}>{podiumMembers[0].name}</span>
+              <span className="text-xl font-bold  text-primary text-center" style={{ padding: '0 10px' }}>{podiumMembers[0][0]?.username}</span>
             </div>
-            <span className="mt-2">{podiumMembers[0].score} Points</span>
+            <span className="mt-2">{podiumMembers[0][0]?.score} Points</span>
             <span className="text-sm mt-1 font-sans font-semibold bg-primary p-2 rounded-xl text-white">1st</span>
           </div>
           
           {/* Third place (right side) */}
           <div className={`flex flex-col items-center mb-4`}>
             <div className={`${colors[2]} w-24 h-24 flex items-center justify-center rounded-full shadow-lg`}>
-              <span className="text-xl font-bold text-primary text-center" style={{ padding: '0 10px' }}>{podiumMembers[2].name}</span>
+              <span className="text-xl font-bold text-primary text-center" style={{ padding: '0 10px' }}>{podiumMembers[0][2]?.username}</span>
             </div>
-            <span className="mt-2">{podiumMembers[2].score} Points</span>
+            <span className="mt-2">{podiumMembers[0][2]?.score} Points</span>
             <span className="text-sm mt-1 font-sans font-semibold bg-primary p-2 rounded-xl text-white">3rd</span>
           </div>
         </div>
@@ -167,9 +146,9 @@ const LeaderboardContent = ({ teamData }) => {
 
                   {/* Avatar and Name */}
                   <ListItemAvatar>
-                      <CustomAvatar username={member.name.split(' ')[0]} />
+                      <CustomAvatar username={member.username} />
                   </ListItemAvatar>
-                  <ListItemText primary={member.name} secondary={member.role} className="flex-grow" />
+                  <ListItemText primary={member.username} secondary={member.role} className="flex-grow" />
 
                   {/* Points */}
                   <span>{member.score} Points</span>

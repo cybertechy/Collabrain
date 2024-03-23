@@ -280,11 +280,14 @@ router.post("/:team/invite/:user", async (req, res) =>
 		req.params.team
 		)
 			
-	}).catch(err => { return res.status(500).json({ error: err }); })
+	}).then(doc =>
+		{
+			return res.status(200).json(doc.data().teamInvites);
+		}).catch(err => { return res.status(500).json({ error: err }); })
 });
 
 /* Endpoint for getting user's invites */
-router.get("/:team/invite", async (req, res) =>
+router.get("/invite", async (req, res) =>
 {
 	// Make sure all required fields are present
 	if (!req.headers.authorization)
@@ -365,17 +368,14 @@ router.post("/:team/users", async (req, res) =>
 	// Make sure all required fields are present
 	if (!req.headers.authorization)
 		return res.status(400).json({ error: "Missing required data" });
-
 	// verify token and authority
 	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
 	if (!user)
 		return res.status(401).json({ error: "Unauthorized" });
-
 	// Check if user is part of the team already
 	let doc = await fb.db.doc(`users/${user.uid}`).get();
 	if (doc.data().teams.includes(req.params.team))
 		return res.status(400).json({ error: "User is already part of the team" });
-
 	try
 	{
 		// Add user to team members list
@@ -384,29 +384,26 @@ router.post("/:team/users", async (req, res) =>
 				role: "member"
 			}
 		});
-
 		// Add team to user's teams list
 		fb.db.collection("users").doc(user.uid).update({
 			teams: fb.admin.firestore.FieldValue.arrayUnion(req.params.team)
 		});
-
 		// If joined from invite, remove invite
 		if (req.query.invite == "true")
 		{
 			fb.db.doc(`users/${user.uid}`).update({
-				invites: fb.admin.firestore.FieldValue.arrayRemove({
-					teamID: req.params.team
-				})
+				teamInvites: fb.admin.firestore.FieldValue.arrayRemove(
+					req.params.team
+				)
 			});
 		}
 	}
 	catch (err) { return res.status(500).json({ error: err }); }
-
 	return res.status(200).json({ message: "Member added" });
 });
 
 /* Endpoint for deleting a member from a team */
-router.delete("/:team/users", async (req, res) =>
+router.delete("/:team/users/:user", async (req, res) =>
 {
 	// Make sure all required fields are present
 	if (!req.headers.authorization)
@@ -424,18 +421,18 @@ router.delete("/:team/users", async (req, res) =>
 
 	// Check if user is a admin of the team
 	let team = await fb.db.doc(`teams/${req.params.team}`).get();
-	if (team.data().members[user.uid].role == "admin")
+	if (team.data().owner === req.params.user)
 		return res.status(400).json({ error: "Admin cannot leave team" });
 
 	// Remove user from team
 	try
 	{
 		fb.db.doc(`teams/${req.params.team}`).update({
-			[`members.${user.uid}`]: fb.admin.firestore.FieldValue.delete()
+			[`members.${req.params.user}`]: fb.admin.firestore.FieldValue.delete()
 		});
 
 		// Remove team from user's teams list
-		fb.db.collection("users").doc(user.uid).update({
+		fb.db.collection("users").doc(req.params.user).update({
 			teams: fb.admin.firestore.FieldValue.arrayRemove(req.params.team)
 		});
 	}

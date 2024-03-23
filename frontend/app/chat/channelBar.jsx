@@ -4,13 +4,17 @@ import Divider from '@mui/material/Divider';
 import UserProfileBox from '@/components/ui/messagesComponents/userProfileBox'; // Corrected import
 import ChannelButton from './channelButton';
 import { useState, useEffect } from 'react';
+import AddIcon from '@mui/icons-material/Add';
 import TeamChannelOptionsMenu from '@/components/ui/chatsComponents/teamChannelOptionsMenu';
+import AddChannelOverlay from '@/components/ui/overlays/addChannelOverlay';
 const ChannelBar = ({ user, userUID, teamData, onUpdated, onInvite,onSettings, onLeave,onDelete, onViewDetails, onMute, onDeafen,   handleChannelSelect , selectedChannel,  onView}) => {
     const [isOwner, setIsOwner] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
+    const [showAddChannelOverlay, setShowAddChannelOverlay] = useState(false); // State to control AddChannelOverlay visibility
 
     useEffect(() => {
         if (teamData) {
+            console.log('Team data:', teamData);
             setIsOwner(teamData.owner === userUID);
             setIsAdmin(teamData.members?.[userUID]?.role === 'admin');
         }
@@ -38,6 +42,20 @@ const ChannelBar = ({ user, userUID, teamData, onUpdated, onInvite,onSettings, o
                 console.warn('Unrecognized option:', option);
         }
     };
+
+    const handleAddChannelClick = () => {
+        setShowAddChannelOverlay(true);
+    };
+    const handleChannelAdded = (channelName) => {
+        console.log(`Channel ${channelName} added`);
+        onUpdated(); // Trigger any updates needed after adding a channel
+    };
+
+    const sortedChannels = teamData?.channels?.slice().sort((a, b) => {
+        if (a.name === 'General') return -1;
+        if (b.name === 'General') return 1;
+        return 0; // Keep other channels in their original order
+      });
     return (
         <div className="flex flex-col h-full bg-white shadow-md z-20">
             {/* Chat Header */}
@@ -47,24 +65,26 @@ const ChannelBar = ({ user, userUID, teamData, onUpdated, onInvite,onSettings, o
       </div>
             <div className = "flex flex-col justify-between h-full">
             <div id= "chats" >
-            <div className="flex items-center justify-center p-4 shadow-md bg-gray-100">
+            <div className="flex flex-row items-center justify-between p-4 shadow-md bg-gray-100">
                 <h2 className="text-xl text-center font-semibold">Channels</h2>
-                
+                <button onClick={handleAddChannelClick} className="bg-primary ml-2  text-white p-2 rounded-md h-8 w-8 flex items-center justify-center">
+                            {/* Using a simple "+" text for the icon */}
+                          <AddIcon></AddIcon>
+                        </button>
             </div>
             
             {/* Chat List */}
-            <List className="overflow-auto flex flex-col">
-            {teamData?.channels?.map((channel, index) => (
-                        <ChannelButton
-                        key = {index}
-                            channelId={channel.id}
-                            channel={channel}
-                            isSelected={selectedChannel === channel.name}
-                            onSelect={handleChannelSelect}
-                        />
-                    ))}
-               
-            </List>
+            <List className="overflow-auto flex flex-col space-y-2">
+            {sortedChannels?.map((channel, index) => (
+              <ChannelButton
+                key={index}
+                channelId={channel.id}
+                channel={channel}
+                isSelected={selectedChannel === channel.name}
+                onSelect={handleChannelSelect}
+              />
+            ))}
+          </List>
             
           
             </div>
@@ -79,6 +99,14 @@ const ChannelBar = ({ user, userUID, teamData, onUpdated, onInvite,onSettings, o
             </div>
             
             </div>
+            {showAddChannelOverlay && (
+                <AddChannelOverlay
+                    isOpen={showAddChannelOverlay}
+                    onClose={() => setShowAddChannelOverlay(false)}
+                    onChannelAdded={handleChannelAdded}
+                    teamData={teamData}
+                />
+            )}
         </div>
     );
 };

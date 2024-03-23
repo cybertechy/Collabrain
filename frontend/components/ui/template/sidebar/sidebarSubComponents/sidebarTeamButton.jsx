@@ -5,15 +5,15 @@ import Link from 'next/link';
 import {getMedia} from '@/app/utils/storage'
 const TeamSidebarItem = ({ team, isSelected , isExpanded = true }) => {
     const { name, teamImageID , channels} = team;
-    console.log("SIDEBAR TEAM",team);
     const [teamImage, setTeamImage] = useState(null);
     useEffect(() => {  
         const fetchAttachments = async () => {
             console.log("fetchAttachments");
-          
-            const imageData = await getMedia(teamImageID);
+            
+            const imageData = await getMedia(teamImageID, "team");
             if (imageData) {
-              setTeamImage(imageData); // Directly use imageData, as getMedia returns response.data
+              setTeamImage(imageData.data);
+              
             } else {
               console.error("Failed to fetch attachment or no data returned");
             }

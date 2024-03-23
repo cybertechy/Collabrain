@@ -125,14 +125,11 @@ const InviteUsersOverlay = ({ onClose, teamData }) => {
     };
     const handleInviteUser = async (user) => {
       console.log("Inviting user:", user.username);
-      toast.success(`User ${user.username} invited successfully!`);
-      
       try {
           const token = await fb.getToken();
-          const teamId = teamData.teamId;
+          const teamId = teamData?.teamId;
           const userId = user.id;
-          
-          await axios.post(
+         const response =  await axios.post(
               `${SERVERLOCATION}/api/teams/${teamId}/invite/${userId}`,
               {},
               {
@@ -141,17 +138,19 @@ const InviteUsersOverlay = ({ onClose, teamData }) => {
                   },
               }
           );
-          // On success, show success toast
+          console.log(response);
+          toast.success(`User ${user.username} invited successfully!`);
           setLoading(false);
           handleDone();
           
       } catch (error) {
           console.error("Error sending invite:", error);
-          // On error, show error toast
+    
           toast.error("Error sending invite. Please try again.");
       } finally {
+        console.log("Finally");
           setLoading(false);
-          handleDone(); // Or handle this differently if you wish
+          handleDone(); 
       }
   };
 

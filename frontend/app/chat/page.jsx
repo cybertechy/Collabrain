@@ -26,7 +26,7 @@ import ShortTextIcon from '@mui/icons-material/ShortText'; // This can act as a 
 import TeamSettingsOverlay from "@/components/ui/overlays/teamSettingsOverlay";
 import TeamOverviewOverlay from "@/components/ui/overlays/teamOverviewOverlay";
 import { set } from "react-hook-form";
-
+import { fetchUser } from "../utils/user";
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
 export default function ChatRoom() {
@@ -50,7 +50,69 @@ const teamSettingsOverlayRef = useRef(null);
 const [showinviteUsersOverlay, setShowinviteUsersOverlay] = useState(false);
 const [showTeamSettingsOverlay, setShowTeamSettingsOverlay] = useState(false);
 const [showTeamOverviewOverlay, setShowTeamOverviewOverlay] = useState(false);
+const [members, setMembers] = useState([]);
+const [bannedMembers, setBannedMembers] = useState([]);
+useEffect(() => {
+    fetchAllMembers();
+}, [teamData, channelsUpdated]);
 
+const fetchAllMembers = async () => {
+    if (teamData && teamData.members && teamData.owner) {
+     
+        const memberPromises = Object.keys(teamData.members).map(async memberId => {
+            // Assume fetchUser returns user info for a given ID
+            const userInfo = await fetchUser(memberId);
+            return {
+                ...userInfo,
+                role: memberId === teamData.owner ? 'owner' : teamData.members[memberId].role,
+                id: memberId,
+                score: teamData.members[memberId].score? teamData.members[memberId].score : 0, 
+            };
+        });
+        Promise.all(memberPromises).then(completeMembers => {
+            setMembers(completeMembers);
+        });
+        const bannedMemberPromises = teamData.banned.map(async memberId => {
+            console.log("BANNED MEMBER ID", memberId)
+            // Assume fetchUser returns user info for a given ID
+            const userInfo = await fetchUser(memberId);
+            return {
+                ...userInfo,
+                
+                id: memberId
+            };
+        });
+        Promise.all(bannedMemberPromises).then(completeMembers => {
+            setBannedMembers(completeMembers);
+        });
+    }
+};
+// const fetchBannedMembers = async () => {
+//     if (teamData && teamData.teamId) {
+//         try {
+//             const token = await fb.getToken(); // Retrieve the authentication token
+//             const response = await axios.get(`${SERVERLOCATION}/api/teams/${teamData.teamId}/ban`, {
+//                 headers: {
+//                     'Authorization': `Bearer ${token}`,
+//                 },
+//             });
+
+//             const bannedMemberIds = response.data; // Assuming the endpoint returns an array of banned member IDs
+//             if (!bannedMemberIds) return;
+
+//             const bannedMemberPromises = bannedMemberIds.map(async (memberId) => {
+//                 const userInfo = await fetchUser(memberId); // Assuming fetchUser fetches user info by ID
+//                 return { ...userInfo, id: memberId };
+//             });
+
+//             Promise.all(bannedMemberPromises).then(completeBannedMembers => {
+//                 setBannedMembers(completeBannedMembers);
+//             });
+//         } catch (error) {
+//             console.error("Error fetching banned members:", error);
+//         }
+//     }
+// };
 const toggleTeamOverviewOverlay = () => {
     setShowTeamOverviewOverlay(!showTeamOverviewOverlay); // Toggle the state
 };
@@ -85,8 +147,52 @@ const buttonStyles = { border:1, borderColor : "#30475E" , color : "#30475E",  '
 const onSettings = () => {}
 const onInvite = () => {}
 const onDeafen = () => {}
-const onLeave = () => {}
-const onDelete = () => {console.log("Implement Delete Team")}
+const onLeave = async () => {
+    try {
+        const token = await fb.getToken(); // Ensure this method correctly retrieves the auth token
+        
+
+        if (!teamId || !user) {
+            console.log("Missing teamId or userId");
+            return;
+        }
+
+        const response = await axios.delete(`${SERVERLOCATION}/api/teams/${teamId}/users/${user.uid}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        if (response.status === 200) {
+            console.log("Successfully left the team");
+            // Optionally, perform any follow-up actions here, e.g., redirecting the user or updating UI
+            router.push("/dashboard");
+        } else {
+            console.error("Failed to leave the team", response.data);
+        }
+    } catch (error) {
+        console.error("Error leaving the team", error);
+    }
+};
+const onMute = () => {console.log("Implement Mute Team")}
+const onDelete = async () => {
+    try {
+        const token = await fb.getToken(); // Replace with your method to get the user's token
+
+        const response = await axios.delete(`${SERVERLOCATION}/api/teams/${teamId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        console.log("Team deleted successfully", response.data);
+        // Handle post-delete logic here (e.g., redirecting the user)
+        router.push("/dashboard")
+    } catch (error) {
+        console.error("Failed to delete team", error.response?.data || error.message);
+        // Handle error (e.g., showing an error message to the user)
+    }
+};
 
 const messagesEndRef = useRef(null); // Create a reference to the message container
 const handleReact = (messageId, emoji) => {
@@ -558,6 +664,7 @@ const scrollToBottom = () => {
                 onDeafen = {onDeafen}
                 onLeave = {onLeave}
                 onDelete = {() => setDeleteOverlayOpen(true)}
+                onMute = {onMute}
                 onViewDetails = {()=> setShowTeamOverviewOverlay(true)}
             />
 			<div className="flex flex-col w-full  relative">
@@ -610,12 +717,12 @@ const scrollToBottom = () => {
 </Dialog>
 {showTeamSettingsOverlay&& (
     <div ref={teamSettingsOverlayRef}>
-        <TeamSettingsOverlay onClose={handleCloseTeamSettings} />
+        <TeamSettingsOverlay onClose={handleCloseTeamSettings} teamData = {teamData} onUpdate = {handleUpdated} members = {members} bannedMembers = {bannedMembers} userId = {user?.uid}/>
     </div>
 )}
 {showTeamOverviewOverlay && (
     <div>
-        <TeamOverviewOverlay onClose={handleCloseTeamOverview} />
+        <TeamOverviewOverlay onClose={handleCloseTeamOverview} teamData = {teamData} members = {members} />
     </div>
 )}
 
