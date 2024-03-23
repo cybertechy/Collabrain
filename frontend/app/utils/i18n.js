@@ -267,6 +267,21 @@ i18n
 
         msg_box: {
           "enter_msg": "Enter a Message..."
+        },
+
+        content_map: {
+          "msg1_title": "Bring ideas onto life",
+          "msg1": "This is the content map, you can create diagrams and much more here",
+          "msg2_title": "Content Map Name",
+          "msg2": "You can edit the content map name by clicking on the icon",
+          "msg3_title": "Share Content Map with others",
+          "msg3": "You can share the current content map to others by clicking on it",
+          "msg4_title": "Saved Status",
+          "msg4": "This icon shows the saving status of the content map",
+          "doneBtn": "Understood",
+          "closeBtn": "Close",
+          "nextBtn": "Next",
+          "prevBtn": "Previous",
         }
       },
       ru: {
@@ -533,6 +548,21 @@ i18n
 
         msg_box: {
           "enter_msg": "Введите сообщение..."
+        },
+
+        content_map: {
+          "msg1_title": "Воплощайте идеи в жизнь",
+          "msg1": "Это контент карта, здесь вы можете создавать диаграмы, и многое другое",
+          "msg2_title": "Имя Контент Карты",
+          "msg2": "Вы можете изменять название контент карты, кликнув на иконку",
+          "msg3_title": "Делитесь Контент Картой с другими",
+          "msg3": "Кликнув на контент карту, вы сможете поделиться ею с другими",
+          "msg4_title": "Статус Сохранения",
+          "msg4": "Эта иконка показывает статус сохранения контент карты",
+          "doneBtn": "Понял",
+          "closeBtn": "Закрыть",
+          "nextBtn": "Вперед",
+          "prevBtn": "Назад",
         }
       },
       // Add more languages here

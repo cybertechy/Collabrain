@@ -315,13 +315,16 @@ const FriendTile = ({ friendData, onMoreOptions, id, setRefreshList, refreshList
       }}
     >
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        <ListItemAvatar>
+        <ListItemAvatar
+        onMouseEnter={() => isTTSEnabled && speak(friendData.username)} onMouseLeave={stop}>
           <Avatar {...stringAvatar(friendData.username)} />
         </ListItemAvatar>
         <ListItemText
           primary={friendData.username}
           primaryTypographyProps={{ color: '#000000' }}
           secondary={friendData.email}
+          onMouseEnter={() => isTTSEnabled && speak(`${friendData.username}, ${friendData.email}`)}
+          onMouseLeave={stop}
         />
       </Box>
 

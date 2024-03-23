@@ -13,8 +13,13 @@ import allFriendsLottie from "@/public/assets/json/allFriendsLottie.json";
 import blockedLottie from "@/public/assets/json/blockedLottie.json";
 import recievedRequestsLottie from "@/public/assets/json/recievedRequestsLottie.json";
 import Lottie from "lottie-react";
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
+import { useTranslation } from 'next-i18next';
 
 const FriendsWindow = () => {
+  const { t } = useTranslation('dms');
+  const { speak, stop, isTTSEnabled } = useTTS();
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -231,20 +236,20 @@ const FriendsWindow = () => {
     switch (activeTab) {
       case 'all':
         animationData = allFriendsLottie;
-        message = "This is where your friends can be found.";
+        message = t('all');
         break;
       case 'Recieved':
         animationData = recievedRequestsLottie;
-        message = "You will find your received friend requests here.";
+        message = t('received');
         break;
       case 'blocked':
         animationData = blockedLottie;
-        message = "You will find your blocked users here.";
+        message = t('blocked');
         break;
       case 'addFriend':
       default:
         animationData = addFriendLottie;
-        message = "Start typing to search for friends to add.";
+        message = t('search_friends');
         break;
     }
   

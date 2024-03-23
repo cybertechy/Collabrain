@@ -79,7 +79,7 @@ const DashboardInfoBar = ({ currentPath, onSort, sortCriteria, moveProjectToPath
               // className='text-xl font-bold font-poppins text-primary cursor-pointer underline'
               className='text-sm xs:text-xl font-bold font-poppins text-primary cursor-pointer underline'
               onClick={() => navigateToPath(part, index)}
-              onMouseEnter={() => isTTSEnabled && speak("My Brain")}
+              onMouseEnter={() => isTTSEnabled && speak(part)}
               onMouseLeave={stop}
               onDragOver={handleDragOver}
               onDrop={(e) => handleDrop(e, part, index)}

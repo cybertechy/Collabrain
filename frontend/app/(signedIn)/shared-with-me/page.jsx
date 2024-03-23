@@ -97,7 +97,7 @@ export default function SharedWithMe() {
       />
 
       <DashboardInfoBar
-        currentPath={searchParams.get("path") ? t('shared_top') + searchParams.get("path") : t('shared_top')}
+        currentPath={searchParams.get("path") ? "Shared with Me" + searchParams.get("path") : "Shared with Me"}
         onSort={handleSort}
         sortCriteria={sortCriteria}
       />
@@ -117,7 +117,8 @@ export default function SharedWithMe() {
           <Lottie animationData={smallLoader} play loop style={{ width: 100, height: 100 }} />
         ) : (
           <div>
-            <p className="text-2xl text-left text-primary ml-4 mb-4">{t('shrd_projects')}</p>
+            <p className="text-2xl text-left text-primary ml-4 mb-4"
+            onMouseEnter={() => isTTSEnabled && speak("Shared projects")} onMouseLeave={stop}>{t('shrd_projects')}</p>
             <div className="flex flex-wrap gap-4 ml-4 justify-start">
               {sortedProjects.length > 0 ? sortedProjects.map((project) => (
                 <DashboardProjectButton
@@ -129,7 +130,9 @@ export default function SharedWithMe() {
                   type={project.type}
                 />
               )) : (
-                <div className="text-primary font-poppins text-xl italic">
+                <div className="text-primary font-poppins text-xl italic" 
+                onMouseEnter={() => isTTSEnabled && speak("No shared projects available.")}
+                onMouseLeave={stop}>
                   {t('no_projects')}
                 </div>
               )}
