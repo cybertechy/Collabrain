@@ -52,12 +52,17 @@ const [showTeamSettingsOverlay, setShowTeamSettingsOverlay] = useState(false);
 const [showTeamOverviewOverlay, setShowTeamOverviewOverlay] = useState(false);
 const [members, setMembers] = useState([]);
 const [bannedMembers, setBannedMembers] = useState([]);
+const [currentUserIsBanned, setCurrentUserIsBanned] = useState(false);
 useEffect(() => {
+    if(!user){
+        return;
+    }
     fetchAllMembers();
-}, [teamData, channelsUpdated]);
+}, [teamData, channelsUpdated, user]);
+
 
 const fetchAllMembers = async () => {
-    if (teamData && teamData.members && teamData.owner) {
+    if (teamData && teamData.members && teamData.owner && user) {
      
         const memberPromises = Object.keys(teamData.members).map(async memberId => {
             // Assume fetchUser returns user info for a given ID
@@ -72,9 +77,13 @@ const fetchAllMembers = async () => {
         Promise.all(memberPromises).then(completeMembers => {
             setMembers(completeMembers);
         });
-        const bannedMemberPromises = teamData.banned.map(async memberId => {
+        const bannedMemberPromises = (teamData?.banned || []).map(async memberId => {
             console.log("BANNED MEMBER ID", memberId)
             // Assume fetchUser returns user info for a given ID
+            if(memberId === user.uid){
+                setCurrentUserIsBanned(true);
+            }
+
             const userInfo = await fetchUser(memberId);
             return {
                 ...userInfo,
@@ -641,7 +650,8 @@ const scrollToBottom = () => {
 
 	return (
 		<Template>
-            
+             {(!currentUserIsBanned) ? ( // Ensure the condition is wrapped in parentheses and properly closed
+            <>
              <ToastContainer />
             <LoaderComponent
                 isLoading={isLoading}
@@ -725,7 +735,12 @@ const scrollToBottom = () => {
         <TeamOverviewOverlay onClose={handleCloseTeamOverview} teamData = {teamData} members = {members} />
     </div>
 )}
-
+    </>
+        ) : (
+            <div className="flex h-full items-center justify-center">
+               <p className="font-bold text-3xl font-sans text-center text-primary">Sorry, you are banned from this team {"  "} :(</p>
+            </div>
+        )}
 		</Template>
 	)
 		{/* </div> */}

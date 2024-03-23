@@ -372,7 +372,7 @@ const RolesTeamSettingsOverlay = ({ onClose, users, onRoleChange, teamData }) =>
     }
     // If roles are the same, compare by name
     return (a.fname+a.lname).localeCompare(b.fname+b.lname);
-  }).filter(user => (user.fname+user.lname).toLowerCase().includes(searchQuery) && teamData.banned.includes(user.id) === false);
+  }).filter(user => (user.fname+user.lname).toLowerCase().includes(searchQuery) && (teamData?.banned||[]).includes(user.id) === false);
   return (
     <div className='flex-grow p-4 overflow-auto flex flex-col'>
       <style>
@@ -440,7 +440,7 @@ const UserManagementOverlay = ({ onClose, users, onKickUser, onBanUser , teamDat
 
   // Filter users based on the search query
   const filteredUsers = users.filter(user => 
-    (user.fname+user.lname).toLowerCase().includes(searchQuery) && user.role !== 'owner' && teamData.banned.includes(user.id) === false && user.id !== userId
+    (user.fname+user.lname).toLowerCase().includes(searchQuery) && user.role !== 'owner' && (teamData?.banned || []).includes(user.id) === false && user.id !== userId
   );
   return (
     <div className='flex-grow p-4 overflow-auto flex flex-col'>
