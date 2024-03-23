@@ -13,6 +13,7 @@ import allFriendsLottie from "@/public/assets/json/allFriendsLottie.json";
 import blockedLottie from "@/public/assets/json/blockedLottie.json";
 import recievedRequestsLottie from "@/public/assets/json/recievedRequestsLottie.json";
 import Lottie from "lottie-react";
+import { ArrowForward } from '@mui/icons-material';
 
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
@@ -323,11 +324,13 @@ const FriendsWindow = ({userInfo, handleAliasUpdate, handleChatUpdate, showChat,
       <Box sx={{ width: '100%' }} className={`${showChat || showFriends ? '' : 'max-sm:hidden'}`}>
         <div className="hidden max-sm:flex max-sm:flex-col items-center justify-center p-4 shadow-md bg-gray-100">
           <h2 className="text-xl text-center font-semibold">Friends</h2>
-            <button className='hidden max-sm:block ml-auto'
+            <button className='hidden max-sm:block ml-auto bg-primary text-white px-3 py-2 rounded-md mt-2'
               onClick={() => {
               setShowFriends(false); 
               console.log("showFriends",showFriends);
-              }}>Open Chats</button>
+              }}>Open Chats
+              <span> <ArrowForward></ArrowForward> </span>
+              </button>
         </div>
       <TopBar activeTab={activeTab} onTabChange={handleTabChange} />
       <SearchBar onSearch={handleSearch} />
