@@ -17,8 +17,8 @@ export default function Call(props)
 {
 	const { callVideoStreams, myPeer, micEnabled, videoEnabled, showCallScreen,
 		setMyPeer, setShowCallScreen, setCallVideoStreams, addCallVideoStream, removeCallVideoStream,
-		toggleAudio, toggleVideo, room, setRoom, stream, setStream, 
-		inCall, setInCall, sockCli, setSockCli } = useVideoCall();
+		toggleAudio, toggleVideo, room, setRoom, stream, setStream,
+		inCall, setInCall, sockCli, setSockCli, receivingCall } = useVideoCall();
 
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
@@ -56,7 +56,7 @@ export default function Call(props)
 		if (myPeer)
 			return;
 
-		setMyPeer(new Peer());
+		setMyPeer(new Peer({ host: 'peer-server.cybertech13.eu.org', secure: true, port: 443}));
 		setRoom(room);
 	};
 
@@ -172,10 +172,20 @@ export default function Call(props)
 			{
 				!inCall ?
 					(pathname == "/messages" && (searchParams.get("chatID") != null)) || pathname === "/chat" ?
-						<button className="border border-white text-white hover:text-white hover:bg-green-500 hover:border-green-500 font-bold px-3 py-2 rounded"
-							onClick={() => { joinCall("room1"); }}>
-							<CallIcon />
-						</button> :
+						(
+							!receivingCall ?
+								<button className="border border-white text-white hover:text-white hover:bg-green-500 hover:border-green-500 font-bold px-3 py-2 rounded"
+									onClick={() => { joinCall("room1"); }}>
+									<CallIcon />
+								</button>
+								:
+								<button className="font-normal border border-green-500 bg-green-500 text-white hover:text-white hover:bg-green-600 hover:border-green-600 font-bold px-3 py-2 rounded"
+									onClick={() => { joinCall("room1"); }}>
+										Join Call
+									<CallIcon className="ml-2"/>
+								</button>
+						)
+						:
 						<></>
 					:
 					// Button to show call with mic, video and leave buttons
