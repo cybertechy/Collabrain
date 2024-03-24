@@ -73,7 +73,7 @@ const DashboardProjectButton = ({
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
-            className="w-10 h-10 sm:w-16 sm:h-16"
+            className="w-10 h-10 sm:w-10 sm:h-10"
         >
             <path
                 fillRule="evenodd"
@@ -92,6 +92,17 @@ const DashboardProjectButton = ({
             router.push(`/contentmap?id=${project.id}`);
         }
     };
+    const handleDocumentClick = (event) => {
+        // Check if the type is "Document"
+        event.stopPropagation();
+        if (type === "Document" && project.id) {
+            // Navigate to the document page with the id parameter
+            OnClick();
+            router.push(`/document?id=${project.id}`);
+        }
+    };
+
+
     async function renameContentMap(contentMapId, newName) {
         let token = await fb.getToken();
         await axios
@@ -160,7 +171,7 @@ const DashboardProjectButton = ({
             <div>
                 <div
 // className="flex flex-wrap items-stretch justify-center bg-aliceBlue text-primary rounded-md hover:bg-columbiablue duration-300  pt-2 px-3  border border-unselected" // Added mb-2 for bottom spacing
-                    className="flex flex-col items-center justify-center bg-aliceBlue text-primary rounded-md hover:bg-columbiablue duration-300 h-22 w-32 sm:h-28 shadow-md pt-3 pl-1 border border-unselected"
+                    className="flex flex-col items-center justify-center bg-aliceBlue text-primary rounded-md hover:bg-columbiablue duration-300 h-22 w-36 sm:h-28 shadow-md pt-3 pl-1 border border-unselected cursor-pointer "
                     draggable="true"
                     onDragStart={(e) => handleDragStart(e, project.id, type)}
                 >
@@ -168,7 +179,10 @@ const DashboardProjectButton = ({
                         <div className="flex flex-col gap-2 items-center">
                             {/* Project type text (left-aligned) */}
                         
-                        <div onClick={handleContentMapClick}>
+                        <div onClick={ 
+                            (e) => type === "Document" ? handleDocumentClick(e) : handleContentMapClick(e)
+                            }
+                        >
                             {type === "Document" ? doc() : map()}
                         </div>
                         
