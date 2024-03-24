@@ -16,6 +16,7 @@ import {
 import axios from "axios";
 import CustomAvatar from "../messagesComponents/avatar";
 import { ToastContainer, toast } from "react-toastify";
+import { fetchUser } from "@/app/utils/user";
 const fb = require("_firebase/firebase");
 
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
@@ -113,13 +114,24 @@ const InviteUsersOverlay = ({ onClose, teamData }) => {
                     },
                 }
             );
-            setUsers(response.data.friends);
+            console.log(response);
+    
+            // Map through the list of friend IDs and call fetchUser for each
+            const friendsPromises = response.data.friends.map(id => fetchUser(id));
+    
+            // Wait for all the fetchUser promises to resolve
+            const friendsData = await Promise.all(friendsPromises);
+    
+            // Now friendsData contains the actual data of each friend
+            console.log(friendsData);
+            setUsers(friendsData);
         } catch (error) {
             console.error("Error fetching friends:", error);
             setUsers([]);
         }
         setLoading(false);
     };
+    
     const handleSearchChange = (event) => {
         setSearchQuery(event.target.value);
     };

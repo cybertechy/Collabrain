@@ -22,7 +22,7 @@ const commonReactions = [
   { emoji: '😢', label: 'sad' },
 ];
 
-function MessageItem({ sender, senderId, title,timestamp, message, messageId, attachmentIds, reactions = {}, onReact, onEdit, onDelete, userInfo, chatId , source, teamId}) {
+function MessageItem({ sender, senderId, title,timestamp, message, messageId, attachmentIds, reactions = {}, onReact, onEdit, onDelete, userInfo, chatId , source = "user", teamId}) {
    const [attachments, setAttachments] = useState([]);
   const [loadingAttachments, setLoadingAttachments] = useState(false);
   const [editMode, setEditMode] = useState(false);

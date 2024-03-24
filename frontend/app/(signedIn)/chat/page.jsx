@@ -225,16 +225,51 @@ export default function ChatRoom() {
 				reactions: updatedMessage.reactions,
 			};
 			console.log(
-				"Emitting updateDirectMessage event with updated reactions:",
+				"Emitting updateTeamMessage event with updated reactions:",
 				updatedMessage
 			);
-			sockCli.current.emit("updateDirectMessage", updatedMessage);
+			sockCli.current.emit("updateTeamMessage", updatedMessage);
 		}
 
 		// Update local state
 		setMessages(messagesCopy);
 	};
 
+	const handleEdit = (messageId, editedText) => {
+        let updatedMessage = {};
+        // Prepare the updated messages
+        const messagesCopy = messages.map((messageComponent) => {
+            if (messageComponent.props.messageId === messageId) {
+                updatedMessage = {
+                    ...messageComponent.props,
+                    message: editedText,
+                };
+                // Return an updated component for local state update
+                return React.cloneElement(messageComponent, updatedMessage);
+            }
+            return messageComponent;
+        });
+
+        // Emit the updateDirectMessage event with updated message text
+        if (sockCli.current) {
+            let sentAt = new Date();
+            // Assuming you have chatId and user information available as in handleReact
+            const messageUpdate = {
+                chat: chatId,
+                sentAt: sentAt.toISOString(),
+                id: updatedMessage.messageId,
+                msg: AES.encrypt(updatedMessage.message, chatId).toString(),
+            };
+            console.log(
+                "Emitting updateTeamMessage event with updated message text:",
+                messageUpdate
+            );
+            sockCli.current.emit("updateTeamMessage", messageUpdate);
+        }
+
+        // Update local state with the modified messages
+        setMessages(messagesCopy);
+    };
 	// Function to scroll to the bottom
 	const scrollToBottom = () => {
 		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -282,6 +317,7 @@ export default function ChatRoom() {
 					userInfo={userInfo}
 					teamId={teamId}
 					source={"team"}
+					onEdit={handleEdit}
 				/>,
 			]);
 		});
@@ -321,6 +357,7 @@ export default function ChatRoom() {
 								teamId={teamId}
 								source={"team"}
 								onReact={handleReact}
+								onEdit={handleEdit}
 							/>
 						);
 					}
@@ -377,12 +414,15 @@ export default function ChatRoom() {
 				});
 
 				const fetchedMessages = response.data.map((messageData) => {
-					// Attempt to safely convert timestamp to Date object
+					// Attempt to safely convert timestamp to Date object'
 					let sentAt = new Date(messageData.sentAt._seconds * 1000 + messageData.sentAt._nanoseconds / 1000000);
 
 					let decryptedMessage = decryptMessage(messageData.message, teamId);
 
 					// Format date or handle invalid dates
+				    if(messageData.username == "System") {
+						decryptedMessage = messageData.message;
+					}
 					let timestamp = sentAt.toLocaleDateString() + ", " + sentAt.toLocaleTimeString();
 					console.log("timestamp", sentAt)
 					return (
@@ -397,6 +437,7 @@ export default function ChatRoom() {
 							teamId={teamId}
 							source={"team"}
 							onReact={handleReact}
+							onEdit={handleEdit}
 						/>
 					);
 				});
@@ -577,10 +618,11 @@ export default function ChatRoom() {
 			team: teamId,
 			channel: channelName,
 			msg: encryptedMsg, // encrypted message
-			sentAt: formatDate2(sentAt),
+			sentAt: sentAt.toISOString(),
 			attachments: attachmentIds,
 			reactions: [] // if you handle reactions
 		};
+		console.log("THIS IS WHAT YOU'RE SENDING TO THE SERVER", messageData)
 		const optimisticMessage = {
 			...messageData,
 			msg: msg, // Display the original, unencrypted message in the UI
@@ -602,6 +644,7 @@ export default function ChatRoom() {
 				teamId={teamId}
 				source={"team"}
 				attachmentIds={attachmentIds} // Include the attachment IDs for rendering
+				onEdit={handleEdit}
 			/>
 		]);
 
