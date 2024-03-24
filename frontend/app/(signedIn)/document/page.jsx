@@ -177,7 +177,7 @@ export default function Editor()
 	return (
 		<div>
 			{user && fileData &&
-				<FileToolbar userID={user.uid} name={docName} commentsEnabled={true} showCommentButton={showCommentButton}
+				<FileToolbar userID={user.uid} name={docName} commentsEnabled={false} showCommentButton={showCommentButton}
 					fileType="doc" fileID={searchParams.get('id')} fileData={fileData} isSaved={isSaved} />
 			}
 
