@@ -180,12 +180,12 @@ function MessageItem({
                 return (
                     <div
                         key={index}
-                        className="flex flex-col items-center p-2 m-1"
+                        className="flex flex-col items-center justify-center  p-2 m-1"
                     >
                         <img
                             src={attachment}
                             alt={fileName}
-                            className="max-w-full h-auto rounded"
+                            className="max-w-xs h-auto rounded"
                         />
                         <p className="text-sm text-center mt-2">{fileName}</p>
                     </div>
@@ -230,11 +230,7 @@ function MessageItem({
                 <div className="flex flex-col">
                     <div className="flex items-baseline gap-2">
                         <span className="font-semibold">
-                            {sender == userInfo.data.username
-                                ? sender
-                                : sender == "System"
-                                ? "System"
-                                : title}
+                            {sender}
                         </span>
                         <span className="text-xs text-gray-500">
                             {timestamp == "Invalid Date" ? "" : timestamp}

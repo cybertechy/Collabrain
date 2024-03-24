@@ -60,7 +60,7 @@ const FriendsWindow = ({userInfo, handleAliasUpdate, handleChatUpdate, showChat,
   const abortControllerRef = useRef(null);
 
   useEffect(() => {
-    if (activeTab === 'addFriend' && searchQuery.trim() !== '') {
+    if (activeTab === 'addFriend') {
       if (searchTimerRef.current) {
         clearTimeout(searchTimerRef.current);
       }
@@ -79,6 +79,10 @@ const FriendsWindow = ({userInfo, handleAliasUpdate, handleChatUpdate, showChat,
         abortControllerRef.current = abortController;
   
         const fetchSearchResults = async () => {
+          if (searchQuery.trim() === '') {
+            setSearchResults([]);
+            return;
+          }
           try {
             setSearching(true);
             const token = await fb.getToken();

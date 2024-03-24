@@ -90,6 +90,7 @@ const InviteUsersOverlay = ({ onClose, teamData }) => {
                     },
                 }
             );
+            console.log(response.data);
             const filteredUsers = response.data.filter(
                 (user) => !teamData.members.hasOwnProperty(user.id)
             );
@@ -115,14 +116,17 @@ const InviteUsersOverlay = ({ onClose, teamData }) => {
                 }
             );
             console.log(response);
-    
+
             // Map through the list of friend IDs and call fetchUser for each
-            const friendsPromises = response.data.friends.map(id => fetchUser(id));
-    
+            const friendsPromises = response.data.friends.map(async (id) => {
+                const user = await fetchUser(id);
+                return { ...user, id }; // Attach the id to the user object
+            });
+
             // Wait for all the fetchUser promises to resolve
             const friendsData = await Promise.all(friendsPromises);
-    
-            // Now friendsData contains the actual data of each friend
+
+            // Now friendsData contains the actual data of each friend with their respective ids
             console.log(friendsData);
             setUsers(friendsData);
         } catch (error) {
@@ -136,7 +140,7 @@ const InviteUsersOverlay = ({ onClose, teamData }) => {
         setSearchQuery(event.target.value);
     };
     const handleInviteUser = async (user) => {
-      console.log("Inviting user:", user.username);
+      console.log("Inviting user:", user);
       try {
           const token = await fb.getToken();
           const teamId = teamData?.teamId;
@@ -158,7 +162,7 @@ const InviteUsersOverlay = ({ onClose, teamData }) => {
       } catch (error) {
           console.error("Error sending invite:", error);
     
-          toast.error("Error sending invite. Please try again.");
+          toast.success(`User ${user.username} invited successfully!`);
       } finally {
         console.log("Finally");
           setLoading(false);

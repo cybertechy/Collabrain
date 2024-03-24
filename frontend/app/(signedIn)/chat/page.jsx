@@ -367,17 +367,20 @@ export default function ChatRoom() {
 				const response = await axios.get(`${SERVERLOCATION}/api/teams/${teamId}/channels/${channelName}/messages`, {
 					headers: { "Authorization": "Bearer " + token }
 				});
-
+			
 				const fetchedMessages = response.data.map((messageData) => {
 					// Attempt to safely convert timestamp to Date object'
-				
+					console.log("MESSAGE DATA", messageData)
 					let sentAt = new Date(messageData.sentAt._seconds * 1000 + messageData.sentAt._nanoseconds / 1000000);
 
-					let decryptedMessage = decryptMessage(messageData.message, teamId);
+					let decryptedMessage = ""
 
 					// Format date or handle invalid dates
 				    if(messageData.username == "System") {
 						decryptedMessage = messageData.message;
+						messageData.reactions = {};
+					}else{
+						decryptedMessage = decryptMessage(messageData.message, teamId);
 					}
 					let timestamp = sentAt.toLocaleDateString() + ", " + sentAt.toLocaleTimeString();
 				
@@ -391,7 +394,7 @@ export default function ChatRoom() {
 							message={decryptedMessage}
 							messageId = {messageData.id}
 							reactions={messageData.reactions || {}}
-							userId={messageData.senderID}
+							userId={messageData.sender}
 							teamId={teamId}
 							source={"team"}
 							onReact={handleReact}
