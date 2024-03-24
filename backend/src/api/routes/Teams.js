@@ -695,7 +695,7 @@ router.get("/:team/channels/:channel/messages", async (req, res) =>
 		.then(snapshot =>
 		{
 			let messages = [];
-			snapshot.forEach(doc => messages.push(doc.data()));
+			snapshot.forEach(doc => messages.push({...doc.data(),id:doc.id}));
 			return res.status(200).json(messages);
 		})
 		.catch(err => { return res.status(500).json({ error: err }); });
