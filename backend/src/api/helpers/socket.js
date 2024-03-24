@@ -228,7 +228,7 @@ function init(server)
 async function broadcastMessage(data, type = "team", newMessage = false, deleteMsg = false) {
 
 	// If the message is a delete message, check if the message has the required fields
-	if(deleteMsg && type == "team" && !data.team && !data.channelId && !data.id) return;
+	if(deleteMsg && type == "team" && !data.team && !data.channelId  && !data.channel&& !data.id) return;
 	if(deleteMsg && type == "direct" && !data.chat && !data.id) return;
 
 	// Get the members of the team or chat
@@ -271,7 +271,7 @@ async function broadcastMessage(data, type = "team", newMessage = false, deleteM
 		(type == "team" ) ? fb.saveTeamMsg(data, newMessage) : fb.saveDirectMsg(data, newMessage);
 	}
     else{
-		(type == "team") ? fb.deleteTeamMsg(data.team,data.channelId,data.id) : fb.deleteChatMsg(data.chat,data.id);
+		(type == "team") ? fb.deleteTeamMsg(data.team,data.channel,data.id) : fb.deleteChatMsg(data.chat,data.id);
 	}
 
 }

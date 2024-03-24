@@ -11,6 +11,7 @@ import MessageBox from "@/components/ui/messagesComponents/messageBox";
 import Toolbar from '@mui/material/Toolbar';
 import { Timestamp } from "firebase/firestore";
 import ChannelBar from "./channelBar";
+import React from "react";
 import { ToastContainer, toast } from "react-toastify";
 import MessageItem from "@/components/ui/messagesComponents/MessageItem";
 const { useRouter, useSearchParams } = require('next/navigation');
@@ -150,6 +151,51 @@ export default function ChatRoom() {
 		}
 	};
 	const onMute = () => { console.log("Implement Mute Team") }
+
+	const onDeleteMessage = (messageId) => {
+    if (!teamId) {
+        console.error("Team ID is not available.");
+        toast.error("An error occurred. Please try again later.");
+        return;
+    }
+	let channelId = "";
+		let teamInfo = teamDataRef.current;
+		console.log(teamDataRef.current);
+		for (let x = 0; x < teamInfo.channels.length; x++) {
+			if(teamInfo.channels[x].name == channelName) {
+				channelId = teamInfo.channels[x].channelId;
+			}
+
+		}
+    // Optimistically remove the message from the UI
+    setMessages((currentMessages) =>
+        currentMessages.filter(
+            (messageComponent) => messageComponent.props.messageId !== messageId
+        )
+    );
+
+    // Prepare the message deletion details for the server
+    const messageToDelete = {
+        team: teamId,
+        id: messageId,
+        channelId: channelId,
+		channel: channelName,
+        sentAt: new Date().toISOString(),
+    };
+
+    console.log("Emitting deleteTeamMessage event with:", messageToDelete);
+
+    // Emit the delete event to the server
+    if (sockCli.current) {
+        sockCli.current.emit("deleteTeamMessage", messageToDelete);
+        toast.success("Message deleted successfully."); // Provide user feedback on successful deletion
+    } else {
+        toast.error("Failed to connect to server. Message not deleted."); // Error handling if the socket connection is unavailable
+    }
+};
+
+
+
 	const onDelete = async () => {
 		try {
 			const token = await fb.getToken(); // Replace with your method to get the user's token
@@ -170,106 +216,7 @@ export default function ChatRoom() {
 	};
 
 	const messagesEndRef = useRef(null); // Create a reference to the message container
-	const handleReact = (messageId, emoji) => {
-		if (!messageId)
-			return toast.error("Cannot react to messages that don't have IDs", {
-				position: "top-center",
-				autoClose: 5000,
-				hideProgressBar: false,
-				closeOnClick: true,
-				pauseOnHover: true,
-				draggable: true,
-				progress: undefined,
-				theme: "colored",
-			});
 
-		let updatedReactions = {};
-		let updatedMessage = {};
-		// Prepare the updated reactions
-		const messagesCopy = messages.map((messageComponent) => {
-			if (messageComponent.props.messageId === messageId) {
-				const currentReactions = messageComponent.props.reactions || {};
-				updatedReactions = { ...currentReactions };
-
-				if (updatedReactions[emoji]) {
-					if (updatedReactions[emoji].includes(user.uid)) {
-						updatedReactions[emoji] = updatedReactions[
-							emoji
-						].filter((id) => id !== user.uid);
-					} else {
-						updatedReactions[emoji].push(user.uid);
-					}
-				} else {
-					updatedReactions[emoji] = [user.uid];
-				}
-				updatedMessage = {
-					...messageComponent.props,
-					reactions: updatedReactions,
-				};
-				// Return an updated component for local state update
-				return React.cloneElement(messageComponent, {
-					...messageComponent.props,
-					reactions: updatedReactions,
-				});
-			}
-			return messageComponent;
-		});
-
-		// Emit the updateDirectMessage event with updated reactions
-		if (sockCli.current) {
-			let sentAt = new Date();
-			updatedMessage = {
-				teamId: teamId,
-				sentAt: sentAt.toISOString(),
-				id: updatedMessage.messageId,
-				reactions: updatedMessage.reactions,
-			};
-			console.log(
-				"Emitting updateTeamMessage event with updated reactions:",
-				updatedMessage
-			);
-			sockCli.current.emit("updateTeamMessage", updatedMessage);
-		}
-
-		// Update local state
-		setMessages(messagesCopy);
-	};
-
-	const handleEdit = (messageId, editedText) => {
-        let updatedMessage = {};
-        // Prepare the updated messages
-        const messagesCopy = messages.map((messageComponent) => {
-            if (messageComponent.props.messageId === messageId) {
-                updatedMessage = {
-                    ...messageComponent.props,
-                    message: editedText,
-                };
-                // Return an updated component for local state update
-                return React.cloneElement(messageComponent, updatedMessage);
-            }
-            return messageComponent;
-        });
-
-        // Emit the updateDirectMessage event with updated message text
-        if (sockCli.current) {
-            let sentAt = new Date();
-            // Assuming you have teamId and user information available as in handleReact
-            const messageUpdate = {
-                teamId: teamId,
-                sentAt: sentAt.toISOString(),
-                id: updatedMessage.messageId,
-                msg: AES.encrypt(updatedMessage.message, teamId).toString(),
-            };
-            console.log(
-                "Emitting updateTeamMessage event with updated message text:",
-                messageUpdate
-            );
-            sockCli.current.emit("updateTeamMessage", messageUpdate);
-        }
-
-        // Update local state with the modified messages
-        setMessages(messagesCopy);
-    };
 	// Function to scroll to the bottom
 	const scrollToBottom = () => {
 		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -303,7 +250,7 @@ export default function ChatRoom() {
 				<MessageItem
 					key={data.id}
 					sender={data.sender}
-					senderId={data.senderId}
+					senderId={data.sender}
 					message={data.msg}
 					timestamp={
 						sentAt.toDateString() +
@@ -318,6 +265,8 @@ export default function ChatRoom() {
 					teamId={teamId}
 					source={"team"}
 					onEdit={handleEdit}
+					onDelete={() => onDeleteMessage(data.id)}
+					
 				/>,
 			]);
 		});
@@ -348,6 +297,7 @@ export default function ChatRoom() {
 							<MessageItem
 								key={updatedMessage.id}
 								sender={messageComponent.props.sender}
+								senderId = {messageComponent.props.sender}
 								message={updatedMessage.msg || messageComponent.props.message}
 								timestamp={messageComponent.props.timestamp}
 								messageId={updatedMessage.id}
@@ -358,6 +308,7 @@ export default function ChatRoom() {
 								source={"team"}
 								onReact={handleReact}
 								onEdit={handleEdit}
+								onDelete= {() => onDeleteMessage(updatedMessage.id)}
 							/>
 						);
 					}
@@ -415,7 +366,7 @@ export default function ChatRoom() {
 
 				const fetchedMessages = response.data.map((messageData) => {
 					// Attempt to safely convert timestamp to Date object'
-					console.log("LOOK HERE JOHANNNN", messageData);
+				
 					let sentAt = new Date(messageData.sentAt._seconds * 1000 + messageData.sentAt._nanoseconds / 1000000);
 
 					let decryptedMessage = decryptMessage(messageData.message, teamId);
@@ -425,24 +376,28 @@ export default function ChatRoom() {
 						decryptedMessage = messageData.message;
 					}
 					let timestamp = sentAt.toLocaleDateString() + ", " + sentAt.toLocaleTimeString();
-					console.log("timestamp", sentAt)
+				
 					return (
 						<MessageItem
 							key={messageData.id}
 							userInfo={userInfo}
 							sender={messageData.username}
+							senderId = {messageData.sender}
 							timestamp={timestamp}
 							message={decryptedMessage}
+							messageId = {messageData.id}
 							reactions={messageData.reactions || {}}
 							userId={messageData.senderID}
 							teamId={teamId}
 							source={"team"}
 							onReact={handleReact}
 							onEdit={handleEdit}
+							onDelete= {() => onDeleteMessage(messageData.id)}
 						/>
 					);
 				});
 				setMessages(fetchedMessages);
+				
 			} catch (error) {
 				console.error("Error fetching messages:", error);
 			}
@@ -513,7 +468,7 @@ export default function ChatRoom() {
 
 					// Update the userTeams state with the team information
 					setTeamData(teamData);
-					console.log("Team data:", teamData);
+					console.log("TEAM DATA", teamData)
 				} else {
 					console.error('Failed to fetch team information:', response.statusText);
 					// Handle the error and provide user feedback here
@@ -621,9 +576,9 @@ export default function ChatRoom() {
 			msg: encryptedMsg, // encrypted message
 			sentAt: sentAt.toISOString(),
 			attachments: attachmentIds,
-			reactions: [] // if you handle reactions
+			reactions: {} // if you handle reactions
 		};
-		console.log("THIS IS WHAT YOU'RE SENDING TO THE SERVER", messageData)
+		
 		const optimisticMessage = {
 			...messageData,
 			msg: msg, // Display the original, unencrypted message in the UI
@@ -654,9 +609,125 @@ export default function ChatRoom() {
 	useEffect(() => {
 		scrollToBottom();
 	}, [messages]);
+	const teamDataRef = useRef(teamData);
 
+	useEffect(() => {
+	  teamDataRef.current = teamData;
+	}, [teamData]);
+	const handleReact = (messageId, emoji) => {
+		if (!messageId) {
+			toast.error("Cannot react to messages that don't have IDs");
+			return;
+		}
+	
+		let additionalProps = null;
+		let updatedReactionsForServer = {}; // This will hold the updated reactions for the server update
+	
+		setMessages(currentMessages => currentMessages.map(message => {
+			const messageProps = { ...message.props };
+			
+			if (messageProps.messageId === messageId) {
+				additionalProps = messageProps;
+				const newReactions = messageProps.reactions ? { ...messageProps.reactions } : {};
+				
+				if (newReactions[emoji]) {
+					if (newReactions[emoji].includes(user.uid)) {
+						newReactions[emoji] = newReactions[emoji].filter(id => id !== user.uid);
+					} else {
+						newReactions[emoji].push(user.uid);
+					}
+				} else {
+					newReactions[emoji] = [user.uid];
+				}
+	
+				updatedReactionsForServer = newReactions; // Capture the updated reactions for this message
+	
+				return React.cloneElement(message, { ...messageProps, reactions: newReactions });
+			}
+	
+			return message;
+		}));
+	
+		let sentAt = new Date();
+		const messageUpdate = {
+			msg: AES.encrypt(additionalProps.message, teamId).toString(),
+		    sender: additionalProps.senderId,
+			username: additionalProps.sender, 
+			team: teamId,
+			sentAt: sentAt.toISOString(),
+			id: messageId,
+			channel: channelName,
+			reactions: updatedReactionsForServer,
+		};
+	
+		// Send the update to the server
+		console.log("Emitting reaction update to server:", messageUpdate);
+		sockCli.current.emit("updateTeamMessage", messageUpdate); // Adjust the event name ("updateReaction") as per your server-side implementation
+	};
+	
+	const prepareReactionsForServer = (messageId, emoji) => {
+		// Implement according to how your server expects the reactions to be formatted
+		// This could involve just sending the updated reactions object for the messageId
+		const message = messages.find((msg) => msg.id === messageId);
+		return message ? message.reactions : {};
+	};
 
-
+	const handleEdit = (messageId, editedText) => {
+		if (!messageId) {
+			toast.error("Cannot edit messages that don't have IDs");
+			return;
+		}
+		// Similar to handleReact, we check for channelID even though it might not be used here, for consistency.
+		let channelId = "";
+		const teamInfo = teamDataRef.current;
+		for (let x = 0; x < teamInfo.channels.length; x++) {
+			if(teamInfo.channels[x].name === channelName) {
+				channelId = teamInfo.channels[x].id;
+				break; // Once we find the channelId, we can break the loop.
+			}
+		}
+	
+		let editedMessageProps = null; // This will hold the properties of the edited message for server update.
+	
+		// Update the local state before sending the update to the server, similar to handleReact.
+		setMessages(currentMessages => currentMessages.map(message => {
+			const messageProps = { ...message.props };
+			
+			if (messageProps.messageId === messageId) {
+				editedMessageProps = {
+					...messageProps,
+					message: editedText, // Update the message text
+				};
+	
+				// Prepare the message update for the server, including encryption.
+				const encryptedMessage = AES.encrypt(editedText, teamId).toString();
+				
+				return React.cloneElement(message, { ...editedMessageProps, message: encryptedMessage });
+			}
+	
+			return message;
+		}));
+	
+		if (!editedMessageProps) return; // If no message was found and updated, do not proceed.
+	
+		const sentAt = new Date();
+		// Construct the message update object for the server, similar to handleReact.
+		const messageUpdate = {
+			msg: AES.encrypt(editedText, teamId).toString(),
+			sender: editedMessageProps.senderId,
+			username: editedMessageProps.sender,
+			team: teamId,
+			sentAt: sentAt.toISOString(),
+			id: messageId,
+			channel: channelName,
+			// No reactions update here since we're editing the message text.
+		};
+	
+		// Log and emit the update to the server, akin to handleReact.
+		console.log("Emitting updateTeamMessage event with updated message text:", messageUpdate);
+		sockCli.current.emit("updateTeamMessage", messageUpdate);
+	};
+	
 
 	return (
 		<>
