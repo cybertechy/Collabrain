@@ -613,7 +613,7 @@ router.post("/:team/channels", async (req, res) =>
 	// Check if user is a admin of the team
 	let team = await fb.db.doc(`teams/${req.params.team}`).get();
 	if (team.data().members[user.uid].role != "admin")
-		return res.status(401).json({ error: "Unauthorized" });
+		return res.status(401).json({ error: "Unauthorized Access" });
 
 	// Create channel
 	fb.db.collection(`teams/${req.params.team}/channels`).add({ name: req.body.name })

@@ -198,7 +198,7 @@ const scrollToBottom = () => {
 
 
 	return (
-		<Template>
+		<>
 		{/* // <div className="flex h-full w-full drop-shadow-lg"> */}
 		<div className="flex flex-row flex-grow">
 			{/* <Sidebar /> */}
@@ -235,7 +235,7 @@ const scrollToBottom = () => {
 					
 				</div>
 		{/* <ChannelBar /> */}
-		</Template>
+		</>
 	)
 		{/* </div> */}
 }

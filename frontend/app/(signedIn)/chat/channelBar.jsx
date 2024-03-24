@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import TeamChannelOptionsMenu from '@/components/ui/chatsComponents/teamChannelOptionsMenu';
 import AddChannelOverlay from '@/components/ui/overlays/addChannelOverlay';
-const ChannelBar = ({ user, userUID, teamData, onUpdated, onInvite,onSettings, onLeave,onDelete, onViewDetails, onMute, onDeafen,   handleChannelSelect , selectedChannel,  onView}) => {
+const ChannelBar = ({ user, userUID, teamData, onUpdated, onInvite, onSettings, onLeave, onDelete, onViewDetails, onMute, onDeafen, handleChannelSelect, selectedChannel, onView }) => {
     const [isOwner, setIsOwner] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
     const [showAddChannelOverlay, setShowAddChannelOverlay] = useState(false); // State to control AddChannelOverlay visibility
@@ -18,7 +18,7 @@ const ChannelBar = ({ user, userUID, teamData, onUpdated, onInvite,onSettings, o
             setIsOwner(teamData.owner === userUID);
             setIsAdmin(teamData.members?.[userUID]?.role === 'admin');
         }
-    }, [teamData, userUID]); 
+    }, [teamData, userUID]);
     const handleTeamOptionSelect = (option) => {
         switch (option) {
             case 'invite':
@@ -55,49 +55,49 @@ const ChannelBar = ({ user, userUID, teamData, onUpdated, onInvite,onSettings, o
         if (a.name === 'General') return -1;
         if (b.name === 'General') return 1;
         return 0; // Keep other channels in their original order
-      });
+    });
     return (
-        <div className="flex flex-col h-full bg-white shadow-md z-20">
+        <div className="flex flex-col h-full bg-white shadow-md z-20 min-w-52">
             {/* Chat Header */}
             <div className="flex flex-col">
-        <TeamChannelOptionsMenu teamName = {teamData.name} onOptionSelect={handleTeamOptionSelect}   isOwner={isOwner}
-                    isAdmin={isAdmin}   />
-      </div>
-            <div className = "flex flex-col justify-between h-full">
-            <div id= "chats" >
-            <div className="flex flex-row items-center justify-between p-4 shadow-md bg-gray-100">
-                <h2 className="text-xl text-center font-semibold">Channels</h2>
-                <button onClick={handleAddChannelClick} className="bg-primary ml-2  text-white p-2 rounded-md h-8 w-8 flex items-center justify-center">
+                <TeamChannelOptionsMenu teamName={teamData.name} onOptionSelect={handleTeamOptionSelect} isOwner={isOwner}
+                    isAdmin={isAdmin} />
+            </div>
+            <div className="flex flex-col justify-between h-full">
+                <div id="chats" >
+                    <div className="flex flex-row items-center justify-between p-4 shadow-md bg-gray-100">
+                        <h2 className="text-xl text-center font-semibold">Channels</h2>
+                        <button onClick={handleAddChannelClick} className="bg-primary ml-2  text-white p-2 rounded-md h-8 w-8 flex items-center justify-center">
                             {/* Using a simple "+" text for the icon */}
-                          <AddIcon></AddIcon>
+                            <AddIcon></AddIcon>
                         </button>
-            </div>
-            
-            {/* Chat List */}
-            <List className="overflow-auto flex flex-col space-y-2">
-            {sortedChannels?.map((channel, index) => (
-              <ChannelButton
-                key={index}
-                channelId={channel.id}
-                channel={channel}
-                isSelected={selectedChannel === channel.name}
-                onSelect={handleChannelSelect}
-              />
-            ))}
-          </List>
-            
-          
-            </div>
-        
-            <div className="">
-                <UserProfileBox // Corrected usage
-                    userData={user}
-                    onMute={onMute}
-                    onDeafen={onDeafen}
-                    onSettings={onSettings}
-                />
-            </div>
-            
+                    </div>
+
+                    {/* Chat List */}
+                    <List className="overflow-auto flex flex-col space-y-2">
+                        {sortedChannels?.map((channel, index) => (
+                            <ChannelButton
+                                key={index}
+                                channelId={channel.id}
+                                channel={channel}
+                                isSelected={selectedChannel === channel.name}
+                                onSelect={handleChannelSelect}
+                            />
+                        ))}
+                    </List>
+
+
+                </div>
+
+                <div className="">
+                    <UserProfileBox // Corrected usage
+                        userData={user}
+                        onMute={onMute}
+                        onDeafen={onDeafen}
+                        onSettings={onSettings}
+                    />
+                </div>
+
             </div>
             {showAddChannelOverlay && (
                 <AddChannelOverlay
