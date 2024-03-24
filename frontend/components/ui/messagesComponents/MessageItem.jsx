@@ -138,7 +138,7 @@ function MessageItem({ sender, senderId, title,timestamp, message, messageId, at
   
     return attachments.map((attachment, index) => (
       // The <img> tag works for both images and GIFs encoded in base64.
-      <img key={index} src={attachment} alt={`Attachment ${index}`} className="max-w-full h-auto" />
+      <img key={index} src={attachment} alt={`Attachment ${index}`} className="w-full sm:w-64 md:w-96 lg:w-[calc(50rem)] h-auto" />
     ));
   };
   
