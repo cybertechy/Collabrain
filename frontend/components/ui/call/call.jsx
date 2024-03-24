@@ -204,15 +204,10 @@ export default function Call(props)
 
 	useEffect(() =>
 	{
-		console.log("call video streams: ", callVideoStreams);
-	}, [callVideoStreams]);
-
-	useEffect(() =>
-	{
 		if (!user)
 			return;
 
-		if (pathname != "/chat" || pathname != "/messages")
+		if (pathname != "/chat" && pathname != "/messages")
 			return;
 
 		fb.getToken().then(token =>
@@ -234,14 +229,17 @@ export default function Call(props)
 				.then(res =>
 				{
 					if (!res.data)
+					{
+						setReceivingCall(false);
 						return;
+					}
 
 					setReceivingCall(true);
 					console.log(res);
 					setRoom(res.data.room);
 				});
 		});
-	}, [user, pathname]);
+	}, [pathname, searchParams]);
 
 	return (
 		<div>
