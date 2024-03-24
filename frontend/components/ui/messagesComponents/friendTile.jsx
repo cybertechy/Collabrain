@@ -277,7 +277,7 @@ const FriendTile = ({ friendData, openChat, setRefreshList , userInfo,id, handle
     console.log('Setting alias for user:', friendData);
     handleClose();
   };
-console.log("Friend Data in friend tile" , friendData);
+// console.log("Friend Data in friend tile" , friendData);
   return (
     <ListItem
       sx={{

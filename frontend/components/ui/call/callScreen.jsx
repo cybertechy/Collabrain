@@ -40,7 +40,6 @@ export default function CallScreen(props)
 			return;
 
 		addVideoElementsToGrid();
-		console.log("numVids: ", gridRef.current.childElementCount); // Log here
 
 		if (gridRef.current && gridRef.current.childElementCount >= 1)
 			setMaxGridHeight("fit-content");

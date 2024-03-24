@@ -20,6 +20,10 @@ export const useVideoCall = create((set) => ({
 		const { [userId]: _, ...rest } = state.callVideoStreams;
 		return { callVideoStreams: rest };
 	}),
+	resetAudioVideo: () => set((state) => 
+	{
+		return { micEnabled: true, videoEnabled: true };
+	}),
 	toggleAudio: () => set((state) => {
 		state.stream.getTracks().forEach(track => {
 			if (track.kind === 'audio')
@@ -43,6 +47,8 @@ export const useVideoCall = create((set) => ({
 
 		if (state.stream)
 			state.stream.getTracks().forEach(track => track.stop());
+
+		state.sockCli.emit('leave-call');
 
 		return {
 			myPeer: null,

@@ -20,17 +20,20 @@ export default function Call(props)
 	const { callVideoStreams, myPeer, micEnabled, videoEnabled, showCallScreen,
 		setMyPeer, setShowCallScreen, setCallVideoStreams, addCallVideoStream, removeCallVideoStream,
 		toggleAudio, toggleVideo, room, setRoom, stream, setStream,
-		inCall, setInCall, sockCli, setSockCli, receivingCall, setReceivingCall } = useVideoCall();
+		inCall, setInCall, sockCli, setSockCli, receivingCall, setReceivingCall, resetAudioVideo } = useVideoCall();
 
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
 	const [peers, setPeers] = useState({});
 	const [user, loading] = fb.useAuthState();
 
-	const connectToNewUser = (userId, stream) =>
+	const connectToNewUser = async (userId, stream) =>
 	{
 		console.log(`### Calling user... ${userId} ###`);
-		const call = myPeer.call(userId, stream);
+		const call = await myPeer.call(userId, stream);
+		if (!call)
+			return;
+		
 		const video = document.createElement('video');
 		video.playsInline = true;
 		video.id = userId;
@@ -59,6 +62,7 @@ export default function Call(props)
 			return;
 
 		setMyPeer(new Peer({ host: 'peer-server.cybertech13.eu.org', secure: true, port: 443 }));
+
 		// Create room with random uid
 		const roomID = uuidv4();
 		setRoom(roomID);
@@ -79,7 +83,8 @@ export default function Call(props)
 			targetID = searchParams.get("chatID");
 		}
 
-		// Create call on db
+		// Create call on db 
+		// NOT CHECKING FOR ERRORS!
 		const res = await axios.post(`${SERVERLOCATION}/api/calls`, {
 			room: roomID,
 			target: target,
@@ -102,7 +107,7 @@ export default function Call(props)
 
 	useEffect(() =>
 	{
-		if (!myPeer || !room)
+		if (!myPeer || !room || inCall)
 			return;
 
 		myPeer.on('error', err =>
@@ -110,9 +115,9 @@ export default function Call(props)
 			console.log("### Peer error ###", err);
 		});
 
-		myPeer.on('disconnected', () =>
+		myPeer.on('disconnected', (reason) =>
 		{
-			console.log("### Peer disconnected ###");
+			console.log("### Peer disconnected ###", reason);
 			if (stream)
 				stream.getTracks().forEach(track => track.stop());
 		});
@@ -163,7 +168,11 @@ export default function Call(props)
 					});
 				});
 
-			sockCli.emit('join-call', room, id);
+			// Data
+			const target = pathname == "/chat" ? "team" : "chat";
+			const targetID = searchParams.get("teamId") || searchParams.get("chatID");
+
+			sockCli.emit('join-call', room, id, target, targetID);
 		});
 
 		setShowCallScreen(true);
@@ -172,25 +181,21 @@ export default function Call(props)
 
 	const leaveCall = () =>
 	{
-		console.log("callScreen: ", showCallScreen,
-			"myPeer: ", myPeer,
-			"callVideoStreams: ", callVideoStreams,
-			"stream: ", stream,
-			"inCall: ", inCall);
-
 		setShowCallScreen(false);
 		if (myPeer)
 			myPeer.destroy();
 
-		setMyPeer(null);
 		setCallVideoStreams({});
 
 		sockCli.emit('leave-call');
 		// STREAM IS null when called from call screen: FIX THIS
 		if (stream)
 			stream.getTracks().forEach(track => track.stop());
+
 		setInCall(false);
 		setStream(null);
+		setMyPeer(null);
+		resetAudioVideo();
 	};
 
 	useEffect(() =>
@@ -202,6 +207,70 @@ export default function Call(props)
 		setSockCli(socket.init(SERVERLOCATION));
 	}, [user, loading]);
 
+	// Handle join button
+	useEffect(() =>
+	{
+		if (!sockCli)
+			return;
+
+		// Handle new and ended direct calls
+		sockCli.on('chat-call-started', (data) =>
+		{
+			// See if current chat is the one being called
+			if (pathname != "/messages" && searchParams.get("chatID") != data.id)
+				return;
+
+			console.log("### chat-call-started ###");
+
+			setReceivingCall(true);
+			setRoom(data.room);
+		});
+
+		sockCli.on('chat-call-ended', (data) =>
+		{
+			// See if current chat is the one being called
+			if (pathname != "/messages" && searchParams.get("chatID") != data.id)
+				return;
+
+			console.log("### chat-call-ended ###");
+
+			setReceivingCall(false);
+			setRoom(null);
+		});
+
+		// Handle new and ended team calls
+		sockCli.on('team-call-started', (data) =>
+		{
+			// See if current chat is the one being called
+			if (pathname != "/chat" && searchParams.get("teamId") != data.id)
+				return;
+
+			console.log("### team-call-started ###");
+
+			setReceivingCall(true);
+			setRoom(data.room);
+		});
+
+		sockCli.on('team-call-ended', (data) =>
+		{
+			// See if current chat is the one being called
+			if (pathname != "/chat" && searchParams.get("teamId") != data.id)
+				return;
+
+			console.log("### team-call-ended ###");
+
+			setReceivingCall(false);
+			setRoom(null);
+		});
+
+		return () =>
+		{
+			sockCli.off('call-started');
+			sockCli.off('call-ended');
+		};
+	}, [sockCli]);
+
+	// Handle call button when loading chat
 	useEffect(() =>
 	{
 		if (!user)
@@ -235,10 +304,11 @@ export default function Call(props)
 					}
 
 					setReceivingCall(true);
-					console.log(res);
 					setRoom(res.data.room);
 				});
 		});
+
+
 	}, [pathname, searchParams]);
 
 	return (
@@ -249,12 +319,12 @@ export default function Call(props)
 						(
 							!receivingCall ?
 								<button className="border border-white text-white hover:text-white hover:bg-green-500 hover:border-green-500 font-bold px-3 py-2 rounded"
-									onClick={() => { startCall("room1"); }}>
+									onClick={() => { startCall(); }}>
 									<CallIcon />
 								</button>
 								:
 								<button className="font-normal border border-green-500 bg-green-500 text-white hover:text-white hover:bg-green-600 hover:border-green-600 font-bold px-3 py-2 rounded"
-									onClick={() => { joinCall("room1"); }}>
+									onClick={() => { joinCall(); }}>
 									Join Call
 									<CallIcon className="ml-2" />
 								</button>

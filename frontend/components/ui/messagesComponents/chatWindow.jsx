@@ -13,7 +13,7 @@ export default function ChatWindow({ messages, setMessages, sendPersonalMsg, wit
 
   useEffect(() => {
     if (withUserInfo && userInfo && userInfo.data) {
-      console.log("asdas",userInfo);
+    //   console.log("asdas",userInfo);
       setTitle(userInfo?.data?.aliases[withUserId] ? userInfo?.data?.aliases[withUserId]: withUserInfo?.data?.username || 'User');
       setAvatar(withUserInfo?.data?.username || 'User');
     }

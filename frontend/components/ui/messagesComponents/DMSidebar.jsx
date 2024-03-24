@@ -7,7 +7,7 @@ import { IconButton } from '@mui/material';
 import ChatIcon from '@mui/icons-material/Chat';
 
 const DMSidebar = ({ userData, onMute, onDeafen, onSettings, chatList, openChat }) => {
-    console.log("UserData informtion", userData)
+    // console.log("UserData informtion", userData)
     return (
         <div className="flex flex-col h-full bg-white shadow-md z-20">
             {/* Chat Header */}
@@ -22,7 +22,7 @@ const DMSidebar = ({ userData, onMute, onDeafen, onSettings, chatList, openChat 
             <List className="overflow-auto flex flex-col">
 
                 {chatList?.map((chat, index) => (
-                   console.log("chat member",chat.members[1]),
+                //    console.log("chat member",chat.members[1]),
                     <UserDMTile // Corrected usage
                         key={index}
                         message={chat.lastMessage.message}

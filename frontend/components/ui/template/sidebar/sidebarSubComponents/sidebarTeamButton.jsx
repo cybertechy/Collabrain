@@ -5,7 +5,7 @@ import Link from 'next/link';
 import {getMedia} from '@/app/utils/storage'
 const TeamSidebarItem = ({ team, isSelected , isExpanded = true }) => {
     const { name, teamImageID , channels} = team;
-    console.log("SIDEBAR TEAM",team);
+    // console.log("SIDEBAR TEAM",team);
     const [teamImage, setTeamImage] = useState(null);
     useEffect(() => {  
         const fetchAttachments = async () => {
