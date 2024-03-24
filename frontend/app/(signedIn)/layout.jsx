@@ -3,6 +3,7 @@
 import "../globals.css";
 import 'react-toastify/dist/ReactToastify.css';
 import Template from "_components/ui/template/template";
+import { TTSProvider, useTTS } from "@/app/utils/tts/TTSContext";
 
 import localFont from 'next/font/local';
 
@@ -49,6 +50,7 @@ const poppins = localFont({
 export default function RootLayout({ children })
 {
 	return (
+		<TTSProvider>
 		<html lang="en">
 			<body className={`${poppins.variable} font-sans h-screen w-screen`}>
 				<Template>
@@ -56,5 +58,6 @@ export default function RootLayout({ children })
 				</Template>
 			</body>
 		</html>
+		</TTSProvider>
 	);
 }

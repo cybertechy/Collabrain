@@ -25,6 +25,9 @@ import ShortTextIcon from '@mui/icons-material/ShortText'; // This can act as a 
 import TeamSettingsOverlay from "@/components/ui/overlays/teamSettingsOverlay";
 import TeamOverviewOverlay from "@/components/ui/overlays/teamOverviewOverlay";
 import { fetchUser } from "../../utils/user";
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
+import { useTranslation } from 'next-i18next';
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
 export default function ChatRoom() {
@@ -51,6 +54,8 @@ export default function ChatRoom() {
 	const [members, setMembers] = useState([]);
 	const [bannedMembers, setBannedMembers] = useState([]);
 	const [currentUserIsBanned, setCurrentUserIsBanned] = useState(false);
+	const { t } = useTranslation('team');
+	const { speak, stop, isTTSEnabled } = useTTS();
 	useEffect(() => {
 		if (!user) {
 			return;
@@ -678,16 +683,20 @@ export default function ChatRoom() {
 
 					{/* <ChannelBar /> */}
 					<Dialog open={deleteOverlayOpen} onClose={() => setDeleteOverlayOpen(false)} sx={dialogStyles}>
-						<DialogTitle>Confirm Delete</DialogTitle>
-						<DialogContent>
-							Are you sure you want to delete this team? THIS IS IRREVERSIBLE!
+						<DialogTitle onMouseEnter={() => isTTSEnabled && speak("Confirm Delete")}
+              				onMouseLeave={stop}>{t('confirm_delete')}</DialogTitle>
+						<DialogContent onMouseEnter={() => isTTSEnabled && speak("Are you sure you want to delete this team? THIS IS IRREVERSIBLE!")}
+              				onMouseLeave={stop}>
+							{t('delete_msg')}
 						</DialogContent>
 						<DialogActions>
-							<Button onClick={() => setDeleteOverlayOpen(false)} sx={buttonStyles}>
-								Cancel
+							<Button onClick={() => setDeleteOverlayOpen(false)} sx={buttonStyles} 
+							onMouseEnter={() => isTTSEnabled && speak("Cancel button")} onMouseLeave={stop}>
+								{t('cancel')}
 							</Button>
-							<Button onClick={onDelete} sx={buttonStyles}>
-								Delete
+							<Button onClick={onDelete} sx={buttonStyles} 
+							onMouseEnter={() => isTTSEnabled && speak("Delete button")} onMouseLeave={stop}>
+								{t('delete')}
 							</Button>
 						</DialogActions>
 					</Dialog>
@@ -704,7 +713,9 @@ export default function ChatRoom() {
 				</>
 			) : (
 				<div className="flex h-full items-center justify-center">
-					<p className="font-bold text-3xl font-sans text-center text-primary">Sorry, you are banned from this team {"  "} :(</p>
+					<p className="font-bold text-3xl font-sans text-center text-primary"
+					onMouseEnter={() => isTTSEnabled && speak("Sorry, you are banned from this team")}
+					onMouseLeave={stop}>{t('banned')} {"  "} :(</p>
 				</div>
 			)}
 		</>

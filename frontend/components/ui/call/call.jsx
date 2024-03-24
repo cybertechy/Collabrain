@@ -11,15 +11,16 @@ import VideocamOffIcon from '@mui/icons-material/VideocamOff';
 import LaunchIcon from '@mui/icons-material/Launch';
 const { Peer } = require('peerjs');
 import { useVideoCall } from "./zustand";
+import { useTTS } from "@/app/utils/tts/TTSContext";
 
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 export default function Call(props)
 {
+	const { speak, stop, isTTSEnabled } = useTTS();
 	const { callVideoStreams, myPeer, micEnabled, videoEnabled, showCallScreen,
 		setMyPeer, setShowCallScreen, setCallVideoStreams, addCallVideoStream, removeCallVideoStream,
 		toggleAudio, toggleVideo, room, setRoom, stream, setStream, 
 		inCall, setInCall, sockCli, setSockCli } = useVideoCall();
-
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
 	const [peers, setPeers] = useState({});
@@ -173,7 +174,9 @@ export default function Call(props)
 				!inCall ?
 					(pathname == "/messages" && (searchParams.get("chatID") != null)) || pathname === "/chat" ?
 						<button className="border border-white text-white hover:text-white hover:bg-green-500 hover:border-green-500 font-bold px-3 py-2 rounded"
-							onClick={() => { joinCall("room1"); }}>
+							onClick={() => { joinCall("room1"); }}
+							onMouseEnter={() => isTTSEnabled && speak("Call button")}
+                        	onMouseLeave={stop}>
 							<CallIcon />
 						</button> :
 						<></>

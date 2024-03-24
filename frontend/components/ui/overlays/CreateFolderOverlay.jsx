@@ -2,7 +2,12 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import {createFolder} from '../../../app/utils/filesAndFolders';
 import { useSearchParams } from 'next/navigation'
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
+import { useTranslation } from 'next-i18next';
 const CreateFolderOverlay = ( {isOpen, onClose, onFolderCreated}) => {
+    const { t } = useTranslation('create_folder_overlay');
+    const { speak, stop, isTTSEnabled } = useTTS();
     const [folderName, setFolderName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
@@ -39,19 +44,27 @@ const CreateFolderOverlay = ( {isOpen, onClose, onFolderCreated}) => {
             {/* <div className="w-1/4 bg-basicallylight rounded-md shadow-lg"> */}
             <div className="w-3/4 sm:w-3/4 md:w-1/2 bg-basicallylight rounded-md shadow-lg">
                 <div className="p-8">
-                    <h2 className="text-2xl font-bold mb-4 text-basicallydark">Create a New Folder</h2>
+                    <h2 className="text-2xl font-bold mb-4 text-basicallydark"
+                    onMouseEnter={() => isTTSEnabled && speak("Create a New Folder")}
+                    onMouseLeave={stop}>{t('folder_top')}</h2>
                     <input
                         type="text"
                         className="w-full text-basicallydark p-2 border border-gray-300 rounded focus:outline-none focus:border-primary"
-                        placeholder="Enter folder name"
+                        placeholder={t('folder_name')}
                         value={folderName}
                         onChange={(e) => setFolderName(e.target.value)}
+                        onMouseEnter={() => isTTSEnabled && speak("Type the folder name here")}
+                        onMouseLeave={stop}
                     />
-                    <div className='text-primary font-medium italic font-poppins'>Pick a color for your folder: <input
+                    <div className='text-primary font-medium italic font-poppins'
+                    onMouseEnter={() => isTTSEnabled && speak("Pick a color for your folder")}
+                    onMouseLeave={stop}>{t('folder_clr')} <input
     type="color"
     className="w-16 h-8 border mt-2 border-gray-300 rounded focus:outline-none text-primary"
     value={folderColor}
     onChange={(e) => setFolderColor(e.target.value)}
+    onMouseEnter={() => isTTSEnabled && speak("Color selection button")}
+    onMouseLeave={stop}
 /></div>
                     
                     {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
@@ -60,15 +73,19 @@ const CreateFolderOverlay = ( {isOpen, onClose, onFolderCreated}) => {
                             className="px-4 py-2 bg-basicallylight border-2 border-solid border-primary text-primary hover:opacity-80  rounded duration-300 ease-in-out"
                             onClick={handleCancel}
                             disabled={isLoading}
+                            onMouseEnter={() => isTTSEnabled && speak("Cancel button")}
+                            onMouseLeave={stop}
                         >
-                            Cancel
+                            {t('folder_cancel')}
                         </button>
                         <button
                             className="px-4 py-2 bg-primary text-basicallylight rounded hover:opacity-80 border-2 border-solid border-primary duration-300 ease-in-out"
                             onClick={handleCreate}
                             disabled={isLoading}
+                            onMouseEnter={() => isTTSEnabled && speak("Create button")}
+                            onMouseLeave={stop}
                         >
-                            {isLoading ? 'Creating...' : 'Create'}
+                            {isLoading ? t('folder_wait') : t('folder_create')}
                         </button>
                     </div>
                 </div>

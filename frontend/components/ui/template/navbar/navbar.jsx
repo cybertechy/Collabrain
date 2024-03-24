@@ -8,6 +8,9 @@ import { Tooltip } from '@mui/material';
 import MenuIcon from "@mui/icons-material/Menu";
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import SettingsOverlay from '../../overlays/settingsOverlay';
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
+import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
 const CallButton = dynamic(() => import("_components/ui/call/call"), { ssr: false });
 import { set } from 'react-hook-form';
@@ -15,13 +18,16 @@ import Badge from '@mui/material/Badge';
 const fb = require('_firebase/firebase');
 
 import { fetchUser } from '@/app/utils/user';
-const Navbar = ({ isOpen, toggleSidebar }) => {
+const Navbar = ({ isOpen, toggleSidebar }) =>
+{
     const [user, loading] = fb.useAuthState();
-    const [showLeaderboard, setShowLeaderboard] = useState(false);
+    const { t } = useTranslation('navbar');
+    const { speak, stop, isTTSEnabled } = useTTS();
+	const [showLeaderboard, setShowLeaderboard] = useState(false);
     const [showNotifications, setShowNotifications] = useState(false);
-    const leaderboardRef = useRef(null);
+	const leaderboardRef = useRef(null);
     const notificationsRef = useRef(null);
-    const leaderboardToggleRef = useRef(null); // Ref for the leaderboard toggle ico
+	const leaderboardToggleRef = useRef(null); // Ref for the leaderboard toggle icon
     const notificationsToggleRef = useRef(null);
     const [teamInvites, setTeamInvites] = useState([]); // State to store team invites
     const [makeUpdate, setMakeUpdate] = useState(0);
@@ -49,9 +55,9 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
         fetchAndSetTeamInvites();
     }, [user, makeUpdate]);
 
-    const [showSettings, setShowSettings] = useState(false);
-    const [currentScreen, setCurrentScreen] = useState("profile");
-    const settingsOverlayRef = useRef(null);
+	const [showSettings, setShowSettings] = useState(false);
+	const [currentScreen, setCurrentScreen] = useState("profile");
+	const settingsOverlayRef = useRef(null);
     const toggleLeaderboard = () => {
         setShowLeaderboard(!showLeaderboard);
         setShowNotifications(false);
@@ -86,7 +92,7 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
             </Badge>
         );
     });
-
+	
     useEffect(() => {
         function handleClickOutside(event) {
             if (leaderboardRef.current && !leaderboardRef.current.contains(event.target) &&
@@ -109,9 +115,11 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
             <>
                 <CallButton />
                 <Tooltip
-                    title={"Leaderboard"}
+                    title={t('leaderboard')}
                     enterDelay={1000}
                     leaveDelay={200}
+                    onMouseEnter={() => isTTSEnabled && speak("Leaderboard")}
+					onMouseLeave={stop}
                 >
                     <EmojiEventsIcon
                         ref={leaderboardToggleRef} // Attach the ref here
@@ -122,17 +130,21 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
                 </Tooltip>
                 <Tooltip
                     title={
-                        "Notifications"
+                        t('notifications')
                     }
                     enterDelay={1000}
                     leaveDelay={200}
+                    onMouseEnter={() => isTTSEnabled && speak("Notifications")}
+					onMouseLeave={stop}
                 >
                     <NotificationIconWithBadge />
                 </Tooltip>
                 <Tooltip
-                    title={"Profile Settings"}
+                    title={t('profile_set')}
                     enterDelay={1000}
                     leaveDelay={200}
+                    onMouseEnter={() => isTTSEnabled && speak("Profile Settings")}
+					onMouseLeave={stop}
                 >
                     <AccountCircleIcon
                         className="cursor-pointer"
@@ -153,6 +165,8 @@ const Navbar = ({ isOpen, toggleSidebar }) => {
                     <MenuIcon
                         className="h-6 w-6 text-white cursor-pointer"
                         onClick={toggleSidebar}
+                        onMouseEnter={() => isTTSEnabled && speak("Open sidebar button")}
+						onMouseLeave={stop}
                     />
                 </div>
                 <div className="flex-grow">

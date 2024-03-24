@@ -18,10 +18,15 @@ import EditIcon from '@mui/icons-material/Edit';
 import axios from 'axios';
 import {Dialog ,DialogTitle,DialogContent,DialogActions,Button,ListItemIcon,List} from '@mui/material';
 import React, { useState } from 'react';
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
+import { useTranslation } from 'next-i18next';
 const fb  = require("_firebase/firebase");
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
 const FriendTile = ({ friendData, onMoreOptions, id, setRefreshList, refreshList }) => {
+  const { t } = useTranslation('dms');
+  const { speak, stop, isTTSEnabled } = useTTS();
   // Function to generate avatar with initials
   const [user, loading] = fb.useAuthState();
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -264,11 +269,13 @@ const FriendTile = ({ friendData, onMoreOptions, id, setRefreshList, refreshList
       // Default rendering for 'all' and other types
       return (
         <>
-          <IconButton sx={{ bgcolor: 'action.hover', borderRadius: '50%' }}>
+          <IconButton sx={{ bgcolor: 'action.hover', borderRadius: '50%' }}
+          onMouseEnter={() => isTTSEnabled && speak("User notification settings button")} onMouseLeave={stop}>
             <NotificationsNoneIcon />
           </IconButton>
           <IconButton sx={{ bgcolor: 'action.hover', borderRadius: '50%', marginX: 1 }}
-            onClick={() => handleChatClick(friendData)}>
+            onClick={() => handleChatClick(friendData)} onMouseEnter={() => isTTSEnabled && speak("Open chat with user button")}
+            onMouseLeave={stop}>
             <ChatBubbleOutlineIcon />
           </IconButton>
         </>
@@ -308,13 +315,16 @@ const FriendTile = ({ friendData, onMoreOptions, id, setRefreshList, refreshList
       }}
     >
       <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        <ListItemAvatar>
+        <ListItemAvatar
+        onMouseEnter={() => isTTSEnabled && speak(friendData.username)} onMouseLeave={stop}>
           <Avatar {...stringAvatar(friendData.username)} />
         </ListItemAvatar>
         <ListItemText
           primary={friendData.username}
           primaryTypographyProps={{ color: '#000000' }}
           secondary={friendData.email}
+          onMouseEnter={() => isTTSEnabled && speak(`${friendData.username}, ${friendData.email}`)}
+          onMouseLeave={stop}
         />
       </Box>
 
@@ -324,6 +334,8 @@ const FriendTile = ({ friendData, onMoreOptions, id, setRefreshList, refreshList
           edge="end"
           aria-label="more-options"
           onClick={openDialog}
+          onMouseEnter={() => isTTSEnabled && speak("More settings button")}
+          onMouseLeave={stop}
         >
           <MoreVertIcon />
         </IconButton>
@@ -335,29 +347,29 @@ const FriendTile = ({ friendData, onMoreOptions, id, setRefreshList, refreshList
         fullWidth
         maxWidth="xs"
       >
-        <DialogTitle>Select an Option</DialogTitle>
+        <DialogTitle>{t('friend_settings')}</DialogTitle>
         <DialogContent>
           <List>
             <ListItem button onClick={() => handleOptionClick('alias')}>
               <ListItemIcon>
                 <EditIcon />
               </ListItemIcon>
-              <ListItemText primary="Set Alias" />
+              <ListItemText primary={t('alias')} />
             </ListItem>
             <ListItem button onClick={() => handleOptionClick('block')}>
               <ListItemIcon>
                 <BlockIcon />
               </ListItemIcon>
-              <ListItemText primary="Block User" />
+              <ListItemText primary={t('block')} />
             </ListItem>
           </List>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDialogAction} color="primary">
-            Confirm
+            {t('confirm')}
           </Button>
           <Button onClick={closeDialog} color="primary">
-            Cancel
+            {t('cancel')}
           </Button>
         </DialogActions>
       </Dialog>

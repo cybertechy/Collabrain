@@ -7,13 +7,16 @@ import TeamChannelOptionsMenu from './teamChannelOptionsMenu';
 import AddChannelOverlay from '../overlays/addChannelOverlay'
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
+import { useTranslation } from 'next-i18next';
 
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 const ChannelBar = ({ user,  teamData,  userUID , onUpdated}) => {
   // State and handlers for channel categories
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAddChannelOverlayOpen, setIsAddChannelOverlayOpen] = useState(false);
-const router  = useRouter();
+  const router  = useRouter();
   console.log(user);
 
   const handleChannelSelect = (channelName) => {
@@ -145,19 +148,22 @@ const router  = useRouter();
 };
 
 const SimpleModal = ({ isOpen, onClose, onConfirm }) => {
+  const { t } = useTranslation('team');
+  const { speak, stop, isTTSEnabled } = useTTS();
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white p-5 rounded-lg shadow-lg flex flex-col items-center">
-        <p className="mb-4">Are you sure you want to delete this team?</p>
+        <p className="mb-4" onMouseEnter={() => isTTSEnabled && speak("Are you sure you want to delete this team?")} 
+            onMouseLeave={stop}>{t('del_msg')}</p>
         <div className="flex space-x-4">
-          <button onClick={onConfirm} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-            Yes
-          </button>
-          <button onClick={onClose} className="bg-primary hover:bg-secondary text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-            No
-          </button>
+          <button onClick={onConfirm} className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          onMouseEnter={() => isTTSEnabled && speak("Yes button")} 
+          onMouseLeave={stop}>{t('yes')} </button>
+          <button onClick={onClose} className="bg-primary hover:bg-secondary text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          onMouseEnter={() => isTTSEnabled && speak("No button")} 
+          onMouseLeave={stop}>{t('no')}</button>
         </div>
       </div>
     </div>

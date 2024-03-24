@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ArrowDropDown } from '@mui/icons-material';
 
-const DropdownDashboard = ({ title, items, hasBorders = false,  dropdownZIndex = 50  }) => {
+const DropdownDashboard = ({ title, items, hasBorders = false,  dropdownZIndex = 50, onMouseEnterTitle, onMouseLeaveTitle  }) => {
     const [isDropdownVisible, setIsDropdownVisible] = useState(false);
     const dropdownRef = useRef(null); // Ref for the dropdown to handle click outside
 
@@ -25,6 +25,8 @@ const DropdownDashboard = ({ title, items, hasBorders = false,  dropdownZIndex =
                 // className="text-primary text-lg bg-transparent px-4 py-2 rounded-md flex items-center"
                 className="text-primary text-sm xs:text-lg bg-transparent px-4 py-2 rounded-md flex items-center"
                 onClick={() => setIsDropdownVisible(!isDropdownVisible)}
+                onMouseEnter={onMouseEnterTitle}
+                onMouseLeave={onMouseLeaveTitle}
             >
                 {title}
                 <ArrowDropDown fontSize='medium'/>
@@ -39,6 +41,8 @@ const DropdownDashboard = ({ title, items, hasBorders = false,  dropdownZIndex =
                                   item.onClick();
                                   setIsDropdownVisible(false); // Close the dropdown when an option is clicked
                                 }}
+                                onMouseEnter={item.onMouseEnter}
+                                onMouseLeave={item.onMouseLeave}
                                 className="px-4 py-2 text-primary hover:bg-primary hover:text-basicallylight rounded-sm cursor-pointer"
                             >
                                 {item.name}

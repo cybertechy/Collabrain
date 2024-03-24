@@ -2,7 +2,10 @@ import { ListItem, ListItemAvatar, ListItemText, Typography , Menu, MenuItem} fr
 import CustomAvatar from './avatar';
 import { blockUser, unblockUser } from '@/app/utils/user';
 import { useState } from 'react';
+import { useTTS } from "@/app/utils/tts/TTSContext";
+
 const userDMTile = ({ message, avatar, openChat, username, data, chatID , actualUsername}) => {
+    const { speak, stop, isTTSEnabled } = useTTS();
     const [anchorEl, setAnchorEl] = useState(null);
     const [menuOpen, setMenuOpen] = useState(false);
 
@@ -20,6 +23,20 @@ const userDMTile = ({ message, avatar, openChat, username, data, chatID , actual
     };
 
     const formattedDate = data.lastMessage?.sentAt? new Date(data.lastMessage.sentAt._seconds * 1000 + data.lastMessage.sentAt._nanoseconds / 1000000).toLocaleDateString() : ""; 
+
+    const handleUsernameHover = () => {
+        if (isTTSEnabled) {
+            speak(`Chat with ${username}`);
+        }
+    };
+    const handleDateHover = () => {
+        if (isTTSEnabled) {
+            speak(`Date of the last message: ${formattedDate}`);
+        }
+    };
+    const handleLeave = () => {
+        stop();
+    };
 
     const truncateMessage = (message, maxLength = 20) => {
         // Truncate message if longer than maxLength
@@ -40,11 +57,13 @@ const userDMTile = ({ message, avatar, openChat, username, data, chatID , actual
             <ListItemText 
                 primary={
                     <>
-                        <Typography component="span" variant="body1" color="textPrimary">
+                        <Typography component="span" variant="body1" color="textPrimary"
+                        onMouseEnter={handleUsernameHover} onMouseLeave={handleLeave}>
                             {username}
                         </Typography>
                         <br/>
-                        <Typography component="span" variant="caption" color="textSecondary">
+                        <Typography component="span" variant="caption" color="textSecondary"
+                        onMouseEnter={handleDateHover} onMouseLeave={handleLeave}>
                             {formattedDate}
                         </Typography>
                     </>

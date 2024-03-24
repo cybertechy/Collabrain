@@ -195,3 +195,7 @@ input:after {
   @apply border border-primary text-primary !important;
   
 }
+
+:root {
+  --filter-url: 'none';
+}

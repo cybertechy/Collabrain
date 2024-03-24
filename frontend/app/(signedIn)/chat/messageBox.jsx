@@ -6,8 +6,13 @@ import AttachFileIcon from '@mui/icons-material/AttachFile';
 import SendIcon from '@mui/icons-material/Send';
 import EmojiPicker from '@/components/ui/messagesComponents/EmojiPicker';
 import Popover from '@mui/material/Popover';
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
+import { useTranslation } from 'next-i18next';
 
 export default function MessageBox(props) {
+  const { t } = useTranslation('msg_box');
+  const { speak, stop, isTTSEnabled } = useTTS();
   const { handleSubmit, reset, setValue, getValues, watch, register } = useForm({
     defaultValues: {
       message: '',
@@ -63,17 +68,19 @@ export default function MessageBox(props) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex items-center w-3/4 p-3 rounded-lg bg-[#30475E] relative">
-      <IconButton ref={emojiButtonRef} onClick={handleEmojiPickerOpen} size="small" className="absolute left-4 z-10 text-white">
+      <IconButton ref={emojiButtonRef} onClick={handleEmojiPickerOpen} size="small" className="absolute left-4 z-10 text-white"
+      onMouseEnter={() => isTTSEnabled && speak("Choose Emoji button")} onMouseLeave={stop}>
         <EmojiEmotionsIcon className='text-basicallylight' />
       </IconButton>
-      <IconButton size="small" className="absolute left-12 z-10 text-white">
+      <IconButton size="small" className="absolute left-12 z-10 text-white" onMouseEnter={() => isTTSEnabled && speak("Attach File button")}
+					onMouseLeave={stop}>
         <AttachFileIcon className='text-basicallylight' />
       </IconButton>
       <input
         {...register('message')}
         ref={inputMsg}
         className="flex-1 bg-transparent p-4 pl-20 text-white placeholder-white outline-none border-none"
-        placeholder="Enter a Message..."
+        placeholder={t('enter_msg')}
         onKeyDown={(e) => {
           if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
@@ -81,7 +88,8 @@ export default function MessageBox(props) {
           }
         }}
       />
-      <IconButton type="submit" onClick={handleSendButtonClick} size="small" className="absolute right-4 z-10 text-white">
+      <IconButton type="submit" onClick={handleSendButtonClick} size="small" className="absolute right-4 z-10 text-white"
+      onMouseEnter={() => isTTSEnabled && speak("Send Message button")} onMouseLeave={stop}>
         <SendIcon className='text-basicallylight' />
       </IconButton>
       <Popover

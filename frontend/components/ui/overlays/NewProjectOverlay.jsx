@@ -4,6 +4,9 @@ const { useRouter } = require("next/navigation");
 import fb from '../../../app/_firebase/firebase';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
+import { useTranslation } from 'next-i18next';
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 const ContentMapBackground = () => (
 	<svg width="597" height="519" viewBox="0 0 597 519" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -49,6 +52,8 @@ const NewProjectOverlay = ({ toggleModal, modalVisible }) =>
 
 const ContentMapOverlay = ({ setOpenModal, switchToDocument }) =>
 {
+	const { t } = useTranslation('new_project');
+	const { speak, stop, isTTSEnabled } = useTTS();
 	const router = useRouter();
 	const NewContentMap = async () =>
 	{
@@ -101,18 +106,22 @@ const ContentMapOverlay = ({ setOpenModal, switchToDocument }) =>
 							</button>
 						</div>
 						<div className=" text-center mt-24 flex justify-center">
-							<p className='text-2xl block text-center font-light'>Choose the type of project you would like to create</p>
+							<p className='text-2xl block text-center font-light' onMouseEnter={() => isTTSEnabled && speak("Choose the type of project you would like to create")}
+            				onMouseLeave={stop}>{t('project_top')}</p>
 						</div>
 						<div className=" h-32 mt-30 justify-center grid grid-rows-2 gap-10">
 
-							<button className="flex mt-11 mr-10 w-56 h-16 text-basicallylight font-normal rounded text-lg  dark:bg-primary dark:hover:bg-primary">
+							<button className="flex mt-11 mr-10 w-56 h-16 text-basicallylight font-normal rounded text-lg  dark:bg-primary dark:hover:bg-primary"
+							onMouseEnter={() => isTTSEnabled && speak("Cuntent map")} onMouseLeave={stop}>
 								<img className='h-6 mt-4 ml-3' src='/assets/images/content.png' />
-								<p className="mt-4 ml-8">Content Map</p></button>
-							<button className="flex mt-11 mr-10 w-56 h-16 text-basicallydark font-normal rounded text-lg" onClick={switchToDocument}>
-								<p className="mt-4 ml-16">Document</p></button>
+								<p className="mt-4 ml-8">{t('map')}</p></button>
+							<button className="flex mt-11 mr-10 w-56 h-16 text-basicallydark font-normal rounded text-lg" onClick={switchToDocument}
+							onMouseEnter={() => isTTSEnabled && speak("Document")} onMouseLeave={stop}>
+								<p className="mt-4 ml-16">{t('doc')}</p></button>
 						</div>
 						<div className="mt-36 flex justify-end">
-							<button onClick={NewContentMap} className="mr-10 w-44 h-12  text-basicallylight bg-primary hover:bg-primary  font-normal rounded text-lg shadow-xl ">Create Project</button>
+							<button onClick={NewContentMap} className="mr-10 w-44 h-12  text-basicallylight bg-primary hover:bg-primary  font-normal rounded text-lg shadow-xl "
+							onMouseEnter={() => isTTSEnabled && speak("Create Project button")} onMouseLeave={stop}>{t('create_button')}</button>
 						</div>
 					</div>
 				</div>
@@ -124,6 +133,8 @@ const ContentMapOverlay = ({ setOpenModal, switchToDocument }) =>
 
 const DocumentOverlay = ({ setOpenModal, switchToContent }) =>
 {
+	const { t } = useTranslation('new_project');
+	const { speak, stop, isTTSEnabled } = useTTS();
 	const router = useRouter();
 	return (
 		<>
@@ -135,20 +146,24 @@ const DocumentOverlay = ({ setOpenModal, switchToContent }) =>
 						</button>
 					</div>
 					<div className=" text-center mt-24 flex justify-center">
-						<p className='text-2xl block text-center font-light'>Choose the type of project you would like to create</p>
+						<p className='text-2xl block text-center font-light' onMouseEnter={() => isTTSEnabled && speak("Choose the type of project you would like to create")}
+            			onMouseLeave={stop}>{t('project_top')}</p>
 					</div>
 					<div className="bg-[url('/assets/images/bgDesign2.png')] w-full h-28 bg-contain bg-no-repeat bg-left">
 						<div className=" h-32 mt-30 justify-center grid grid-rows-2 gap-10">
 
-							<button className="flex mt-11 mr-10 w-56 h-16 text-basicallydark font-normal rounded text-lg " onClick={switchToContent}>
-								<p className="mt-4 ml-16">Content Map</p></button>
+							<button className="flex mt-11 mr-10 w-56 h-16 text-basicallydark font-normal rounded text-lg " onClick={switchToContent}
+							onMouseEnter={() => isTTSEnabled && speak("Cuntent map")} onMouseLeave={stop}>
+								<p className="mt-4 ml-16">{t('map')}</p></button>
 							<img className='h-7 mt-4 ml-3' src='/assets/images/doc.png' />
-							<button className="flex mt-11 mr-10 w-56 h-16 text-basicallylight font-normal rounded text-lg dark:bg-primary dark:hover:bg-primary">
+							<button className="flex mt-11 mr-10 w-56 h-16 text-basicallylight font-normal rounded text-lg dark:bg-primary dark:hover:bg-primary"
+							onMouseEnter={() => isTTSEnabled && speak("Document")} onMouseLeave={stop}>
 								<img className='h-7 mt-4 ml-3' src='/assets/images/doc.png' />
-								<p className="mt-4 ml-10">Document</p></button>
+								<p className="mt-4 ml-10">{t('doc')}</p></button>
 						</div>
 						<div className="mt-36 flex justify-end">
-							<button onClick = {()=>{router.push('/document')}}className="mr-10 w-44 h-12  text-basicallylight bg-primary hover:bg-primary  font-normal rounded text-lg shadow-xl ">Create Project</button>
+							<button onClick = {()=>{router.push('/document')}}className="mr-10 w-44 h-12  text-basicallylight bg-primary hover:bg-primary  font-normal rounded text-lg shadow-xl "
+							onMouseEnter={() => isTTSEnabled && speak("Create Project button")} onMouseLeave={stop}>{t('create_button')}</button>
 						</div>
 					</div>
 
