@@ -9,12 +9,12 @@ import { useVideoCall } from "./zustand";
 
 export default function CallScreen(props)
 {
-	const { callVideoStreams, micEnabled, videoEnabled, toggleAudio, toggleVideo} = useVideoCall();
+	const { callVideoStreams, micEnabled, videoEnabled, toggleAudio, toggleVideo, leaveCallFunc, setShowCallScreen} = useVideoCall();
 	const [gridCols, setGridCols] = useState(1);
 	const [maxGridHeight, setMaxGridHeight] = useState("100%");
 	const gridRef = useRef(null);
 
-	const minimize = () => props.setShowCallScreen(false);
+	const minimize = () => setShowCallScreen(false);
 
 	const addVideoElementsToGrid = () =>
 	{

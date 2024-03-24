@@ -212,7 +212,7 @@ function init(server)
 				socket.to(room).emit('user-left-call', id);
 				socket.leave(room);
 			});
-		
+				
 			socket.on('disconnect', () => socket.to(room).emit('user-left-call', id));
 		});
 	});
