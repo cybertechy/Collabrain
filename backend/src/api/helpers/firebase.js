@@ -124,6 +124,7 @@ async function deleteQueryBatch(query, resolve) {
 
 
 async function saveTeamMsg(data, newMessage = false) {
+	let sentAt = admin.firestore.Timestamp.fromDate(new Date(data.sentAt));
 	let channels = (await db.collection(`teams/${data.team}/channels/`).where("name", "==", data.channel).get());
 	let channelID = channels.docs[0].id;
 	if(!data.id) return console.log("No message ID provided");
@@ -133,7 +134,7 @@ async function saveTeamMsg(data, newMessage = false) {
 			"message": data.msg,
 			"sender": data.senderID,
 			"username": data.sender,
-			"sentAt": data.sentAt,
+			"sentAt": sentAt,
 			"reactions": (data.reactions) ? data.reactions : []
 		});
 
