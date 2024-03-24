@@ -4,8 +4,8 @@ import UploadButton from "../button/uploadButton";
 import axios from "axios";
 import fb from "../../../app/_firebase/firebase";
 import { FileVideo } from "lucide-react";
-import { useTTS } from "../../../app/utils/tts/TTSContext";
-import "../../../app/utils/i18n"
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
 import { useTranslation } from 'next-i18next';
 
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;

@@ -6,9 +6,9 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import {Tooltip}  from '@mui/material';
 import { useState } from 'react';
 import CreateFolderOverlay from  '../overlays/CreateFolderOverlay';
-import "../../../app/utils/i18n"
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
 import { useTranslation } from 'next-i18next';
-import { useTTS } from "../../../app/utils/tts/TTSContext";
 const DashboardNewFolder = ({ onNewFolderCreated }) => {
     const { t } = useTranslation('create_folder_overlay');
     const { speak, stop, isTTSEnabled } = useTTS();

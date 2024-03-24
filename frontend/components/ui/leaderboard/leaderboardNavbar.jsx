@@ -3,9 +3,9 @@ import axios from 'axios';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
 import QueryBuilderIcon from '@mui/icons-material/QueryBuilder';
 import { IconButton, Button } from '@mui/material';
-import { useTTS } from "../../../app/utils/tts/TTSContext";
-import "../../../app/utils/i18n"
-import { useTranslation } from 'react-i18next';
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
+import { useTranslation } from 'next-i18next';
 
 const fb = require('_firebase/firebase');
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;

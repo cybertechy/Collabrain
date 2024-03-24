@@ -12,9 +12,9 @@ import EditIcon from '@mui/icons-material/Edit';
 import fb from '../../../app/_firebase/firebase';
 import axios from 'axios';
 import {useRouter} from 'next/navigation';
-import "../../../app/utils/i18n"
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
 import { useTranslation } from 'next-i18next';
-import { useTTS } from "../../../app/utils/tts/TTSContext";
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
 const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, handleProjectDeleted}) => {

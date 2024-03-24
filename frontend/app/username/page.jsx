@@ -4,9 +4,9 @@ import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import "../utils/i18n"
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
 import { useTranslation } from 'next-i18next';
-import { useTTS } from "../utils/tts/TTSContext";
 const fb = require("_firebase/firebase");
 import { hasUsername } from "../utils/user";
 

@@ -4,8 +4,8 @@ const { useRouter } = require("next/navigation");
 import fb from '../../../app/_firebase/firebase';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { useTTS } from "../../../app/utils/tts/TTSContext";
-import "../../../app/utils/i18n"
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
 import { useTranslation } from 'next-i18next';
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 const ContentMapBackground = () => (

@@ -4,8 +4,8 @@ import { styled } from '@mui/material/styles';
 import clsx from 'clsx';
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import IconButton from '@mui/material/IconButton';
-import "../../../app/utils/i18n"
-import { useTranslation } from 'react-i18next';
+import "@/app/utils/i18n"
+import { useTranslation } from 'next-i18next';
 
 const RedTooltip = styled(({ className, ...props }) => (
   <Tooltip {...props} classes={{ popper: className }} />

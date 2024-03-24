@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import {createFolder} from '../../../app/utils/filesAndFolders';
 import { useSearchParams } from 'next/navigation'
-import "../../../app/utils/i18n"
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
 import { useTranslation } from 'next-i18next';
-import { useTTS } from "../../../app/utils/tts/TTSContext";
 const CreateFolderOverlay = ( {isOpen, onClose, onFolderCreated}) => {
     const { t } = useTranslation('create_folder_overlay');
     const { speak, stop, isTTSEnabled } = useTTS();

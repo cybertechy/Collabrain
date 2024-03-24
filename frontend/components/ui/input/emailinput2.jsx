@@ -3,8 +3,8 @@ import { useState, useEffect } from 'react';
 import Tooltip from '@mui/material/Tooltip';
 import { styled } from '@mui/material/styles';
 import clsx from 'clsx';
-import "../../../app/utils/i18n"
-import { useTranslation } from 'react-i18next';
+import "@/app/utils/i18n"
+import { useTranslation } from 'next-i18next';
 // Create a custom styled tooltip with a red background
 const RedTooltip = styled(({ className, ...props }) => (
     <Tooltip {...props} classes={{ popper: className }} />

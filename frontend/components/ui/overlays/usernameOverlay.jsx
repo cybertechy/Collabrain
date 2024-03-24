@@ -3,9 +3,9 @@ const fb = require("../../../app/_firebase/firebase");
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import "../../../app/utils/i18n"
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
 import { useTranslation } from 'next-i18next';
-import { useTTS } from "../../../app/utils/tts/TTSContext";
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 const UsernameOverlay = ({ onClose, hasUserUsername, setHasUserUsername }) =>
 {

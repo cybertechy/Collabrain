@@ -17,9 +17,9 @@ import ShareIcon from "@mui/icons-material/Share"; // Icon for Share
 import SortIcon from "@mui/icons-material/Sort"; // Icon for Organize
 import DeleteIcon from "@mui/icons-material/Delete"; // Icon for Delete
 import fb from "../../../app/_firebase/firebase";
-import "../../../app/utils/i18n"
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
 import { useTranslation } from 'next-i18next';
-import { useTTS } from "../../../app/utils/tts/TTSContext";
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 const DashboardProjectButton = ({
     title,
