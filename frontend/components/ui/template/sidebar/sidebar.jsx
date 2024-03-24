@@ -116,7 +116,7 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
 
     return (
         <aside
-            className={`transition-all shadow-md h-screen pt-[height_of_navbar] z-10 duration-500 ease-in-out overflow-y-hidden
+            className={`transition-all shadow-md h-screen pt-[height_of_navbar] z-10 duration-500 ease-in-out overflow-y-hidden min-w-64 lg:min-w-0
             ${
                 isOpen ? "sm:w-80 max-sm:w-screen" : "sm:w-20 max-sm:hidden"
             }
