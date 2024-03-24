@@ -158,8 +158,13 @@ function MessageItem({ sender, senderId, title,timestamp, message, messageId, at
         <CustomAvatar username={sender} />
         <div className="flex flex-col">
           <div className="flex items-baseline gap-2">
-            <span className="font-semibold">{sender == userInfo.data.username? sender:sender =="System"? "System":title}</span>
-            <span className="text-xs text-gray-500">{timestamp == "Invalid Date"? "":timestamp}</span>
+            <span className="font-semibold"
+              onMouseEnter={() => isTTSEnabled && speak(sender)}
+              onMouseLeave={stop}>
+                {sender == userInfo.data.username? sender:sender =="System"? "System":title}</span>
+            <span className="text-xs text-gray-500"
+              onMouseEnter={() => isTTSEnabled && speak(timestamp === "Invalid Date" ? "Date not available" : timestamp)}
+                onMouseLeave={stop}>{timestamp == "Invalid Date"? "":timestamp}</span>
           </div>
           <Linkify componentDecorator={(decoratedHref, decoratedText, key) => (
             <CustomLink href={decoratedHref} key={key}>{decoratedText}</CustomLink>
@@ -176,12 +181,14 @@ function MessageItem({ sender, senderId, title,timestamp, message, messageId, at
             className="ml-2 bg-primary  text-white font-bold py-2 px-4 rounded"
             onClick={handleEditSave} onMouseEnter={() => isTTSEnabled && speak("Save button")}
             onMouseLeave={stop}>
-            Save
+            {t('save')}
           </button>
         </div>
       ) : (
         // Message view mode
-        <p className="whitespace-pre-wrap break-words max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl">{editedMessage || message}</p>
+        <p className="whitespace-pre-wrap break-words max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl"
+        onMouseEnter={() => isTTSEnabled && speak(message)}
+        onMouseLeave={stop}>{editedMessage || message}</p>
       )}
             {urls.map((url, index) => (
               <div key={index} className="iframe-container my-2">
@@ -241,7 +248,8 @@ function MessageItem({ sender, senderId, title,timestamp, message, messageId, at
        
         <div>
           <div className="absolute -top-10 right-0 flex items-center bg-white rounded-t-full shadow-xl border-2 p-1" onMouseEnter={() => setIsHovering(true)} onMouseLeave={() => setIsHovering(false)}>
-            <IconButton size="small" onClick={() => setMenuVisible(!menuVisible)} title="Options">
+            <IconButton size="small" onClick={() => setMenuVisible(!menuVisible)} title="Options"
+              onMouseEnter={() => isTTSEnabled && speak("Message Options button")} onMouseLeave={stop}>
               <OptionsIcon />
             </IconButton>
             {menuVisible && (
