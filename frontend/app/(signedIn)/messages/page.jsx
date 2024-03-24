@@ -23,7 +23,7 @@ import "driver.js/dist/driver.css";
 
 import { addMedia } from "@/app/utils/storage";
 import { ToastContainer, toast } from "react-toastify";
-import { search } from "homoglyph-search";
+
 export default function Messages() {
     const router = useRouter();
     const [user, loading] = fb.useAuthState();
@@ -39,6 +39,7 @@ export default function Messages() {
     const [replyTo, setReplyTo] = useState(null);
     const [chatUpdates, setChatUpdates] = useState(0);
     const [emptyChat, setEmptyChat] = useState(false);
+    const [showFriends, setShowFriends] = useState(false);
     const withUser = params.get("user");
     const chatId = params.get("chatID");
 
@@ -105,6 +106,7 @@ export default function Messages() {
                     replyTo={data.replyTo}
                     userInfo={userInfo}
                     chatId={chatId}
+                    source = {"user"}
                 />,
             ]);
         });
@@ -148,6 +150,8 @@ export default function Messages() {
                                         : messageComponent.props.attachmentIds
                                 }
                                 userInfo={messageComponent.props.userInfo}
+                                chatId={messageComponent.props.chatId}
+                                source = {"user"}
                             />
                         );
                     }
@@ -471,6 +475,7 @@ export default function Messages() {
                 messageId={msgId}
                 userInfo={userInfo}
                 chatId={chatId}
+                source = {"user"}
             />,
         ]);
 
@@ -585,6 +590,7 @@ export default function Messages() {
         router.push("/messages");
     };
     const openChat = (userId, chatId) => {
+        setShowChat(true);
         router.push("/messages?user=" + userId + "&chatID=" + chatId);
     };
 
@@ -598,15 +604,20 @@ export default function Messages() {
 
             <div className="flex flex-row flex-grow">
                 <DMSideBar
-                    userData={userInfo}
+                    userData={{...userInfo, id: user?.uid}}
                     friendsHandler={() => setShowChat(false)}
                     chatList={directMessages}
                     openChat={openChat}
+                    setShowChat={setShowChat}
+                    showChat={showChat}
+                    setShowFriends={setShowFriends}
+                    showFriends={showFriends}
                     loadingState={loadingState}
                     setLoadingState={setLoadingState}
                     chatHandler={(id, user) => {
                         router.push(`/messages?chatID=${id}&user=${user}`);
                     }}
+                    
                 />
                 {withUser ? (
                     <ChatWindow
@@ -617,6 +628,10 @@ export default function Messages() {
                         withUserInfo={withUserInfo}
                         withUserId={withUser}
                         switchToFriends={openFriends}
+                        setShowChat={setShowChat}
+                    showChat={showChat}
+                    setShowFriends={setShowFriends}
+                    showFriends={showFriends}
                         onReact={handleReact}
                         onReply={setReplyTo}
                         replyTo={replyTo}
@@ -626,7 +641,7 @@ export default function Messages() {
                     />
                 ) : (
                     <FriendsWindow
-                 
+                    showFriends={showFriends} setShowFriends={setShowFriends}
                         userInfo={userInfo}
                         handleAliasUpdate={handleAliasUpdate}
                         handleChatUpdate={() => {

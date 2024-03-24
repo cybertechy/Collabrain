@@ -65,6 +65,7 @@ async function getTeamMembers(teamID) {
 			return []; // Return an empty array or null if the team doesn't exist
 		}
 		const teamData = teamDoc.data();
+		teamData.members = Object.keys(teamData.members)
 		return teamData.members || []; // Return members or an empty array if members field is missing
 	} catch (error) {
 		console.error("Error getting team members:", error);
@@ -123,6 +124,7 @@ async function deleteQueryBatch(query, resolve) {
 
 
 async function saveTeamMsg(data, newMessage = false) {
+	let sentAt = admin.firestore.Timestamp.fromDate(new Date(data.sentAt));
 	let channels = (await db.collection(`teams/${data.team}/channels/`).where("name", "==", data.channel).get());
 	let channelID = channels.docs[0].id;
 	if(!data.id) return console.log("No message ID provided");
@@ -132,7 +134,7 @@ async function saveTeamMsg(data, newMessage = false) {
 			"message": data.msg,
 			"sender": data.senderID,
 			"username": data.sender,
-			"sentAt": data.sentAt,
+			"sentAt": sentAt,
 			"reactions": (data.reactions) ? data.reactions : []
 		});
 

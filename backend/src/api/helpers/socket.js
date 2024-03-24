@@ -4,6 +4,10 @@ const oci = require("../helpers/oracle");
 const uuid = require("uuid");
 const { createAdapter } = require('@socket.io/redis-adapter');
 const { createClient } = require('redis');
+const dotenv = require('dotenv');
+dotenv.config();
+
+let prod = process.env.NODE_ENV === "production";
 
 /** @type Server */
 let io;
@@ -152,13 +156,11 @@ function init(server)
 
 		socket.on('join-doc', doc => 
 		{
-			console.log(`${socket.id} joined doc: ${doc}`);
 			socket.join(doc);
 		});
 
 		socket.on('leave-doc', doc => 
 		{
-			console.log(`${socket.id} left doc: ${doc}`);
 			socket.leave(doc);
 		});
 
@@ -406,7 +408,7 @@ function connectToRedis(io)
 	Promise.all([pubClient.connect(), subClient.connect()])
 		.then(() =>
 		{
-			console.log("BAPS: Enabled");
+			if(!prod) console.log("BAPS: Enabled");
 			if (io) io.adapter(createAdapter(pubClient, subClient));
 
 			if (BAPS_ERROR)
@@ -420,8 +422,8 @@ function connectToRedis(io)
 		})
 		.catch((error) =>
 		{
-			console.log("BAPS: Disabled");
-			console.log("Error connecting to Redis: ", error);
+			if(!prod) console.log("BAPS: Disabled");
+			if(!prod) console.log("Error connecting to Redis: ", error);
 			// Retry after 5 seconds
 			if (!BAPS_ERROR)
 			{
@@ -434,7 +436,7 @@ function connectToRedis(io)
 	{
 		if (!BAPS_ERROR)
 		{
-			console.log("BAPS: Disabled");
+			if(!prod) console.log("BAPS: Disabled");
 			BAPS_ERROR = true;
 			BAPS_ERROR_ID = setInterval(reconnectToRedis, 5000);
 		}
@@ -445,7 +447,7 @@ function connectToRedis(io)
 	{
 		if (!BAPS_ERROR)
 		{
-			console.log("BAPS: Disabled");
+			if(!prod) console.log("BAPS: Disabled");
 			BAPS_ERROR = true;
 			BAPS_ERROR_ID = setInterval(reconnectToRedis, 5000);
 		}

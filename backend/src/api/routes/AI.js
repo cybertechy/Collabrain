@@ -1,9 +1,12 @@
 const express = require('express');
 const router = express.Router();
+const dotenv = require('dotenv');
 
-const API_TOKEN = "ASK OWNER"
-const Account = "ASK OWNER";
-const Model = "ASK OWNER";
+dotenv.config();
+
+const API_TOKEN = process.env.AI_API_TOKEN;
+const Account = process.env.AI_ACCOUNT;
+const Model = process.env.AI_MODEL;
 
 
 const fetchDataFromAI = async function run(input) {
@@ -15,7 +18,6 @@ const fetchDataFromAI = async function run(input) {
             content: input
         }
     ]
-
 
     let body = {
         messages,
@@ -36,26 +38,37 @@ const fetchDataFromAI = async function run(input) {
 
 router.get("/", async (req, res) => {
     const query = req.query.query;
-    let queryResult = await fetchDataFromAI(query);
-
-    // use regex and get content betwen the ```
-    let content = String(queryResult.result.response)
-    if(!content) {
-        res.json({error: "No content found"});
+    let queryResult 
+    try {
+        queryResult = await fetchDataFromAI(query);
+    } catch (e) {
+        res.status(500).json({ error: "Error in AI model" });
         return;
     }
-    
+
+    // use regex and get content betwen the ```
+    if (!queryResult?.result) {
+        res.json({ error: "No result found" });
+        return;
+    }
+
+    let content = String(queryResult.result.response)
+    if (!content) {
+        res.json({ error: "No content found" });
+        return;
+    }
+
 
     let parts = content.split("```");
-    if(parts.length < 2) {
-        res.json({error: "No mermaid syntax found"});
+    if (parts.length < 2) {
+        res.json({ error: "No mermaid syntax found" });
         return;
     }
 
     let match = parts[1].match(/[^]*[^]*/);
     // Remove the word mermaid from the string
     let mermaid = match[0].replace("mermaid", "");
-    
+
     queryResult = {
         mermaid: mermaid
     }

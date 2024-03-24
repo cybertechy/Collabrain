@@ -4,7 +4,6 @@ import PieChart from "./Microservice";
 import LineChart from "./activeMembersInTeam";
 import DashboardCard from "./Storage";
 import ChartComponent from "./activeUsers";
-import axios from "axios";
 import Template from "@/components/ui/template/template";
 
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
@@ -74,18 +73,18 @@ const UserStats = () => {
 
     return(
         <>
-        <div className="h-screen">
-            <div className="ml-48">
+        <div className="h-screen overflow-y-auto">
+            <div className="">
                 <p className='pt-12 pl-10 pb-8 font-medium text-3xl'>User Statistics</p>           
                 <div className="flex ">
-                <div className="w-2/3 h-96 border-gray-200 border-2 bg-white rounded-md drop-shadow-md  ml-10">
+                <div className="w-3/5 h-96 border-gray-200 border-2 bg-white rounded-md drop-shadow-md  ml-10">
                     <p className='pb-4 pl-4 pt-4 font-medium text-xl'>Active Platform Users </p>           
                     <div className="flex pl-4 ">
                     <div className="w-8/12 pt-5">
                         <ChartComponent />
                         </div>
                         <div className="block pl-3 pt-2">
-                            <div className="w-64 h-32 mb-4 bg-white rounded-md border-2 border-gray-200">
+                            <div className="w-52 h-32 mb-4 bg-white rounded-md border-2 border-gray-200">
                                 <div className="block pl-8 pt-5">
                                     <div className="flex">
                                         <p className="font-bold text-5xl">{weeklyActiveUsers}</p>
@@ -94,7 +93,7 @@ const UserStats = () => {
                                     <p className="text-start pl-1.5 pt-1.5">per week</p>
                                 </div>
                             </div>
-                            <div className="w-64 h-32 bg-white rounded-md border-2 border-gray-200">
+                            <div className="w-52 h-32 bg-white rounded-md border-2 border-gray-200">
                                 <div className="block pl-8 pt-5">
                                     <div className="flex">
                                         <p className="font-bold text-5xl">{monthlyActiveUsers}</p>
@@ -158,6 +157,3 @@ const UserStats = () => {
 };
 
 export default UserStats;
-
-
-

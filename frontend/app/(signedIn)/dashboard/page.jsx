@@ -22,9 +22,14 @@ import {
     newContentMap,
 } from "@/app/utils/filesAndFolders";
 import { hasUsername } from "@/app/utils/user";
+import { TTSProvider, useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
+import { useTranslation } from 'next-i18next';
 const  LoaderComponent = dynamic(() => import('@/components/ui/loader/loaderComponent'), { ssr: false });
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 export default function Dashboard() {
+    const { t } = useTranslation('dashboard');
+    const { speak, stop, isTTSEnabled } = useTTS();
     const [user, loading] = fb.useAuthState();
     const [isLoading, setIsLoading] = useState(true);
     const [loadingState, setLoadingState] = useState("LOGGING_IN");
@@ -63,20 +68,29 @@ export default function Dashboard() {
 
     const contextMenuOptions = [
         {
-            text: "New Folder",
+            text: t('new_folder_rclick'),
             icon: <FolderIcon />,
             onClick: () => {
                 toggleCreateFolderOverlay();
             },
+            onMouseEnter: () => {
+                isTTSEnabled && speak("New Folder")
+            },
+            onMouseEnter: () => isTTSEnabled && speak("New folder"),
+            onMouseLeave: stop
         },
         {
-            text: "New Map",
+            text: t('new_map_rclick'),
             icon: <MapIcon />,
             onClick: () => {
                 createContentMap();
             },
+            onMouseEnter: () => isTTSEnabled && speak("New map"),
+            onMouseLeave: stop
         },
-        { text: "New Document", icon: <DescriptionIcon />, onClick: () => { } },
+        { text: t('new_doc_rclick'), icon: <DescriptionIcon />, onClick: () => { }, 
+        onMouseEnter: () => isTTSEnabled && speak("New document"),
+        onMouseLeave: stop},
     ];
 
 
@@ -368,8 +382,10 @@ export default function Dashboard() {
 
 
                 <div>
-                    <p className="text-2xl text-left text-primary ml-4 mb-4">
-                        Folders
+                    <p className="text-2xl text-left text-primary ml-4 mb-4"
+                    onMouseEnter={() => isTTSEnabled && speak("Folders")}
+                    onMouseLeave={stop}>
+                        {t('folders')}
                     </p>
 
                     <div className="flex flex-wrap content-start items-start w-full justify-start ml-4 gap-8 ">
@@ -401,11 +417,14 @@ export default function Dashboard() {
                 </div>
 
                 <div>
-                    <p className="text-2xl text-left text-primary ml-4 mb-4 mt-5">
-                        Projects
+                    <p className="text-2xl text-left text-primary ml-4 mb-4 mt-5"
+                    onMouseEnter={() => isTTSEnabled && speak("Projects")}
+                    onMouseLeave={stop}>
+                        {t('projects')}
                     </p>
                     <div
-                        className="scrollbar-thin scrollbar-thumb-primary scrollbar-thumb-scrollbar h-full  overflow-auto pr-28"
+                        // className="scrollbar-thin scrollbar-thumb-primary scrollbar-thumb-scrollbar h-full  overflow-auto pr-28"
+                        className="scrollbar-thin scrollbar-thumb-primary scrollbar-thumb-scrollbar h-full  overflow-auto pr-4"
                         style={{ maxHeight: "500px" }}
                     >
                         <div className="flex flex-wrap gap-4 ml-4 justify-start">
@@ -436,8 +455,10 @@ export default function Dashboard() {
                                     />
                                 ))
                             ) : (
-                                <div className="text-primary font-poppins text-xl italic">
-                                    Right click to make your first project!
+                                <div className="text-primary font-poppins text-xl italic"
+                                onMouseEnter={() => isTTSEnabled && speak("Right click to make your first project!")}
+                                onMouseLeave={stop}>
+                                    {t('rclick_msg')}
                                 </div>
                             )}
                         </div>

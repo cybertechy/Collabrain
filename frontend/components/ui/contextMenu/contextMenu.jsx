@@ -28,6 +28,8 @@ const ContextMenu = ({ xPos, yPos, isVisible, menuOptions, onClose }) => {
             key={index} 
             className="py-2 px-4 flex items-center text-primary hover:bg-gray-100 cursor-pointer"
             onClick={() => handleOptionClick(option)}
+            onMouseEnter={option.onMouseEnter}
+            onMouseLeave={option.onMouseLeave}
           >
             {option.icon && <span className="mr-2">{option.icon}</span>}
             {option.text}

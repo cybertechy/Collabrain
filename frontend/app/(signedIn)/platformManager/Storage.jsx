@@ -64,7 +64,7 @@ const DashboardCard = () => {
   };
 
   return (
-    <div className="max-w-screen-lg w-full bg-white rounded-lg  p-4 md:p-6">
+    <div className="max-w-screen-lg w-11/12 bg-white rounded-lg  p-4 md:p-6">
       <ApexCharts width="100%" options={chartOptions} series={chartOptions.series} type="bar" height={chartOptions.chart.height} />
 
       {dbUsage !== null && (

@@ -1,0 +1,6 @@
+@import './globals.css';
+@import './utils/colorblind/accecss.scss';
+
+html {
+    filter: var(--colorblind-filter);
+}

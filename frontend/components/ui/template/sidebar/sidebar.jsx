@@ -3,7 +3,7 @@ const { useRouter } = require("next/navigation");
 import SidebarButtonIcon from "./sidebarSubComponents/sidebarButton";
 import AddIcon from '@mui/icons-material/Add';
 import FolderIcon from "@mui/icons-material/Folder";
-const fb = require("_firebase/firebase");
+const fb = require("_firebase/firebase"); 
 import SidebarItem from "./sidebarSubComponents/sidebarItem";
 import PeopleIcon from "@mui/icons-material/People";
 import HistoryIcon from "@mui/icons-material/History";
@@ -16,51 +16,51 @@ import { useState } from "react";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import { useEffect } from "react";
-import TeamOverlay from "../../overlays/TeamOverlay";
-import TeamSidebarItem from "./sidebarSubComponents/sidebarTeamButton";
+import TeamOverlay from "../../overlays/TeamOverlay"
+import TeamSidebarItem from "./sidebarSubComponents/sidebarTeamButton"
 // Define the sidebar navigation items
 import { usePathname } from "next/navigation";
 import NewProjectOverlay from "../../overlays/NewProjectOverlay";
-import { useMediaQuery } from "react-responsive"; // Import useMediaQuery
-
 import axios from "axios";
-const navigationItems1 = [
-	{ name: "My Brain", href: "/dashboard", icon: FolderIcon },
-	{ name: "Shared With Me", href: "/shared-with-me", icon: PeopleIcon },
-
-];
-
-const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
-
-
-const navigationItems2 = [
-	{ name: "Direct Messages", href: "/messages", icon: ForumIcon },
-
-];
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
+import { useTranslation } from 'next-i18next';
 
 const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
+    
+    const { t } = useTranslation('sidebar');
+    const { speak, stop, isTTSEnabled } = useTTS();
+
+    const navigationItems1 = [
+        { name: t('my_brain'), href: "/dashboard", icon: FolderIcon },
+        { name: t('shared_with_me'), href: "/shared-with-me", icon: PeopleIcon },
+        
+    ];
+    
+    const navigationItems2 = [
+        { name: t('dms'), href: "/messages", icon: ForumIcon },
+       
+    ];
+    
     const router = useRouter();
     // const [isOpen, setIsOpen] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false); 
     const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+    const [teamChanges, setTeamChanges] = useState(0);
     const toggleModal = () => { // Define toggleModal function
         setIsModalOpen(!isModalOpen);
     };
-    const isSmallScreen = useMediaQuery({ query: "(max-width: 768px)" }); // Define breakpoint
-
+    
     const toggleProjectModal = () => { 
         setIsProjectModalOpen(!isProjectModalOpen);
     };
 
-
-	const pathname = usePathname();
-	// const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-	const [userTeams, setUserTeams] = useState(null);
-	const [user, loading] = fb.useAuthState();
-	useEffect(() =>
-	{
-		if (!user)
-		{
+    const pathname = usePathname(); 
+    // const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+    const [userTeams, setUserTeams] = useState(null);
+    const [user, loading] = fb.useAuthState();
+    useEffect(() => {
+        if (!user){
 
             return;
         }
@@ -68,7 +68,7 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
             try {
                 // Make a GET request to retrieve user's team IDs
                 const token = await fb.getToken();
-                const response = await axios.get(`${SERVERLOCATION}/api/teams`, {
+                const response = await axios.get('http://localhost:8080/api/teams', {
                     headers: {
                         Authorization: `Bearer ${token}`, // Replace with the actual auth token
                     },
@@ -80,7 +80,7 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
     
                     // Create an array of promises to fetch team information
                     const teamPromises = teamIds.map(async (teamId) => {
-                        const teamResponse = await axios.get(`${SERVERLOCATION}/api/teams/${teamId}`, {
+                        const teamResponse = await axios.get(`http://localhost:8080/api/teams/${teamId}`, {
                             headers: {
                                 Authorization: `Bearer ${token}`, // Replace with the actual auth token
                             },
@@ -107,7 +107,7 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
     
                     // Update the userTeams state with the array of team information
                     setUserTeams(filteredTeamsData);
-                  
+                    console.log(filteredTeamsData);
                 } else {
                     throw new Error('Failed to fetch user teams');
                 }
@@ -119,18 +119,19 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
     
         // Call the function to fetch user teams when the component mounts
         fetchUserTeams();
-    }, [user]);
-    
-    
+    }, [user, teamChanges]);
 
 
     return (
         <aside
-      className={`transition-all shadow-md h-screen pt-[height_of_navbar] z-10 duration-500 ease-in-out
-     ${isOpen ? (isSmallScreen ? "w-full" : "lg:w-80 md:w-80") : "hidden"}
-     ${isSmallScreen && isOpen ? "fixed top-0 left-0 z-40" : "lg:block md:block md:w-20"} // Adjusted for responsive design
-      bg-basicallylight text-basicallydark`}
-    >
+            className={`transition-all shadow-md h-screen pt-[height_of_navbar] z-10 duration-500 ease-in-out overflow-y-auto min-w-full sm:min-w-0 lg:min-w-0
+            ${
+                isOpen ? "sm:w-80 max-sm:w-screen" : "sm:w-20 max-sm:hidden"
+            }
+             bg-basicallylight text-basicallydark`}
+            // style={isOpen ? sidebarStyle() : sidebarStyle1()}
+            // onClick={handleSidebarClick}
+        >
             <div className="flex flex-col">
                 <div className="flex items-center justify-center h-24">
                     <div className="flex items-center justify-center">
@@ -147,17 +148,21 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
                                 </p>
                                 </div>
                                 <CloseIcon
-                                    className="text-xl ml-16 text-primary transition-all duration-1000 ease-in-out cursor-pointer"
+                                    className="text-lg ml-16 text-primary transition-all duration-1000 ease-in-out cursor-pointer"
                                     onClick={toggleSidebar}
                                     fontSize="large"
+                                    onMouseEnter={() => isTTSEnabled && speak("Close sidebar button")}
+                                    onMouseLeave={stop}
                                 />
                             </div>
                         ) : (
-                            <div className="flex-grow flex max-xsm:hidden">
+                            <div className="flex-grow flex max-sm:hidden">
                             <MenuIcon
                                 className="h-6 w-6 mb-2 text-lg text-primary transition-all duration-500 ease-in-out"
                                 onClick={toggleSidebar}
                                 fontSize="large"
+                                onMouseEnter={() => isTTSEnabled && speak("Open sidebar button")}
+                                onMouseLeave={stop}
                             />
                             </div>
                         )}
@@ -167,8 +172,8 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
                 {/* Navigation items */}
              <nav className="flex flex-col p-4">
                     <SidebarButtonIcon
-                        key={"New Project"}
-                        text={"New Project"}
+                        key={t('new_project')}
+                        text={t('new_project')}
                         color="primary"
                         withShadow={true}
                         onClick={toggleProjectModal}
@@ -181,6 +186,7 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
                     />
                     {navigationItems1.map((item) => (
                         <SidebarItem
+                        toggleSidebar={toggleSidebar}
                             key={item.name}
                             href={item.href}
                             icon={item.icon}
@@ -192,6 +198,7 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
                     <hr className="border-t-1 mx-4 my-6 border-solid border-gray-400 opacity-30"></hr>
                     {navigationItems2.map((item) => (
                         <SidebarItem
+                        toggleSidebar={toggleSidebar}
                             key={item.name}
                             href={item.href}
                             icon={item.icon}
@@ -201,8 +208,8 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
                         />
                     ))}
                                       <SidebarButtonIcon
-                key={"New Team"}
-                text={"New Team"}
+                key={t('new_team')}
+                text={t('new_team')}
                 color="primary"
                 withShadow={true}
                 onClick={toggleModal} // Use toggleModal to open the overlay
@@ -212,13 +219,22 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
                 isExpanded={isOpen}
             />
             
-            {isModalOpen && <TeamOverlay toggleModal={ toggleModal} modalVisible= {isModalOpen} />}
+            {isModalOpen && <TeamOverlay toggleModal={ toggleModal} modalVisible= {isModalOpen} handleUpdate = {()=>{setTeamChanges(teamChanges+1)}}/>}
             {isProjectModalOpen && <NewProjectOverlay toggleModal={ toggleProjectModal} modalVisible= {isProjectModalOpen} />}
-                
+                {/* {teams.map(team => (
+                    <SidebarItem
+                        key={team.name}
+                        href={`/team/${team.uid}`} // Assuming each team has a unique ID and a page
+                        icon={GroupsIcon} // You can use a default icon for teams
+                        text={team.name}
+                        isSelected={pathname === `/team/${team.uid}`}
+                        isExpanded={isOpen}
+                    />
+                ))} */}
 
-					<SidebarButtonIcon
-						key={"Discover Teams"}
-						text={"Discover Teams"}
+                <SidebarButtonIcon
+                        key={t('teams_disc')}
+                        text={t('teams_disc')}
 						color="primary"
 						withShadow={true}
 						onClick={() => router.push("/leaderboard")}
@@ -233,10 +249,10 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
 						)) : null}
 					</div>
 
-				</nav>
-			</div>
-		</aside>
-	);
+                </nav>
+            </div>
+        </aside>
+    );
 };
 
 export default Sidebar;

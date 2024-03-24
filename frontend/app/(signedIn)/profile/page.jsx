@@ -9,15 +9,21 @@ import TextareaAutosize from '@mui/material/TextareaAutosize';
 import PlusIcon from '@mui/icons-material/Add';
 // import TeamSidebarItem from '@/components/ui/template/sidebar/sidebarSubComponents/sidebarTeamButton';
 import { useRouter } from 'next/navigation';
+import { TTSProvider, useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
+import { useTranslation } from 'next-i18next';
 
 // import React from 'react';
 import PropTypes from 'prop-types';
 import { Tooltip } from '@mui/material';
 import Link from 'next/link';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const TeamItem = ({ team }) =>
 {
 	const { name, imageUrl, channels } = team;
+	const { speak, stop, isTTSEnabled } = useTTS();
 	// const itemClasses = isSelected ? "text-primary" : "text-unselected";
 	const defaultImage = '/assets/images/imagenotFound.jpg';
 	// const selectedBorder = isSelected ? "border-primary border-2 border-solid" : "group-hover:border-primary group-hover:border-2";
@@ -26,7 +32,8 @@ const TeamItem = ({ team }) =>
 	return (
 		<Tooltip title={name} enterDelay={1000} leaveDelay={200}>
 			<Link href={`chat?teamId=${team.teamId}&channelName=${"General"}`}>
-				<div className={`flex flex-row items-center my-2 transition-colors duration-200 cursor-pointer hover:bg-gray-200 `}>
+				<div className={`flex flex-row items-center my-2 transition-colors duration-200 cursor-pointer hover:bg-gray-200 `}
+				    onMouseEnter={() => isTTSEnabled && speak(`Team ${name}`)} onMouseLeave={stop}>
 					<img
 						src={
 							// imageUrl ? imageUrl : 
@@ -59,8 +66,9 @@ const ProfilePage = () =>
 {
 	const axios = require("axios");
 	const fb = require("_firebase/firebase");
-	const socket = require("_socket/socket");
 
+	const { t } = useTranslation('my_profile');
+	const { speak, stop, isTTSEnabled } = useTTS();
 	const [name, setName] = useState("");
 	const [username, setUsername] = useState("");
 	const [email, setEmail] = useState("");
@@ -86,7 +94,10 @@ const ProfilePage = () =>
 	{
 		try
 		{
-			await saveProfileChanges();
+			await saveProfileChanges({
+				fname: name.split(' ')[0],
+				lname: name.split(' ')[1]
+			});
 			setIsNameEditMode(!isNameEditMode);
 		} catch (error)
 		{
@@ -95,27 +106,16 @@ const ProfilePage = () =>
 		}
 	};
 
-	const handleEmailEditClick = async () =>
-	{
-		try
-		{
-			await saveProfileChanges();
-			setIsEmailEditMode(!isEmailEditMode);
-		} catch (error)
-		{
-			console.error('Error saving profile changes:', error);
-			// Handle errors here, if needed
-		}
-	};
+	
 
 
-	const saveProfileChanges = async () =>
+	const saveProfileChanges = async (data) =>
 	{
-		const updatedUserInfo = {
-			bio: bio, // Assuming 'bio' state holds the biography text
-			education: education, // Assuming 'education' state holds an array of education objects
-			certifications: certifications, // Assuming 'certifications' state holds an array of certification objects
-		};
+		console.log("Saving profile changes...");
+		console.log("education: ", education);
+		const updatedUserInfo = data
+
+		if (Object.keys(updatedUserInfo).length === 0) return;
 
 		try
 		{
@@ -144,7 +144,21 @@ const ProfilePage = () =>
 		{
 			setEducation(prevEdu => [...prevEdu, newEdu]);
 			setNewEdu({ school: '', degree: '', startYear: '', endYear: '' });
-			await saveProfileChanges(); // Save changes after adding
+			await saveProfileChanges({
+				education: [...education, newEdu]
+			}); // Save changes after adding
+		}
+		else {
+			toast.error("Please fill in all fields",{
+				position: "bottom-right",
+				autoClose: 3000,
+				hideProgressBar: false,
+				closeOnClick: true,
+				pauseOnHover: true,
+				draggable: true,
+				progress: undefined,
+				theme: "colored"
+			});
 		}
 	};
 
@@ -153,18 +167,33 @@ const ProfilePage = () =>
 		if (newCert.title && newCert.date)
 		{
 			// Update certifications state first
-			setCertifications(prevCerts => [...prevCerts, newCert]);
+			console.log("Adding certification: ", certifications);
+			let updatedCertifications = [...certifications, newCert];
+			setCertifications(updatedCertifications);
 			setNewCert({ title: '', date: '' });
-
 			try
 			{
 				// Now, call saveProfileChanges to save the changes including certifications
-				await saveProfileChanges();
+				await saveProfileChanges({
+					certifications: [...certifications, newCert]
+				});
 			} catch (error)
 			{
 				console.error('Error saving profile changes:', error);
 				// Handle errors here, if needed
 			}
+		} else {
+			toast.error("Please fill in all fields",{
+				position: "bottom-right",
+				autoClose: 3000,
+				hideProgressBar: false,
+				closeOnClick: true,
+				pauseOnHover: true,
+				draggable: true,
+				progress: undefined,
+				theme: "colored"
+			});
+		
 		}
 	};
 
@@ -198,7 +227,7 @@ const ProfilePage = () =>
 					setImage(photo);
 					setBio(bio); // Set bio from response
 					setEducation(education); // Set education from response
-					setCertifications(certifications); // Set certifications from response
+					setCertifications(certifications || []); // Set certifications from response
 
 					// Navigate to the profile page with updated information
 					const newPath = `/profile?username=${response.data.username}`;
@@ -377,17 +406,21 @@ const ProfilePage = () =>
 	};
 
 	return (
-		<>
+		<div className='overflow-auto mb-5'>
+		<ToastContainer />
 			<div
 				className="p-4 container focus:outline-none focus:border-primary text-gray-500">
-				<h2 className="text-lg font-bold text-tertiary text-left font-poppins"> Edit your information here @{username}</h2>
+				<h2 className="text-lg font-bold text-tertiary text-left font-poppins"
+				onMouseEnter={() => isTTSEnabled && speak(`Edit your information here, ${username}`)}
+				onMouseLeave={stop}> {t('top')} @{username}</h2>
 			</div>
 			<div className="container mx-auto px-4 pt-8 2xl:w-5/6">
 				<div className="flex flex-col space-x-4 md:flex-row 2xl:space-x-4 mb-6 max-md:space-y-4 max-md:space-x-0">
 					{/* Profile card */}
 					<div className="bg-white rounded-lg p-4 md:mb-0 border border-primary border-opacity-30 shadow-sm">
 						<div className="text-center">
-							<div className="mb-4">
+							<div className="mb-4"
+							onMouseEnter={() => isTTSEnabled && speak("Your current profile icon. Click to edit.")} onMouseLeave={stop}>
 								<UploadButton
 									onUpload={uploadImage}
 									photo={image}
@@ -396,34 +429,36 @@ const ProfilePage = () =>
 							<div className='relative mb-4 flex items-center ml-6'>
 								<input
 									type="text"
-									placeholder="Enter your name"
+									placeholder={t('name_ent')}
 									value={name}
 									onChange={(e) =>
 										setName(e.target.value)
 									}
+									onMouseEnter={() => isTTSEnabled && speak("Enter your name")}
+									onMouseLeave={stop}
 									className={`bg-white text-lg font-bold text-center border-0 p-2 w-full text-black ${isNameEditMode && 'border-2 rounded-lg'}`}
 									disabled={!isNameEditMode}
 								/>
 								{isNameEditMode ?
-									<SaveIcon className={`text-primary ml-2 cursor-pointer`} onClick={handleNameEditClick} />
+									<SaveIcon className={`text-primary ml-2 cursor-pointer`} onClick={handleNameEditClick} 
+									onMouseEnter={() => isTTSEnabled && speak("Save Name button")} onMouseLeave={stop}/>
 									:
-									<EditIcon className={`text-primary ml-2 cursor-pointer`} onClick={handleNameEditClick} />}
+									<EditIcon className={`text-primary ml-2 cursor-pointer`} onClick={handleNameEditClick} 
+									onMouseEnter={() => isTTSEnabled && speak("Edit Name button")} onMouseLeave={stop}/>}
 							</div>
 							<div className='relative mb-4 flex items-center ml-6'>
 								<input
 									type="text"
-									placeholder="Enter your updated email"
+									placeholder={t('email_ent')}
 									value={email}
 									onChange={(e) =>
 										setEmail(e.target.value)
 									}
+									onMouseEnter={() => isTTSEnabled && speak("Enter your updated email")}
+									onMouseLeave={stop}
 									className={`bg-white text-lg text-center border-0 w-full text-black ${isEmailEditMode && 'border-2 rounded-lg'}`}
 									disabled={!isEmailEditMode}
 								/>
-								{isEmailEditMode ?
-									<SaveIcon className={`text-primary ml-2 cursor-pointer`} onClick={handleEmailEditClick} />
-									:
-									<EditIcon className={`text-primary ml-2 cursor-pointer`} onClick={handleEmailEditClick} />}
 							</div>
 							{/* <p className="text-lg text-black">{email}</p>  */}
 						</div>
@@ -432,11 +467,14 @@ const ProfilePage = () =>
 					{/* Biography Section */}
 					<div className="rounded-lg p-4 flex-1 md:w-2/3 border border-primary border-opacity-30 shadow-sm">
 						<div className='flex items-center mb-4'>
-							<h3 className="font-bold text-lg text-black">Biography</h3>
+							<h3 className="font-bold text-lg text-black"
+							onMouseEnter={() => isTTSEnabled && speak("Biography")} onMouseLeave={stop}>{t('bio')}</h3>
 							{isBioEditMode ?
-								<SaveIcon className={`text-primary ml-auto cursor-pointer`} onClick={handleBioEditClick} />
+								<SaveIcon className={`text-primary ml-auto cursor-pointer`} onClick={handleBioEditClick}
+								onMouseEnter={() => isTTSEnabled && speak("Save biography button")} onMouseLeave={stop} />
 								:
-								<EditIcon className={`text-primary ml-auto cursor-pointer`} onClick={handleBioEditClick} />}
+								<EditIcon className={`text-primary ml-auto cursor-pointer`} onClick={handleBioEditClick}
+								onMouseEnter={() => isTTSEnabled && speak("Edit biography button")} onMouseLeave={stop} />}
 						</div>
 						<TextareaAutosize
 							minRows={3}
@@ -444,7 +482,9 @@ const ProfilePage = () =>
 							value={bio}
 							onChange={(e) => setBio(e.target.value)}
 							className="border p-2 b-2 rounded-md focus:outline-none focus:border-primary text-black"
-							placeholder="Your biography here"
+							placeholder={t('your_bio')}
+							onMouseEnter={() => isTTSEnabled && speak("Your biography here")}
+							onMouseLeave={stop}
 							disabled={!isBioEditMode}
 						/>
 					</div>
@@ -454,11 +494,14 @@ const ProfilePage = () =>
 				<div className="flex flex-col md:flex-row md:space-x-4">
 					<div className="rounded-lg p-4 mb-6 flex flex-col w-full md:w-1/2 border border-primary border-opacity-30 shadow-sm h-min">
 						<div className='flex items-center'>
-							<h3 className="font-bold text-lg text-black pb-2">Education</h3>
+							<h3 className="font-bold text-lg text-black pb-2"
+							onMouseEnter={() => isTTSEnabled && speak("Education")} onMouseLeave={stop}>{t('edu')}</h3>
 							{isEduEditMode ?
-								<SaveIcon className={`text-primary ml-auto cursor-pointer`} onClick={addEducation} />
+								<SaveIcon className={`text-primary ml-auto cursor-pointer`} onClick={addEducation}
+								onMouseEnter={() => isTTSEnabled && speak("Save Education button")} onMouseLeave={stop} />
 								:
-								<PlusIcon className={`text-primary ml-auto cursor-pointer`} onClick={() => setIsEduEditMode(true)} />}
+								<PlusIcon className={`text-primary ml-auto cursor-pointer`} onClick={() => setIsEduEditMode(true)}
+								onMouseEnter={() => isTTSEnabled && speak("Add Education button")} onMouseLeave={stop} />}
 							{/* Education details */}
 						</div>
 						{isEduEditMode ? (
@@ -469,14 +512,16 @@ const ProfilePage = () =>
 									value={newEdu.school}
 									onChange={(e) => setNewEdu({ ...newEdu, school: e.target.value })}
 									className="mt-2 p-2 border-2 rounded text-tertiary"
-									placeholder="School name..."
+									placeholder={t('school_name')}
+									onMouseEnter={() => isTTSEnabled && speak("Enter school name here")} onMouseLeave={stop}
 								/>
 								<input
 									type="text"
 									value={newEdu.degree}
 									onChange={(e) => setNewEdu({ ...newEdu, degree: e.target.value })}
 									className="mt-2 p-2 border-2 rounded text-tertiary"
-									placeholder="Degree..."
+									placeholder={t('degree')}
+									onMouseEnter={() => isTTSEnabled && speak("Enter degree here")} onMouseLeave={stop}
 								/>
 								{/* Inputs for start and end year */}
 								<div className="flex flex-auto space-x-4 items-center">
@@ -485,7 +530,8 @@ const ProfilePage = () =>
 										value={newEdu.startYear}
 										onChange={(e) => setNewEdu({ ...newEdu, startYear: e.target.value })}
 										className="mt-2 p-2 w-3/4 border-2 rounded text-tertiary"
-										placeholder="Start Year..."
+										placeholder={t('start_yr')}
+										onMouseEnter={() => isTTSEnabled && speak("Choose the start year")} onMouseLeave={stop}
 										min="1900"
 										step="1" //whole numbers
 									/>
@@ -495,7 +541,8 @@ const ProfilePage = () =>
 										value={newEdu.endYear}
 										onChange={(e) => setNewEdu({ ...newEdu, endYear: e.target.value })}
 										className="mt-2 p-2 w-3/4 border-2 rounded text-tertiary"
-										placeholder="End Year..."
+										placeholder={t('end_yr')}
+										onMouseEnter={() => isTTSEnabled && speak("Choose the end year")} onMouseLeave={stop}
 										min="1900"
 										step="1"
 									/>
@@ -505,9 +552,10 @@ const ProfilePage = () =>
 							<>
 								<ul className='text-tertiary'>
 									{education?.map((edu, index) => (
-										<li key={index}>
+										<li key={index} onMouseEnter={() => isTTSEnabled && speak(`${edu.degree} from ${edu.school}, ${edu.startYear} to ${edu.endYear}`)}
+										onMouseLeave={stop}>
 											<hr className="border-t-1 mx-1 border-solid border-gray-400 opacity-30 py-1"></hr>
-											<i>{edu.degree}</i> from <i>{edu.school}</i> ({edu.startYear} - {edu.endYear})
+											<i>{edu.degree}</i> {t('from')} <i>{edu.school}</i> ({edu.startYear} - {edu.endYear})
 										</li>
 									))}
 								</ul>
@@ -519,11 +567,14 @@ const ProfilePage = () =>
 
 					<div className="rounded-lg p-4 mb-6 flex flex-col w-full md:w-1/2 border border-primary border-opacity-30 shadow-sm h-min">
 						<div className='flex items-center'>
-							<h3 className="font-bold text-lg text-black pb-2">Licenses & Certifications</h3>
+							<h3 className="font-bold text-lg text-black pb-2"
+							onMouseEnter={() => isTTSEnabled && speak("Licenses and Certifications")} onMouseLeave={stop}>{t('lic_cert')}</h3>
 							{isLCEditMode ?
-								<SaveIcon className={`text-primary ml-auto cursor-pointer`} onClick={addCertification} />
+								<SaveIcon className={`text-primary ml-auto cursor-pointer`} onClick={addCertification}
+								onMouseEnter={() => isTTSEnabled && speak("Save button")} onMouseLeave={stop} />
 								:
-								<PlusIcon className={`text-primary ml-auto cursor-pointer`} onClick={() => setIsLCEditMode(true)} />}
+								<PlusIcon className={`text-primary ml-auto cursor-pointer`} onClick={() => setIsLCEditMode(true)}
+								onMouseEnter={() => isTTSEnabled && speak("Add Licenses And Certifications button")} onMouseLeave={stop} />}
 							{/* Certifications list */}
 						</div>
 						{isLCEditMode ? (
@@ -534,22 +585,25 @@ const ProfilePage = () =>
 									value={newCert.title}
 									onChange={(e) => setNewCert({ ...newCert, title: e.target.value })}
 									className="mt-2 p-2 border-2 rounded text-tertiary"
-									placeholder="Certification title..."
+									placeholder={t('cert_title')}
+									onMouseEnter={() => isTTSEnabled && speak("Enter certification title here")} onMouseLeave={stop}
 								/>
 								<input
 									type="date"
 									value={newCert.date}
 									onChange={(e) => setNewCert({ ...newCert, date: e.target.value })}
 									className="mt-2 p-2 border-2 rounded text-tertiary"
-									placeholder="Date obtained..."
+									placeholder={t('date_obt')}
+									onMouseEnter={() => isTTSEnabled && speak("Choose date obtained")} onMouseLeave={stop}
 								/>
 							</div>
 						) : (
 							<ul className='text-tertiary'>
 								{certifications?.map((cert, index) => (
-									<li key={index}>
+									<li key={index} onMouseEnter={() => isTTSEnabled && speak(`${cert.title}, obtained on ${cert.date}`)} 
+									onMouseLeave={stop}>
 										<hr className="border-t-1 mx-1 border-solid border-gray-400 opacity-30 py-1"></hr>
-										<i>{cert.title}</i>, obtained on {cert.date}
+										<i>{cert.title}</i>, {t('obt_on')} {cert.date}
 									</li>
 								))}
 							</ul>
@@ -557,8 +611,9 @@ const ProfilePage = () =>
 					</div>
 				</div>
 
-				<div className={`rounded-lg p-4 flex flex-col w-1/2 md:w-full border border-primary border-opacity-30 shadow-sm`}>
-					<h3 className="font-bold text-lg text-black pb-2">Your Teams</h3>
+				<div className={`rounded-lg p-4 flex flex-col w-full border border-primary border-opacity-30 shadow-sm`}>
+					<h3 className="font-bold text-lg text-black pb-2"
+					onMouseEnter={() => isTTSEnabled && speak("Your teams")} onMouseLeave={stop}>{t('teams')}</h3>
 					{userTeams ? userTeams?.map((team, index) => (
 						<TeamItem key={index} team={team}
 							onClick={router.forward(`chat?teamId=${team.teamId}`)}
@@ -566,7 +621,7 @@ const ProfilePage = () =>
 					)) : null}
 				</div>
 			</div>
-		</>
+		</div>
 	);
 };
 

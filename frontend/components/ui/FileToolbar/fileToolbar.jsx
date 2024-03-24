@@ -70,7 +70,7 @@ export default function FileToolbar(props)
 			<ToastContainer />
 
 			{/* Document Name (leftmost element) */}
-			<div className="text-lg font-bold">{props.name}</div>
+			<div id="Name" className="text-lg font-bold">{props.name}</div>
 
 			{/* Save button */}
 			{props?.fileData?.access && (props.fileData.access[props.userID].role == "edit" || props.fileData.access[props.userID].role == "owner") &&

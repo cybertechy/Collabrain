@@ -6,9 +6,10 @@ import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import MicOffIcon from '@mui/icons-material/MicOff';
 import MicIcon from '@mui/icons-material/Mic';
 import Avatar from '@mui/material/Avatar';
-
+import { useTTS } from "@/app/utils/tts/TTSContext";
 
 const ProfileBox = ({ userData, onMute, onDeafen, onSettings }) => {
+    const { speak, stop, isTTSEnabled } = useTTS();
     const [isMuted, setIsMuted] = useState(false);
     const [isDeafened, setIsDeafened] = useState(false);
   //  const avatarName = userData?.fname ? `${userData.fname} ${userData.lname}` : "User";
@@ -71,20 +72,36 @@ const ProfileBox = ({ userData, onMute, onDeafen, onSettings }) => {
       const brightness = ((c_r * 299) + (c_g * 587) + (c_b * 114)) / 1000;
       return brightness > 155; // Brightness threshold, adjust if needed
     }
+
+    const handleHover = () => {
+      if (isTTSEnabled) {
+          speak(`My username is ${displayName}`);
+      }
+    };
+
+    const handleLeave = () => {
+      stop();
+    };
+
     return (
         <div className=" bg-primary w-full text-white p-2 flex flex-col justify-between items-center shadow-lg">
             <div className="flex items-center flex-row mt-2">
             <Avatar {...stringAvatar(displayName)} />
-<span className="ml-2">{displayName}</span>
+<span className="ml-2" onMouseEnter={handleHover} onMouseLeave={handleLeave}>{displayName}</span>
             </div>
             <div>
                 <IconButton onClick={handleMute}>
-                    {isMuted ? <MicOffIcon className="text-white" /> : <MicIcon className="text-white" />}
+                    {isMuted ? <MicOffIcon className="text-white" onClick={onSettings} onMouseEnter={() => isTTSEnabled && speak("Microphone is currently turned off. Click to turn it on.")} 
+                onMouseLeave={stop}/> : <MicIcon className="text-white" onClick={onSettings} onMouseEnter={() => isTTSEnabled && speak("Microphone is currently turned on. Click to turn it off.")} 
+                onMouseLeave={stop}/>}
                 </IconButton>
                 <IconButton onClick={handleDeafen}>
-                    {isDeafened ? <VolumeOffIcon className="text-white" /> : <VolumeUpIcon className="text-white" />}
+                    {isDeafened ? <VolumeOffIcon className="text-white" onClick={onSettings} onMouseEnter={() => isTTSEnabled && speak("Sound is currently turned off. Click to turn it on.")} 
+                onMouseLeave={stop}/> : <VolumeUpIcon className="text-white" onClick={onSettings} onMouseEnter={() => isTTSEnabled && speak("Sound is currently turned on. Click to turn it off.")} 
+                onMouseLeave={stop}/>}
                 </IconButton>
-                <IconButton onClick={onSettings}>
+                <IconButton onClick={onSettings} onMouseEnter={() => isTTSEnabled && speak("Settings button")} 
+                onMouseLeave={stop}>
                     <SettingsIcon className="text-white" />
                 </IconButton>
             </div>

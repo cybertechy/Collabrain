@@ -15,6 +15,7 @@ export default function CallScreen(props)
 	const gridRef = useRef(null);
 
 	const minimize = () => setShowCallScreen(false);
+	const minimize = () => setShowCallScreen(false);
 
 	const addVideoElementsToGrid = () =>
 	{

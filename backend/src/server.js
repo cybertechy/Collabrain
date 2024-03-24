@@ -5,6 +5,8 @@ const cors = require("cors");
 const bodyParser = require('body-parser');
 const http = require('http');
 const fb = require('./api/helpers/firebase');
+const dotenv = require('dotenv');
+
 
 // Routes
 const chatRoute = require("./api/routes/Chat");
@@ -25,10 +27,11 @@ const callRoute = require("./api/routes/Call");
 const sockServer = require("./api/helpers/socket");
 
 // Config
-
+dotenv.config();
 const app = express();
 const port = process.env.PORT || 8080;
 const server = http.createServer(app);
+
 
 // Database usage counter
 let APIUsageCount = fb.getObjectFromRealtimeDB("usageCount").then((data) => { return data || 0; });
