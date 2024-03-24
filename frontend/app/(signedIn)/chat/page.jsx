@@ -219,7 +219,7 @@ export default function ChatRoom() {
 		if (sockCli.current) {
 			let sentAt = new Date();
 			updatedMessage = {
-				chat: chatId,
+				teamId: teamId,
 				sentAt: sentAt.toISOString(),
 				id: updatedMessage.messageId,
 				reactions: updatedMessage.reactions,
@@ -253,12 +253,12 @@ export default function ChatRoom() {
         // Emit the updateDirectMessage event with updated message text
         if (sockCli.current) {
             let sentAt = new Date();
-            // Assuming you have chatId and user information available as in handleReact
+            // Assuming you have teamId and user information available as in handleReact
             const messageUpdate = {
-                chat: chatId,
+                teamId: teamId,
                 sentAt: sentAt.toISOString(),
                 id: updatedMessage.messageId,
-                msg: AES.encrypt(updatedMessage.message, chatId).toString(),
+                msg: AES.encrypt(updatedMessage.message, teamId).toString(),
             };
             console.log(
                 "Emitting updateTeamMessage event with updated message text:",
@@ -294,9 +294,9 @@ export default function ChatRoom() {
 
 			console.log("Received team message:", data);
 
-			if (chatId !== data.chat) return;
+			if (teamId !== data.chat) return;
 
-			data.msg = AES.decrypt(data.msg, chatId).toString(enc);
+			data.msg = AES.decrypt(data.msg, teamId).toString(enc);
 
 			setMessages((prevMessage) => [
 				...prevMessage,
@@ -415,6 +415,7 @@ export default function ChatRoom() {
 
 				const fetchedMessages = response.data.map((messageData) => {
 					// Attempt to safely convert timestamp to Date object'
+					console.log("LOOK HERE JOHANNNN", messageData);
 					let sentAt = new Date(messageData.sentAt._seconds * 1000 + messageData.sentAt._nanoseconds / 1000000);
 
 					let decryptedMessage = decryptMessage(messageData.message, teamId);

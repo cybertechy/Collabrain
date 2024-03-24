@@ -7,6 +7,7 @@ import EmojiPicker from '@/components/ui/messagesComponents/EmojiPicker';
 import Popover from '@mui/material/Popover';
 import CloseIcon from '@mui/icons-material/Close';
 import { ToastContainer, toast } from 'react-toastify';
+import { set } from 'react-hook-form';
 
 export default function MessageBox({ onSendMessage, replyTo, onReply }) {
   const [message, setMessage] = useState('');
@@ -23,6 +24,8 @@ export default function MessageBox({ onSendMessage, replyTo, onReply }) {
 
     if (!message.trim()) {
       toast.error("Cannot send an empty message.");
+      setMessage('');
+      setAttachments([]);
       return;
     }
 

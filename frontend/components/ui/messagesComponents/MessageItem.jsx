@@ -12,6 +12,7 @@ import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
 import { getMedia } from '@/app/utils/storage';
 import {reportMessage} from '@/app/utils/messages';
+import { Download } from 'lucide-react';
 const commonReactions = [
   { emoji: '👍', label: 'thumbs up' },
   { emoji: '👎', label: 'thumbs down' },
@@ -136,11 +137,49 @@ function MessageItem({ sender, senderId, title,timestamp, message, messageId, at
       return <CircularProgress size={24} />;
     }
   
-    return attachments.map((attachment, index) => (
-      // The <img> tag works for both images and GIFs encoded in base64.
-      <img key={index} src={attachment} alt={`Attachment ${index}`} className="max-w-full h-auto" />
-    ));
+    return attachments.map((attachment, index) => {
+      const [mimeInfo, base64Data] = attachment.split(',');
+      const mimeType = mimeInfo.split(':')[1].split(';')[0];
+      const fileType = mimeType.split('/')[0];
+      const fileExtension = mimeType.split('/')[1];
+      
+      const fileName = `Attachment-${index + 1}.${fileExtension || 'file'}`;
+  
+      const downloadFile = () => {
+        const link = document.createElement('a');
+        link.href = attachment;
+        link.download = fileName;
+        document.body.appendChild(link); // Required for FF
+        link.click();
+        document.body.removeChild(link);
+      };
+  
+      // Display images and GIFs directly
+      if (fileType === 'image') {
+        return (
+          <div key={index} className="flex flex-col items-center p-2 m-1">
+            <img src={attachment} alt={fileName} className="max-w-full h-auto rounded" />
+            <p className="text-sm text-center mt-2">{fileName}</p>
+          </div>
+        );
+      } else {
+        // For non-image files, show a download button
+        return (
+          <div key={index} className="bg-primary  text-white font-light font-sans attachment-tile flex items-center justify-between p-4 border rounded-lg m-1">
+            <div className='mr-8'>
+              <p className="file-name font-medium">{fileName}</p>
+              <p className="file-type text-sm">{mimeType}</p>
+            </div>
+            <IconButton onClick={downloadFile} size="small" title="Download">
+              <Download color={"white"}/>
+            </IconButton>
+          </div>
+        );
+      }
+    });
   };
+  
+  
   
   const onLeave =()=> { setIsHovering(false);setMenuVisible(false);} // Reset the menu visibility}
   

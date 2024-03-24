@@ -32,11 +32,6 @@ router.post("/media/", async (req, res) =>
 
 	const { MIMEtype, data } = req.body;
 
-	// Check if the datatype eixsts and is of image/png or image/jpeg or image/gif
-	if (!MIMEtype || (MIMEtype !== "image/png" && MIMEtype !== "image/jpeg" && MIMEtype !== "image/gif"))
-	{
-		return res.status(400).json({ code: "AM103", error: "Missing or invalid MIMEtype" });
-	}
 
 	// Check if the request has the required data
 	if (!data) return res.status(400).json({ code: "AM104", error: "Missing data" });
