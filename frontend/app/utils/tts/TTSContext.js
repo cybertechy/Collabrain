@@ -1,5 +1,6 @@
 "use client"
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import i18n from '@/app/utils/i18n';
 
 const TTSContext = createContext();
 
@@ -23,7 +24,8 @@ export const TTSProvider = ({ children }) => {
     };
 
     const speak = (text) => {
-        if (isTTSEnabled && window.speechSynthesis) {
+        // Check if TTS is enabled and the current language is English
+        if (isTTSEnabled && window.speechSynthesis && i18n.language.startsWith('en')) {
             const utterance = new SpeechSynthesisUtterance(text);
             window.speechSynthesis.speak(utterance);
         }

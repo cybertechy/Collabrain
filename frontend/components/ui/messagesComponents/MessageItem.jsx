@@ -25,10 +25,10 @@ const commonReactions = [
   { emoji: '😢', label: 'sad' },
 ];
 
-function MessageItem({ sender, senderId, title,timestamp, message, messageId, attachmentIds, reactions = {}, onReact, onEdit, onDelete, userInfo, chatId }) {
+function MessageItem({ sender, senderId, title,timestamp, message, messageId, attachmentIds, reactions = {}, onReact, onEdit, onDelete, userInfo, chatId , source, teamId}) {
   const { t } = useTranslation('msg_item');
   const { speak, stop, isTTSEnabled } = useTTS();
-  const [attachments, setAttachments] = useState([]);
+   const [attachments, setAttachments] = useState([]);
   const [loadingAttachments, setLoadingAttachments] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
@@ -51,11 +51,16 @@ function MessageItem({ sender, senderId, title,timestamp, message, messageId, at
   };
   const handleReport = async () => {
     // Assuming you have the necessary information like chatId or teamId
-    const reportDetails = {
-      chatId: chatId, // You need to pass the correct chatId or teamId based on your app's context
+    const isTeamMessage = source === "team";
+  
+  const reportDetails = {
+    // Use either chatId or teamId based on the source
+    chatId: isTeamMessage ? undefined : chatId,
+    teamId: isTeamMessage ? chatId : undefined, // If it's a team message, chatId will act as teamId
       messageId: messageId,
-      reason: reportReason + additionalComments? `: ${additionalComments}` : "",
-      source: "user", // or "team", depending on your context
+      policy: reportReason,
+      reason: additionalComments? `: ${additionalComments}` : "",
+      source: source, // or "team", depending on your context
       sender: senderId,
       message: editedMessage,
       image: attachmentIds.length > 0 ? attachmentIds : null,
@@ -153,8 +158,8 @@ function MessageItem({ sender, senderId, title,timestamp, message, messageId, at
         <CustomAvatar username={sender} />
         <div className="flex flex-col">
           <div className="flex items-baseline gap-2">
-            <span className="font-semibold">{sender == (userInfo?.data?.username)? sender:title}</span>
-            <span className="text-xs text-gray-500">{timestamp}</span>
+            <span className="font-semibold">{sender == userInfo.data.username? sender:sender =="System"? "System":title}</span>
+            <span className="text-xs text-gray-500">{timestamp == "Invalid Date"? "":timestamp}</span>
           </div>
           <Linkify componentDecorator={(decoratedHref, decoratedText, key) => (
             <CustomLink href={decoratedHref} key={key}>{decoratedText}</CustomLink>
@@ -220,7 +225,9 @@ function MessageItem({ sender, senderId, title,timestamp, message, messageId, at
                 onClick={() =>  {onReact(messageId, reaction.emoji)}}//{onReact(messageId, reaction.emoji)}}
                 // Apply a different style if the reaction is already selected
                 style={{ backgroundColor: isReacted ? '#f0f0f0' : 'transparent' }}
-                title={reaction.label}>
+                title={reaction.label}
+                onMouseEnter={() => isTTSEnabled && speak(`${reaction.label} emoji`)}
+                onMouseLeave={stop}>
                 <span className="text-xl" style={{ opacity: 1, color: isReacted ? 'black' : 'grey' }}>
                     {reaction.emoji}
                 </span>
@@ -265,33 +272,42 @@ function MessageItem({ sender, senderId, title,timestamp, message, messageId, at
       className="w-full mt-2 border-gray-300 rounded-md shadow-sm"
       value={reportReason}
       onChange={(e) => setReportReason(e.target.value)}
+      required // Ensures that the select must have a value
     >
-      <option value="" onMouseEnter={() => isTTSEnabled && speak("Select a reason")} onMouseLeave={stop}>{t('select_rsn')}</option>
+      <option value="" disabled onMouseEnter={() => isTTSEnabled && speak("Select a policy")} onMouseLeave={stop}>{t('select_policy')}</option> {/* Disabled placeholder option */}
       <option value="spam" onMouseEnter={() => isTTSEnabled && speak("Spam")} onMouseLeave={stop}>{t('spam')}</option>
-      <option value="abuse" onMouseEnter={() => isTTSEnabled && speak("Abuse")} onMouseLeave={stop}>{t('abuse')}</option>
-      <option value="other" onMouseEnter={() => isTTSEnabled && speak("Other")} onMouseLeave={stop}>{t('other')}</option>
+      <option value="graphic-violence" onMouseEnter={() => isTTSEnabled && speak("Graphic Violence")} onMouseLeave={stop}>{t('graph_violence')}</option>
+      <option value="privacy-violation" onMouseEnter={() => isTTSEnabled && speak("Privacy Violation")} onMouseLeave={stop}>{t('priv_violation')}</option>
+      <option value="hate-speech" onMouseEnter={() => isTTSEnabled && speak("Hate Speech")} onMouseLeave={stop}>{t('hate_speech')}</option>
     </select>
-    {reportReason === 'other' && (
-      <textarea
-        className="w-full mt-2 border-gray-300 rounded-md shadow-sm"
-        placeholder="Please provide additional comments"
-        value={additionalComments}
-        onChange={(e) => setAdditionalComments(e.target.value)}
-      ></textarea>
-    )}
+   
+    <textarea
+      className="w-full mt-2 border-gray-300 rounded-md shadow-sm"
+      placeholder={t('add_comments')}
+      value={additionalComments}
+      onChange={(e) => setAdditionalComments(e.target.value)}
+      required // Makes input required
+    ></textarea>
   </DialogContent>
   <DialogActions>
-    <Button onClick={() => setShowReportDialog(false)} onMouseEnter={() => isTTSEnabled && speak("Cancel button")}
+  <Button onClick={() => setShowReportDialog(false)} onMouseEnter={() => isTTSEnabled && speak("Cancel button")}
       onMouseLeave={stop}>{t('cancel')}</Button>
-    <Button onClick={() => handleReport()} color="primary" onMouseEnter={() => isTTSEnabled && speak("Report button")}
-      onMouseLeave={stop}>
+    <Button 
+      onClick={() => handleReport()} 
+      color="primary"
+      disabled={!reportReason || !additionalComments} // Button is disabled if either field is empty
+      onMouseEnter={() => isTTSEnabled && speak("Report button")}
+      onMouseLeave={stop}
+    >
       {t('report_btn')}
     </Button>
   </DialogActions>
 </Dialog>
 
+
           <Dialog open={showDeleteConfirm} onClose={() => setShowDeleteConfirm(false)}>
-            <DialogTitle>{"Delete Message?"}</DialogTitle>
+            <DialogTitle onMouseEnter={() => isTTSEnabled && speak("Delete Message")}
+              onMouseLeave={stop}>{t('delete_top')}</DialogTitle>
             <DialogContent>
               <DialogContentText onMouseEnter={() => isTTSEnabled && speak("Are you sure you want to delete this message? This action cannot be undone.")}
                   onMouseLeave={stop}>

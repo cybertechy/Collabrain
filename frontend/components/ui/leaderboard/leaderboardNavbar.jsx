@@ -72,12 +72,16 @@ const LeaderboardNavbar = ({ user }) => {
                 {leaderboardData.teams.slice(0, showMore ? 10 : 3).map((entry) => (
                     <div className="flex justify-between items-center py-2" key={entry.rank}>
                         <div className="flex items-center justify-center">
-                            <span className="text-primary text-xl bg-basicallylight rounded-full w-8 h-8 flex items-center justify-center font-bold">
+                            <span className="text-primary text-xl bg-basicallylight rounded-full w-8 h-8 flex items-center justify-center font-bold"
+                                onMouseEnter={() => speak(`Rank number ${entry.rank}`)}
+                                onMouseLeave={stop}>
                                 {entry.rank}
                             </span>
-                            <span className="ml-2">{entry.displayName}</span>
+                            <span className="ml-2" onMouseEnter={() => speak(`Team ${entry.displayName}`)}
+                                onMouseLeave={stop}>{entry.displayName}</span>
                         </div>
-                        <div className="text-lg">{entry.xp} XP</div>
+                        <div className="text-lg" onMouseEnter={() => speak(`${entry.xp} XP`)}
+                                onMouseLeave={stop}>{entry.xp} XP</div>
                     </div>
                 ))}
                 {leaderboardData.teams.length > 3 && ( // Only show if there are more than 3 teams

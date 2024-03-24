@@ -22,19 +22,19 @@ const Leaderboard = () => {
   const [hoveredRow, setHoveredRow] = useState(null);
   const { t } = useTranslation('discover');
   const { speak, stop, isTTSEnabled } = useTTS();
- 
-const fetchTeams = async () => {
-  try {
-    const token = await fb.getToken();
-    const response = await axios.get(`${SERVERLOCATION}/api/teams?sort=score`, {
+
+  const fetchTeams = async () => {
+    try {
+      const token = await fb.getToken();
+      const response = await axios.get(`${SERVERLOCATION}/api/teams?sort=score`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setTeamData(response.data.map((team, index) => ({ ...team, rank: index + 1  })));
+      setTeamData(response.data.map((team, index) => ({ ...team, rank: index + 1 })));
     } catch (error) {
       console.error(error);
     }
   };
- 
+
   useEffect(() => {
     const fetchJoinedTeams = async () => {
       try {
@@ -52,11 +52,11 @@ const fetchTeams = async () => {
     fetchJoinedTeams();
     fetchTeams();
   }, [user]);
-  
+
   const handleRowClick = (teamName) => {
     setClickedRow(clickedRow === teamName ? null : teamName);
   };
- 
+
   const handleSearchChange = (event) => {
     const query = event.target.value;
     setSearchQuery(query);
@@ -97,26 +97,32 @@ const fetchTeams = async () => {
 
   return (
     <>
-      <div className="container mx-auto px-4 lg:px-10 pt-8"> 
+      <div className="container mx-auto px-4 lg:px-10 pt-8">
         <p className="text-3xl font-md text-start text-primary bg-white mb-4"
           onMouseEnter={() => isTTSEnabled && speak("Discover Teams")} onMouseLeave={stop}>{t('top')}</p>
+        <div className="mt-4 flex justify-between items-center">
+          <p className="text-xl font-bold text-primary"
+            onMouseEnter={() => isTTSEnabled && speak("Joined Teams")} onMouseLeave={stop}>{t('joined_teams')}</p>
         </div>
         {joinedTeams.length > 0 ? (
           <div className="flex text-white flex-wrap gap-2 mt-3 mb-5">
             {joinedTeams.map((teamId, index) => (
-              <div key={index} className="bg-primary rounded-lg p-2 flex items-center">
+              <div key={index} className="bg-primary rounded-lg p-2 flex items-center"
+              onMouseEnter={() => isTTSEnabled && speak(`Team ${teamId}`)}
+              onMouseLeave={stop}>
                 <GroupsIcon className="mr-2 text-secondary" />
                 <span>{teamData.find((team) => team.name === teamId)?.name || teamId}</span>
               </div>
             ))}
           </div>
         ) : (
-          <p className='mt-3 mb-5 text-gray-400'>No teams joined yet.</p>
+          <p className='mt-3 mb-5 text-gray-400'>{t('no_joins')}</p>
         )}
 
         <div className="border-gray-300 inner-shadow border-2 bg-aliceBlue rounded-md drop-shadow-md overflow-visible">
           {/* Search bar */}
           <div className="p-4 flex justify-between">
+            <SearchIcon className='mt-1.5 mr-2 text-3xl text-primary' />
             <input
               type="text"
               value={searchQuery}
@@ -125,11 +131,10 @@ const fetchTeams = async () => {
               placeholder={t('search')}
               className="p-2 border border-gray-300 rounded-lg w-full"
               onMouseEnter={() => isTTSEnabled && speak("Type a team's name here to search")}
-              onMouseLeave={stop}          
+              onMouseLeave={stop}
             />
-          
           </div>
- 
+
           {/* Header row for team data */}
           <div className="flex text-start justify-start bg-primary font-bold px-4 py-2">
             <span className="text-lg text-white w-1/4" onMouseEnter={() => isTTSEnabled && speak("Team Rank")}
@@ -141,12 +146,12 @@ const fetchTeams = async () => {
             <span className="text-lg text-white w-1/4" onMouseEnter={() => isTTSEnabled && speak("Actions")}
               onMouseLeave={stop}>{t('actions')}</span>
           </div>
-          
+
           <div className="flex flex-col overflow-visible">
             {teamData.map((team, index) => (
               <div
                 key={index}
-                className={`h-16 flex items-center justify-start border-b border-gray-200 py-2 px-4 cursor-pointer relative transform transition-all duration-300 ${clickedRow === team.name ? 'scale-100 shadow-xl bg-secondary' : 'scale-100','border-none', 'rounded-md'
+                className={`h-16 flex items-center justify-start border-b border-gray-200 py-2 px-4 cursor-pointer relative transform transition-all duration-300 ${clickedRow === team.name ? 'scale-100 shadow-xl bg-secondary' : 'scale-100', 'border-none', 'rounded-md'
                   }`}
                 onClick={() => handleRowClick(team.name)}
                 onMouseEnter={() => setHoveredRow(team.name)}
@@ -157,15 +162,16 @@ const fetchTeams = async () => {
                   transform: clickedRow === team.name ? 'scale(1)' : 'scale(1)',
                 }}
               >
-                  <span className="text-lg w-1/4 pl-2 text-primary "
-                  onMouseEnter={() => isTTSEnabled && speak(`Rank number ${team.rank}`)} onMouseLeave={stop}># {team.rank}</span>
-                  <span className="text-lg w-1/4 text-start text-primary overflow-hidden"
+                <span className="text-lg w-1/4 pl-2 text-primary "
+                  onMouseEnter={() => isTTSEnabled && speak(`Rank number ${team.rank}`)} 
+                  onMouseLeave={stop}># {team.rank}</span>
+                <span className="text-lg w-1/4 text-start text-primary overflow-hidden"
                     onMouseEnter={() => isTTSEnabled && speak(`Team ${team.name}`)}
                     onMouseLeave={stop}>{team.name}</span>
-                  <span className="text-lg text-center w-1/4 text-primary"
+                <span className="text-lg text-center w-1/4 text-primary"
                     onMouseEnter={() => isTTSEnabled && speak(`Score ${team.score}`)}
                     onMouseLeave={stop}>{team.score}</span>
-                  {joinedTeams.includes(team.name) ? (                  
+                {joinedTeams.includes(team.name) ? (
                   <button
                     className=" text-green-500 px-4 py-2 rounded-lg ml-2 cursor-default"
                     disabled
@@ -186,15 +192,6 @@ const fetchTeams = async () => {
             ))}
           </div>
         </div>
- 
-      {/* Joined teams section */}
-      <div className="mt-4">
-        <h2 className="text-xl font-bold">Joined Teams:</h2>
-        <ul>
-          {joinedTeams.map((teamName, index) => (
-            <li key={index}>{teamName}</li>
-          ))}
-        </ul>
       </div>
     </>
   );

@@ -8,11 +8,11 @@ import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import DeleteIcon from '@mui/icons-material/Delete';
+import InfoIcon from '@mui/icons-material/Info';
 import { useTTS } from "@/app/utils/tts/TTSContext";
 import "@/app/utils/i18n"
 import { useTranslation } from 'next-i18next';
-
-const TeamChannelOptionsMenu = ({ teamName, onOptionSelect, isOwner }) => {
+const TeamChannelOptionsMenu = ({ teamName, onOptionSelect, isOwner, isAdmin }) => {
     const { t } = useTranslation('team');
     const { speak, stop, isTTSEnabled } = useTTS();
     const [anchorEl, setAnchorEl] = useState(null);
@@ -63,21 +63,25 @@ const TeamChannelOptionsMenu = ({ teamName, onOptionSelect, isOwner }) => {
                     horizontal: 'center',
                 }}
             >
-                <MenuItem onClick={() => handleClose('invite')}>
-                    <ListItemIcon>
-                        <GroupAddIcon style={{ color: '#30475E' }} />
-                    </ListItemIcon>
-                   <span className='text-primary'
-                    onMouseEnter={() => isTTSEnabled && speak("Invite People button")} onMouseLeave={stop}>{t('invite')}</span> 
-                </MenuItem>
-                <MenuItem onClick={() => handleClose('settings')}>
-                    <ListItemIcon>
-                        <SettingsIcon style={{ color: '#30475E' }} />
-                    </ListItemIcon>
-                    <span className='text-primary'
-                    onMouseEnter={() => isTTSEnabled && speak("Team Settings button")} onMouseLeave={stop}>{t('team_settings')}</span>  
-                </MenuItem>
-                {isOwner ? (
+                {(isOwner || isAdmin) && (
+                    <MenuItem onClick={() => handleClose('invite')}>
+                        <ListItemIcon>
+                            <GroupAddIcon style={{ color: '#30475E' }} />
+                        </ListItemIcon>
+                        <span className='text-primary'
+                        onMouseEnter={() => isTTSEnabled && speak("Invite People button")} onMouseLeave={stop}>{t('invite')}</span> 
+                    </MenuItem>
+                )}
+                {(isOwner || isAdmin) && (
+                    <MenuItem onClick={() => handleClose('settings')}>
+                        <ListItemIcon>
+                            <SettingsIcon style={{ color: '#30475E' }} />
+                        </ListItemIcon>
+                        <span className='text-primary'
+                        onMouseEnter={() => isTTSEnabled && speak("Team Settings button")} onMouseLeave={stop}>{t('team_settings')}</span>  
+                    </MenuItem>
+                )}
+                {isOwner && (
                     <MenuItem onClick={() => handleClose('delete')}>
                         <ListItemIcon>
                             <DeleteIcon style={{ color: '#30475E' }} />
@@ -85,15 +89,24 @@ const TeamChannelOptionsMenu = ({ teamName, onOptionSelect, isOwner }) => {
                         <span className='text-primary'
                         onMouseEnter={() => isTTSEnabled && speak("Delete Team button")} onMouseLeave={stop}>{t('del_team')}</span> 
                     </MenuItem>
-                ) :  <MenuItem onClick={() => handleClose('leave')}>
-                <ListItemIcon>
-                    <ExitToAppIcon style={{ color: '#30475E' }} />
-                </ListItemIcon>
-                <span className='text-primary'
-                onMouseEnter={() => isTTSEnabled && speak("Leave Team button")} onMouseLeave={stop}>{t('leave_team')}</span> 
-            </MenuItem>}
-               
-                {/* You can add more options with icons here as needed */}
+                )}
+                {!isOwner && (
+                    <MenuItem onClick={() => handleClose('leave')}>
+                        <ListItemIcon>
+                            <ExitToAppIcon style={{ color: '#30475E' }} />
+                        </ListItemIcon>
+                        <span className='text-primary'
+                        onMouseEnter={() => isTTSEnabled && speak("Leave Team button")} onMouseLeave={stop}>{t('leave_team')}</span> 
+                    </MenuItem>
+                )}
+                {/* View Team Details - Available for all roles */}
+                <MenuItem onClick={() => handleClose('viewDetails')}>
+                    <ListItemIcon>
+                        <InfoIcon style={{ color: '#30475E' }} />
+                    </ListItemIcon>
+                    <span className='text-primary'
+                    onMouseEnter={() => isTTSEnabled && speak("View Team Details button")} onMouseLeave={stop}>{t('view_details')}</span>
+                </MenuItem>
             </Menu>
         </div>
     );

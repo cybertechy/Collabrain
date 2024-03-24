@@ -6,11 +6,11 @@ const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 const apiBaseUrl = SERVERLOCATION + '/api/storage'; // Adjust accordingly to your actual API base URL
 
 // Function to add media to the bucket
-export const addMedia = async (MIMEtype, base64Data) => {
+export const addMedia = async (MIMEtype, base64Data, type) => {
     console.log("In storage utils, ",  MIMEtype,base64Data)
     try {
         const token = await fb.getToken(); // Assuming getToken() retrieves the current user's auth token
-        const response = await axios.post(`${apiBaseUrl}/media/`, {
+        const response = await axios.post(`${apiBaseUrl}/media/${type === "team" ? "?team=true" : ""}`, {
             MIMEtype,
             data: base64Data
         }, {
@@ -25,10 +25,11 @@ export const addMedia = async (MIMEtype, base64Data) => {
 };
 
 // Function to get media from the bucket
-export const getMedia = async (mediaId) => {
+export const getMedia = async (mediaId, type = "user") => {
     try {
+        console.log("In get media", mediaId, type)
         const token = await fb.getToken();
-        const response = await axios.get(`${apiBaseUrl}/media/${mediaId}`, {
+        const response = await axios.get(`${apiBaseUrl}/media/${mediaId}${type === "team" ? "?team=true" : ""}`, {
             headers: { "Authorization": `Bearer ${token}` }
         });
        
@@ -40,10 +41,10 @@ export const getMedia = async (mediaId) => {
 };
 
 // Function to delete media from the bucket
-export const deleteMedia = async (mediaId) => {
+export const deleteMedia = async (mediaId, type = "user") => {
     try {
         const token = await fb.getToken();
-        const response = await axios.delete(`${apiBaseUrl}/media/${mediaId}`, {
+        const response = await axios.delete(`${apiBaseUrl}/media/${mediaId}${type === "team" ? "?team=true" : ""}`, {
             params: { token } // Since you're passing token as query, ensure this matches your server expectation
         });
 

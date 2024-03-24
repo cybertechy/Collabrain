@@ -887,7 +887,7 @@ const NotificationsOverlay = () => {
                             onMouseEnter={() => isTTSEnabled && speak("Configure notification sound button")}
                             onMouseLeave={stop}
                         >
-                            {t('config')}
+                            {t('config_button')}
                         </button>
                     </div>
                 </div>

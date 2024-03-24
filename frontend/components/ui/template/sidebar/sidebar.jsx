@@ -46,6 +46,7 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
     // const [isOpen, setIsOpen] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false); 
     const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
+    const [teamChanges, setTeamChanges] = useState(0);
     const toggleModal = () => { // Define toggleModal function
         setIsModalOpen(!isModalOpen);
     };
@@ -118,7 +119,8 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
     
         // Call the function to fetch user teams when the component mounts
         fetchUserTeams();
-    }, [user]);
+    }, [user, teamChanges]);
+
 
     return (
         <aside
@@ -217,7 +219,7 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
                 isExpanded={isOpen}
             />
             
-            {isModalOpen && <TeamOverlay toggleModal={ toggleModal} modalVisible= {isModalOpen} />}
+            {isModalOpen && <TeamOverlay toggleModal={ toggleModal} modalVisible= {isModalOpen} handleUpdate = {()=>{setTeamChanges(teamChanges+1)}}/>}
             {isProjectModalOpen && <NewProjectOverlay toggleModal={ toggleProjectModal} modalVisible= {isProjectModalOpen} />}
                 {/* {teams.map(team => (
                     <SidebarItem

@@ -38,7 +38,7 @@ const TopBar = ({ activeTab, onTabChange }) => {
         <Button id="blocked" sx={tabButtonStyle('blocked')} onClick={() => onTabChange('blocked')}
         onMouseEnter={() => isTTSEnabled && speak("Blocked Users section")} onMouseLeave={stop}>{t('blocked_btn')}</Button>
         <Button id="addFriend" sx={tabButtonStyle('addFriend')} onClick={() => onTabChange('addFriend')}
-        onMouseEnter={() => isTTSEnabled && speak("Add Friend section")} onMouseLeave={stop}>{t('add_friend')}</Button>
+        onMouseEnter={() => isTTSEnabled && speak("Search Users section")} onMouseLeave={stop}>{t('search_users')}</Button>
 
       </Box>
     </Box>

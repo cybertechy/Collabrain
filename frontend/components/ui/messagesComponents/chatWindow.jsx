@@ -37,19 +37,6 @@ export default function ChatWindow({ messages, setMessages, sendPersonalMsg, wit
           <span className="ml-2">{title}</span>
         </Toolbar>
       </div>
-
-      {/* <div className="flex-auto overflow-y-scroll p-5 mb-[76px]  max-h-[calc(100vh-160px)] sm:max-h-[calc(100vh-180px)] md:max-h-[calc(100vh-200px)] lg:max-h-[calc(100vh-220px)] xl:max-h-[calc(100vh-240px)]">
-       <div className="mt-10"></div>
-        {messages?.map((message) => (
-          <MessageItem key={message?.key} {...message?.props} title = {title} onReact = {onReact} onReply ={onReply} onEdit = {onEdit} onDelete = {onDelete}   userInfo={userInfo} chatId = {chatId}
-          />
-        ))}
-        <div ref={messagesEndRef} /> {/* Invisible element at the end of messages 
-      </div>
-      {/* <div className="absolute bottom-0 left-0 right-0 p-3  bg-white" style={{ paddingLeft: '2rem', paddingRight: '2rem' }}> 
-      <div className="absolute bottom-0 left-0 right-0 p-3  bg-white" style={{ paddingRight: '2rem' }}>
-        <MessageBox onSendMessage={sendPersonalMsg} replyTo = {replyTo} onReply = {onReply}/>
-      </div> */}
       <div className="flex flex-col h-full">
         <div className="flex-auto overflow-y-scroll p-5 mb-[76px]  max-h-[calc(90vh-160px)] sm:max-h-[calc(100vh-180px)] md:max-h-[calc(100vh-200px)] lg:max-h-[calc(100vh-220px)] xl:max-h-[calc(100vh-240px)]">
           {messages?.map((message) => (
@@ -62,6 +49,5 @@ export default function ChatWindow({ messages, setMessages, sendPersonalMsg, wit
           <MessageBox onSendMessage={sendPersonalMsg} replyTo={replyTo} onReply={onReply} />
         </div>
       </div>
-    </div>
-  );
+    </div> )
 }

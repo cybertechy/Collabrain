@@ -9,8 +9,8 @@ import "@/app/utils/i18n"
 import { useTranslation } from 'next-i18next';
 
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
-const TeamOverlay = ({ toggleModal, modalVisible }) => {
-  
+const TeamOverlay = ({ toggleModal, modalVisible, handleUpdate }) => {
+
   // const [modalVisible, setModalVisible] = useState(true); // Set to false initially
   const [currentScreen, setCurrentScreen] = useState("home");
 
@@ -31,13 +31,14 @@ const TeamOverlay = ({ toggleModal, modalVisible }) => {
               switchToCreateTeam={switchToCreateTeam}
               switchToJoinTeam={switchToJoinTeam}
               toggleModal={toggleModal}
+              handleUpdate={handleUpdate}
             />
           )}
           {currentScreen === "create" && (
-            <CreateTeamOverlay switchToHome={switchToHome} toggleModal={toggleModal} />
+            <CreateTeamOverlay switchToHome={switchToHome} toggleModal={toggleModal}  handleUpdate={handleUpdate} />
           )}
           {currentScreen === "join" && (
-            <JoinTeamOverlay switchToHome={switchToHome} toggleModal={toggleModal} />
+            <JoinTeamOverlay switchToHome={switchToHome} toggleModal={toggleModal}  handleUpdate={handleUpdate} />
           )}
         </div>
       </div>
@@ -46,7 +47,7 @@ const TeamOverlay = ({ toggleModal, modalVisible }) => {
 };
 
 
-const CreateJoinTeamScreen = ({ switchToCreateTeam, switchToJoinTeam , toggleModal}) => {
+const CreateJoinTeamScreen = ({ switchToCreateTeam, switchToJoinTeam , toggleModal, handleUpdate}) => {
   const { t } = useTranslation('create_join_team');
   const { speak, stop, isTTSEnabled } = useTTS();
   return (
@@ -95,7 +96,7 @@ const CreateJoinTeamScreen = ({ switchToCreateTeam, switchToJoinTeam , toggleMod
 
 
   
-const CreateTeamOverlay = ({ switchToHome , toggleModal}) => {
+const CreateTeamOverlay = ({ switchToHome , toggleModal, handleUpdate}) => {
   const { t } = useTranslation('create_team');
   const { speak, stop, isTTSEnabled } = useTTS();
   const [image, setImage] = useState(null);
@@ -133,6 +134,7 @@ const CreateTeamOverlay = ({ switchToHome , toggleModal}) => {
         if (response.status === 200) {
             const teamId = response.data.teamID;
             console.log('Team created with ID:', teamId);
+            handleUpdate();
             toggleModal(); // Assuming this closes the overlay
         } else {
             throw new Error('Team creation failed');
@@ -140,7 +142,7 @@ const CreateTeamOverlay = ({ switchToHome , toggleModal}) => {
     } catch (error) {
         console.error('Error during team creation:', error);
     }
-};
+  };
   return (
     <div className="w-screen h-screen  flex items-center justify-center">
     <div className="w-full md:w-3/4 lg:w-2/4 shadow-lg bg-basicallylight rounded-md flex flex-col" style={{ maxHeight: '60%' }}> {/* Responsive width */}
@@ -176,7 +178,7 @@ const CreateTeamOverlay = ({ switchToHome , toggleModal}) => {
     </div>
     {/* Label text */}
     <div className="ml-3 text-gray-700 font-medium">
-      {visibility === 'public' ? 'Public Team' : 'Private Team'}
+      {visibility === 'public' ? t('public') : t('private')}
     </div>
   </label>
 </div>
@@ -197,7 +199,7 @@ const CreateTeamOverlay = ({ switchToHome , toggleModal}) => {
 
 
   
-const JoinTeamOverlay = ({ switchToHome }) => {
+const JoinTeamOverlay = ({ switchToHome , handleUpdate}) => {
   const { t } = useTranslation('join_team');
   const { speak, stop, isTTSEnabled } = useTTS();
   return (

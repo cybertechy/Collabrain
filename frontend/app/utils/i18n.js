@@ -102,6 +102,11 @@ i18n
           "view_less": "View Less"
         },
 
+        notifications: {
+          "invites": "Team Invites",
+          "no_invites": "You have no team invites."
+        },
+
         create_join_team: {
           "create_top": "Create a team",
           "create_desc": "Creating a team has never been simpler, you're only a few clicks away from your exclusive space.",
@@ -118,7 +123,9 @@ i18n
           "guidelines1": "By creating a team, you agree to Collabrain's ",
           "guidelines2": "Community Guidelines*",
           "back_button": "Back",
-          "create_button": "Create"
+          "create_button": "Create",
+          "public": "Public Team",
+          "private": "Private Team"
         },
 
         join_team: {
@@ -234,7 +241,7 @@ i18n
           "all_btn": "All",
           "received_btn": "Received",
           "blocked_btn": "Blocked",
-          "add_friend": "Add Friend",
+          "search_users": "Search Users",
           "friend_settings": "Select an Option",
           "block": "Block User",
           "alias": "Set Alias",
@@ -293,11 +300,12 @@ i18n
           "name": "Name",
           "score": "Score",
           "actions": "Actions",
-          "search": "Search team...",
+          "search": " Search team... ",
           "leave": "Leave",
           "joined": "Joined", 
           "join": "Join Team",
-          "joined_teams": "Joined Teams:"
+          "joined_teams": "Joined Teams",
+          "no_joins": "No teams joined yet."
         },
 
         team: {
@@ -307,23 +315,84 @@ i18n
           "leave_team": "Leave Team",
           "del_msg": "Are you sure you want to delete this team?",
           "yes": "Yes",
-          "no": "No"
+          "no": "No",
+          "view_details": "View Team Details",
+          "confirm_delete": "Confirm Delete",
+          "delete_msg": "Are you sure you want to delete this team? THIS IS IRREVERSIBLE!",
+          "cancel": "Cancel",
+          "delete": "Delete",
+          "banned": "Sorry, you are banned from this team",
+          "channels": "Channels"
+        },
+
+        team_overview: {
+          "desc": "Description",
+          "leaderboard": "Leaderboard",
+          "members": "Team Members",
+          "points": "Points",
+          "1st": "1st",
+          "2nd": "2nd",
+          "3rd": "3rd"
+        },
+
+        team_settings: {
+          "general": "General",
+          "roles": "Roles",
+          "usr_mgmt": "User Management",
+          "bans": "Bans",
+          "server_name": "Server Name",
+          "save": "Save", 
+          "edit": "Edit",
+          "name_success": "Team name updated successfully!",
+          "img_success": "Team image updated successfully!",
+          "img_error": "Error updating team image. Please try again.",
+          "visib": "Server Visibility",
+          "public": "Public",
+          "private": "Private",
+          "usr_kicked": "User kicked successfully",
+          "ban_success": "User banned successfully", 
+          "ban_error": "Error banning user. Please try again.",
+          "roles": "Roles",
+          "member": "Member",
+          "admin": "Admin",
+          "owner": "Owner",
+          "kick": "Kick",
+          "ban": "Ban",
+          "unban": "Unban",
+          "search": "Search Users"
+        },
+
+        create_channel: {
+          "name": "Channel Name",
+          "enter_name": "Enter channel name",
+          "create": "Create",
+          "cancel": "Cancel"  
+        },
+
+        invite_users: {
+          "invite": "Invite",
+          "inv_users": "Invite Users",
+          "search": "Search Users",
+          "done": "Done",
+          "not_found": "No users found" 
         },
 
         msg_item: {
           "save": "Save", 
           "edit": "Edit Message",
-          "delete": "Delete Message",
+          "delete_top": "Delete Message",
           "report": "Report Message",
           "report_btn": "Report",
           "report_rsn": "Please select a reason for reporting this message.",
-          "select_rsn": "Select a reason", 
+          "select_policy": "Select a policy", 
           "spam": "Spam",          
-          "abuse": "Abuse",
-          "other": "Other",
+          "graph_violence": "Graphic Violence",
+          "priv_violation": "Privacy Violation",
+          "hate_speech": "Hate Speech",
           "del_msg": "Are you sure you want to delete this message? This action cannot be undone.",
           "cancel": "Cancel",
-          "delete": "Delete"
+          "delete": "Delete",
+          "add_comments": "Please provide additional comments"
         }
       },
       ru: {
@@ -419,6 +488,11 @@ i18n
           "view_less": "Свернуть"
         },
 
+        notifications: {
+          "invites": "Приглашения в Команды",
+          "no_invites": "У вас нет приглашений в команды."
+        },
+
         create_project: {
 
         },
@@ -439,7 +513,9 @@ i18n
           "guidelines1": "Создавая команду, вы соглашаетесь с ",
           "guidelines2": "Правилами Сообщества Collabrain*",
           "back_button": "Назад",
-          "create_button": "Создать"
+          "create_button": "Создать",
+          "public": "Открытая Команда",
+          "private": "Закрытая Команда"
         },
 
         join_team: {
@@ -557,7 +633,7 @@ i18n
           "all_btn": "Все",
           "received_btn": "Запросы",
           "blocked_btn": "Заблокированы",
-          "add_friend": "Добавить Друга",
+          "search_users": "Поиск Друзей",
           "friend_settings": "Выберите Действие",
           "block": "Заблокировать пользователя",
           "alias": "Дать Прозвище",
@@ -616,11 +692,12 @@ i18n
           "name": "Название",
           "score": "Кол-во очков",
           "actions": "Действия",
-          "search": "Найдите команду...",
+          "search": " Найдите команду... ",
           "leave": "Покинуть",
-          "joined": "Успех", 
+          "joined": "Вы уже в команде", 
           "join": "Присоединиться",
-          "joined_teams": "Присоединился к:"
+          "joined_teams": "Я уже участник",
+          "no_joins": "Вы не состоите ни в одной команде."
         },
 
         team: {
@@ -630,7 +707,66 @@ i18n
           "leave_team": "Покинуть Команду",
           "del_msg": "Вы уверены, что хотите удалить эту команду?",
           "yes": "Да",
-          "no": "Нет"
+          "no": "Нет",
+          "view_details": "Подробности Команды",
+          "confirm_delete": "Подтвердите Удаление",
+          "delete_msg": "Вы уверены, что хотите удалить эту команду? ДАННОЕ ДЕЙСТВИЕ НЕОБРАТИМО!",
+          "cancel": "Отмена",
+          "delete": "Удалить",
+          "banned": "Извините, вы заблокированы в этой команде",
+          "channels": "Каналы"
+        },
+
+        team_overview: {
+          "desc": "Описание",
+          "leaderboard": "Доска Почета",
+          "members": "Члены Команды",
+          "points": "Очков",
+          "1st": "1-ый",
+          "2nd": "2-ой",
+          "3rd": "3-ий"
+        },
+
+        team_settings: {
+          "general": "Общие",
+          "roles": "Роли",
+          "usr_mgmt": "Управление",
+          "bans": "Блокировка",
+          "server_name": "Имя Сервера",
+          "save": "Сохранить", 
+          "edit": "Изменить",
+          "name_success": "Team name updated successfully!",
+          "img_success": "Team image updated successfully!",
+          "img_error": "Error updating team image. Please try again.",
+          "visib": "Видимость Сервера",
+          "public": "Открытый",
+          "private": "Закрытый",
+          "usr_kicked": "User kicked successfully",
+          "ban_success": "User banned successfully", 
+          "ban_error": "Error banning user. Please try again.",
+          "roles": "Роли",
+          "member": "Член",
+          "admin": "Админ",
+          "owner": "Владелец",
+          "kick": "Выгнать",
+          "ban": "Заблокировать",
+          "unban": "Разблокировать",
+          "search": "Поиск Пользователей"
+        },
+
+        create_channel: {
+          "name": "Имя Канала",
+          "enter_name": "Введите имя канала",
+          "create": "Создать",
+          "cancel": "Отмена"  
+        },
+
+        invite_users: {
+          "invite": "Пригласить",
+          "inv_users": "Пригласить Пользователей",
+          "search": "Поиск Пользователей",
+          "done": "Готово",
+          "not_found": "Пользователь не найден" 
         },
 
         msg_item: {
@@ -640,19 +776,21 @@ i18n
           "report": "Пожаловаться",
           "report_btn": "Пожаловаться",
           "report_rsn": "Пожалуйста, укажите причину жалобы",
-          "select_rsn": "Выберите причину", 
+          "select_policy": "Выберите нарушение", 
           "spam": "Спам",          
-          "abuse": "Оскорбление",
-          "other": "Другое",
+          "graph_violence": "Сцены Насилия",
+          "priv_violation": "Нарушение Конфиденц.",
+          "hate_speech": "Разжиг. ненависти",
           "del_msg": "Вы уверены что хотите удалить это сообщение? Данное действие необратимо.",
           "cancel": "Отмена",
-          "delete": "Удалить"
+          "delete": "Удалить",
+          "add_comments": "Пожалуйста, опишите ситуацию"
         }
       },
       // Add more languages here
     },
     detection: {
-        order: ['querystring', 'cookie', 'localStorage', 'navigator', 'htmlTag', 'path', 'subdomain'],
+        order: ['querystring', 'cookie', 'localStorage', 'htmlTag', 'path', 'subdomain'],
         caches: ['cookie'], // Cache the detected language in cookies
     },
     fallbackLng: "en", // Use "en" if detected lng is not available
