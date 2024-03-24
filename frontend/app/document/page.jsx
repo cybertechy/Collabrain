@@ -50,9 +50,15 @@ export default function Editor()
 	const randomColor = () =>
 	{
 		const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-		var h = randomInt(0, 360);
-		var s = randomInt(42, 98);
-		var l = randomInt(40, 90);
+		// Generate random hue and saturation
+		const h = randomInt(0, 360);
+		const s = randomInt(42, 98);
+		// Ensure enough contrast with white text
+		let l;
+		do
+		{
+			l = randomInt(40, 90);
+		} while (Math.abs(l - 100) < 30); // Ensure the color is not too close to white
 		return `hsl(${h},${s}%,${l}%)`;
 	};
 
