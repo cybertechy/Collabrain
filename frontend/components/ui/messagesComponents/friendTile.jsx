@@ -30,7 +30,9 @@ import { updateFriendAlias,blockUser } from '@/app/utils/user';
 const fb = require("_firebase/firebase");
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 import { unblockUser } from '@/app/utils/user';
-const FriendTile = ({ friendData, openChat, setRefreshList , userInfo,id, handleAliasUpdate, handleChatUpdate}) => {
+import { ToastContainer, toast } from "react-toastify";
+const FriendTile = ({ friendData, openChat, setRefreshList , userInfo,id, handleAliasUpdate, handleChatUpdate, handleFriendListUpdate}) => {
+  console.log("Friend Data in friend tile" , friendData);
   const [user, loading] = useAuthState();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
@@ -129,7 +131,7 @@ const FriendTile = ({ friendData, openChat, setRefreshList , userInfo,id, handle
         });
   
         console.log(response.data.message); // Log the response message (e.g., "Friend request sent")
-  
+        toast.success("Friend request sent");
        
       } catch (error) {
         console.error("Error sending friend request:", error);
@@ -153,7 +155,8 @@ const FriendTile = ({ friendData, openChat, setRefreshList , userInfo,id, handle
         });
 
         console.log(response.data.message); // Log the response message (e.g., "Friend request accepted")
-        
+        toast.success("Friend request accepted");
+        handleFriendListUpdate();
         // Handle any UI updates or state changes here, such as changing the friend's listType to 'accepted'
       } catch (error) {
         console.error("Error accepting friend request:", error);
@@ -179,7 +182,8 @@ const FriendTile = ({ friendData, openChat, setRefreshList , userInfo,id, handle
         });
 
         console.log(response.data.message); // Log the response message (e.g., "Friend request declined")
-
+        toast.success("Friend request declined");
+        handleFriendListUpdate();
         // Handle any UI updates or state changes here, such as removing the friend request from the list
       } catch (error) {
         console.error("Error declining friend request:", error);
@@ -188,42 +192,69 @@ const FriendTile = ({ friendData, openChat, setRefreshList , userInfo,id, handle
 
     declineFriendRequest(); // Call the function to decline the friend request
   };
-  const renderActionIcons = () => {
-    if (friendData.listType === 'blocked') {
-      // Don't render any icons for blocked friends
-      return null;
-    } else if (friendData.listType === 'addFriend') {
-      // Render the chat and add friend icons for users found during search
-      return (
-        <>
-          <IconButton
-            sx={{ bgcolor: 'action.hover', borderRadius: '50%' }}
-            onClick={() => handleChatClick(friendData)}
-          >
-            <ChatBubbleOutlineIcon />
-          </IconButton>
-          <IconButton
-            sx={{ bgcolor: 'action.hover', borderRadius: '50%' }}
-            onClick={handleAddFriendClick}
-          >
-            <PersonAddIcon />
-          </IconButton>
-        </>
-      );
-    }
-    // Render default icons for other list types ('all', 'pending', etc.)
+const renderActionIcons = () => {
+  if (friendData.listType === 'blocked') {
+    // Don't render any icons for blocked friends
+    return null;
+  } else if (friendData.listType === 'addFriend') {
+    // Render the chat and add friend icons for users found during search
     return (
       <>
-        <IconButton sx={{ bgcolor: 'action.hover', borderRadius: '50%' }}>
-          <NotificationsNoneIcon />
-        </IconButton>
-        <IconButton sx={{ bgcolor: 'action.hover', borderRadius: '50%', marginX: 1 }}
-            onClick={() => handleChatClick(friendData)}>
+        <IconButton
+          sx={{ bgcolor: 'action.hover', borderRadius: '50%' }}
+          onClick={() => handleChatClick(friendData)}
+        >
           <ChatBubbleOutlineIcon />
+        </IconButton>
+        <IconButton
+          sx={{ bgcolor: 'action.hover', borderRadius: '50%' }}
+          onClick={handleAddFriendClick}
+        >
+          <PersonAddIcon />
         </IconButton>
       </>
     );
+  } else if (friendData.listType === 'pending') {
+    // Render accept and decline icons for pending friend requests
+    return (
+      <>
+        <IconButton
+          sx={{
+            background: 'success', // Use a theme color for success, adjusts background color to a success context, e.g., green
+          
+            borderRadius: '50%',
+          }}
+          onClick={handleAcceptFriendRequest}
+        >
+          <CheckCircleIcon sx={{ color: '#00FF00' }} /> {/* Adjusts the icon color */}
+        </IconButton>
+        <IconButton
+          sx={{
+            backgroundColor: 'error', // Use a theme color for error, adjusts background color to an error context, e.g., red
+           
+            borderRadius: '50%',
+          }}
+          onClick={handleDeclineFriendRequest}
+        >
+          <CancelIcon sx={{ color: '#FF0000' }} /> {/* Adjusts the icon color */}
+        </IconButton>
+      </>
+    );
+  }
+  // Render default icons for other list types ('all', etc.)
+  return (
+    <>
+      <IconButton sx={{ bgcolor: 'action.hover', borderRadius: '50%' }}>
+        <NotificationsNoneIcon />
+      </IconButton>
+      <IconButton sx={{ bgcolor: 'action.hover', borderRadius: '50%', marginX: 1 }}
+          onClick={() => handleChatClick(friendData)}>
+        <ChatBubbleOutlineIcon />
+      </IconButton>
+    </>
+  );
 };
+
 
 
   const handleClick = (event) => {

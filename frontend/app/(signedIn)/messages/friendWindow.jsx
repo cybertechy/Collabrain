@@ -201,7 +201,7 @@ const FriendsWindow = ({userInfo, handleAliasUpdate, handleChatUpdate, showChat,
     } else if (activeTab === 'Recieved') {
       getFriendRequests();
     }
-  }, [activeTab, user]);
+  }, [activeTab, user, refreshList]);
 
   
   useEffect(() => {
@@ -337,7 +337,7 @@ const FriendsWindow = ({userInfo, handleAliasUpdate, handleChatUpdate, showChat,
       <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
         {visibleList.length > 0 ? (
           visibleList.map((friend, index) => (
-            <FriendTile key = {index} id={friend.id} friendData={friend} onMoreOptions={handleMoreOptions} handleAliasUpdate = {handleAliasUpdate}  userInfo = {userInfo} handleChatUpdate={handleChatUpdate} />
+            <FriendTile key = {index} id={friend.id} friendData={friend} onMoreOptions={handleMoreOptions} handleAliasUpdate = {handleAliasUpdate}  userInfo = {userInfo} handleChatUpdate={handleChatUpdate} handleFriendListUpdate={()=> setRefreshList(refreshList+1)} />
           ))
         ) : (
           // <Typography variant="body1" sx={{ p: 2 }}>
