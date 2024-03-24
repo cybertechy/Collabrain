@@ -1,8 +1,24 @@
-import { ListItem, ListItemAvatar, ListItemText, Typography } from '@mui/material';
+import { ListItem, ListItemAvatar, ListItemText, Typography , Menu, MenuItem} from '@mui/material';
 import CustomAvatar from './avatar';
-
+import { blockUser, unblockUser } from '@/app/utils/user';
+import { useState } from 'react';
 const userDMTile = ({ message, avatar, openChat, username, data, chatID , actualUsername}) => {
-   
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [menuOpen, setMenuOpen] = useState(false);
+
+    const handleContextMenu = (event) => {
+        event.preventDefault();
+        setAnchorEl(event.currentTarget);
+        setMenuOpen(true);
+    };
+    const handleClose = () => {
+        setMenuOpen(false);
+    };
+    const handleBlock = () => {
+        blockUser(data.members[1].id); // Adjust according to how you identify the user to block
+        handleClose();
+    };
+
     const formattedDate = data.lastMessage?.sentAt? new Date(data.lastMessage.sentAt._seconds * 1000 + data.lastMessage.sentAt._nanoseconds / 1000000).toLocaleDateString() : ""; 
 
     const truncateMessage = (message, maxLength = 20) => {
@@ -16,6 +32,7 @@ const userDMTile = ({ message, avatar, openChat, username, data, chatID , actual
         return truncated;
     };
     return (
+        <>
         <ListItem onClick={() => openChat(data.members[1].id,chatID)} className="border-b border-gray-200">
             <ListItemAvatar>
                 <CustomAvatar username={actualUsername} />
@@ -35,6 +52,15 @@ const userDMTile = ({ message, avatar, openChat, username, data, chatID , actual
                 secondary={message? truncateMessage(message) : "Enter a message now"}
             />
         </ListItem>
+        <Menu
+        anchorEl={anchorEl}
+        open={menuOpen}
+        onClose={handleClose}
+        keepMounted
+    >
+        <MenuItem onClick={handleBlock}>Block</MenuItem>
+    </Menu>
+    </>
     );
 };
 

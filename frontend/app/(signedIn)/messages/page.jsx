@@ -106,6 +106,7 @@ export default function Messages() {
                     replyTo={data.replyTo}
                     userInfo={userInfo}
                     chatId={chatId}
+                    source = {"user"}
                 />,
             ]);
         });
@@ -149,6 +150,8 @@ export default function Messages() {
                                         : messageComponent.props.attachmentIds
                                 }
                                 userInfo={messageComponent.props.userInfo}
+                                chatId={messageComponent.props.chatId}
+                                source = {"user"}
                             />
                         );
                     }
@@ -472,6 +475,7 @@ export default function Messages() {
                 messageId={msgId}
                 userInfo={userInfo}
                 chatId={chatId}
+                source = {"user"}
             />,
         ]);
 
@@ -600,7 +604,7 @@ export default function Messages() {
 
             <div className="flex flex-row flex-grow">
                 <DMSideBar
-                    userData={userInfo}
+                    userData={{...userInfo, id: user?.uid}}
                     friendsHandler={() => setShowChat(false)}
                     chatList={directMessages}
                     openChat={openChat}
@@ -613,6 +617,7 @@ export default function Messages() {
                     chatHandler={(id, user) => {
                         router.push(`/messages?chatID=${id}&user=${user}`);
                     }}
+                    
                 />
                 {withUser ? (
                     <ChatWindow

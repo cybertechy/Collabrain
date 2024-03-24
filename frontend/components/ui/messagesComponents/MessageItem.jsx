@@ -22,8 +22,8 @@ const commonReactions = [
   { emoji: '😢', label: 'sad' },
 ];
 
-function MessageItem({ sender, senderId, title,timestamp, message, messageId, attachmentIds, reactions = {}, onReact, onEdit, onDelete, userInfo, chatId }) {
-  const [attachments, setAttachments] = useState([]);
+function MessageItem({ sender, senderId, title,timestamp, message, messageId, attachmentIds, reactions = {}, onReact, onEdit, onDelete, userInfo, chatId , source, teamId}) {
+   const [attachments, setAttachments] = useState([]);
   const [loadingAttachments, setLoadingAttachments] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
@@ -46,11 +46,16 @@ function MessageItem({ sender, senderId, title,timestamp, message, messageId, at
   };
   const handleReport = async () => {
     // Assuming you have the necessary information like chatId or teamId
-    const reportDetails = {
-      chatId: chatId, // You need to pass the correct chatId or teamId based on your app's context
+    const isTeamMessage = source === "team";
+  
+  const reportDetails = {
+    // Use either chatId or teamId based on the source
+    chatId: isTeamMessage ? undefined : chatId,
+    teamId: isTeamMessage ? chatId : undefined, // If it's a team message, chatId will act as teamId
       messageId: messageId,
-      reason: reportReason + additionalComments? `: ${additionalComments}` : "",
-      source: "user", // or "team", depending on your context
+      policy: reportReason,
+      reason: additionalComments? `: ${additionalComments}` : "",
+      source: source, // or "team", depending on your context
       sender: senderId,
       message: editedMessage,
       image: attachmentIds.length > 0 ? attachmentIds : null,
@@ -148,8 +153,8 @@ function MessageItem({ sender, senderId, title,timestamp, message, messageId, at
         <CustomAvatar username={sender} />
         <div className="flex flex-col">
           <div className="flex items-baseline gap-2">
-            <span className="font-semibold">{sender == (userInfo?.data?.username)? sender:title}</span>
-            <span className="text-xs text-gray-500">{timestamp}</span>
+            <span className="font-semibold">{sender == userInfo.data.username? sender:sender =="System"? "System":title}</span>
+            <span className="text-xs text-gray-500">{timestamp == "Invalid Date"? "":timestamp}</span>
           </div>
           <Linkify componentDecorator={(decoratedHref, decoratedText, key) => (
             <CustomLink href={decoratedHref} key={key}>{decoratedText}</CustomLink>
@@ -255,28 +260,35 @@ function MessageItem({ sender, senderId, title,timestamp, message, messageId, at
       className="w-full mt-2 border-gray-300 rounded-md shadow-sm"
       value={reportReason}
       onChange={(e) => setReportReason(e.target.value)}
+      required // Ensures that the select must have a value
     >
-      <option value="">Select a reason</option>
+      <option value="" disabled>Select a policy</option> {/* Disabled placeholder option */}
       <option value="spam">Spam</option>
-      <option value="abuse">Abuse</option>
-      <option value="other">Other</option>
+      <option value="graphic-violence">Graphic Violence</option>
+      <option value="privacy-violation">Privacy Violation</option> {/* Corrected value */}
+      <option value="hate-speech">Hate Speech</option>
     </select>
-    {reportReason === 'other' && (
-      <textarea
-        className="w-full mt-2 border-gray-300 rounded-md shadow-sm"
-        placeholder="Please provide additional comments"
-        value={additionalComments}
-        onChange={(e) => setAdditionalComments(e.target.value)}
-      ></textarea>
-    )}
+   
+    <textarea
+      className="w-full mt-2 border-gray-300 rounded-md shadow-sm"
+      placeholder="Please provide additional comments"
+      value={additionalComments}
+      onChange={(e) => setAdditionalComments(e.target.value)}
+      required // Makes input required
+    ></textarea>
   </DialogContent>
   <DialogActions>
     <Button onClick={() => setShowReportDialog(false)}>Cancel</Button>
-    <Button onClick={() => handleReport()} color="primary">
+    <Button 
+      onClick={() => handleReport()} 
+      color="primary"
+      disabled={!reportReason || !additionalComments} // Button is disabled if either field is empty
+    >
       Report
     </Button>
   </DialogActions>
 </Dialog>
+
 
           <Dialog open={showDeleteConfirm} onClose={() => setShowDeleteConfirm(false)}>
             <DialogTitle>{"Delete Message?"}</DialogTitle>
