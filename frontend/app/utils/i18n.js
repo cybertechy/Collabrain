@@ -165,7 +165,7 @@ i18n
           "2fa": "Two-factor Authentication",
           "2fa_desc": "Protect your Collabrain account with an extra layer of security.",
           "2fa_enable": "Enable",
-          "2fa_enable": "Enabled",
+          "2fa_enabled": "Enabled",
           "2fa_disable": "Disable",
           "2fa_disabled": "Disabled",
           "remove_acc": "Account Removal",

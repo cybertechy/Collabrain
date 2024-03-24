@@ -463,7 +463,7 @@ const ProfileOverlay = ({ user , Close }) => {
                                             <button onClick={handleDisable2FA} className={`justify-center w-fit font-semibold inline-flex items-center border border-primary text-primary hover:bg-primary hover:text-basicallylight px-7 py-3 ${userInfo?.twoFA === false && "bg-primary text-white"} `}
                                                 onMouseEnter={() => isTTSEnabled && speak(userInfo?.twoFA === true ? "Disable two-factor authentication button" : "Two-factor authentication disabled")} 
                                                 onMouseLeave={stop}>
-                                                {userInfo?.twoFA === true ? t('2fa_disabled') : t('2fa_disable')}
+                                                {userInfo?.twoFA === true ? t('2fa_disable') : t('2fa_disabled')}
                                             </button>
                                         </div>
 
