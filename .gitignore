@@ -39,4 +39,6 @@ next-env.d.ts
 android/
 ios/
 
+.env
+
 oci-config

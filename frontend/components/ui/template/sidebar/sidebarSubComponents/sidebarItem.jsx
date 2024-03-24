@@ -66,7 +66,9 @@ const SidebarItem = ({ href, icon: Icon, text = "", isSelected = false, isExpand
             <Link href={href}
             // >
                 // <div
-                onClick={toggleSidebar}
+                onClick={() => {
+                    if(isExpanded) toggleSidebar()
+                }}
                     className={`flex items-center p-2 my-2 transition-colors duration-200 justify-start cursor-pointer ${isExpanded ? "hover:bg-gray-200" : ""} ${itemClasses} hover:text-primary`}
                     style={{ 
                         maxWidth: isExpanded ? "100%" : "0",

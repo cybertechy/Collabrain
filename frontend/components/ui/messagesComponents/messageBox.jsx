@@ -98,7 +98,7 @@ export default function MessageBox({ onSendMessage, replyTo, onReply }) {
   };
 
   return (
-    <form onSubmit={onSubmit} className="flex items-center rounded-lg w-full p-3 mx-5 bg-[#30475E] relative">
+    <form onSubmit={onSubmit} className="flex items-center rounded-lg w-full p-2 mx-1 bg-[#30475E] relative">
       <ToastContainer />
       {replyTo && (
         <div className="flex items-center justify-between p-2 rounded-lg bg-[#406882] text-white">

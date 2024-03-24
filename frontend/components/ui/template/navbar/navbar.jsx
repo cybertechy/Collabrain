@@ -12,9 +12,7 @@ import { useTranslation } from 'next-i18next';
 import dynamic from 'next/dynamic';
 const CallButton = dynamic(() => import("_components/ui/call/call"), { ssr: false });
 
-
-const Navbar = ({ isOpen, toggleSidebar, setShowCallScreen, setCallVideoStreams, callVideoStreams, 
-				  toggleAudio, toggleVideo, leaveCall, micEnabled, videoEnabled, setLeaveCall }) =>
+const Navbar = ({ isOpen, toggleSidebar }) =>
 {
 	const { t } = useTranslation('navbar');
     const { speak, stop, isTTSEnabled } = useTTS();
@@ -65,55 +63,50 @@ const Navbar = ({ isOpen, toggleSidebar, setShowCallScreen, setCallVideoStreams,
 		};
 	}, []);
 
-    const tooltips = () => {
-        return (
-            <>
-				<CallButton setShowCallScreen={setShowCallScreen} setCallVideoStreams={setCallVideoStreams} callVideoStreams={callVideoStreams}
-							toggleAudio={toggleAudio} toggleVideo={toggleVideo} leaveCall={leaveCall} micEnabled={micEnabled} videoEnabled={videoEnabled} 
-							setLeaveCall={setLeaveCall} />
-            	<Tooltip
+	const tooltips = () =>
+	{
+		return (
+			<>
+				<CallButton/>
+				<Tooltip
             		title={t('leaderboard')}
             		enterDelay={1000}
             		leaveDelay={200}
 					onMouseEnter={() => isTTSEnabled && speak("Leaderboard")}
-					onMouseLeave={stop}
-        > 
-                    <EmojiEventsIcon
-                        ref={leaderboardToggleRef} // Attach the ref here
-                        onClick={toggleLeaderboard}
-                        className="cursor-pointer"
-                        style={{ color: "#FFFFFF" }}
-                    />
-                </Tooltip>
-                <Tooltip
-            		title={
+					onMouseLeave={stop}				
+				>
+					<EmojiEventsIcon
+						ref={leaderboardToggleRef} // Attach the ref here
+						onClick={toggleLeaderboard}
+						className="cursor-pointer"
+						style={{ color: "#FFFFFF" }}
+					/>
+				</Tooltip>
+				<Tooltip
+					title={
                 		t('notifications')
-            		}
-            		enterDelay={1000}
-            		leaveDelay={200}
-					onMouseEnter={() => isTTSEnabled && speak("Notifications")}
-					onMouseLeave={stop}
-          
-        > 
-                    <NotificationsIcon
-                        className="cursor-pointer"
-                        style={{ color: "#FFFFFF" }}
-                    />
-                </Tooltip>
-                <Tooltip
+					}
+					enterDelay={1000}
+					leaveDelay={200}
+				>
+					<NotificationsIcon
+						className="cursor-pointer"
+						style={{ color: "#FFFFFF" }}
+					/>
+				</Tooltip>
+				<Tooltip
             		title={t('profile_set')}
             		enterDelay={1000}
             		leaveDelay={200}
 					onMouseEnter={() => isTTSEnabled && speak("Profile Settings")}
-					onMouseLeave={stop}
-        > 
-                    <AccountCircleIcon
-                        className="cursor-pointer"
-                        style={{ color: "#FFFFFF" }}
-                        onClick={toggleSettingsOverlay}
-                    />
-                </Tooltip>
-            </>
+					onMouseLeave={stop}				>
+					<AccountCircleIcon
+						className="cursor-pointer"
+						style={{ color: "#FFFFFF" }}
+						onClick={toggleSettingsOverlay}
+					/>
+				</Tooltip>
+			</>
 
 		);
 	};

@@ -17,6 +17,8 @@ import { useTranslation } from 'next-i18next';
 import PropTypes from 'prop-types';
 import { Tooltip } from '@mui/material';
 import Link from 'next/link';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const TeamItem = ({ team }) =>
 {
@@ -64,7 +66,6 @@ const ProfilePage = () =>
 {
 	const axios = require("axios");
 	const fb = require("_firebase/firebase");
-	const socket = require("_socket/socket");
 
 	const { t } = useTranslation('my_profile');
 	const { speak, stop, isTTSEnabled } = useTTS();
@@ -93,7 +94,10 @@ const ProfilePage = () =>
 	{
 		try
 		{
-			await saveProfileChanges();
+			await saveProfileChanges({
+				fname: name.split(' ')[0],
+				lname: name.split(' ')[1]
+			});
 			setIsNameEditMode(!isNameEditMode);
 		} catch (error)
 		{
@@ -102,27 +106,16 @@ const ProfilePage = () =>
 		}
 	};
 
-	const handleEmailEditClick = async () =>
-	{
-		try
-		{
-			await saveProfileChanges();
-			setIsEmailEditMode(!isEmailEditMode);
-		} catch (error)
-		{
-			console.error('Error saving profile changes:', error);
-			// Handle errors here, if needed
-		}
-	};
+	
 
 
-	const saveProfileChanges = async () =>
+	const saveProfileChanges = async (data) =>
 	{
-		const updatedUserInfo = {
-			bio: bio, // Assuming 'bio' state holds the biography text
-			education: education, // Assuming 'education' state holds an array of education objects
-			certifications: certifications, // Assuming 'certifications' state holds an array of certification objects
-		};
+		console.log("Saving profile changes...");
+		console.log("education: ", education);
+		const updatedUserInfo = data
+
+		if (Object.keys(updatedUserInfo).length === 0) return;
 
 		try
 		{
@@ -151,7 +144,21 @@ const ProfilePage = () =>
 		{
 			setEducation(prevEdu => [...prevEdu, newEdu]);
 			setNewEdu({ school: '', degree: '', startYear: '', endYear: '' });
-			await saveProfileChanges(); // Save changes after adding
+			await saveProfileChanges({
+				education: [...education, newEdu]
+			}); // Save changes after adding
+		}
+		else {
+			toast.error("Please fill in all fields",{
+				position: "bottom-right",
+				autoClose: 3000,
+				hideProgressBar: false,
+				closeOnClick: true,
+				pauseOnHover: true,
+				draggable: true,
+				progress: undefined,
+				theme: "colored"
+			});
 		}
 	};
 
@@ -160,18 +167,33 @@ const ProfilePage = () =>
 		if (newCert.title && newCert.date)
 		{
 			// Update certifications state first
-			setCertifications(prevCerts => [...prevCerts, newCert]);
+			console.log("Adding certification: ", certifications);
+			let updatedCertifications = [...certifications, newCert];
+			setCertifications(updatedCertifications);
 			setNewCert({ title: '', date: '' });
-
 			try
 			{
 				// Now, call saveProfileChanges to save the changes including certifications
-				await saveProfileChanges();
+				await saveProfileChanges({
+					certifications: [...certifications, newCert]
+				});
 			} catch (error)
 			{
 				console.error('Error saving profile changes:', error);
 				// Handle errors here, if needed
 			}
+		} else {
+			toast.error("Please fill in all fields",{
+				position: "bottom-right",
+				autoClose: 3000,
+				hideProgressBar: false,
+				closeOnClick: true,
+				pauseOnHover: true,
+				draggable: true,
+				progress: undefined,
+				theme: "colored"
+			});
+		
 		}
 	};
 
@@ -205,7 +227,7 @@ const ProfilePage = () =>
 					setImage(photo);
 					setBio(bio); // Set bio from response
 					setEducation(education); // Set education from response
-					setCertifications(certifications); // Set certifications from response
+					setCertifications(certifications || []); // Set certifications from response
 
 					// Navigate to the profile page with updated information
 					const newPath = `/profile?username=${response.data.username}`;
@@ -384,7 +406,8 @@ const ProfilePage = () =>
 	};
 
 	return (
-		<>
+		<div className='overflow-auto mb-5'>
+		<ToastContainer />
 			<div
 				className="p-4 container focus:outline-none focus:border-primary text-gray-500">
 				<h2 className="text-lg font-bold text-tertiary text-left font-poppins"
@@ -436,12 +459,6 @@ const ProfilePage = () =>
 									className={`bg-white text-lg text-center border-0 w-full text-black ${isEmailEditMode && 'border-2 rounded-lg'}`}
 									disabled={!isEmailEditMode}
 								/>
-								{isEmailEditMode ?
-									<SaveIcon className={`text-primary ml-2 cursor-pointer`} onClick={handleEmailEditClick}
-									onMouseEnter={() => isTTSEnabled && speak("Save email button")} onMouseLeave={stop} />
-									:
-									<EditIcon className={`text-primary ml-2 cursor-pointer`} onClick={handleEmailEditClick}
-									onMouseEnter={() => isTTSEnabled && speak("Edit email button")} onMouseLeave={stop} />}
 							</div>
 							{/* <p className="text-lg text-black">{email}</p>  */}
 						</div>
@@ -594,7 +611,7 @@ const ProfilePage = () =>
 					</div>
 				</div>
 
-				<div className={`rounded-lg p-4 flex flex-col w-1/2 md:w-full border border-primary border-opacity-30 shadow-sm`}>
+				<div className={`rounded-lg p-4 flex flex-col w-full border border-primary border-opacity-30 shadow-sm`}>
 					<h3 className="font-bold text-lg text-black pb-2"
 					onMouseEnter={() => isTTSEnabled && speak("Your teams")} onMouseLeave={stop}>{t('teams')}</h3>
 					{userTeams ? userTeams?.map((team, index) => (
@@ -604,7 +621,7 @@ const ProfilePage = () =>
 					)) : null}
 				</div>
 			</div>
-		</>
+		</div>
 	);
 };
 

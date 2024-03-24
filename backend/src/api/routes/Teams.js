@@ -251,7 +251,7 @@ router.get("/", async (req, res) =>
 			.then(snapshot =>
 			{
 				let teams = [];
-				snapshot.forEach(doc => teams.push(doc.data()));
+				snapshot.forEach(doc => teams.push({...doc.data(),id:doc.id}));
 				return res.status(200).json(teams);
 			})
 			.catch(err => { return res.status(500).json({ error: err }); });
@@ -259,9 +259,22 @@ router.get("/", async (req, res) =>
 	}
 
 	// Get user's teams
-	fb.db.doc(`users/${user.uid}`).get()
-		.then(doc => { return res.status(200).json(doc.data().teams); })
-		.catch(err => { return res.status(500).json({ error: err }); });
+	let userRef = await fb.db.doc(`users/${user.uid}`).get()
+	let teams = userRef?.data()?.teams;
+
+	if(!teams) return res.status(200).json([]);
+
+	if(req.query.names) {
+		let teamData = [];
+		for (let i = 0; i < teams.length; i++) {
+			let team = await fb.db.doc(`teams/${teams[i]}`).get();
+			teamData.push(team.data().name);
+		}
+		return res.status(200).json(teamData);
+	}
+
+	return res.status(200).json(teams);
+		
 });
 
 /************************************************************/
@@ -423,7 +436,7 @@ router.post("/:team/users", async (req, res) =>
 });
 
 /* Endpoint for deleting a member from a team */
-router.delete("/:team/users", async (req, res) =>
+router.delete("/:team/users/:user", async (req, res) =>
 {
 	// Make sure all required fields are present
 	if (!req.headers.authorization)
@@ -441,19 +454,19 @@ router.delete("/:team/users", async (req, res) =>
 
 	// Check if user is a admin of the team
 	let team = await fb.db.doc(`teams/${req.params.team}`).get();
-	if (team.data().members[user.uid].role == "admin")
+	if (team.data().owner == req.params.user)
 		return res.status(400).json({ error: "Admin cannot leave team" });
 
 	// Remove user from team
 	try
 	{
 		fb.db.doc(`teams/${req.params.team}`).update({
-			[`members.${user.uid}`]: fb.admin.firestore.FieldValue.delete(),
+			[`members.${req.params.user}`]: fb.admin.firestore.FieldValue.delete(),
 			size: fb.admin.firestore.FieldValue.increment(-1)
 		});
 
 		// Remove team from user's teams list
-		fb.db.collection("users").doc(user.uid).update({
+		fb.db.collection("users").doc(req.params.user).update({
 			teams: fb.admin.firestore.FieldValue.arrayRemove(req.params.team)
 		});
 	}
