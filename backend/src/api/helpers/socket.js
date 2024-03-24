@@ -383,6 +383,14 @@ async function broadcastMessage(data, type = "team", newMessage = false, deleteM
 
 }
 
+async function broadcastDocChanges(data, socket, type)
+{
+	if (type == "cursor")
+		socket.broadcast.to(data.doc).emit('get-doc-cursor-changes', data.data);
+	else
+		socket.broadcast.to(data.doc).emit('get-doc-changes', data.data);
+}
+
 function connectToRedis(io)
 {
 
