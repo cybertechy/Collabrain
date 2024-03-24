@@ -151,13 +151,11 @@ function init(server)
 
 		socket.on('join-doc', doc => 
 		{
-			console.log(`${socket.id} joined doc: ${doc}`);
 			socket.join(doc);
 		});
 
 		socket.on('leave-doc', doc => 
 		{
-			console.log(`${socket.id} left doc: ${doc}`);
 			socket.leave(doc);
 		});
 
@@ -274,6 +272,14 @@ async function broadcastMessage(data, type = "team", newMessage = false, deleteM
 		(type == "team") ? fb.deleteTeamMsg(data.team,data.channelId,data.id) : fb.deleteChatMsg(data.chat,data.id);
 	}
 
+}
+
+async function broadcastDocChanges(data, socket, type)
+{
+	if (type == "cursor")
+		socket.broadcast.to(data.doc).emit('get-doc-cursor-changes', data.data);
+	else
+		socket.broadcast.to(data.doc).emit('get-doc-changes', data.data);
 }
 
 
