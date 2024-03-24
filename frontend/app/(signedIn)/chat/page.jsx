@@ -3,10 +3,10 @@
 import { useState, useEffect, useRef } from "react";
 import AES from "crypto-js/aes";
 const cryptoJS = require("crypto-js");
+import dynamic from "next/dynamic";
 import { maskProfanity, containsProfanity } from "../../utils/textmoderator";
 import enc from "crypto-js/enc-utf8";
 const uuid = require("uuid");
-import LoaderComponent from "@/components/ui/loader/loaderComponent";
 import MessageBox from "@/components/ui/messagesComponents/messageBox";
 import Toolbar from '@mui/material/Toolbar';
 import { Timestamp } from "firebase/firestore";
@@ -21,11 +21,12 @@ const fb = require("_firebase/firebase");
 import InviteUsersOverlay from "@/components/ui/overlays/inviteUsersOverlay";
 const socket = require("_socket/socket");
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
-
+const  LoaderComponent = dynamic(() => import('@/components/ui/loader/loaderComponent'), { ssr: false });
 import ShortTextIcon from '@mui/icons-material/ShortText'; // This can act as a hash
 import TeamSettingsOverlay from "@/components/ui/overlays/teamSettingsOverlay";
 import TeamOverviewOverlay from "@/components/ui/overlays/teamOverviewOverlay";
 import { fetchUser } from "../../utils/user";
+import { set } from "react-hook-form";
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
 export default function ChatRoom() {
@@ -62,7 +63,7 @@ export default function ChatRoom() {
 
 	const fetchAllMembers = async () => {
 		if (teamData && teamData.members && teamData.owner && user) {
-
+			setIsLoading(true);
 			const memberPromises = Object.keys(teamData.members).map(async memberId => {
 				// Assume fetchUser returns user info for a given ID
 				const userInfo = await fetchUser(memberId);
@@ -94,6 +95,7 @@ export default function ChatRoom() {
 				setBannedMembers(completeMembers);
 			});
 		}
+		setIsLoading(false);
 	};
 
 	const handleCloseTeamOverview = () => {
@@ -359,6 +361,8 @@ export default function ChatRoom() {
 
 		const fetchMessages = async () => {
 			try {
+				setIsLoading(true);
+				setLoadingState("FETCHING_MESSAGES");
 				const token = await fb.getToken();
 				const response = await axios.get(`${SERVERLOCATION}/api/teams/${teamId}/channels/${channelName}/messages`, {
 					headers: { "Authorization": "Bearer " + token }
@@ -397,7 +401,8 @@ export default function ChatRoom() {
 					);
 				});
 				setMessages(fetchedMessages);
-				
+				setIsLoading(false);
+				setLoadingState("");
 			} catch (error) {
 				console.error("Error fetching messages:", error);
 			}

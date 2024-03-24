@@ -324,6 +324,7 @@ function MessageItem({
                     >
                         {commonReactions.map((reaction, index) => {
                             // Check if the current reaction is included in the message's reactions
+                         
                             const isReacted =
                                 reactions &&
                                 reactions[reaction.emoji] &&
