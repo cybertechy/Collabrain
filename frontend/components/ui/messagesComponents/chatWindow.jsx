@@ -12,11 +12,16 @@ export default function ChatWindow({ messages, setMessages, sendPersonalMsg, wit
   const messagesEndRef = useRef(null); // Create a ref for the scrolling target
 
   useEffect(() => {
-    console.log("withUserInfo", withUserInfo, userInfo, withUserId)
+    console.log("withUserInfo", withUserInfo, userInfo, withUserId);
+  
     if (withUserInfo && userInfo && withUserId) {
-
-      setTitle(userInfo?.data?.alias[withUserId] ? userInfo?.data?.alias[withUserId] : withUserInfo?.data?.username || 'User');
-      setAvatar(withUserInfo?.data?.username || 'User');
+      // Attempt to retrieve an alias. If it doesn't exist, use the username.
+      const userAlias = userInfo.data.alias ? userInfo.data.alias[withUserId] : null;
+      const username = withUserInfo.data.username || 'User';
+  
+      setTitle(userAlias || username);
+      // Assuming you want to set the avatar to the username for now, as your original logic suggests.
+      setAvatar(username);
     }
   }, [withUserInfo, userInfo, withUserId]);
 

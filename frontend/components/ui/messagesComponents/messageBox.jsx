@@ -55,6 +55,7 @@ export default function MessageBox({ onSendMessage, replyTo, onReply }) {
     onSendMessage(message, attachmentsAsBase64);
     setMessage('');
     setAttachments([]);
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleCancelReply = () => {
@@ -75,7 +76,9 @@ export default function MessageBox({ onSendMessage, replyTo, onReply }) {
   };
 
   const handleAttachmentChange = (event) => {
-    setAttachments(Array.from(event.target.files));
+    if (event.target.files.length > 0) {
+      setAttachments(Array.from(event.target.files));
+    }
   };
 
   const handleEmojiPickerOpen = () => {

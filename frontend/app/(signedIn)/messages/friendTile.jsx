@@ -38,7 +38,7 @@ const FriendTile = ({ friendData, openChat, setRefreshList,id, userInfo,handleAl
   useEffect(() => {
     // This checks if user and friendData.alias are defined to safely access user.uid
     console.log("Userinfo, ",userInfo);
-    if (user && userInfo.alias && userInfo.alias[friendData.id]) {
+    if (user && userInfo?.alias && userInfo?.alias[friendData.id]) {
       setAlias(userInfo.alias[friendData.id]);
     } else {
       setAlias('');

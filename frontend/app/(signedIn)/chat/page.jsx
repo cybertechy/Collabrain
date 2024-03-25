@@ -30,6 +30,7 @@ import { useTTS } from "@/app/utils/tts/TTSContext";
 import "@/app/utils/i18n"
 import { useTranslation } from 'next-i18next';
 import { set } from "react-hook-form";
+import { addMedia } from "@/app/utils/storage";
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
 export default function ChatRoom() {
@@ -563,7 +564,7 @@ export default function ChatRoom() {
 			const uploadResponses = await Promise.all(
 				attachments.map(async (file) => {
 					try {
-						const uploadResponse = await addMedia(file.type, file.base64); // Adjust based on your API structure
+						const uploadResponse = await addMedia(file.type, file.base64, "team"); // Adjust based on your API structure
 						return uploadResponse?.mediaId; // Assuming the response includes an id
 					} catch (error) {
 						console.error("Failed to upload attachment:", error);

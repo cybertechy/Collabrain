@@ -136,10 +136,12 @@ function MessageItem({
     useEffect(() => {
         const fetchAttachments = async () => {
             setLoadingAttachments(true);
+            console.log("FETCHING FROM SOURCE", source)
             const fetchedAttachments = await Promise.all(
                 attachmentIds.map(async (id) => {
                     try {
-                        const response = await getMedia(id);
+                        
+                        const response = await getMedia(id, source);
                         return response.data; // Assuming the API response structure includes a data object with the file info
                     } catch (error) {
                         console.error("Failed to fetch attachment:", error);

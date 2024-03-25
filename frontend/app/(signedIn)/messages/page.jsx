@@ -83,7 +83,7 @@ export default function Messages() {
             console.log("Received direct message:", data);
 
             if (chatId !== data.chat) return;
-
+            
             data.msg = AES.decrypt(data.msg, chatId).toString(enc);
 
             setMessages((prevMessage) => [
@@ -102,7 +102,7 @@ export default function Messages() {
                     reactions={{}}
                     onReact={handleReact}
                     onReply={setReplyTo}
-                    attachments={data.attachments}
+                    attachmentIds={data.attachments}
                     replyTo={data.replyTo}
                     userInfo={userInfo}
                     chatId={chatId}
