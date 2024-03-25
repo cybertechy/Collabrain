@@ -7,7 +7,6 @@ import dynamic from "next/dynamic";
 import { maskProfanity, containsProfanity } from "../../utils/textmoderator";
 import enc from "crypto-js/enc-utf8";
 const uuid = require("uuid");
-import dynamic from "next/dynamic";
 import MessageBox from "@/components/ui/messagesComponents/messageBox";
 import Toolbar from '@mui/material/Toolbar';
 import { Timestamp } from "firebase/firestore";
