@@ -37,9 +37,9 @@ export default function Quill(props)
 			setPendingChanges(null);
 			console.log("Saved");
 		}
-	}, 1000); // Adjust the debounce delay as needed
+	}, 500); // Adjust the debounce delay as needed
 
-	const delayedSaveChanges = _debounce(saveChanges, 1000); // Adjust the debounce delay as needed
+	const delayedSaveChanges = _debounce(saveChanges, 500); // Adjust the debounce delay as needed
 
 	// Handle input changes
 	const onChange = (content, delta, source, editor) =>
