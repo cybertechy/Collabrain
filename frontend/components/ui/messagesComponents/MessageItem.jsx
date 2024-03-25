@@ -73,16 +73,16 @@ function MessageItem({
         const reportDetails = {
             // Use either chatId or teamId based on the source
             chatId: isTeamMessage ? undefined : chatId,
-            teamId: isTeamMessage ? chatId : undefined, // If it's a team message, chatId will act as teamId
+            teamId: isTeamMessage ? teamId : undefined, // If it's a team message, chatId will act as teamId
             messageId: messageId,
             policy: reportReason,
             reason: additionalComments ? `: ${additionalComments}` : "",
             source: source, // or "team", depending on your context
             sender: senderId,
             message: editedMessage,
-            image: attachmentIds.length > 0 ? attachmentIds : null,
+            image: attachmentIds?.length > 0 ? attachmentIds : null,
         };
-
+        console.log("Reporting message with details:", reportDetails);
         await reportMessage(reportDetails);
         setShowReportDialog(false);
         setReportReason("");

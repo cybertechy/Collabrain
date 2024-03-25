@@ -6,7 +6,7 @@ const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
 import smallLoader from "_public/assets/json/smallLoaderLottie.json";
 import {
 
-  fetchSharedContentMaps
+  fetchSharedContentMaps, fetchSharedDocuments
 } from "../../utils/sharedFiles";
 import DashboardInfoBar from "_components/ui/dashboardComponents/dashboardInfoBar";
 import DashboardProjectButton from "_components/ui/dashboardComponents/dashboardProjectButton";
@@ -17,6 +17,7 @@ import { useAuthState } from "_firebase/firebase"; // Adjust based on actual pat
 import { useTTS } from "@/app/utils/tts/TTSContext";
 import "@/app/utils/i18n"
 import { useTranslation } from 'next-i18next';
+
 
 export default function SharedWithMe() {
   const { t } = useTranslation('shared');
