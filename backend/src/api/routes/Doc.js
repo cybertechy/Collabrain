@@ -45,7 +45,7 @@ router.post('/', async (req, res) =>
 		data: dataId,
 		createdAt: fb.admin.firestore.FieldValue.serverTimestamp(),
 		updatedAt: fb.admin.firestore.FieldValue.serverTimestamp(),
-		access: {
+		Access: {
 			[user.uid]: {
 				role: roles.owner,
 				type: "users",
@@ -134,7 +134,7 @@ router.get('/:id', async (req, res) =>
 		return res.status(401).json({ error: "No Access" });
 
 	let userAccess = false;
-	if (!docData.data().Access[user.uid]) userAccess = false;
+	if (!docData.data()?.Access[user.uid]) userAccess = false;
 	else userAccess = true;
 
 	if (!userAccess)
@@ -276,11 +276,11 @@ router.put("/:id", async (req, res) =>
 	//check if user has access to the content map
 	let Access = null;
 	let userRole = null;
-	if (!docData.access[user.uid])
+	if (!docData.Access[user.uid])
 	{
 
 		// check if the user exists in the team members list
-		for (const [key, value] of Object.entries(docData.access))
+		for (const [key, value] of Object.entries(docData.Access))
 		{
 			if (value.type !== "teams") continue;
 			if (value.members.includes(user.uid))
@@ -293,7 +293,7 @@ router.put("/:id", async (req, res) =>
 	} else
 	{
 		Access = "user";
-		userRole = docData.access[user.uid].role;
+		userRole = docData.Access[user.uid].role;
 	}
 
 	if (!Access) return res.status(403).json({ code: "AM109", error: "Access Denied" });

@@ -119,21 +119,22 @@ export default function Editor()
 				headers: {
 					"Authorization": `Bearer ${token}`
 				}
-			})
-				.then(res =>
+			}).then(res =>
 				{
+					
 					setFileData(res.data);
 					setDocName(res.data.name);
 					setOciID(res.data.data);
 					setValue(JSON.parse(res.data.contents));
 
-					if (res.data.access[userData.uid] != "view")
+					console.log(res.data.Access[userData.uid]);
+					if (res.data.Access[userData.uid] != "view")
 						setIsDisabled(false);
 				})
 				.catch(err =>
 				{
-					console.log(err.response.data.error);
-					setLoadFailed(err.response.data.error);
+					console.log(err);
+					setLoadFailed(err);
 				});
 		});
 
@@ -179,7 +180,7 @@ export default function Editor()
 			{user && fileData &&
 				<div className="">
 					<FileToolbar userID={user.uid} name={docName} commentsEnabled={false} showCommentButton={showCommentButton}
-						fileType="doc" fileID={searchParams.get('id')} fileData={fileData} isSaved={isSaved} />
+						fileType="doc" fileID={searchParams.get('id')} fileData={{...fileData,access: fileData.Access}} isSaved={isSaved} />
 				</div>
 			}
 
