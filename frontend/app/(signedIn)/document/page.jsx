@@ -6,7 +6,7 @@ const { useSearchParams } = require("next/navigation");
 import { useRouter } from "next/navigation";
 
 import axios from 'axios';
-const Lottie = dynamic(() => import('lottie-react'), { ssr: false }); 
+const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
 
 const fb = require("_firebase/firebase");
 const socket = require("_socket/socket");
@@ -175,10 +175,12 @@ export default function Editor()
 	}
 
 	return (
-		<div>
+		<>
 			{user && fileData &&
-				<FileToolbar userID={user.uid} name={docName} commentsEnabled={false} showCommentButton={showCommentButton}
-					fileType="doc" fileID={searchParams.get('id')} fileData={fileData} isSaved={isSaved} />
+				<div className="">
+					<FileToolbar userID={user.uid} name={docName} commentsEnabled={false} showCommentButton={showCommentButton}
+						fileType="doc" fileID={searchParams.get('id')} fileData={fileData} isSaved={isSaved} />
+				</div>
 			}
 
 			<div className="relative flex overflow-y-auto h-fit">
@@ -189,6 +191,6 @@ export default function Editor()
 						setShowCommentButton={setShowCommentButton} setIsSaved={setIsSaved} />
 				</div>
 			</div>
-		</div>
+		</>
 	);
 }
