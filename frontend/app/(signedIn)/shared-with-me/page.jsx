@@ -5,8 +5,8 @@ import dynamic from 'next/dynamic';
 const Lottie = dynamic(() => import('lottie-react'), { ssr: false }); 
 import smallLoader from "_public/assets/json/smallLoaderLottie.json";
 import {
-  fetchSharedProjects,
-  fetchSharedContentMaps,
+
+  fetchSharedContentMaps
 } from "../../utils/sharedFiles";
 import DashboardInfoBar from "_components/ui/dashboardComponents/dashboardInfoBar";
 import DashboardProjectButton from "_components/ui/dashboardComponents/dashboardProjectButton";
@@ -52,9 +52,7 @@ export default function SharedWithMe() {
     if (!loading && user) {
       setLoadingState("");
       setIsLoading(false);
-    } else if (!user) {
-      router.push("/");
-    }
+    } 
   }, [user, loading, router]);
 
   useEffect(() => {
@@ -62,15 +60,14 @@ export default function SharedWithMe() {
       setLoadingState("FETCHING_SHARED_CONTENT");
       setProjectsLoading(true);
       setSharedContentMapsLoading(true);
-      fetchSharedProjects(user.uid).then((sharedProjects) => {
-        setProjects(sharedProjects);
-        setProjectsLoading(false);
-      });
-
+      setProjectsLoading(false);
       fetchSharedContentMaps(user.uid).then((contentMaps) => {
         setSharedContentMaps(contentMaps);
         setSharedContentMapsLoading(false);
+        
       });
+      setIsLoading(false);
+        setLoadingState("");
     }
   }, [user, projectChanges]);
 
