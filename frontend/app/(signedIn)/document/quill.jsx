@@ -89,16 +89,25 @@ export default function Quill(props)
 		[{ 'header': [1, 2, 3, 4, 5, 6, false] }],
 		[{ 'size': fontSizeArr }],
 
-		[{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+		[{ 'color': [] }],          					  // dropdown with defaults from theme
+		[{ 'background': [] }],
 		[{ 'align': [] }],
 
-		['bold', 'italic', 'underline', 'strike'],        // toggled buttons
-		['image', 'blockquote', 'code-block'],
+		['bold'],        								  // toggled buttons
+		['italic'],
+		['underline'],
+		['strike'],
+		['image'],
+		['blockquote'],
+		['code-block'],
 
-		[{ 'header': 1 }, { 'header': 2 }],               // custom button values
-		[{ 'list': 'ordered' }, { 'list': 'bullet' }],
-		[{ 'script': 'sub' }, { 'script': 'super' }],      // superscript/subscript
-		[{ 'indent': '-1' }, { 'indent': '+1' }],          // outdent/indent
+		// [{ 'header': 1 }, { 'header': 2 }],            // custom button values
+		[{ 'list': 'ordered' }],
+		[{ 'list': 'bullet' }],
+		[{ 'script': 'sub' }],      					  // superscript/subscript
+		[{ 'script': 'super' }],
+		[{ 'indent': '-1' }],        					  // outdent/indent
+		[{ 'indent': '+1' }]
 		[{ 'direction': 'rtl' }],                         // text direction
 
 		['clean'],                                        // remove formatting button
