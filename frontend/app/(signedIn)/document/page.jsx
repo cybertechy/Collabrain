@@ -191,6 +191,6 @@ export default function Editor()
 						setShowCommentButton={setShowCommentButton} setIsSaved={setIsSaved} />
 				</div>
 			</div>
-		</>
+		</> 
 	);
 }

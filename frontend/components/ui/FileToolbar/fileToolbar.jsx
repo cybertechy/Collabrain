@@ -42,20 +42,9 @@ export default function FileToolbar(props)
 	// Function to update file data for sharing
 	const updateFileData = async (newData) =>
 	{
-		let res;
-		// Different API calls for different file types due to inconsistencies
-		if (props.fileType === "doc")
-		{
-			res = await axios.patch(`${SERVERLOCATION}/api/${props.fileType}s/${props.fileID}`, newData, {
+		let res = await axios.put(`${SERVERLOCATION}/api/${props.fileType}s/${props.fileID}`, newData, {
 				headers: { "Authorization": "Bearer " + token }
 			});
-		}
-		else if (props.fileType === "map")
-		{
-			res = await axios.put(`${SERVERLOCATION}/api/${props.fileType}s/${props.fileID}`, newData, {
-				headers: { "Authorization": "Bearer " + token }
-			});
-		}
 
 		return res;
 	};
