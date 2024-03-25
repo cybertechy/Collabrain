@@ -180,8 +180,9 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, h
     };
     
     const buttonStyles = {
-        color: "#FFFFFF",  // Text color
-        backgroundColor: "#30475E",  // Button background color
+        color: "black",  // Text color
+        
+        borderColor: "black",  // Button background color
     };
    
     return (

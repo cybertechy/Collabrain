@@ -111,7 +111,49 @@ const DashboardProjectButton = ({
             router.push(`/document?id=${project.id}`);
         }
     };
-
+    async function renameDocument(documentId, newName) {
+        let token = await fb.getToken();
+        await axios
+            .patch(
+                `${SERVERLOCATION}/api/docs/${documentId}`, // Assuming base URL is predefined in axios instance
+                {
+                    name: newName,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                    },
+                }
+            )
+            .then(function (response) {
+                console.log("Document renamed successfully:", response.data);
+                // Handle successful rename operation, e.g., update UI or state
+                renamedProject(response.data);
+            })
+            .catch(function (error) {
+                console.error("Error renaming document:", error);
+            });
+    }
+    async function deleteDocument(documentId) {
+        let token = await fb.getToken();
+        await axios
+            .delete(`${SERVERLOCATION}/api/docs/${documentId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            .then(function (response) {
+                console.log("Document deleted successfully", response);
+                // Handle successful deletion, e.g., update UI or state
+                renamedProject(response.data);
+                handleProjectDeleted(response.data);
+            })
+            .catch(function (error) {
+                console.error("Error deleting document:", error);
+            });
+    }
+    
 
     async function renameContentMap(contentMapId, newName) {
         let token = await fb.getToken();
@@ -146,7 +188,9 @@ const DashboardProjectButton = ({
             })
             .then(function (response) {
                 console.log("Content Map deleted successfully", response);
+                renamedProject(response.data);
                 handleProjectDeleted(response.data);
+                
             })
             .catch(function (error) {
                 console.error("Error deleting content map:", error);
@@ -158,10 +202,13 @@ const DashboardProjectButton = ({
     };
 
     const buttonStyles = {
-        color: "#FFFFFF", // Text color
-        backgroundColor: "#30475E", // Button background color
+        color: "black",  // Text color
+        
+        borderColor: "black",  // Button background color
     };
     const handleRename = () => {
+        type === "Document"
+            ? renameDocument(project.id, newProjectName):
         renameContentMap(project.id, newProjectName);
         setRenameOverlayOpen(false);
         // Update other UI elements or state if necessary
@@ -172,6 +219,8 @@ const DashboardProjectButton = ({
     };
 
     const handleDelete = () => {
+        type === "Document"
+            ? deleteDocument(project.id):
         deleteContentMap(project.id);
         setDeleteOverlayOpen(false);
         // Update other UI elements or state if necessary
@@ -239,7 +288,7 @@ const DashboardProjectButton = ({
                                         {t('rename_button')}
                                     </span>
                                 </MenuItem>
-                                <MenuItem onClick={handleClose}
+                                {/* <MenuItem onClick={handleClose}
                                 onMouseEnter={() => isTTSEnabled && speak("Share map button")}
                                 onMouseLeave={stop}>
                                     <ShareIcon
@@ -249,8 +298,8 @@ const DashboardProjectButton = ({
                                     <span className="text-tertiary">
                                         {t('share_button')}
                                     </span>
-                                </MenuItem>
-                                <MenuItem onClick={handleClose}
+                                </MenuItem> */}
+                                {/* <MenuItem onClick={handleClose}
                                 onMouseEnter={() => isTTSEnabled && speak("Organize map button")}
                                 onMouseLeave={stop}>
                                     <SortIcon
@@ -260,7 +309,7 @@ const DashboardProjectButton = ({
                                     <span className="text-tertiary">
                                         {t('organize_button')}
                                     </span>
-                                </MenuItem>
+                                </MenuItem> */}
                                 <MenuItem
                                     onClick={() => {
                                         handleClose();
