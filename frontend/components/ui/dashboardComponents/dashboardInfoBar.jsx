@@ -51,7 +51,7 @@ const DashboardInfoBar = ({ currentPath, onSort, sortCriteria, moveProjectToPath
     e.stopPropagation();
 
     const projectId = e.dataTransfer.getData("projectId");
-    const type = e.dataTransfer.getData("type") === "Content Map" ? "contentMap": "documents";
+    const type = e.dataTransfer.getData("type") === "Content Map" ? "contentMap": "document";
     if (projectId) {
       if(index === 0 ){
         moveProjectToPath(projectId, "/", type);
