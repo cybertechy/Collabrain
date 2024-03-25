@@ -66,8 +66,11 @@ export default function SharedWithMe() {
         setProjects(contentMaps);
         setSharedContentMaps(contentMaps);
         setSharedContentMapsLoading(false);
-        
       });
+	  fetchSharedDocuments(user.uid).then((documents) => {
+		setProjects((prevProjects) => [...prevProjects, ...documents]);
+		setProjectsLoading(false);
+	  });
       setIsLoading(false);
         setLoadingState("");
     }

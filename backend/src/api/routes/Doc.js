@@ -134,12 +134,12 @@ router.get('/:id', async (req, res) =>
 		return res.status(401).json({ error: "No Access" });
 
 	let userAccess = false;
-	if (!docData.data().access[user.uid]) userAccess = false;
+	if (!docData.data().Access[user.uid]) userAccess = false;
 	else userAccess = true;
 
 	if (!userAccess)
 	{
-		for (const [key, value] of Object.entries(docData.data().access))
+		for (const [key, value] of Object.entries(docData.data().Access))
 		{
 			if (value.type !== "teams") continue;
 			if (value.members.includes(user.uid))
@@ -151,7 +151,7 @@ router.get('/:id', async (req, res) =>
 	}
 
 	if (!userAccess)
-		return res.status(401).json({ error: "Unauthorized" });
+		return res.status(401).json({ error: "Unauthorized access" });
 
 	// Get document
 

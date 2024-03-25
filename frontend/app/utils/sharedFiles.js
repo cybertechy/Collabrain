@@ -53,7 +53,7 @@ export const fetchSharedDocuments = async (userId) => {
     const userInfo = await fetchUser(userId);
 
     if (!userInfo || !userInfo.AccessDocuments || userInfo.AccessDocuments.length === 0) {
-      console.error("User has no access to shared content maps.");
+      console.error("User has no access to shared content documents.");
       return [];
     }
 
@@ -61,7 +61,7 @@ export const fetchSharedDocuments = async (userId) => {
     const documentsData = await Promise.all(
       userInfo.AccessDocuments.map(async (documentId) => {
         try {
-          console.log("Fetching content map with ID:", documentId);
+          console.log("Fetching content document with ID:", documentId);
           const response = await axios.get(`${DOCUMENTS_URL}/${documentId}`, {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -75,6 +75,10 @@ export const fetchSharedDocuments = async (userId) => {
       })
     );
 
+	// Add type document to the documents
+	documentsData.forEach((doc) => {
+		doc.type = "document";
+	});
 
     return documentsData.filter(map => map !== null); // Filter out any nulls from failed fetches
   } catch (error) {
