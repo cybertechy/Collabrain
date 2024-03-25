@@ -18,6 +18,7 @@ import { useTTS } from "@/app/utils/tts/TTSContext";
 import "@/app/utils/i18n"
 import { useTranslation } from 'next-i18next';
 import { set } from 'react-hook-form';
+import { getBlockedUsers } from '@/app/utils/user';
 
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
@@ -43,6 +44,14 @@ const FriendsWindow = ({userInfo, handleAliasUpdate, handleChatUpdate, showChat,
     handleAliasUpdate(friendId, newAlias);
     setRefreshList(refreshList + 1);
   }
+  const getBlocked = async () => {
+    try {
+      const response = await getBlockedUsers();
+      setBlockedUsers(response);
+    } catch (error) {
+      console.error("Error fetching blocked users:", error);
+    }
+  };
   const searchUsers = async (username) => {
     try {
       const token = await fb.getToken();
@@ -173,6 +182,8 @@ const FriendsWindow = ({userInfo, handleAliasUpdate, handleChatUpdate, showChat,
       getFriends();
     } else if (activeTab === 'Recieved') {
       getFriendRequests();
+    }else if (activeTab === 'blocked') {
+      getBlocked();
     }
   }, [activeTab, user, refreshList]);
 
@@ -195,7 +206,11 @@ const FriendsWindow = ({userInfo, handleAliasUpdate, handleChatUpdate, showChat,
       default:
         break;
     }
-  
+    if (activeTab !== 'blocked') {
+      const blockedIds = new Set(userInfo?.data?.blocked);
+      console.log("BLOCKEDIDS", blockedIds)
+      list = list.filter(friend => !blockedIds.has(friend.id));
+    }
     if (searchQuery && activeTab !== 'addFriend') {
       list = list.filter(friend => friend.name?.toLowerCase().includes(searchQuery.toLowerCase()));
     }
@@ -281,6 +296,7 @@ const FriendsWindow = ({userInfo, handleAliasUpdate, handleChatUpdate, showChat,
   //     <FriendTile key={index} id={friend.id} friendData={friend} onMoreOptions={handleMoreOptions} />
   //   ))
   // ) : renderEmptyState()}
+  console.log("LOOK HERE",userInfo, friendsList, blockedUsers)
     return (
       <Box sx={{ width: '100%' }} className={`${showChat || showFriends ? '' : 'max-sm:hidden'}`}>
         <div className="hidden max-sm:flex max-sm:flex-col items-center justify-center p-4 shadow-md bg-gray-100">
@@ -298,6 +314,7 @@ const FriendsWindow = ({userInfo, handleAliasUpdate, handleChatUpdate, showChat,
       <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
         {visibleList.length > 0 ? (
           visibleList.map((friend, index) => (
+           
             <FriendTile key = {index} id={friend.id} friendData={friend} onMoreOptions={handleMoreOptions} handleAliasUpdate = {handleNewAliasUpdate}  userInfo = {userInfo} handleChatUpdate={handleChatUpdate} handleFriendListUpdate={()=> setRefreshList(refreshList+1)} />
           ))
         ) : (

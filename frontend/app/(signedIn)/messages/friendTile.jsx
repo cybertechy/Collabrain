@@ -26,7 +26,7 @@ const fb  = require("_firebase/firebase");
 import CustomAvatar from '@/components/ui/messagesComponents/avatar';
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
-const FriendTile = ({ friendData, openChat, setRefreshList,id, userInfo,handleAliasUpdate,handleFriendListUpdate}) => {
+const FriendTile = ({ friendData, openChat, setRefreshList,id, userInfo,handleAliasUpdate,handleFriendListUpdate, handleChatUpdate}) => {
   const { t } = useTranslation('dms');
   const { speak, stop, isTTSEnabled } = useTTS();
   // Function to generate avatar with initials
@@ -38,8 +38,8 @@ const FriendTile = ({ friendData, openChat, setRefreshList,id, userInfo,handleAl
   useEffect(() => {
     // This checks if user and friendData.alias are defined to safely access user.uid
     console.log("Userinfo, ",userInfo);
-    if (user && userInfo.aliases && userInfo.aliases[friendData.id]) {
-      setAlias(userInfo.aliases[friendData.id]);
+    if (user && userInfo.alias && userInfo.alias[friendData.id]) {
+      setAlias(userInfo.alias[friendData.id]);
     } else {
       setAlias('');
     }
@@ -63,7 +63,7 @@ const FriendTile = ({ friendData, openChat, setRefreshList,id, userInfo,handleAl
     if(option === 'alias'){
     openDialog();}
   else if(option === 'block'){
-  handleBlockUser().then(()=>{handleChatUpdate()});
+  handleBlockUser().then(()=>{handleAliasUpdate(); handleFriendListUpdate();handleChatUpdate();});
   ;}
   };
   const handleDialogAction = async () => {
@@ -71,7 +71,10 @@ const FriendTile = ({ friendData, openChat, setRefreshList,id, userInfo,handleAl
       const isSuccess = await updateFriendAlias(friendData.id, alias.trim(), user?.uid);
       if (isSuccess) {
         console.log(`Alias "${alias}" set for user:`, friendData);
+        
         handleAliasUpdate(friendData.id, alias.trim()); // Call the update function passed as prop
+        handleChatUpdate();
+        handleFriendListUpdate();
       }
     } else if (selectedOption === 'block') {
       await blockUser(friendData.id);
@@ -325,7 +328,7 @@ const FriendTile = ({ friendData, openChat, setRefreshList,id, userInfo,handleAl
     // Logic to unblock the user
     console.log('Unblocking user:', friendData);
     // Assume you have an unblockUser function similar to blockUser
-    await unblockUser(friendData.id).then(()=>{handleChatUpdate()});;
+    await unblockUser(friendData.id).then(()=>{handleFriendListUpdate(); handleAliasUpdate(); handleChatUpdate();});;
     closeDialog();
 };
 
