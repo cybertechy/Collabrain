@@ -73,10 +73,11 @@ const ChannelBar = ({ user, userUID, teamData, onUpdated, onInvite, onSettings, 
                     <div className="flex flex-row items-center justify-between p-4 shadow-md bg-gray-100">
                         <h2 className="text-xl text-center font-semibold"
                         onMouseEnter={() => isTTSEnabled && speak("Team Channels")} onMouseLeave={stop}>{t('channels')}</h2>
-                        <button onClick={handleAddChannelClick} className="bg-primary ml-2  text-white p-2 rounded-md h-8 w-8 flex items-center justify-center">
+                        {teamData.owner == userUID && <button onClick={handleAddChannelClick} className="bg-primary ml-2  text-white p-2 rounded-md h-8 w-8 flex items-center justify-center">
                             {/* Using a simple "+" text for the icon */}
                             <AddIcon onMouseEnter={() => isTTSEnabled && speak("Add Channel button")} onMouseLeave={stop}></AddIcon>
-                        </button>
+                        </button> }
+                        
                     </div>
 
                     {/* Chat List */}

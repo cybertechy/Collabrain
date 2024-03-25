@@ -125,7 +125,7 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, h
         
     };
     const moveFileToFolder = async (projectId, folderPath, type) => {
-       
+       console.log("projectId", projectId, folderPath, type);
         try {
           const token = await fb.getToken(); // Assuming you have a function to get the user's token
           const response = await axios.patch(
@@ -167,7 +167,7 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, h
       const handleDrop = (e, folderPath) => {
         e.preventDefault();
         const projectId = e.dataTransfer.getData("projectId");
-        const type = e.dataTransfer.getData("type") === "Content Map" ? "contentMap": "documents";
+        const type = e.dataTransfer.getData("type") === "Content Map" ? "contentMap": "document";
         console.log("projectId", e.dataTransfer);
 
         moveFileToFolder(projectId, folderPath, type);
@@ -180,8 +180,9 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, h
     };
     
     const buttonStyles = {
-        color: "#FFFFFF",  // Text color
-        backgroundColor: "#30475E",  // Button background color
+        color: "black",  // Text color
+        
+        borderColor: "black",  // Button background color
     };
    
     return (

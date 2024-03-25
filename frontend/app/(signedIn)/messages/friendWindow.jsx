@@ -17,6 +17,8 @@ import { ArrowForward } from '@mui/icons-material';
 import { useTTS } from "@/app/utils/tts/TTSContext";
 import "@/app/utils/i18n"
 import { useTranslation } from 'next-i18next';
+import { set } from 'react-hook-form';
+import { getBlockedUsers } from '@/app/utils/user';
 
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
@@ -35,7 +37,21 @@ const FriendsWindow = ({userInfo, handleAliasUpdate, handleChatUpdate, showChat,
   const [user, loading] = fb.useAuthState();
   const searchDelay = 500;
   const searchTimerRef = useRef(null);
-
+  const handleFriendListUpdate = () => {
+    setRefreshList(refreshList + 1);
+  };
+  const handleNewAliasUpdate = (friendId, newAlias)  => {
+    handleAliasUpdate(friendId, newAlias);
+    setRefreshList(refreshList + 1);
+  }
+  const getBlocked = async () => {
+    try {
+      const response = await getBlockedUsers();
+      setBlockedUsers(response);
+    } catch (error) {
+      console.error("Error fetching blocked users:", error);
+    }
+  };
   const searchUsers = async (username) => {
     try {
       const token = await fb.getToken();
@@ -61,13 +77,17 @@ const FriendsWindow = ({userInfo, handleAliasUpdate, handleChatUpdate, showChat,
   };
   
   useEffect(() => {
-    if (activeTab === 'addFriend' && searchQuery.trim() !== '') {
+    if (activeTab === 'addFriend') {
       if (searchTimerRef.current) {
         clearTimeout(searchTimerRef.current);
       }
 
       searchTimerRef.current = setTimeout(() => {
         const fetchSearchResults = async () => {
+          if (searchQuery.trim() === '') {
+            setSearchResults([]);
+            return;
+          }
           try {
             const results = await searchUsers(searchQuery);
             setSearchResults(results);
@@ -162,8 +182,10 @@ const FriendsWindow = ({userInfo, handleAliasUpdate, handleChatUpdate, showChat,
       getFriends();
     } else if (activeTab === 'Recieved') {
       getFriendRequests();
+    }else if (activeTab === 'blocked') {
+      getBlocked();
     }
-  }, [activeTab, user]);
+  }, [activeTab, user, refreshList]);
 
   
   useEffect(() => {
@@ -184,7 +206,11 @@ const FriendsWindow = ({userInfo, handleAliasUpdate, handleChatUpdate, showChat,
       default:
         break;
     }
-  
+    if (activeTab !== 'blocked') {
+      const blockedIds = new Set(userInfo?.data?.blocked);
+      console.log("BLOCKEDIDS", blockedIds)
+      list = list.filter(friend => !blockedIds.has(friend.id));
+    }
     if (searchQuery && activeTab !== 'addFriend') {
       list = list.filter(friend => friend.name?.toLowerCase().includes(searchQuery.toLowerCase()));
     }
@@ -211,7 +237,7 @@ const FriendsWindow = ({userInfo, handleAliasUpdate, handleChatUpdate, showChat,
       if (searchQuery && searchResults.length > 0) {
         // Render search results
         return searchResults.map((user) => (
-          <FriendTile key={user.id} friendData={user} onMoreOptions={handleMoreOptions} />
+          <FriendTile key={user.id} friendData={user}onMoreOptions={handleMoreOptions} handleAliasUpdate = {handleNewAliasUpdate}  userInfo = {userInfo} handleChatUpdate={handleChatUpdate} handleFriendListUpdate={()=> setRefreshList(refreshList+1)} />
         ));
       } else {
         // Render a message to encourage searching
@@ -227,7 +253,7 @@ const FriendsWindow = ({userInfo, handleAliasUpdate, handleChatUpdate, showChat,
 
       
   return filteredFriends.map((friend, index) => (
-    <FriendTile key={index} id = {friend.id} friendData={friend} onMoreOptions={handleMoreOptions} />
+    <FriendTile key={index} id = {friend.id} friendData={friend} onMoreOptions={handleMoreOptions} handleAliasUpdate = {handleNewAliasUpdate}  userInfo = {userInfo} handleChatUpdate={handleChatUpdate} handleFriendListUpdate={()=> setRefreshList(refreshList+1)} />
   ));
     }
   };
@@ -265,40 +291,42 @@ const FriendsWindow = ({userInfo, handleAliasUpdate, handleChatUpdate, showChat,
   };
   
   // Inside the return statement of the FriendsWindow component, replace the old "No friends found" messages with:
-  {visibleList.length > 0 ? (
-    visibleList.map((friend, index) => (
-      <FriendTile key={index} id={friend.id} friendData={friend} onMoreOptions={handleMoreOptions} />
-    ))
-  ) : renderEmptyState()}
-  return (
-    <Box sx={{ width: '100%' }} className={`${showChat || showFriends ? '' : 'max-sm:hidden'}`}>
-      <div className="hidden max-sm:flex max-sm:flex-col items-center justify-center p-4 shadow-md bg-gray-100">
-        <h2 className="text-xl text-center font-semibold">Friends</h2>
-          <button className='hidden max-sm:block ml-auto bg-primary text-white px-3 py-2 rounded-md mt-2'
-            onClick={() => {
-            setShowFriends(false); 
-            console.log("showFriends",showFriends);
-            }}>Open Chats
-            <span> <ArrowForward></ArrowForward> </span>
-            </button>
-      </div>
-    <TopBar activeTab={activeTab} onTabChange={handleTabChange} />
-    <SearchBar onSearch={handleSearch} />
-    <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
-      {visibleList.length > 0 ? (
-        visibleList.map((friend, index) => (
-          <FriendTile key = {index} id={friend.id} friendData={friend} onMoreOptions={handleMoreOptions} handleAliasUpdate = {handleAliasUpdate}  userInfo = {userInfo} handleChatUpdate={handleChatUpdate} />
-        ))
-      ) : (
-        // <Typography variant="body1" sx={{ p: 2 }}>
-        <div>
-        {renderEmptyState()}
+  // {visibleList.length > 0 ? (
+  //   visibleList.map((friend, index) => (
+  //     <FriendTile key={index} id={friend.id} friendData={friend} onMoreOptions={handleMoreOptions} />
+  //   ))
+  // ) : renderEmptyState()}
+  console.log("LOOK HERE",userInfo, friendsList, blockedUsers)
+    return (
+      <Box sx={{ width: '100%' }} className={`${showChat || showFriends ? '' : 'max-sm:hidden'}`}>
+        <div className="hidden max-sm:flex max-sm:flex-col items-center justify-center p-4 shadow-md bg-gray-100">
+          <h2 className="text-xl text-center font-semibold">Friends</h2>
+            <button className='hidden max-sm:block ml-auto bg-primary text-white px-3 py-2 rounded-md mt-2'
+              onClick={() => {
+              setShowFriends(false); 
+              console.log("showFriends",showFriends);
+              }}>Open Chats
+              <span> <ArrowForward></ArrowForward> </span>
+              </button>
         </div>
-        // </Typography>
-      )}
-    </List>
-  </Box>
-    );
-  };
+      <TopBar activeTab={activeTab} onTabChange={handleTabChange} />
+      <SearchBar onSearch={handleSearch} />
+      <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
+        {visibleList.length > 0 ? (
+          visibleList.map((friend, index) => (
+           
+            <FriendTile key = {index} id={friend.id} friendData={friend} onMoreOptions={handleMoreOptions} handleAliasUpdate = {handleNewAliasUpdate}  userInfo = {userInfo} handleChatUpdate={handleChatUpdate} handleFriendListUpdate={()=> setRefreshList(refreshList+1)} />
+          ))
+        ) : (
+          // <Typography variant="body1" sx={{ p: 2 }}>
+          <div>
+          {renderEmptyState()}
+          </div>
+          // </Typography>
+        )}
+      </List>
+    </Box>
+      );
+    };
 
 export default FriendsWindow;

@@ -64,7 +64,8 @@ const ContentMapOverlay = ({ setOpenModal, switchToDocument }) =>
 		{
 			const res = await axios.post(`${SERVERLOCATION}/api/maps`, {
 				name: "New Content Map",
-				data: ""
+				data: "",
+				path: "/",
 			}, {
 				headers: {
 					authorization: `Bearer ${token}`,
@@ -75,7 +76,7 @@ const ContentMapOverlay = ({ setOpenModal, switchToDocument }) =>
 			if (res.status !== 200) return null;
 
 
-
+			setOpenModal();
 			router.push(`/contentmap?id=${res.data.id}`);
 		}
 		catch (err)
@@ -136,6 +137,45 @@ const DocumentOverlay = ({ setOpenModal, switchToContent }) =>
 	const { t } = useTranslation('new_project');
 	const { speak, stop, isTTSEnabled } = useTTS();
 	const router = useRouter();
+
+	const NewDocument = async () =>
+	{
+		let token = await fb.getToken();
+		if (!token) return null;
+
+		try
+		{
+			const res = await axios.post(`${SERVERLOCATION}/api/docs`, {
+				name: "New Document",
+				path: "/",
+			}, {
+				headers: {
+					authorization: `Bearer ${token}`,
+				},
+			});
+
+
+			if (res.status !== 200) return null;
+
+
+			setOpenModal();
+			router.push(`/document?id=${res.data.id}`);
+		}
+		catch (err)
+		{
+			console.log(err);
+			toast.error("Error creating new content map", {
+				position: "bottom-right",
+				autoClose: 5000,
+				hideProgressBar: false,
+				closeOnClick: true,
+				pauseOnHover: true,
+				theme: "colored"
+			});
+
+			return null;
+		}
+	};
 	return (
 		<>
 			<div className="w-screen h-screen flex items-center justify-center">
@@ -162,7 +202,7 @@ const DocumentOverlay = ({ setOpenModal, switchToContent }) =>
 								<p className="mt-4 ml-10">{t('doc')}</p></button>
 						</div>
 						<div className="mt-36 flex justify-end">
-							<button onClick = {()=>{router.push('/document')}}className="mr-10 w-44 h-12  text-basicallylight bg-primary hover:bg-primary  font-normal rounded text-lg shadow-xl "
+							<button onClick = {NewDocument}className="mr-10 w-44 h-12  text-basicallylight bg-primary hover:bg-primary  font-normal rounded text-lg shadow-xl "
 							onMouseEnter={() => isTTSEnabled && speak("Create Project button")} onMouseLeave={stop}>{t('create_button')}</button>
 						</div>
 					</div>

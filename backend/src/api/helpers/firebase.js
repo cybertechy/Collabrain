@@ -125,9 +125,16 @@ async function deleteQueryBatch(query, resolve) {
 
 async function saveTeamMsg(data, newMessage = false) {
 	let sentAt = admin.firestore.Timestamp.fromDate(new Date(data.sentAt));
-	let channels = (await db.collection(`teams/${data.team}/channels/`).where("name", "==", data.channel).get());
-	let channelID = channels.docs[0].id;
+	let channelQuerySnapshot = await db.collection(`teams/${data.team}/channels/`).where("name", "==", data.channel).get();
+    if (channelQuerySnapshot.empty) {
+        return console.log("Channel not found");
+    }
+
+	
+    let channelID = channelQuerySnapshot.docs[0].id;
 	if(!data.id) return console.log("No message ID provided");
+
+	if (newMessage)
 	db.collection(`teams/${data.team}/channels/${channelID}/messages`)
 		.doc(data.id)
 		.set({
@@ -135,8 +142,17 @@ async function saveTeamMsg(data, newMessage = false) {
 			"sender": data.senderID,
 			"username": data.sender,
 			"sentAt": sentAt,
-			"reactions": (data.reactions) ? data.reactions : []
+			"attachments":(data.attachments) ? data.attachments : null,
+			"reactions": (data.reactions) ? data.reactions : {}
 		});
+		else{
+			let updateData = {}
+			if(data.msg) updateData.message = data.msg;
+			if(data.attachments) updateData.attachments = data.attachments;
+			if(data.reactions) updateData.reactions = data.reactions;
+			db.collection(`teams/${data.team}/channels/${channelID}/messages`).doc(data.id).update(updateData);
+		}
+	
 
 	if (newMessage) {
 

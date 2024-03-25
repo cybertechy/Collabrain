@@ -88,7 +88,7 @@ export default function Dashboard() {
             onMouseEnter: () => isTTSEnabled && speak("New map"),
             onMouseLeave: stop
         },
-        { text: t('new_doc_rclick'), icon: <DescriptionIcon />, onClick: () => { }, 
+        { text: t('new_doc_rclick'), icon: <DescriptionIcon />, onClick: () => { createDocument();}, 
         onMouseEnter: () => isTTSEnabled && speak("New document"),
         onMouseLeave: stop},
     ];
@@ -239,6 +239,7 @@ export default function Dashboard() {
 
     const createContentMap = async () => {
         setIsLoading(true);
+        console.log("Creating new content map", path);
         await newContentMap(fb.getToken, (url) => {
             setProjectChanges((prevCount) => prevCount + 1);
             router.push(url);
@@ -249,7 +250,81 @@ export default function Dashboard() {
         setIsLoading(false);
         setProjectChanges((prevCount) => prevCount + 1);
     };
+const createDocument = async () => {
+        setIsLoading(true);
+        console.log("Creating new document", path);
+        await newDocument(fb.getToken, (url) => {
+            setProjectChanges((prevCount) => prevCount + 1);
+            router.push(url);
+        }, path);
+        setIsLoading(false);
+        setProjectChanges((prevCount) => prevCount + 1);
+    };
+const newDocument = async (getToken, callback, path) => {
+        try {
+            const token = await getToken();
+            const response = await axios.post(
+                `${SERVERLOCATION}/api/docs`,
+                {
+                    name: "New Document",
+                    path: path,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            if (response.status === 200) {
+                console.log("Document created successfully");
+                callback(`/document?id=${response.data.id}`);
+            } else {
+                console.error("Failed to create document");
+            }
+        } catch (error) {
+            console.error("Error creating document:", error);
+        }
+    };
 
+
+    // const NewDocument = async () =>
+	// {
+	// 	let token = await fb.getToken();
+	// 	if (!token) return null;
+
+	// 	try
+	// 	{
+	// 		const res = await axios.post(`${SERVERLOCATION}/api/docs`, {
+	// 			name: "New Document",
+	// 			path: "/",
+	// 		}, {
+	// 			headers: {
+	// 				authorization: `Bearer ${token}`,
+	// 			},
+	// 		});
+
+
+	// 		if (res.status !== 200) return null;
+
+
+	// 		setOpenModal();
+	// 		router.push(`/document?id=${res.data.id}`);
+	// 	}
+	// 	catch (err)
+	// 	{
+	// 		console.log(err);
+	// 		toast.error("Error creating new content map", {
+	// 			position: "bottom-right",
+	// 			autoClose: 5000,
+	// 			hideProgressBar: false,
+	// 			closeOnClick: true,
+	// 			pauseOnHover: true,
+	// 			theme: "colored"
+	// 		});
+
+	// 		return null;
+	// 	}
+	// };
     const handleContextMenu = (e) => {
         e.preventDefault(); // Prevent the default right-click context menu
         const xPos = e.clientX;

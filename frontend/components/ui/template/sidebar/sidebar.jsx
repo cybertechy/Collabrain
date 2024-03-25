@@ -49,10 +49,14 @@ const Sidebar = ({ teams = {}, isOpen, toggleSidebar }) => {
     const [teamChanges, setTeamChanges] = useState(0);
     const toggleModal = () => { // Define toggleModal function
         setIsModalOpen(!isModalOpen);
+        if(isOpen)
+        toggleSidebar();
     };
     
     const toggleProjectModal = () => { 
         setIsProjectModalOpen(!isProjectModalOpen);
+        if(isOpen)
+        toggleSidebar();
     };
 
     const pathname = usePathname(); 

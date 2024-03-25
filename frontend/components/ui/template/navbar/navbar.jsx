@@ -16,10 +16,13 @@ const CallButton = dynamic(() => import("_components/ui/call/call"), { ssr: fals
 import { set } from 'react-hook-form';
 import Badge from '@mui/material/Badge';
 const fb = require('_firebase/firebase');
-
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import MonitorHeartIcon from '@mui/icons-material/MonitorHeart';
 import { fetchUser } from '@/app/utils/user';
+import {useRouter} from 'next/navigation';
 const Navbar = ({ isOpen, toggleSidebar }) =>
 {
+    const router = useRouter();
     const [user, loading] = fb.useAuthState();
     const { t } = useTranslation('navbar');
     const { speak, stop, isTTSEnabled } = useTTS();
@@ -31,6 +34,7 @@ const Navbar = ({ isOpen, toggleSidebar }) =>
     const notificationsToggleRef = useRef(null);
     const [teamInvites, setTeamInvites] = useState([]); // State to store team invites
     const [makeUpdate, setMakeUpdate] = useState(0);
+    const [userInfo, setUserInfo] = useState(null);
     const toggleNotifications = () => {
         setShowNotifications(!showNotifications);
         setShowLeaderboard(false);
@@ -42,9 +46,10 @@ const Navbar = ({ isOpen, toggleSidebar }) =>
 
             try {
                 console.log("TRYING TO FETCH")
-                const userInfo = await fetchUser(user.uid); // Call the async function to fetch invites
-                console.log("FETCHED", userInfo)
-                const invites = userInfo.teamInvites;
+                const x = await fetchUser(user.uid); // Call the async function to fetch invites
+                setUserInfo(x);
+                
+                const invites = x.teamInvites;
                 console.log("FINISHED FETCHING", invites)
                 setTeamInvites(invites); // Update the state with fetched invites
             } catch (error) {
@@ -114,6 +119,35 @@ const Navbar = ({ isOpen, toggleSidebar }) =>
         return (
             <>
                 <CallButton />
+
+                {userInfo?.role == "platform manager" &&(  <Tooltip
+                    title={t('platform management')}
+                    enterDelay={1000}
+                    leaveDelay={200}
+                    onMouseEnter={() => isTTSEnabled && speak("Platform Management")}
+                    onMouseLeave={stop}
+                >
+                    <MonitorHeartIcon
+                        className="cursor-pointer"
+                        style={{ color: "#FFFFFF" }}
+                        onClick={()=>{router.push("/platformManager")}}
+                    />
+                </Tooltip>)}
+              {userInfo?.role == "content moderator" &&( <Tooltip
+                    title={t('content moderation')}
+                    enterDelay={1000}
+                    leaveDelay={200}
+                    onMouseEnter={() => isTTSEnabled && speak("Content Moderation")}
+                    onMouseLeave={stop}
+                >
+                    <ManageAccountsIcon
+                        className="cursor-pointer"
+                        style={{ color: "#FFFFFF" }}
+                        onClick={()=>{router.push("/contentModeration")}}
+                    />
+                </Tooltip>
+ )}
+                
                 <Tooltip
                     title={t('leaderboard')}
                     enterDelay={1000}
@@ -175,7 +209,7 @@ const Navbar = ({ isOpen, toggleSidebar }) =>
                     </div>
                 </div>
             </nav>
-
+           
             {showLeaderboard && (
                 <div ref={leaderboardRef}>
                     <LeaderboardNavbar />

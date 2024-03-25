@@ -12,12 +12,18 @@ export default function ChatWindow({ messages, setMessages, sendPersonalMsg, wit
   const messagesEndRef = useRef(null); // Create a ref for the scrolling target
 
   useEffect(() => {
-    if (withUserInfo && userInfo && userInfo.data) {
-      console.log("asdas", userInfo);
-      setTitle(userInfo?.data?.aliases[withUserId] ? userInfo?.data?.aliases[withUserId] : withUserInfo?.data?.username || 'User');
-      setAvatar(withUserInfo?.data?.username || 'User');
+    console.log("withUserInfo", withUserInfo, userInfo, withUserId);
+  
+    if (withUserInfo && userInfo && withUserId) {
+      // Attempt to retrieve an alias. If it doesn't exist, use the username.
+      const userAlias = userInfo.data.alias ? userInfo.data.alias[withUserId] : null;
+      const username = withUserInfo.data.username || 'User';
+  
+      setTitle(userAlias || username);
+      // Assuming you want to set the avatar to the username for now, as your original logic suggests.
+      setAvatar(username);
     }
-  }, [withUserInfo, userInfo]);
+  }, [withUserInfo, userInfo, withUserId]);
 
   useEffect(() => {
     // Scroll to the bottom whenever the messages change

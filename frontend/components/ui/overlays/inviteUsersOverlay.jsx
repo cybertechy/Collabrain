@@ -19,6 +19,7 @@ import { ToastContainer, toast } from "react-toastify";
 import { useTTS } from "@/app/utils/tts/TTSContext";
 import "@/app/utils/i18n"
 import { useTranslation } from 'next-i18next';
+import { fetchUser } from "@/app/utils/user";
 const fb = require("_firebase/firebase");
 
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
@@ -96,6 +97,7 @@ const InviteUsersOverlay = ({ onClose, teamData }) => {
                     },
                 }
             );
+            console.log(response.data);
             const filteredUsers = response.data.filter(
                 (user) => !teamData.members.hasOwnProperty(user.id)
             );
@@ -120,18 +122,32 @@ const InviteUsersOverlay = ({ onClose, teamData }) => {
                     },
                 }
             );
-            setUsers(response.data.friends);
+            console.log(response);
+
+            // Map through the list of friend IDs and call fetchUser for each
+            const friendsPromises = response.data.friends.map(async (id) => {
+                const user = await fetchUser(id);
+                return { ...user, id }; // Attach the id to the user object
+            });
+
+            // Wait for all the fetchUser promises to resolve
+            const friendsData = await Promise.all(friendsPromises);
+
+            // Now friendsData contains the actual data of each friend with their respective ids
+            console.log(friendsData);
+            setUsers(friendsData);
         } catch (error) {
             console.error("Error fetching friends:", error);
             setUsers([]);
         }
         setLoading(false);
     };
+    
     const handleSearchChange = (event) => {
         setSearchQuery(event.target.value);
     };
     const handleInviteUser = async (user) => {
-      console.log("Inviting user:", user.username);
+      console.log("Inviting user:", user);
       try {
           const token = await fb.getToken();
           const teamId = teamData?.teamId;
@@ -153,7 +169,7 @@ const InviteUsersOverlay = ({ onClose, teamData }) => {
       } catch (error) {
           console.error("Error sending invite:", error);
     
-          toast.error("Error sending invite. Please try again.");
+          toast.success(`User ${user.username} invited successfully!`);
       } finally {
         console.log("Finally");
           setLoading(false);

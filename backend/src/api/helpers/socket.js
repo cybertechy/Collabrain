@@ -326,12 +326,11 @@ function init(server)
 	});
 }
 
-async function broadcastMessage(data, type = "team", newMessage = false, deleteMsg = false)
-{
-
+async function broadcastMessage(data, type = "team", newMessage = false, deleteMsg = false) {
+	console.log("RECIEVED, ", data, type, newMessage, deleteMsg);
 	// If the message is a delete message, check if the message has the required fields
-	if (deleteMsg && type == "team" && !data.team && !data.channelId && !data.id) return;
-	if (deleteMsg && type == "direct" && !data.chat && !data.id) return;
+	if(deleteMsg && type == "team" && !data.team && !data.channelId  && !data.channel&& !data.id) return;
+	if(deleteMsg && type == "direct" && !data.chat && !data.id) return;
 
 	// Get the members of the team or chat
 	let members = type == "team" ? await fb.getTeamMembers(data.team) : await fb.getChatMembers(data.chat);
@@ -380,7 +379,7 @@ async function broadcastMessage(data, type = "team", newMessage = false, deleteM
 	}
 	else
 	{
-		(type == "team") ? fb.deleteTeamMsg(data.team, data.channelId, data.id) : fb.deleteChatMsg(data.chat, data.id);
+		(type == "team") ? fb.deleteTeamMsg(data.team, data.channel, data.id) : fb.deleteChatMsg(data.chat, data.id);
 	}
 
 }
@@ -408,7 +407,7 @@ function connectToRedis(io)
 	Promise.all([pubClient.connect(), subClient.connect()])
 		.then(() =>
 		{
-			if(!prod) console.log("BAPS: Enabled");
+			if (!prod) console.log("BAPS: Enabled");
 			if (io) io.adapter(createAdapter(pubClient, subClient));
 
 			if (BAPS_ERROR)
@@ -422,8 +421,8 @@ function connectToRedis(io)
 		})
 		.catch((error) =>
 		{
-			if(!prod) console.log("BAPS: Disabled");
-			if(!prod) console.log("Error connecting to Redis: ", error);
+			if (!prod) console.log("BAPS: Disabled");
+			if (!prod) console.log("Error connecting to Redis: ", error);
 			// Retry after 5 seconds
 			if (!BAPS_ERROR)
 			{
@@ -436,7 +435,7 @@ function connectToRedis(io)
 	{
 		if (!BAPS_ERROR)
 		{
-			if(!prod) console.log("BAPS: Disabled");
+			if (!prod) console.log("BAPS: Disabled");
 			BAPS_ERROR = true;
 			BAPS_ERROR_ID = setInterval(reconnectToRedis, 5000);
 		}
@@ -447,7 +446,7 @@ function connectToRedis(io)
 	{
 		if (!BAPS_ERROR)
 		{
-			if(!prod) console.log("BAPS: Disabled");
+			if (!prod) console.log("BAPS: Disabled");
 			BAPS_ERROR = true;
 			BAPS_ERROR_ID = setInterval(reconnectToRedis, 5000);
 		}

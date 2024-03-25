@@ -5,8 +5,8 @@ import dynamic from 'next/dynamic';
 const Lottie = dynamic(() => import('lottie-react'), { ssr: false }); 
 import smallLoader from "_public/assets/json/smallLoaderLottie.json";
 import {
-  fetchSharedProjects,
-  fetchSharedContentMaps,
+
+  fetchSharedContentMaps, fetchSharedDocuments
 } from "../../utils/sharedFiles";
 import DashboardInfoBar from "_components/ui/dashboardComponents/dashboardInfoBar";
 import DashboardProjectButton from "_components/ui/dashboardComponents/dashboardProjectButton";
@@ -17,6 +17,7 @@ import { useAuthState } from "_firebase/firebase"; // Adjust based on actual pat
 import { useTTS } from "@/app/utils/tts/TTSContext";
 import "@/app/utils/i18n"
 import { useTranslation } from 'next-i18next';
+
 
 export default function SharedWithMe() {
   const { t } = useTranslation('shared');
@@ -52,9 +53,7 @@ export default function SharedWithMe() {
     if (!loading && user) {
       setLoadingState("");
       setIsLoading(false);
-    } else if (!user) {
-      router.push("/");
-    }
+    } 
   }, [user, loading, router]);
 
   useEffect(() => {
@@ -62,15 +61,15 @@ export default function SharedWithMe() {
       setLoadingState("FETCHING_SHARED_CONTENT");
       setProjectsLoading(true);
       setSharedContentMapsLoading(true);
-      fetchSharedProjects(user.uid).then((sharedProjects) => {
-        setProjects(sharedProjects);
-        setProjectsLoading(false);
-      });
-
+      setProjectsLoading(false);
       fetchSharedContentMaps(user.uid).then((contentMaps) => {
+        setProjects(contentMaps);
         setSharedContentMaps(contentMaps);
         setSharedContentMapsLoading(false);
+        
       });
+      setIsLoading(false);
+        setLoadingState("");
     }
   }, [user, projectChanges]);
 
@@ -78,7 +77,7 @@ export default function SharedWithMe() {
     setSortCriteria(newSortCriteria);
   };
 
-  const sortedProjects = useMemo(() => projects.filter(project => project.path === path).sort((a, b) => {
+  const sortedProjects = useMemo(() => projects.sort((a, b) => {2
     if (sortCriteria.sortName) {
       return sortCriteria.isAscending ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
     } else if (sortCriteria.sortDate) {
@@ -125,9 +124,15 @@ export default function SharedWithMe() {
                   key={project.id}
                   id={project.id}
                   title={project.name}
+                  project = {project}
                   createdAt={project.createdAt}
                   updatedAt={project.updatedAt}
-                  type={project.type}
+                  type={
+                    project.type === "document"
+                        ? "Document"
+                        : "Content Map"
+                }
+                OnClick={() => { setIsLoading(true); setLoadingState("FETCHING_FILES"); }}
                 />
               )) : (
                 <div className="text-primary font-poppins text-xl italic" 

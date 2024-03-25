@@ -83,7 +83,7 @@ export default function Messages() {
             console.log("Received direct message:", data);
 
             if (chatId !== data.chat) return;
-
+            
             data.msg = AES.decrypt(data.msg, chatId).toString(enc);
 
             setMessages((prevMessage) => [
@@ -102,7 +102,7 @@ export default function Messages() {
                     reactions={{}}
                     onReact={handleReact}
                     onReply={setReplyTo}
-                    attachments={data.attachments}
+                    attachmentIds={data.attachments}
                     replyTo={data.replyTo}
                     userInfo={userInfo}
                     chatId={chatId}
@@ -337,7 +337,7 @@ export default function Messages() {
             setLoadingState("FETCHING_MESSAGES");
             try {
                 const fetchedMessages = await fetchMessages(chatId, userInfo);
-
+               
                 setMessages(fetchedMessages);
                 setIsLoading(false);
                 setLoadingState(""); // Or any state indicating success
@@ -451,7 +451,7 @@ export default function Messages() {
             msg: AES.encrypt(msg, chatId).toString(),
             sentAt: sentAt.toISOString(),
             attachments: attachmentIds,
-            reactions: [],
+            reactions: {},
         };
 
         // Optimistically update the UI with the new message and attachments
@@ -499,6 +499,7 @@ export default function Messages() {
         let updatedMessage = {};
         // Prepare the updated reactions
         const messagesCopy = messages.map((messageComponent) => {
+            console.log("HELLLO WE ARE DOING DA MAPPING", messageComponent)
             if (messageComponent.props.messageId === messageId) {
                 const currentReactions = messageComponent.props.reactions || {};
                 updatedReactions = { ...currentReactions };
@@ -531,6 +532,7 @@ export default function Messages() {
         if (sockCli.current) {
             let sentAt = new Date();
             updatedMessage = {
+                
                 chat: chatId,
                 sentAt: sentAt.toISOString(),
                 id: updatedMessage.messageId,

@@ -10,7 +10,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import { useTTS } from "@/app/utils/tts/TTSContext";
 import "@/app/utils/i18n"
 import { useTranslation } from 'next-i18next';
-
+import { set } from 'react-hook-form';
 export default function MessageBox({ onSendMessage, replyTo, onReply }) {
   const { t } = useTranslation('msg_box');
   const { speak, stop, isTTSEnabled } = useTTS();
@@ -28,6 +28,8 @@ export default function MessageBox({ onSendMessage, replyTo, onReply }) {
 
     if (!message.trim()) {
       toast.error("Cannot send an empty message.");
+      setMessage('');
+      setAttachments([]);
       return;
     }
 
@@ -53,6 +55,7 @@ export default function MessageBox({ onSendMessage, replyTo, onReply }) {
     onSendMessage(message, attachmentsAsBase64);
     setMessage('');
     setAttachments([]);
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleCancelReply = () => {
@@ -73,7 +76,9 @@ export default function MessageBox({ onSendMessage, replyTo, onReply }) {
   };
 
   const handleAttachmentChange = (event) => {
-    setAttachments(Array.from(event.target.files));
+    if (event.target.files.length > 0) {
+      setAttachments(Array.from(event.target.files));
+    }
   };
 
   const handleEmojiPickerOpen = () => {
