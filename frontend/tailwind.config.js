@@ -8,12 +8,14 @@ module.exports = {
     ],
     // darkMode: 'class',
     theme: {
-        extend: {
             screens: {
-                'xxs': '450px', // min-width
-                'xsm': '650px',
+                'xs': '450px',
+                'sm': '640px',
+                'md': '768px',
+                'lg': '1024px',
+                'xl': '1280px',
+                '2xl': '1536px'
             },
-        },
         fontFamily: {
             sans: ['var(--font-poppins)']
         },
@@ -55,4 +57,4 @@ module.exports = {
         require('tailwind-scrollbar')
 
     ],
-};
+}

@@ -3,11 +3,16 @@ import axios from 'axios';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
 import QueryBuilderIcon from '@mui/icons-material/QueryBuilder';
 import { IconButton, Button } from '@mui/material';
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
+import { useTranslation } from 'next-i18next';
 
 const fb = require('_firebase/firebase');
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
 const LeaderboardNavbar = ({ user }) => {
+    const { t } = useTranslation('leaderboard');
+    const { speak, stop, isTTSEnabled } = useTTS();
     const [showAnimation, setShowAnimation] = useState(false);
     const [leaderboardData, setLeaderboardData] = useState({
         remainingDays: 2,
@@ -55,7 +60,10 @@ const LeaderboardNavbar = ({ user }) => {
             }`}
             style={{ transformOrigin: 'top' }}
         >
-            <div className="text-xl text-center mb-4 font-poppins">League Leaderboard</div>
+            <div className="text-xl text-center mb-4 font-poppins" 
+            onMouseEnter={() => isTTSEnabled && speak("League Leaderboard")}
+            onMouseLeave={stop}
+            >{t('leaderboard')}</div>
 
             {/* Rest of the component remains unchanged */}
 
@@ -64,18 +72,24 @@ const LeaderboardNavbar = ({ user }) => {
                 {leaderboardData.teams.slice(0, showMore ? 10 : 3).map((entry) => (
                     <div className="flex justify-between items-center py-2" key={entry.rank}>
                         <div className="flex items-center justify-center">
-                            <span className="text-primary text-xl bg-basicallylight rounded-full w-8 h-8 flex items-center justify-center font-bold">
+                            <span className="text-primary text-xl bg-basicallylight rounded-full w-8 h-8 flex items-center justify-center font-bold"
+                                onMouseEnter={() => speak(`Rank number ${entry.rank}`)}
+                                onMouseLeave={stop}>
                                 {entry.rank}
                             </span>
-                            <span className="ml-2">{entry.displayName}</span>
+                            <span className="ml-2" onMouseEnter={() => speak(`Team ${entry.displayName}`)}
+                                onMouseLeave={stop}>{entry.displayName}</span>
                         </div>
-                        <div className="text-lg">{entry.xp} XP</div>
+                        <div className="text-lg" onMouseEnter={() => speak(`${entry.xp} XP`)}
+                                onMouseLeave={stop}>{entry.xp} XP</div>
                     </div>
                 ))}
                 {leaderboardData.teams.length > 3 && ( // Only show if there are more than 3 teams
                     <div className="text-center mt-4">
-                        <Button sx={{color:'white'}} variant="text" onClick={handleViewMore}>
-                            {showMore ? 'View Less' : 'View More'}
+                        <Button sx={{color:'white'}} variant="text" onClick={handleViewMore}
+                        onMouseEnter={() => isTTSEnabled && speak(showMore ? 'View Less' : 'View More')}
+                        onMouseLeave={stop}>
+                            {showMore ? t('view_less') : t('view_more')}
                         </Button>
                     </div>
                 )}

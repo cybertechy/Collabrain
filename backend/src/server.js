@@ -5,6 +5,8 @@ const cors = require("cors");
 const bodyParser = require('body-parser');
 const http = require('http');
 const fb = require('./api/helpers/firebase');
+const dotenv = require('dotenv');
+
 
 // Routes
 const chatRoute = require("./api/routes/Chat");
@@ -19,15 +21,17 @@ const storageRoute = require("./api/routes/Storage");
 const aiRoute = require("./api/routes/AI");
 const statsRoute = require("./api/routes/Stats");
 const twoFARoute = require("./api/routes/twoFA");
+const callRoute = require("./api/routes/Call");
 
 // Helpers
 const sockServer = require("./api/helpers/socket");
 
 // Config
-
+dotenv.config();
 const app = express();
 const port = process.env.PORT || 8080;
 const server = http.createServer(app);
+
 
 // Database usage counter
 let APIUsageCount = fb.getObjectFromRealtimeDB("usageCount").then((data) => { return data || 0; });
@@ -81,6 +85,7 @@ app.use("/api/storage", storageRoute);
 app.use("/api/stats", statsRoute);
 app.use("/api/ai", aiRoute);
 app.use("/api/2FA", twoFARoute);
+app.use("/api/calls", callRoute);
 
 // Endpoint to display DB usage
 app.get("/api/dbUsage", (req, res) => {

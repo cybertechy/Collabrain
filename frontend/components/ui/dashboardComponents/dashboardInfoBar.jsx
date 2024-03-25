@@ -1,9 +1,21 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowCircleUp, ArrowCircleDown, ChevronRight } from '@mui/icons-material';
 import DropdownDashboard from './dropdownDashboard';
-import { useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation'; 
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
+import { useTranslation } from 'next-i18next';
 import axios from 'axios';
 const DashboardInfoBar = ({ currentPath, onSort, sortCriteria, moveProjectToPath }) => {
+  const { speak, stop, isTTSEnabled } = useTTS();
+  const { t } = useTranslation('dashboard');
+
+  useEffect(() => {
+    import('jquery').then(jQuery => {
+        window.jQuery = window.$ = jQuery.default;
+        require('../../../app/utils/tts/articulate');
+    });
+}, []);
   const router = useRouter();
 
   const toggleAscending = () => {
@@ -39,7 +51,7 @@ const DashboardInfoBar = ({ currentPath, onSort, sortCriteria, moveProjectToPath
     e.stopPropagation();
 
     const projectId = e.dataTransfer.getData("projectId");
-    const type = e.dataTransfer.getData("type") === "Content Map" ? "contentMap": "documents";
+    const type = e.dataTransfer.getData("type") === "Content Map" ? "contentMap": "document";
     if (projectId) {
       if(index === 0 ){
         moveProjectToPath(projectId, "/", type);
@@ -60,13 +72,17 @@ const DashboardInfoBar = ({ currentPath, onSort, sortCriteria, moveProjectToPath
   return (
     <div className="flex items-center justify-between bg-aliceBlue p-4 w-full drop-shadow-md mb-3">
       <div className="flex items-center">
-        {pathParts.map((part, index) => (
+
+      {pathParts.map((part, index) => (
           <React.Fragment key={index}>
             <p
-              className='text-xl font-bold font-poppins text-primary cursor-pointer underline'
+              // className='text-xl font-bold font-poppins text-primary cursor-pointer underline'
+              className='text-sm xs:text-xl font-bold font-poppins text-primary cursor-pointer underline'
               onClick={() => navigateToPath(part, index)}
+              onMouseEnter={() => isTTSEnabled && speak(part)}
+              onMouseLeave={stop}
               onDragOver={handleDragOver}
-            onDrop={(e) => handleDrop(e, part, index)}
+              onDrop={(e) => handleDrop(e, part, index)}
             >
               {part}
             </p>
@@ -75,17 +91,25 @@ const DashboardInfoBar = ({ currentPath, onSort, sortCriteria, moveProjectToPath
         ))}
       </div>
       <div className="flex items-center">
-        <DropdownDashboard
-          title={sortCriteria ? (sortCriteria.sortName ? "Name" : "Date Modified") : "Sort By"}
+      <DropdownDashboard
+          title={sortCriteria ? (sortCriteria.sortName ? t('sort_name') : t('sort_date')) : t('sort_by')}
           items={[
-            { name: "Name", onClick: () => toggleSortOrder('name') },
-            { name: "Date Modified", onClick: () => toggleSortOrder('date') },
+            { name: t('sort_name'), onClick: () => toggleSortOrder('name'), onMouseEnter: () => isTTSEnabled && speak("Sort by name"),
+            onMouseLeave: stop, },
+            { name: t('sort_date'), onClick: () => toggleSortOrder('date'), onMouseEnter: () => isTTSEnabled && speak("Sort by date modified"),
+            onMouseLeave: stop, },
           ]}
+          speak={speak}
+          stop={stop}
+          onMouseEnterTitle={() => isTTSEnabled && speak(sortCriteria.sortName ? "Sort files. Currently sorted by name." : "Sort files. Currently sorted by date modified.")}
+          onMouseLeaveTitle={stop}
         />
         {sortCriteria.isAscending ? (
-          <ArrowCircleUp className="text-primary cursor-pointer" fontSize="large" onClick={toggleAscending} />
+          <ArrowCircleUp className="text-primary cursor-pointer" fontSize="large" onClick={toggleAscending}
+          onMouseEnter={() => isTTSEnabled && speak("Ascending Order")} onMouseLeave={stop}/>
         ) : (
-          <ArrowCircleDown className="text-primary cursor-pointer" fontSize="large" onClick={toggleAscending} />
+          <ArrowCircleDown className="text-primary cursor-pointer" fontSize="large" onClick={toggleAscending}
+          onMouseEnter={() => isTTSEnabled && speak("Descending Order")} onMouseLeave={stop}/>
         )}
       </div>
     </div>

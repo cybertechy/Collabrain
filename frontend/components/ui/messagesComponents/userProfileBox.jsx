@@ -6,8 +6,10 @@ import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import MicOffIcon from '@mui/icons-material/MicOff';
 import MicIcon from '@mui/icons-material/Mic';
 import CustomAvatar from './avatar';
+import { useTTS } from "../../../app/utils/tts/TTSContext";
 
 const userProfileBox = ({ userData, onMute, onDeafen, onSettings }) => {
+    const { speak, stop, isTTSEnabled } = useTTS();
     const [isMuted, setIsMuted] = useState(false);
     const [isDeafened, setIsDeafened] = useState(false);
     const [displayName, setDisplayName] = useState("User");
@@ -27,23 +29,31 @@ const userProfileBox = ({ userData, onMute, onDeafen, onSettings }) => {
         onDeafen();
     };
 
+    const handleHover = () => {
+        if (isTTSEnabled) {
+            speak(`My username is ${displayName}`);
+        }
+    };
+
+    const handleLeave = () => {
+        stop();
+    };
+
+    const formatDisplayName = (name) => {
+        if (name.length > 14) {
+            return name.substring(0, 11) + '...';
+        }
+        return name;
+    };
+
     return (
         <div className="bg-primary w-full text-white p-4 flex flex-col h-full items-center shadow-xl rounded-t-lg">
-            <div className="flex items-center flex-row mt-2 space-x-2">
+            <div className="flex items-center flex-row mt-2 space-x-2 ">
                 <CustomAvatar username={displayName} />
-                <span className="font-semibold">{displayName}</span>
+                <span className="font-semibold"
+                onMouseEnter={handleHover} onMouseLeave={handleLeave}>{formatDisplayName(displayName)}</span>
             </div>
-            <div className="flex mt-4 space-x-2">
-                <IconButton onClick={handleMute} className="hover:bg-primary-dark rounded-full">
-                    {isMuted ? <MicOffIcon className="text-white" /> : <MicIcon className="text-white" />}
-                </IconButton>
-                <IconButton onClick={handleDeafen} className="hover:bg-primary-dark rounded-full">
-                    {isDeafened ? <VolumeOffIcon className="text-white" /> : <VolumeUpIcon className="text-white" />}
-                </IconButton>
-                <IconButton onClick={onSettings} className="hover:bg-primary-dark rounded-full">
-                    <SettingsIcon className="text-white" />
-                </IconButton>
-            </div>
+ 
         </div>
     );
 };

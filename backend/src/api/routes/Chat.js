@@ -19,16 +19,14 @@ router.post("/", async (req, res) =>
 	if (!user)
 		return res.status(401).json({ error: "Unauthorized" });
 
+	//Check if chat already exists
+	if (!chatRef.empty) return res.status(400).json({ error: "Chat already exists" });
+
 	// Create new chat
 	let members = req.body.members?.concat(user.uid);
 
-	if(!members) return res.status(400).json({ error: "Missing required data" });
+	if (!members) return res.status(400).json({ error: "Missing required data" });
 	if (members?.length < 2) return res.status(400).json({ error: "Not enough members" });
-
-	//Check if chat already exists
-	let chatRef = await fb.db.collection("chats").where("members", "==", members).get();
-	console.log(chatRef.empty);
-	if (!chatRef.empty) return res.status(400).json({ error: "Chat already exists" });
 
 	let ref = await fb.db.collection("chats").add({
 		members,
@@ -37,7 +35,7 @@ router.post("/", async (req, res) =>
 	// Add chat to each member's chats
 	members.forEach(async (member) =>
 	{
-		
+
 		let status = await fb.db.doc(`users/${member}`).update({
 			chats: fb.admin.firestore.FieldValue.arrayUnion(ref.id)
 		});
@@ -49,69 +47,74 @@ router.post("/", async (req, res) =>
 });
 
 /* Endpoint for retrieving all chats a user is part of */
-router.get("/", async (req, res) => {
-    // Make sure all required fields are present
-    if (!req.headers.authorization)
-        return res.status(400).json({ error: "Missing required data" });
+router.get("/", async (req, res) =>
+{
+	// Make sure all required fields are present
+	if (!req.headers.authorization)
+		return res.status(400).json({ error: "Missing required data" });
 
-    // verify token
-    let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
-    if (!user)
-        return res.status(401).json({ error: "Unauthorized" });
+	// verify token
+	let user = await fb.verifyUser(req.headers.authorization.split(" ")[1]); // Get token from header
+	if (!user)
+		return res.status(401).json({ error: "Unauthorized" });
 
-    // get chats from users
-    let userRef = await fb.db.doc(`users/${user.uid}`).get();
-    if (!userRef?.data()?.chats)
-        return res.status(200).json({ message: "No chats" });
+	// get chats from users
+	let userRef = await fb.db.doc(`users/${user.uid}`).get();
+	if (!userRef?.data()?.chats)
+		return res.status(200).json({ message: "No chats" });
 
-    //get the chats info
-    let chats = userRef.data().chats;
+	//get the chats info
+	let chats = userRef.data().chats;
 	let chatsLength = chats.length;
 	let result = [];
 
-    for(let i=0; i<chatsLength; i++){
-        // get chat info
+	for (let i = 0; i < chatsLength; i++)
+	{
+		// get chat info
 		let chatId = chats[i];
-        let chatRef = await fb.db.doc(`chats/${chatId}`).get();
-		
-		if (!chatRef.data()?.members) {
-			console.log("ChatID: ",chatId,"Chat has no members");
+		let chatRef = await fb.db.doc(`chats/${chatId}`).get();
+
+		if (!chatRef.data()?.members)
+		{
+			console.log("ChatID: ", chatId, "Chat has no members");
 			continue;
 		}
-        
-		result.push({id: chatId, ...chatRef.data()});
-	
-        // get chat members info
-		
 
-        let members = [];
-        await Promise.all(chatRef.data().members.map(async member => {
-			if(member === user.uid) return; // Skip the user themselves
-            let memberRef = await fb.db.doc(`users/${member}`).get();
-            // Prepend the user themselves to the members list if it's their ID
-            let memberData = { id: member, username: memberRef.data().username, email: memberRef.data().email, fname: memberRef.data().fname, lname: memberRef.data().lname };
-            
+		result.push({ id: chatId, ...chatRef.data() });
+
+		// get chat members info
+
+
+		let members = [];
+		await Promise.all(chatRef.data().members.map(async member =>
+		{
+			if (member === user.uid) return; // Skip the user themselves
+			let memberRef = await fb.db.doc(`users/${member}`).get();
+			// Prepend the user themselves to the members list if it's their ID
+			let memberData = { id: member, username: memberRef.data().username, email: memberRef.data().email, fname: memberRef.data().fname, lname: memberRef.data().lname };
+
 			if (member === user.uid) members.unshift(memberData); // Prepend the user themselves
-			else members.push(memberData);  
-        }));
+			else members.push(memberData);
+		}));
 
 		// add the current user to the members list
 		members.unshift({ id: user.uid, username: userRef.data().username, email: userRef.data().email, fname: userRef.data().fname, lname: userRef.data().lname });
-        result[result.length-1].members = members;
-	
-        // also get the last message
-        let lastMessage = await fb.db.collection(`chats/${chatId}/messages`).orderBy("sentAt", "desc").limit(1).get();	
-        if (lastMessage.size > 0) {
-            result[result.length-1].lastMessage =  lastMessage.docs[0].data();
-			result[result.length-1].lastMessage.id = lastMessage.docs[0].id;
+		result[result.length - 1].members = members;
+
+		// also get the last message
+		let lastMessage = await fb.db.collection(`chats/${chatId}/messages`).orderBy("sentAt", "desc").limit(1).get();
+		if (lastMessage.size > 0)
+		{
+			result[result.length - 1].lastMessage = lastMessage.docs[0].data();
+			result[result.length - 1].lastMessage.id = lastMessage.docs[0].id;
 		}
-        else
-            result[result.length-1].lastMessage = {};	
-    }
+		else
+			result[result.length - 1].lastMessage = {};
+	}
 
 	res.setHeader('Content-Type', 'application/json');
 	res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate');
-    return res.status(200).json(result);
+	return res.status(200).json(result);
 });
 
 
@@ -134,7 +137,7 @@ router.post("/:chat/members", async (req, res) =>
 		return res.status(401).json({ error: "Unauthorized" });
 
 	// Add members to chat
-	
+
 	let status = await fb.db.doc(`chats/${req.params.chat}`).update({
 		members: fb.admin.firestore.FieldValue.arrayUnion(...req.body.members)
 	});
@@ -205,11 +208,11 @@ router.get("/:chat/messages", async (req, res) =>
 
 	// Get messages
 	fb.db.collection(`chats/${req.params.chat}/messages`)
-		.orderBy("sentAt","desc").limit(100).get()
+		.orderBy("sentAt", "desc").limit(100).get()
 		.then(snapshot =>
 		{
 			let messages = [];
-			snapshot.forEach(doc => messages.push({... doc.data(), id: doc.id}));
+			snapshot.forEach(doc => messages.push({ ...doc.data(), id: doc.id }));
 			messages.reverse();
 			return res.status(200).json(messages);
 		})
@@ -240,8 +243,8 @@ router.patch("/:chat/messages/:message", async (req, res) =>
 
 	// Update message
 	fb.db.doc(`chats/messages/${req.params.message}`).update({
-		message: (req.body.message)? req.body.message : message.data().message,
-		reactions: (req.body.reactions)? req.body.reactions : message.data().reactions,
+		message: (req.body.message) ? req.body.message : message.data().message,
+		reactions: (req.body.reactions) ? req.body.reactions : message.data().reactions,
 		edited: true
 	})
 		.catch(err => { return res.status(500).json({ error: err }); });

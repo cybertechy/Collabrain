@@ -152,6 +152,10 @@ router.patch("/", async (req, res) => {
 		req.body.lowUsername = req.body.username.toLowerCase();
 	}
 
+	if(req.body.fname || req.body.lname){
+		fb.updateUser(user.uid, { displayName: req.body.fname + " " + req.body.lname });
+	}
+
 	if(req.body.photo && req.body.type){
 		// get current photo
 		let userRef = await fb.db.doc(`users/${user.uid}`).get();

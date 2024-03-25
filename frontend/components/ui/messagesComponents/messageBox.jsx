@@ -7,8 +7,13 @@ import EmojiPicker from '@/components/ui/messagesComponents/EmojiPicker';
 import Popover from '@mui/material/Popover';
 import CloseIcon from '@mui/icons-material/Close';
 import { ToastContainer, toast } from 'react-toastify';
-
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
+import { useTranslation } from 'next-i18next';
+import { set } from 'react-hook-form';
 export default function MessageBox({ onSendMessage, replyTo, onReply }) {
+  const { t } = useTranslation('msg_box');
+  const { speak, stop, isTTSEnabled } = useTTS();
   const [message, setMessage] = useState('');
   const [attachments, setAttachments] = useState([]);
   const [emojiPickerAnchorEl, setEmojiPickerAnchorEl] = useState(null);
@@ -23,6 +28,8 @@ export default function MessageBox({ onSendMessage, replyTo, onReply }) {
 
     if (!message.trim()) {
       toast.error("Cannot send an empty message.");
+      setMessage('');
+      setAttachments([]);
       return;
     }
 
@@ -48,6 +55,7 @@ export default function MessageBox({ onSendMessage, replyTo, onReply }) {
     onSendMessage(message, attachmentsAsBase64);
     setMessage('');
     setAttachments([]);
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleCancelReply = () => {
@@ -68,7 +76,9 @@ export default function MessageBox({ onSendMessage, replyTo, onReply }) {
   };
 
   const handleAttachmentChange = (event) => {
-    setAttachments(Array.from(event.target.files));
+    if (event.target.files.length > 0) {
+      setAttachments(Array.from(event.target.files));
+    }
   };
 
   const handleEmojiPickerOpen = () => {
@@ -93,7 +103,7 @@ export default function MessageBox({ onSendMessage, replyTo, onReply }) {
   };
 
   return (
-    <form onSubmit={onSubmit} className="flex items-center rounded-lg w-full p-3 mx-5 bg-[#30475E] relative">
+    <form onSubmit={onSubmit} className="flex items-center rounded-lg w-full p-2 mx-1 bg-[#30475E] relative">
       <ToastContainer />
       {replyTo && (
         <div className="flex items-center justify-between p-2 rounded-lg bg-[#406882] text-white">
@@ -103,10 +113,12 @@ export default function MessageBox({ onSendMessage, replyTo, onReply }) {
           </IconButton>
         </div>
       )}
-      <IconButton ref={emojiButtonRef} onClick={handleEmojiPickerOpen} size="small" className="absolute left-4 z-10 text-white">
+      <IconButton ref={emojiButtonRef} onClick={handleEmojiPickerOpen} size="small" className="absolute left-4 z-10 text-white"
+      onMouseEnter={() => isTTSEnabled && speak("Choose Emoji button")} onMouseLeave={stop}>
         <EmojiEmotionsIcon className='text-basicallylight' />
       </IconButton>
-      <IconButton size="small" className="absolute left-12 z-10 text-white" onClick={() => fileInputRef.current.click()}>
+      <IconButton size="small" className="absolute left-12 z-10 text-white" onClick={() => fileInputRef.current.click()}
+      onMouseEnter={() => isTTSEnabled && speak("Attach Files button")} onMouseLeave={stop}>
         <AttachFileIcon className='text-basicallylight' />
         <input
           type="file"
@@ -121,14 +133,17 @@ export default function MessageBox({ onSendMessage, replyTo, onReply }) {
         onChange={(e) => setMessage(e.target.value)} 
         ref={inputMsg} 
         className="flex-1 bg-transparent p-4 pl-20 pr-40 text-white placeholder-white outline-none border-none" 
-        placeholder="Enter a Message..." 
+        placeholder={t('enter_msg')}
+        onMouseEnter={() => isTTSEnabled && speak("Type your message here")}
+        onMouseLeave={stop}
       />
       {attachments.length > 0 && (
         <span className="absolute right-20 z-10 text-white text-sm">
-          {attachments.length} file(s) attached
+          {attachments.length} {t('files_attached')}
         </span>
       )}
-      <IconButton type="submit" size="small" className="absolute right-4 z-10 text-white">
+      <IconButton type="submit" size="small" className="absolute right-4 z-10 text-white"
+      onMouseEnter={() => isTTSEnabled && speak("Send Message button")} onMouseLeave={stop}>
         <SendIcon className='text-basicallylight'/>
       </IconButton>
       <Popover

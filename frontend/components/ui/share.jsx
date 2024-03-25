@@ -191,7 +191,7 @@ const share = ({ contentMapName = "Content Map", sData, setShare, isOwner, updat
                         </div>
                     </div>
 
-                    {shareData[key].role === "owner" ? <p>Owner</p> : <select onChange={(e) => setPermission(key, e.target.value,shareData[key]?.type)} value={shareData[key].role === "edit" ? "Edit" : "View"} disabled={!isOwner} className="outline-none bg-none p-2 rounded-lg bg-inherit text-sm">
+                    {shareData[key].role === "owner" ? <p>Owner</p> : <select onChange={(e) => setPermission(key, e.target.value,shareData[key]?.type)} value={shareData[key].role === "edit" ? "Edit" : "View"} disabled={!isOwner} className="outline-none bg-none p-2 rounded-lg bg-inherit text-sm w-[5vw]">
                         <option >View</option>
                         <option>Edit</option>
                         {/*Add divider to show this is a special operation*/}

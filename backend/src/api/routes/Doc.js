@@ -45,7 +45,7 @@ router.post('/', async (req, res) =>
 		data: dataId,
 		createdAt: fb.admin.firestore.FieldValue.serverTimestamp(),
 		updatedAt: fb.admin.firestore.FieldValue.serverTimestamp(),
-		access: {
+		Access: {
 			[user.uid]: {
 				role: roles.owner,
 				type: "users",
@@ -60,20 +60,23 @@ router.post('/', async (req, res) =>
 	let docRef = await fb.db.collection(`documents`).add(doc);
 
 	// Add document to user
-	if(req.body.path==="/") {
+	if (req.body.path === "/")
+	{
 		userRef.update({
 			documents: fb.admin.firestore.FieldValue.arrayUnion(docRef.id)
-		})
-	} else {
+		});
+	} else
+	{
 		// Get the folder of the user
 		let folderRef = await userRef.collection("folders").where("path", "==", req.body.path).get();
 
-		if(folderRef?.empty) {
+		if (folderRef?.empty)
+		{
 			return res.status(500).json({ error: "Failed to create document" });
 		}
 
 		let folder = folderRef.docs[0].data();
-		if(!folder?.documents) return res.status(500).json({ code: 500, error: "Critical Server Error" });
+		if (!folder?.documents) return res.status(500).json({ code: 500, error: "Critical Server Error" });
 
 		let documents = folder.documents || [];
 		documents.push(docRef.id);
@@ -125,9 +128,32 @@ router.get('/:id', async (req, res) =>
 		return res.status(401).json({ error: "Unauthorized" });
 
 	// Check if user has access to document
-	const userRef = await fb.db.doc(`users/${user.uid}`).get();
-	if (!userRef.data().documents.includes(req.params.id))
-		return res.status(400).json({ error: "No Access" });
+	let docRef = fb.db.doc(`documents/${req.params.id}`);
+	let docData = await docRef.get();
+	if (!docData.data())
+		return res.status(401).json({ error: "No Access" });
+
+	let userAccess = false;
+	if (!docData.data()?.Access[user.uid]) userAccess = false;
+	else userAccess = true;
+
+	if (!userAccess)
+	{
+		for (const [key, value] of Object.entries(docData.data().Access))
+		{
+			if (value.type !== "teams") continue;
+			if (value.members.includes(user.uid))
+			{
+				userAccess = true;
+				break;
+			}
+		}
+	}
+
+	if (!userAccess)
+		return res.status(401).json({ error: "Unauthorized access" });
+
+	// Get document
 
 	try
 	{
@@ -213,12 +239,156 @@ router.patch('/:id', async (req, res) =>
 				return res.status(401).json({ error: "Unauthorized" });
 
 			// Update document
-			docRef.update()
+			let updateData = {};
+			if (req.body.name) updateData.name = req.body.name;
+			if (req.body.path) updateData.path = req.body.path;
+			if (req.body.access) updateData.access = req.body.access;
+
+			updateData.updatedAt = fb.admin.firestore.FieldValue.serverTimestamp();
+			docRef.update(updateData)
 				.then(() => { res.status(200).json({ message: "Document updated" }); })
 				.catch((error) => { throw error; });
 		})
 		.catch((error) => { res.status(500).json({ error: "Failed to update document" }); });
 
+});
+
+/* Update a document of a user for sharing */
+router.put("/:id", async (req, res) =>
+{
+	if (!req.headers.authorization || !req.body) return res.status(400).json({ code: 400, error: "Missing token or data" });
+
+	// Check if the data exists
+	let token = req.headers.authorization.split(' ')[1];
+	if (!token) return res.status(400).json({ code: 400, error: "Missing token" });
+
+	//verify user
+	const user = await fb.verifyUser(token);
+	if (!user) return res.status(403).json({ code: 403, error: "Invalid token" });
+
+	const db = fb.admin.firestore();
+
+	const document = await db.collection("documents").doc(req.params.id).get();
+	if (!document.exists) return res.status(404).json({ code: 404, error: "Document not found" });
+
+
+	let docData = document.data();
+	//check if user has access to the content map
+	let Access = null;
+	let userRole = null;
+	if (!docData.Access[user.uid])
+	{
+
+		// check if the user exists in the team members list
+		for (const [key, value] of Object.entries(docData.Access))
+		{
+			if (value.type !== "teams") continue;
+			if (value.members.includes(user.uid))
+			{
+				Access = "team";
+				userRole = value.role;
+				break;
+			}
+		}
+	} else
+	{
+		Access = "user";
+		userRole = docData.Access[user.uid].role;
+	}
+
+	if (!Access) return res.status(403).json({ code: "AM109", error: "Access Denied" });
+
+	let updatedDocument = { ...docData };
+
+	if (userRole === "read") return res.status(403).json({ code: 403, error: "User does not have access to the operation" });
+
+	if (req.body.data && (userRole === "owner" || userRole === "edit"))
+	{
+
+
+		// check if the data is uuid else generate new uuid
+		if (uuid.validate(docData.data)) updatedDocument.data = docData.data;
+		else updatedDocument.data = uuid.v4();
+
+		// upload data to oracle cloud
+		const uploadData = await oci.addData("B3", docData.data, "application/json", JSON.stringify(req.body.data));
+
+
+		if (!uploadData.eTag)
+		{
+			return res.status(500).json({ code: 500, error: "Uploading data failed" });
+		}
+	}
+
+	if (userRole === "owner")
+	{
+
+		if (req.body.name) updatedDocument.name = req.body.name;
+
+		if (req.body.path) updatedDocument.path = req.body.path;
+
+		// Revoke/grant access
+		if (req.body.access && req.body.user && (req.body.revokeAccess === true || req.body.revokeAccess === false))
+		{
+			updatedDocument.Access = req.body.access;
+
+			if (req.body.revokeAccess)
+			{
+				fb.db.collection("users").doc(req.body.user).update({
+					AccessDocuments: fb.admin.firestore.FieldValue.arrayRemove(req.params.id)
+				});
+			} else
+			{
+				fb.db.collection("users").doc(req.body.user).update({
+					AccessDocuments: fb.admin.firestore.FieldValue.arrayUnion(req.params.id)
+				});
+			}
+		}
+
+		if (req.body.access && req.body.team && (req.body.revokeAccess === true || req.body.revokeAccess === false))
+		{
+			// Get the members of the team
+			let team = await fb.db.collection("teams").doc(req.body.team).get();
+			let members = Object.keys(team.data().members);
+
+			// Grant access to the team members
+			if (req.body.revokeAccess)
+			{
+				fb.db.collection("teams").doc(req.body.team).update({
+					teamDocAccess: fb.admin.firestore.FieldValue.arrayRemove({
+						documentId: req.params.id,
+						contentMapName: docData.name,
+						type: "document"
+					})
+				});
+			} else
+			{
+				fb.db.collection("teams").doc(req.body.team).update({
+					teamDocAccess: fb.admin.firestore.FieldValue.arrayUnion({
+						documentId: req.params.id,
+						contentMapName: docData.name,
+						type: "document"
+					})
+				});
+				req.body.access[req.body.team].members = members;
+			}
+
+			updatedDocument.Access = req.body.access;
+		}
+
+		// Set public access
+		if ("public" in req.body)
+		{
+			updatedDocument.public = req.body.public;
+		}
+	}
+
+	updatedDocument.updatedAt = fb.admin.firestore.FieldValue.serverTimestamp();
+
+	//set updated content map
+	await db.collection("documents").doc(req.params.id).set(updatedDocument);
+
+	return res.status(200).json({ code: 200, id: req.params.id });
 });
 
 /************************************************************/
@@ -245,7 +415,7 @@ router.post('/:id/share/:user', async (req, res) =>
 			if (doc.data().access[user.uid].role !== roles.owner)
 				return res.status(401).json({ error: "Unauthorized" });
 
-			let userRef = fb.db.doc(`users/${req.params.user}`)
+			let userRef = fb.db.doc(`users/${req.params.user}`);
 			let userData = (await userRef.get()).data();
 
 			// Add document to user
@@ -253,7 +423,7 @@ router.post('/:id/share/:user', async (req, res) =>
 				AccessDocuments: fb.admin.firestore.FieldValue.arrayUnion(req.params.id)
 			})
 				.then(() =>
-				{ 
+				{
 					// Add user to document
 					docRef.update({
 						[`access.${req.params.user}`]: {

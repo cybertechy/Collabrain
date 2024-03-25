@@ -26,10 +26,18 @@ import EditIcon from '@mui/icons-material/Edit';
 import axios from 'axios';
 import { useAuthState } from '_firebase/firebase';
 import CustomAvatar from './avatar';
+import "@/app/utils/i18n"
+import { useTranslation } from 'next-i18next';
+import { useTTS } from "@/app/utils/tts/TTSContext";
 import { updateFriendAlias,blockUser } from '@/app/utils/user';
+const fb = require("_firebase/firebase");
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
+import { unblockUser } from '@/app/utils/user';
 
-const FriendTile = ({ friendData, openChat, setRefreshList , userInfo, handleAliasUpdate}) => {
+import { ToastContainer, toast } from "react-toastify";
+const FriendTile = ({ friendData, openChat, setRefreshList , userInfo,id, handleAliasUpdate, handleChatUpdate}) => {
+  const { t } = useTranslation('dms');
+  const { speak, stop, isTTSEnabled } = useTTS();
   const [user, loading] = useAuthState();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
@@ -39,9 +47,9 @@ const FriendTile = ({ friendData, openChat, setRefreshList , userInfo, handleAli
   useEffect(() => {
     // This checks if user and friendData.alias are defined to safely access user.uid
     console.log("Userinfo, ",userInfo);
-    if (user && userInfo.alias && userInfo.alias[friendData.id]) {
+    if (user && userInfo.aliases && userInfo.aliases[friendData.id]) {
     
-      setAlias(userInfo.alias[friendData.id]);
+      setAlias(userInfo.aliases[friendData.id]);
     } else {
       setAlias('');
     }
@@ -55,7 +63,7 @@ const FriendTile = ({ friendData, openChat, setRefreshList , userInfo, handleAli
     setDialogOpen(false);
     setSelectedOption('');
     // Resetting alias to the current value in userInfo
-    setAlias(userInfo?.alias?.[friendData.id] || '');
+    setAlias(userInfo?.aliases?.[friendData.id] || '');
   };
   
   
@@ -64,7 +72,11 @@ const FriendTile = ({ friendData, openChat, setRefreshList , userInfo, handleAli
     setSelectedOption(option);
     console.log("Our user", user);
     console.log('Option selected:', friendData);
-    openDialog();
+    if(option === 'alias'){
+    openDialog();}
+  else if(option === 'block'){
+  handleBlockUser().then(()=>{handleChatUpdate()});
+  ;}
   };
 
   const handleDialogAction = async () => {
@@ -100,8 +112,8 @@ const FriendTile = ({ friendData, openChat, setRefreshList , userInfo, handleAli
           },
         });
   
-        console.log(response.data.message); // Log the response message (e.g., "Chat created")
-  
+        console.log(response.data); // Log the response message (e.g., "Chat created")
+                handleChatUpdate();
         // Handle any UI updates or navigation to the newly created chat here
       } catch (error) {
         console.error('Error creating chat:', error);
@@ -124,7 +136,7 @@ const FriendTile = ({ friendData, openChat, setRefreshList , userInfo, handleAli
         });
   
         console.log(response.data.message); // Log the response message (e.g., "Friend request sent")
-  
+        toast.success("Friend request sent");
        
       } catch (error) {
         console.error("Error sending friend request:", error);
@@ -148,7 +160,8 @@ const FriendTile = ({ friendData, openChat, setRefreshList , userInfo, handleAli
         });
 
         console.log(response.data.message); // Log the response message (e.g., "Friend request accepted")
-        
+        toast.success("Friend request accepted");
+        handleFriendListUpdate();
         // Handle any UI updates or state changes here, such as changing the friend's listType to 'accepted'
       } catch (error) {
         console.error("Error accepting friend request:", error);
@@ -174,7 +187,8 @@ const FriendTile = ({ friendData, openChat, setRefreshList , userInfo, handleAli
         });
 
         console.log(response.data.message); // Log the response message (e.g., "Friend request declined")
-
+        toast.success("Friend request declined");
+        handleFriendListUpdate();
         // Handle any UI updates or state changes here, such as removing the friend request from the list
       } catch (error) {
         console.error("Error declining friend request:", error);
@@ -183,78 +197,69 @@ const FriendTile = ({ friendData, openChat, setRefreshList , userInfo, handleAli
 
     declineFriendRequest(); // Call the function to decline the friend request
   };
-  const renderActionIcons = () => {
-    if (friendData.listType === 'pending') {
-      // Render Tick and Cross for pending friends
-      return (
-        <>
-          <IconButton
-            sx={{
-              bgcolor: 'action.hover',
-              borderRadius: '50%',
-              color: 'green', // Apply green color to CheckCircleIcon
-            }}
-            onClick={handleAcceptFriendRequest}
-          >
-            <CheckCircleIcon />
-          </IconButton>
-          <IconButton
-            sx={{
-              bgcolor: 'action.hover',
-              borderRadius: '50%',
-              marginX: 1,
-              color: 'red', // Apply red color to CancelIcon
-            }}
-            onClick={handleDeclineFriendRequest}
-          >
-            <CancelIcon />
-          </IconButton>
-        </>
-      );
-    } else if (friendData.listType === 'blocked') {
-      // Render nothing for blocked friends
-      return null;
-    } else if (friendData.listType === 'addFriend') {
-      // Render chat and add friend icons for searching users
-      return (
-        <>
-          <IconButton
-            sx={{
-              bgcolor: 'action.hover',
-              borderRadius: '50%',
-              marginX: 1,
-            }}
-            onClick={() => handleChatClick(friendData)}
-          >
-            <ChatBubbleOutlineIcon />
-          </IconButton>
-          <IconButton
-            sx={{
-              bgcolor: 'action.hover',
-              borderRadius: '50%',
-               // Apply blue color to PersonAddIcon
-            }}
-            onClick={() => handleAddFriendClick(friendData)}
-          >
-            <PersonAddIcon /> {/* Use the PersonAddIcon for "add friend" */}
-          </IconButton>
-        </>
-      );
-    } else {
-      // Default rendering for 'all' and other types
-      return (
-        <>
-          <IconButton sx={{ bgcolor: 'action.hover', borderRadius: '50%' }}>
-            <NotificationsNoneIcon />
-          </IconButton>
-          <IconButton sx={{ bgcolor: 'action.hover', borderRadius: '50%', marginX: 1 }}
-            onClick={() => handleChatClick(friendData)}>
-            <ChatBubbleOutlineIcon />
-          </IconButton>
-        </>
-      );
-    }
-  };
+const renderActionIcons = () => {
+  if (friendData.listType === 'blocked') {
+    // Don't render any icons for blocked friends
+    return null;
+  } else if (friendData.listType === 'addFriend') {
+    // Render the chat and add friend icons for users found during search
+    return (
+      <>
+        <IconButton
+          sx={{ bgcolor: 'action.hover', borderRadius: '50%' }}
+          onClick={() => handleChatClick(friendData)}
+        >
+          <ChatBubbleOutlineIcon />
+        </IconButton>
+        <IconButton
+          sx={{ bgcolor: 'action.hover', borderRadius: '50%' }}
+          onClick={handleAddFriendClick}
+        >
+          <PersonAddIcon />
+        </IconButton>
+      </>
+    );
+  } else if (friendData.listType === 'pending') {
+    // Render accept and decline icons for pending friend requests
+    return (
+      <>
+        <IconButton
+          sx={{
+            background: 'success', // Use a theme color for success, adjusts background color to a success context, e.g., green
+          
+            borderRadius: '50%',
+          }}
+          onClick={handleAcceptFriendRequest}
+        >
+          <CheckCircleIcon sx={{ color: '#00FF00' }} /> {/* Adjusts the icon color */}
+        </IconButton>
+        <IconButton
+          sx={{
+            backgroundColor: 'error', // Use a theme color for error, adjusts background color to an error context, e.g., red
+           
+            borderRadius: '50%',
+          }}
+          onClick={handleDeclineFriendRequest}
+        >
+          <CancelIcon sx={{ color: '#FF0000' }} /> {/* Adjusts the icon color */}
+        </IconButton>
+      </>
+    );
+  }
+  // Render default icons for other list types ('all', etc.)
+  return (
+    <>
+      <IconButton sx={{ bgcolor: 'action.hover', borderRadius: '50%' }}>
+        <NotificationsNoneIcon />
+      </IconButton>
+      <IconButton sx={{ bgcolor: 'action.hover', borderRadius: '50%', marginX: 1 }}
+          onClick={() => handleChatClick(friendData)}>
+        <ChatBubbleOutlineIcon />
+      </IconButton>
+    </>
+  );
+};
+
 
 
   const handleClick = (event) => {
@@ -264,11 +269,29 @@ const FriendTile = ({ friendData, openChat, setRefreshList , userInfo, handleAli
   const handleClose = () => {
     setAnchorEl(null);
   };
+  const handleUnblockUser = async () => {
+    // Logic to unblock the user
+    console.log('Unblocking user:', friendData);
+    // Assume you have an unblockUser function similar to blockUser
+    await unblockUser(friendData.id).then(()=>{handleChatUpdate()});;
+    closeDialog();
+  };
 
-  const handleBlockUser = () => {
-    // Add logic to block the user here
-    console.log('Blocking user:', friendData);
-    handleClose();
+  const handleBlockUser = async () => {
+    try {
+        const token = await fb.getToken(); // Make sure this method correctly retrieves the current user's token
+       const response =  await axios.post(`${SERVERLOCATION}/api/users/block/${friendData.id}`, {}, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        console.log('User blocked successfully', response.data);
+        closeDialog();
+    } catch (error) {
+        console.error('Error blocking user:', error.response?.data || error.message);
+        // Optionally, handle errors in the UI here
+    }
   };
 
   const handleSetAlias = () => {
@@ -276,7 +299,24 @@ const FriendTile = ({ friendData, openChat, setRefreshList , userInfo, handleAli
     console.log('Setting alias for user:', friendData);
     handleClose();
   };
-console.log("Friend Data in friend tile" , friendData);
+  console.log("Friend Data in friend tile" , friendData);
+
+  const handleAlias = () => {
+    if (isTTSEnabled) {
+      speak('Set Alias button');
+    }
+  };
+
+  const handleBlock = () => {
+    if (isTTSEnabled) {
+      speak('Block User button');
+    }
+  };
+
+  const handleLeave = () => {
+    stop();
+  };
+
   return (
     <ListItem
       sx={{
@@ -293,13 +333,13 @@ console.log("Friend Data in friend tile" , friendData);
         </ListItemAvatar>
         <ListItemText
   primary={
-    userInfo.data&& userInfo.data.alias && userInfo.data.alias[friendData.id]
-      ? `${userInfo.data.alias[friendData.id]}`
+    userInfo.data&& userInfo.data.aliases && userInfo.data.aliases[friendData.id]
+      ? `${userInfo.data.aliases[friendData.id]}`
       : friendData.username
   }
   secondary={friendData.email}
   primaryTypographyProps={{ color: 'text.primary' }}
-/>
+  />
 
       </Box>
 
@@ -316,42 +356,52 @@ console.log("Friend Data in friend tile" , friendData);
         fullWidth
         maxWidth="xs"
       >
-        <DialogTitle>Select an Option</DialogTitle>
+        <DialogTitle onMouseEnter={() => isTTSEnabled && speak("Select an Option")}
+              onMouseLeave={stop}>{t('friend_settings')}</DialogTitle>
         <DialogContent>
-  {selectedOption === 'alias' ? (
-    <TextField
-      autoFocus
-      margin="dense"
-      id="alias"
-      label="Alias"
-      type="text"
-      fullWidth
-      variant="standard"
-      value={alias}
-      onChange={(e) => setAlias(e.target.value)}
-    />
-  ) : (
-    <List>
-      <ListItem button onClick={() => handleOptionClick('alias')}>
-        <ListItemIcon>
-          <EditIcon />
-        </ListItemIcon>
-        <ListItemText primary="Set Alias" />
-      </ListItem>
-      <ListItem button onClick={() => handleOptionClick('block')}>
-        <ListItemIcon>
-          <BlockIcon />
-        </ListItemIcon>
-        <ListItemText primary="Block User" />
-      </ListItem>
-    </List>
-  )}
-</DialogContent>
+    {friendData.listType === 'blocked' ? (
+        <List>
+            <ListItem button onClick={handleUnblockUser}>
+                <ListItemIcon>
+                    <BlockIcon />
+                </ListItemIcon>
+                <ListItemText primary="Unblock User" />
+            </ListItem>
+        </List>
+    ) : selectedOption === 'alias' ? (
+        <TextField
+            autoFocus
+            margin="dense"
+            id="alias"
+            label="Alias"
+            type="text"
+            fullWidth
+            variant="standard"
+            value={alias}
+            onChange={(e) => setAlias(e.target.value)}
+        />
+    ) : (
+        <List>
+            <ListItem button onClick={() => handleOptionClick('alias')}>
+                <ListItemIcon>
+                    <EditIcon />
+                </ListItemIcon>
+                <ListItemText primary="Set Alias" />
+            </ListItem>
+            <ListItem button onClick={() => handleOptionClick('block')}>
+                <ListItemIcon>
+                    <BlockIcon />
+                </ListItemIcon>
+                <ListItemText primary="Block User" />
+            </ListItem>
+        </List>
+    )}
+  </DialogContent>
 
         <DialogActions>
-          <Button onClick={handleDialogAction} color="primary">
+          {/* <Button onClick={handleDialogAction} color="primary">
             Confirm
-          </Button>
+          </Button> */}
           <Button onClick={closeDialog} color="primary">
             Cancel
           </Button>

@@ -65,6 +65,7 @@ async function getTeamMembers(teamID) {
 			return []; // Return an empty array or null if the team doesn't exist
 		}
 		const teamData = teamDoc.data();
+		teamData.members = Object.keys(teamData.members)
 		return teamData.members || []; // Return members or an empty array if members field is missing
 	} catch (error) {
 		console.error("Error getting team members:", error);
@@ -123,18 +124,35 @@ async function deleteQueryBatch(query, resolve) {
 
 
 async function saveTeamMsg(data, newMessage = false) {
-	let channels = (await db.collection(`teams/${data.team}/channels/`).where("name", "==", data.channel).get());
-	let channelID = channels.docs[0].id;
+	let sentAt = admin.firestore.Timestamp.fromDate(new Date(data.sentAt));
+	let channelQuerySnapshot = await db.collection(`teams/${data.team}/channels/`).where("name", "==", data.channel).get();
+    if (channelQuerySnapshot.empty) {
+        return console.log("Channel not found");
+    }
+
+	
+    let channelID = channelQuerySnapshot.docs[0].id;
 	if(!data.id) return console.log("No message ID provided");
+
+	if (newMessage)
 	db.collection(`teams/${data.team}/channels/${channelID}/messages`)
 		.doc(data.id)
 		.set({
 			"message": data.msg,
 			"sender": data.senderID,
 			"username": data.sender,
-			"sentAt": data.sentAt,
-			"reactions": (data.reactions) ? data.reactions : []
+			"sentAt": sentAt,
+			"attachments":(data.attachments) ? data.attachments : null,
+			"reactions": (data.reactions) ? data.reactions : {}
 		});
+		else{
+			let updateData = {}
+			if(data.msg) updateData.message = data.msg;
+			if(data.attachments) updateData.attachments = data.attachments;
+			if(data.reactions) updateData.reactions = data.reactions;
+			db.collection(`teams/${data.team}/channels/${channelID}/messages`).doc(data.id).update(updateData);
+		}
+	
 
 	if (newMessage) {
 
@@ -400,6 +418,7 @@ async function listenToRealtimeDB(path, callback) {
 
 module.exports = {
 	db,
+	realtimeDB,
 	admin,
 	verifyUser,
 	createDoc,

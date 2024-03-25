@@ -12,10 +12,14 @@ import EditIcon from '@mui/icons-material/Edit';
 import fb from '../../../app/_firebase/firebase';
 import axios from 'axios';
 import {useRouter} from 'next/navigation';
-
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
+import { useTranslation } from 'next-i18next';
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
 const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, handleProjectDeleted}) => {
+    const { t } = useTranslation('dashboard_folder');
+    const { speak, stop, isTTSEnabled } = useTTS();
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
    const router = useRouter();
@@ -40,6 +44,12 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, h
             return title?.substring(0, maxLength - 3) + '..';
         }
         return title;
+    };
+
+    const handleMouseEnter = () => {
+        if (isTTSEnabled) {
+            speak(`Folder named ${title}`);
+        }
     };
     
     //this will only work once there is a patch api endpoint to update the folder name
@@ -115,7 +125,7 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, h
         
     };
     const moveFileToFolder = async (projectId, folderPath, type) => {
-       
+       console.log("projectId", projectId, folderPath, type);
         try {
           const token = await fb.getToken(); // Assuming you have a function to get the user's token
           const response = await axios.patch(
@@ -157,7 +167,7 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, h
       const handleDrop = (e, folderPath) => {
         e.preventDefault();
         const projectId = e.dataTransfer.getData("projectId");
-        const type = e.dataTransfer.getData("type") === "Content Map" ? "contentMap": "documents";
+        const type = e.dataTransfer.getData("type") === "Content Map" ? "contentMap": "document";
         console.log("projectId", e.dataTransfer);
 
         moveFileToFolder(projectId, folderPath, type);
@@ -170,11 +180,14 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, h
     };
     
     const buttonStyles = {
-        color: "#FFFFFF",  // Text color
-        backgroundColor: "#30475E",  // Button background color
+        color: "black",  // Text color
+        
+        borderColor: "black",  // Button background color
     };
    
     return (
+        <div onMouseEnter={handleMouseEnter} 
+        onMouseLeave={stop}>
         <Tooltip title={title} enterDelay={1000} leaveDelay={200} >
             <div>
             <div className="bg-aliceBlue shadow-md  text-primary flex items-center justify-center rounded-md w-min pl-3 hover:bg-columbiablue hover:customShadow duration-300"
@@ -183,8 +196,11 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, h
             onDrop={(e) => handleDrop(e, folder.path)}>
                 <FolderIcon sx={{ color: folder?.color }} fontSize="large" />
 
-                <span className='mx-5 w-24 text-lg font-semibold mr-10'>{truncateTitle(title)}</span>
-                <IconButton onClick={handleClick} color="inherit">
+                {/* <span className='mx-5 w-24 text-lg font-semibold mr-10'>{truncateTitle(title)}</span> */}
+                <span className='ml-5 w-24 text-lg font-semibold sm:mr-10'>{truncateTitle(title)}</span>                
+                <IconButton onClick={handleClick} color="inherit"
+                onMouseEnter={() => isTTSEnabled && speak("Folder options")}
+                onMouseLeave={stop}>
                     <MoreVertIcon fontSize="large" />
                 </IconButton>
                 <Menu
@@ -195,62 +211,85 @@ const DashboardFolder = ({ id, title, folder,  onFolderDeleted, projectUpdate, h
                     'aria-labelledby': 'folder-menu-button',
                 }}
             >
-                <MenuItem onClick={() => {
+                <MenuItem 
+                onMouseEnter={() => isTTSEnabled && speak("Rename button")}
+                onMouseLeave={stop}
+                onClick={() => {
                     handleClose();
                     setRenameOverlayOpen(true);
                 }} className="flex justify-between gap-5 text-tertiary">
                 <EditIcon className="mr-2 text-tertiary flex justify-between gap-5" />
-                    <span className='text-tertiary'>Rename</span>
+                    <span className='text-tertiary'>{t("rename_button")}</span>
                 </MenuItem>
-                <MenuItem onClick={() => {
+                <MenuItem 
+                onMouseEnter={() => isTTSEnabled && speak("Delete button")}
+                onMouseLeave={stop}
+                onClick={() => {
                     handleClose();
                     setDeleteOverlayOpen(true);
                 }} className="flex justify-between gap-5  text-tertiary">
-                <DeleteIcon className='text-tertiary'/> <span className='text-tertiary'>Delete</span> 
+                <DeleteIcon className='text-tertiary'/> <span className='text-tertiary'>{t("delete_button")}</span> 
                 </MenuItem>
             </Menu>
             </div>
               {/* Rename Overlay */}
               <Dialog open={renameOverlayOpen} onClose={() => setRenameOverlayOpen(false)} sx={dialogStyles}>
-  <DialogTitle>Rename Folder</DialogTitle>
+  <DialogTitle
+  onMouseEnter={() => isTTSEnabled && speak("Rename folder")}
+  onMouseLeave={stop}>{t("rename_top")}</DialogTitle>
     <DialogContent>
         <TextField
-            label="New Folder Name"
+            label={t("new_folder_name")}
             variant="outlined"
             fullWidth
             value={newFolderName}
             onChange={(e) => setNewFolderName(e.target.value)}
+            onMouseEnter={() => isTTSEnabled && speak("Type new folder name here")}
+            onMouseLeave={stop}
         />
     </DialogContent>
     <DialogActions>
-    <Button onClick={() => setRenameOverlayOpen(false)} sx={buttonStyles}>
-    Cancel
+    <Button onClick={() => setRenameOverlayOpen(false)} sx={buttonStyles}
+    onMouseEnter={() => isTTSEnabled && speak("Cancel button")}
+    onMouseLeave={stop}>
+    {t("cancel_button")}
         </Button>
-        <Button onClick={handleRename} sx={buttonStyles}>
+        <Button onClick={handleRename} sx={buttonStyles}
+        onMouseEnter={() => isTTSEnabled && speak("Rename button")}
+        onMouseLeave={stop}>
 
-            Rename
+            {t("rename_button")}
         </Button>
     </DialogActions>
 </Dialog>
 
 {/* Delete Confirmation Overlay */}
 <Dialog open={deleteOverlayOpen} onClose={() => setDeleteOverlayOpen(false)} sx={dialogStyles}>
-    <DialogTitle>Confirm Delete</DialogTitle>
-    <DialogContent>
-        Are you sure you want to delete this folder and its contents?
+    <DialogTitle
+    onMouseEnter={() => isTTSEnabled && speak("Confirm deletion")}
+    onMouseLeave={stop}>{t('delete_top')}</DialogTitle>
+    <DialogContent
+    onMouseEnter={() => isTTSEnabled && speak("Are you sure you want to delete this folder and its contents?")}
+    onMouseLeave={stop}>
+        {t('delete_msg')}
     </DialogContent>
     <DialogActions>
-        <Button onClick={() => setDeleteOverlayOpen(false)} sx={buttonStyles}>
-            Cancel
+        <Button onClick={() => setDeleteOverlayOpen(false)} sx={buttonStyles}
+        onMouseEnter={() => isTTSEnabled && speak("Cancel button")}
+        onMouseLeave={stop}>
+            {t('cancel_button')}
         </Button>
-        <Button onClick={handleDelete} sx={buttonStyles}>
-            Delete
+        <Button onClick={handleDelete} sx={buttonStyles}
+        onMouseEnter={() => isTTSEnabled && speak("Delete button")}
+        onMouseLeave={stop}>
+            {t('delete_button')}
         </Button>
     </DialogActions>
 </Dialog>
             </div>
            
         </Tooltip>
+        </div>
     );
 };
 

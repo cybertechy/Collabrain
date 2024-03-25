@@ -32,11 +32,6 @@ router.post("/media/", async (req, res) =>
 
 	const { MIMEtype, data } = req.body;
 
-	// Check if the datatype eixsts and is of image/png or image/jpeg or image/gif
-	if (!MIMEtype || (MIMEtype !== "image/png" && MIMEtype !== "image/jpeg" && MIMEtype !== "image/gif"))
-	{
-		return res.status(400).json({ code: "AM103", error: "Missing or invalid MIMEtype" });
-	}
 
 	// Check if the request has the required data
 	if (!data) return res.status(400).json({ code: "AM104", error: "Missing data" });
@@ -51,7 +46,7 @@ router.post("/media/", async (req, res) =>
 	if (dataInBytes > 10485760) return res.status(400).json({ code: "AM106", error: "Data is too large" });
 
 
-	const bucketName = "B1";
+	const bucketName = (req.query?.team === "true") ? "B2" : "B1";
 
 	// Generate a random filename for the media uuid
 	const fileName = uuid.v4();
@@ -93,8 +88,8 @@ router.get("/media/:mediaId", async (req, res) =>
 	{
 		return res.status(400).json({ code: "GM103", error: "Invalid mediaID" });
 	}
-
-	const bucketName = (req.query?.team === true) ? "B2" : "B1";
+	
+	const bucketName = (req.query?.team === "true") ? "B2" : "B1";
 
 	const response = await ociOjectStorage.getData(bucketName, mediaId);
 
@@ -147,7 +142,7 @@ router.delete("/media/:mediaId", async (req, res) => {
 		return res.status(400).json({ code: "DM103", error: "Invalid mediaID" });
 	}
 
-	const bucketName = "B1";
+	const bucketName = (req.query?.team === "true") ? "B2" : "B1";
 
 	const response = await ociOjectStorage.deleteFile(bucketName, mediaId);
 
