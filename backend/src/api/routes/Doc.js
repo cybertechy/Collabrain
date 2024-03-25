@@ -125,9 +125,27 @@ router.get('/:id', async (req, res) =>
 		return res.status(401).json({ error: "Unauthorized" });
 
 	// Check if user has access to document
-	const userRef = await fb.db.doc(`users/${user.uid}`).get();
-	if (!userRef.data().documents.includes(req.params.id))
-		return res.status(400).json({ error: "No Access" });
+	let docRef = fb.db.doc(`documents/${req.params.id}`);
+	let docData = await docRef.get()
+
+	let userAccess = false;
+	if (!docData.data().access[user.uid]) userAccess = false;
+	else userAccess = true;
+
+	if(!userAccess) {
+		for (const [key, value] of Object.entries(docData.data().access)) {
+            if(value.type !== "teams") continue;
+            if (value.members.includes(user.uid)) {
+                userAccess = true;
+                break;
+            }
+        }
+	}
+
+	if (!userAccess)
+		return res.status(401).json({ error: "Unauthorized" });
+
+	// Get document
 
 	try
 	{
@@ -213,7 +231,13 @@ router.patch('/:id', async (req, res) =>
 				return res.status(401).json({ error: "Unauthorized" });
 
 			// Update document
-			docRef.update()
+			let updateData = {}
+			if (req.body.name) updateData.name = req.body.name;
+			if (req.body.path) updateData.path = req.body.path;
+			if (req.body.access) updateData.access = req.body.access;
+			
+			updateData.updatedAt = fb.admin.firestore.FieldValue.serverTimestamp();
+			docRef.update(updateData)
 				.then(() => { res.status(200).json({ message: "Document updated" }); })
 				.catch((error) => { throw error; });
 		})

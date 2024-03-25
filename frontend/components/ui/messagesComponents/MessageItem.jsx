@@ -13,6 +13,9 @@ import Button from "@mui/material/Button";
 import { getMedia } from "@/app/utils/storage";
 import { reportMessage } from "@/app/utils/messages";
 import { Download } from "lucide-react";
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
+import { useTranslation } from 'next-i18next';
 const commonReactions = [
     { emoji: "👍", label: "thumbs up" },
     { emoji: "👎", label: "thumbs down" },
@@ -40,6 +43,8 @@ function MessageItem({
     source = "user",
     teamId,
 }) {
+    const { t } = useTranslation('msg_item');
+    const { speak, stop, isTTSEnabled } = useTTS();
     const [attachments, setAttachments] = useState([]);
     const [loadingAttachments, setLoadingAttachments] = useState(false);
     const [editMode, setEditMode] = useState(false);
@@ -229,10 +234,12 @@ function MessageItem({
                 <CustomAvatar username={sender} />
                 <div className="flex flex-col">
                     <div className="flex items-baseline gap-2">
-                        <span className="font-semibold">
+                        <span className="font-semibold"  onMouseEnter={() => isTTSEnabled && speak(sender)}
+              onMouseLeave={stop}>
                             {sender}
                         </span>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-gray-500"onMouseEnter={() => isTTSEnabled && speak(timestamp === "Invalid Date" ? "Date not available" : timestamp)}
+                onMouseLeave={stop}>
                             {timestamp == "Invalid Date" ? "" : timestamp}
                         </span>
                     </div>
@@ -259,14 +266,16 @@ function MessageItem({
                                 />
                                 <button
                                     className="ml-2 bg-primary  text-white font-bold py-2 px-4 rounded"
-                                    onClick={handleEditSave}
+                                    onClick={handleEditSave}onMouseEnter={() => isTTSEnabled && speak("Save button")}
+                                    onMouseLeave={stop}
                                 >
-                                    Save
+                                   {t('save')}
                                 </button>
                             </div>
                         ) : (
                             // Message view mode
-                            <p className="whitespace-pre-wrap break-words max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl">
+                            <p className="whitespace-pre-wrap break-words max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl"   onMouseEnter={() => isTTSEnabled && speak(message)}
+                            onMouseLeave={stop}>
                                 {editedMessage || message}
                             </p>
                         )}
@@ -339,6 +348,8 @@ function MessageItem({
                                             : "transparent",
                                     }}
                                     title={reaction.label}
+                                    onMouseEnter={() => isTTSEnabled && speak(`${reaction.label} emoji`)}
+                                    onMouseLeave={stop}
                                 >
                                     <span
                                         className="text-xl"
@@ -364,6 +375,7 @@ function MessageItem({
                                 size="small"
                                 onClick={() => setMenuVisible(!menuVisible)}
                                 title="Options"
+                                onMouseEnter={() => isTTSEnabled && speak("Message Options button")} onMouseLeave={stop}
                             >
                                 <OptionsIcon />
                             </IconButton>
@@ -377,8 +389,9 @@ function MessageItem({
                                                     onClick={() =>
                                                         setEditMode(true)
                                                     }
-                                                >
-                                                    Edit Message
+                                                    onMouseEnter={() => isTTSEnabled && speak("Edit Message button")} onMouseLeave={stop}>{t('edit')}
+                                                
+                                                   
                                                 </li>
                                                 <li
                                                     className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
@@ -387,16 +400,14 @@ function MessageItem({
                                                             true
                                                         )
                                                     }
-                                                >
-                                                    Delete Message
+                                                    onMouseEnter={() => isTTSEnabled && speak("Delete Message button")} onMouseLeave={stop}>{t('delete')}
                                                 </li>
                                             </div>
                                         )}
                                         <li
                                             className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                                             onClick={onReport}
-                                        >
-                                            Report Message
+                                            onMouseEnter={() => isTTSEnabled && speak("Report Message button")} onMouseLeave={stop}>{t('report')}
                                         </li>
                                     </ul>
                                 </div>
@@ -406,12 +417,12 @@ function MessageItem({
                             open={showReportDialog}
                             onClose={() => setShowReportDialog(false)}
                         >
-                            <DialogTitle>{"Report Message"}</DialogTitle>
+                            <DialogTitle onMouseEnter={() => isTTSEnabled && speak("Report Message")}
+  onMouseLeave={stop}>{t('report')}</DialogTitle>
                             <DialogContent>
-                                <DialogContentText>
-                                    Please select a reason for reporting this
-                                    message.
-                                </DialogContentText>
+                            <DialogContentText onMouseEnter={() => isTTSEnabled && speak("Please select a reason for reporting this message.")} onMouseLeave={stop}>
+      {t('report_rsn')}
+    </DialogContentText>
                                 <select
                                     className="w-full mt-2 border-gray-300 rounded-md shadow-sm"
                                     value={reportReason}
@@ -420,26 +431,17 @@ function MessageItem({
                                     }
                                     required // Ensures that the select must have a value
                                 >
-                                    <option value="" disabled>
-                                        Select a policy
-                                    </option>{" "}
-                                    {/* Disabled placeholder option */}
-                                    <option value="spam">Spam</option>
-                                    <option value="graphic-violence">
-                                        Graphic Violence
-                                    </option>
-                                    <option value="privacy-violation">
-                                        Privacy Violation
-                                    </option>{" "}
-                                    {/* Corrected value */}
-                                    <option value="hate-speech">
-                                        Hate Speech
-                                    </option>
+                                   <option value="" disabled onMouseEnter={() => isTTSEnabled && speak("Select a policy")} onMouseLeave={stop}>{t('select_policy')}</option> {/* Disabled placeholder option */}
+      <option value="spam" onMouseEnter={() => isTTSEnabled && speak("Spam")} onMouseLeave={stop}>{t('spam')}</option>
+      <option value="graphic-violence" onMouseEnter={() => isTTSEnabled && speak("Graphic Violence")} onMouseLeave={stop}>{t('graph_violence')}</option>
+      <option value="privacy-violation" onMouseEnter={() => isTTSEnabled && speak("Privacy Violation")} onMouseLeave={stop}>{t('priv_violation')}</option>
+      <option value="hate-speech" onMouseEnter={() => isTTSEnabled && speak("Hate Speech")} onMouseLeave={stop}>{t('hate_speech')}</option>
+    
                                 </select>
 
                                 <textarea
                                     className="w-full mt-2 border-gray-300 rounded-md shadow-sm"
-                                    placeholder="Please provide additional comments"
+                                    placeholder={t('add_comments')}
                                     value={additionalComments}
                                     onChange={(e) =>
                                         setAdditionalComments(e.target.value)
@@ -448,20 +450,17 @@ function MessageItem({
                                 ></textarea>
                             </DialogContent>
                             <DialogActions>
-                                <Button
-                                    onClick={() => setShowReportDialog(false)}
-                                >
-                                    Cancel
-                                </Button>
-                                <Button
-                                    onClick={() => handleReport()}
-                                    color="primary"
-                                    disabled={
-                                        !reportReason || !additionalComments
-                                    } // Button is disabled if either field is empty
-                                >
-                                    Report
-                                </Button>
+                            <Button onClick={() => setShowReportDialog(false)} onMouseEnter={() => isTTSEnabled && speak("Cancel button")}
+      onMouseLeave={stop}>{t('cancel')}</Button>
+    <Button 
+      onClick={() => handleReport()} 
+      color="primary"
+      disabled={!reportReason || !additionalComments} // Button is disabled if either field is empty
+      onMouseEnter={() => isTTSEnabled && speak("Report button")}
+      onMouseLeave={stop}
+    >
+      {t('report_btn')}
+    </Button>
                             </DialogActions>
                         </Dialog>
 
@@ -469,26 +468,21 @@ function MessageItem({
                             open={showDeleteConfirm}
                             onClose={() => setShowDeleteConfirm(false)}
                         >
-                            <DialogTitle>{"Delete Message?"}</DialogTitle>
-                            <DialogContent>
-                                <DialogContentText>
-                                    Are you sure you want to delete this
-                                    message? This action cannot be undone.
-                                </DialogContentText>
-                            </DialogContent>
-                            <DialogActions>
-                                <Button
-                                    onClick={() => setShowDeleteConfirm(false)}
-                                >
-                                    Cancel
-                                </Button>
-                                <Button
-                                    onClick={handleDelete}
-                                    color="primary"
-                                    autoFocus
-                                >
-                                    Delete
-                                </Button>
+                                       <DialogTitle onMouseEnter={() => isTTSEnabled && speak("Delete Message")}
+              onMouseLeave={stop}>{t('delete_top')}</DialogTitle>
+            <DialogContent>
+              <DialogContentText onMouseEnter={() => isTTSEnabled && speak("Are you sure you want to delete this message? This action cannot be undone.")}
+                  onMouseLeave={stop}>
+                {t('del_msg')}
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setShowDeleteConfirm(false)} onMouseEnter={() => isTTSEnabled && speak("Cancel button")}
+                onMouseLeave={stop}>{t('cancel')}</Button>
+              <Button onClick={handleDelete} color="primary" autoFocus onMouseEnter={() => isTTSEnabled && speak("Delete button")}
+                onMouseLeave={stop}>
+                {t('delete')}
+              </Button>
                             </DialogActions>
                         </Dialog>
                     </div>

@@ -17,9 +17,10 @@ import ShareIcon from "@mui/icons-material/Share"; // Icon for Share
 import SortIcon from "@mui/icons-material/Sort"; // Icon for Organize
 import DeleteIcon from "@mui/icons-material/Delete"; // Icon for Delete
 import fb from "../../../app/_firebase/firebase";
-
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
+import { useTranslation } from 'next-i18next';
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
-
 const DashboardProjectButton = ({
     title,
     project,
@@ -32,6 +33,8 @@ const DashboardProjectButton = ({
     handleProjectDeleted,
     OnClick
 }) => {
+    const { t } = useTranslation('dashboard_project');
+    const { speak, stop, isTTSEnabled } = useTTS();
     const [anchorEl, setAnchorEl] = useState(null);
     const [renameOverlayOpen, setRenameOverlayOpen] = useState(false);
     const [deleteOverlayOpen, setDeleteOverlayOpen] = useState(false);
@@ -47,6 +50,13 @@ const DashboardProjectButton = ({
     const handleClose = () => {
         setAnchorEl(null);
     };
+
+    const handleMouseEnter = () => {
+        if (isTTSEnabled) {
+            speak(`Project named ${title}`);
+        }
+    };
+
     const truncateTitle = (title, maxLength = 9) => {
         if (title.length > maxLength) {
             return title.substring(0, maxLength - 3) + "..";
@@ -73,7 +83,7 @@ const DashboardProjectButton = ({
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
-            className="w-10 h-10 sm:w-16 sm:h-16"
+            className="w-10 h-10 sm:w-10 sm:h-10"
         >
             <path
                 fillRule="evenodd"
@@ -92,6 +102,17 @@ const DashboardProjectButton = ({
             router.push(`/contentmap?id=${project.id}`);
         }
     };
+    const handleDocumentClick = (event) => {
+        // Check if the type is "Document"
+        event.stopPropagation();
+        if (type === "Document" && project.id) {
+            // Navigate to the document page with the id parameter
+            OnClick();
+            router.push(`/document?id=${project.id}`);
+        }
+    };
+
+
     async function renameContentMap(contentMapId, newName) {
         let token = await fb.getToken();
         await axios
@@ -156,11 +177,12 @@ const DashboardProjectButton = ({
         // Update other UI elements or state if necessary
     };
     return (
+        <div onMouseEnter={handleMouseEnter} onMouseLeave={stop}>
         <Tooltip title={title} enterDelay={1000} leaveDelay={200}>
             <div>
                 <div
 // className="flex flex-wrap items-stretch justify-center bg-aliceBlue text-primary rounded-md hover:bg-columbiablue duration-300  pt-2 px-3  border border-unselected" // Added mb-2 for bottom spacing
-                    className="flex flex-col items-center justify-center bg-aliceBlue text-primary rounded-md hover:bg-columbiablue duration-300 h-22 w-32 sm:h-28 shadow-md pt-3 pl-1 border border-unselected"
+                    className="flex flex-col items-center justify-center bg-aliceBlue text-primary rounded-md hover:bg-columbiablue duration-300 h-22 w-36 sm:h-28 shadow-md pt-3 pl-1 border border-unselected cursor-pointer "
                     draggable="true"
                     onDragStart={(e) => handleDragStart(e, project.id, type)}
                 >
@@ -168,7 +190,10 @@ const DashboardProjectButton = ({
                         <div className="flex flex-col gap-2 items-center">
                             {/* Project type text (left-aligned) */}
                         
-                        <div onClick={handleContentMapClick}>
+                        <div onClick={ 
+                            (e) => type === "Document" ? handleDocumentClick(e) : handleContentMapClick(e)
+                            }
+                        >
                             {type === "Document" ? doc() : map()}
                         </div>
                         
@@ -188,6 +213,8 @@ const DashboardProjectButton = ({
                                 color="inherit"
                                 onClick={handleClick}
                                 className="sm:ml-2"
+                                onMouseEnter={() => isTTSEnabled && speak("Project options")}
+                                onMouseLeave={stop}
                             >
                                 <MoreVertIcon fontSize="small" />
                             </IconButton>
@@ -201,29 +228,37 @@ const DashboardProjectButton = ({
                                         handleClose();
                                         setRenameOverlayOpen(true);
                                     }}
+                                    onMouseEnter={() => isTTSEnabled && speak("Rename map button")}
+                                    onMouseLeave={stop}
                                 >
                                     <EditIcon
                                         fontSize="small text-tertiary"
                                         className="mr-2 text-tertiary flex justify-between gap-5"
                                     />
                                     <span className="text-tertiary">
-                                        Rename
+                                        {t('rename_button')}
                                     </span>
                                 </MenuItem>
-                                <MenuItem onClick={handleClose}>
+                                <MenuItem onClick={handleClose}
+                                onMouseEnter={() => isTTSEnabled && speak("Share map button")}
+                                onMouseLeave={stop}>
                                     <ShareIcon
                                         fontSize="small text-tertiary"
                                         className="mr-2 text-tertiary flex justify-between gap-5"
                                     />
-                                    <span className="text-tertiary">Share</span>
+                                    <span className="text-tertiary">
+                                        {t('share_button')}
+                                    </span>
                                 </MenuItem>
-                                <MenuItem onClick={handleClose}>
+                                <MenuItem onClick={handleClose}
+                                onMouseEnter={() => isTTSEnabled && speak("Organize map button")}
+                                onMouseLeave={stop}>
                                     <SortIcon
                                         fontSize="small text-tertiary"
                                         className="mr-2 text-tertiary flex justify-between gap-5"
                                     />
                                     <span className="text-tertiary">
-                                        Organize
+                                        {t('organize_button')}
                                     </span>
                                 </MenuItem>
                                 <MenuItem
@@ -231,13 +266,15 @@ const DashboardProjectButton = ({
                                         handleClose();
                                         setDeleteOverlayOpen(true);
                                     }}
+                                    onMouseEnter={() => isTTSEnabled && speak("Delete map button")}
+                                    onMouseLeave={stop}
                                 >
                                     <DeleteIcon
                                         fontSize="small text-tertiary"
                                         className="mr-2 text-tertiary flex justify-between gap-5"
                                     />
                                     <span className="text-tertiary">
-                                        Delete
+                                        {t('delete_button')}
                                     </span>
                                 </MenuItem>
                             </Menu>
@@ -251,25 +288,33 @@ const DashboardProjectButton = ({
                     onClose={() => setRenameOverlayOpen(false)}
                     sx={dialogStyles}
                 >
-                    <DialogTitle>Rename Project</DialogTitle>
+                    <DialogTitle 
+                    onMouseEnter={() => isTTSEnabled && speak("Rename Project")}
+                    onMouseLeave={stop}>{t('rename_top')}</DialogTitle>
                     <DialogContent>
                         <TextField
-                            label="New Project Name"
+                            label={t('new_project_name')}
                             variant="outlined"
                             fullWidth
                             value={newProjectName}
                             onChange={(e) => setNewProjectName(e.target.value)}
+                            onMouseEnter={() => isTTSEnabled && speak("Type new project name here")}
+                            onMouseLeave={stop}
                         />
                     </DialogContent>
                     <DialogActions>
                         <Button
                             onClick={() => setRenameOverlayOpen(false)}
                             sx={buttonStyles}
+                            onMouseEnter={() => isTTSEnabled && speak("Cancel button")}
+                            onMouseLeave={stop}
                         >
-                            Cancel
+                            {t('cancel_button')}
                         </Button>
-                        <Button onClick={handleRename} sx={buttonStyles}>
-                            Rename
+                        <Button onClick={handleRename} sx={buttonStyles}
+                        onMouseEnter={() => isTTSEnabled && speak("Rename button")}
+                        onMouseLeave={stop}>
+                            {t('rename_button')}
                         </Button>
                     </DialogActions>
                 </Dialog>
@@ -279,25 +324,33 @@ const DashboardProjectButton = ({
                     onClose={() => setDeleteOverlayOpen(false)}
                     sx={dialogStyles}
                 >
-                    <DialogTitle>Confirm Delete</DialogTitle>
-                    <DialogContent>
-                        Are you sure you want to delete this Project and its
-                        contents?
+                    <DialogTitle
+                    onMouseEnter={() => isTTSEnabled && speak("Confirm deletion")}
+                    onMouseLeave={stop}>{t('delete_top')}</DialogTitle>
+                    <DialogContent
+                    onMouseEnter={() => isTTSEnabled && speak("Are you sure you want to delete this Project and its contents?")}
+                    onMouseLeave={stop}>
+                        {t('delete_msg')}
                     </DialogContent>
                     <DialogActions>
                         <Button
                             onClick={() => setDeleteOverlayOpen(false)}
                             sx={buttonStyles}
+                            onMouseEnter={() => isTTSEnabled && speak("Cancel button")}
+                            onMouseLeave={stop}
                         >
-                            Cancel
+                            {t('cancel_button')}
                         </Button>
-                        <Button onClick={handleDelete} sx={buttonStyles}>
-                            Delete
+                        <Button onClick={handleDelete} sx={buttonStyles}
+                        onMouseEnter={() => isTTSEnabled && speak("Delete button")}
+                        onMouseLeave={stop}>
+                            {t('delete_button')}
                         </Button>
                     </DialogActions>
                 </Dialog>
             </div>
         </Tooltip>
+        </div>
     );
 };
 

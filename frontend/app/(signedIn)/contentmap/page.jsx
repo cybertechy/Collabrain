@@ -19,6 +19,9 @@ import FileToolbar from "@/components/ui/FileToolbar/fileToolbar";
 import logo from "@/public/assets/images/logo_whitebackground.png";
 import Image from "next/image";
 import { parseMermaidToExcalidraw } from "@excalidraw/mermaid-to-excalidraw";
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
+import { useTranslation } from 'next-i18next';
 
 const SOCKET_DEBUG = false;
 const POINTER_DEBUG = false;
@@ -114,6 +117,8 @@ const AIoverlay = ({ OverlayDisplay, updateExcalidraw , ExcalidrawData , UpdateS
 
 
 function page() {
+    const { t } = useTranslation('content_map');
+    const { speak, stop, isTTSEnabled } = useTTS();
     const [token, setToken] = useState(null);
     const [Excalidraw, setExcalidraw] = useState(null);
     const [ExcalidrawOtherComponents, setExcalidrawOtherComponents] = useState(null);
@@ -138,17 +143,17 @@ function page() {
         showProgress: true,
         animate: true,
         allowClose: true,
-        doneBtnText: "Understood",
-        closeBtnText: "Close",
-        nextBtnText: "Next",
-        prevBtnText: "Previous",
+        doneBtnText: t('doneBtn'),
+        closeBtnText: t('closeBtn'),
+        nextBtnText: t('nextBtn'),
+        prevBtnText: t('prevBtn'),
         keyboardControl: true,
         popoverClass: "recommendation-popover",
         steps: [
-            { element: "#excalidraw", popover: { title: "Bring ideas onto life", description: "This is the content map, you can create diagrams and much more here" } },
-            { element: "#Name", popover: { title: "Content Map Name", description: "You can edit the content map name by clicking on the icon" } },
-            { element: "#share", popover: { title: "Share Content Map with others", description: "You can share the current content map to others by clicking on it" } },
-            { element: "#save", popover: { title: "Saved Status", description: "This icon shows the saving status of the content map" } },
+            { element: "#excalidraw", popover: { title: t('msg1_title'), description: t('msg1') } },
+            { element: "#Name", popover: { title: t('msg2_title'), description: t('msg2') } },
+            { element: "#share", popover: { title: t('msg3_title'), description: t('msg3') } },
+            { element: "#save", popover: { title: t('msg4_title'), description: t('msg4') } },
         ]
     };
 

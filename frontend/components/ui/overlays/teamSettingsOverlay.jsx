@@ -16,8 +16,13 @@ import axios from 'axios';
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 const fb = require("_firebase/firebase");
 import {patchTeamData} from '@/app/utils/teams';
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
+import { useTranslation } from 'next-i18next';
 
 const TeamSettingsOverlay = ({ onClose, teamData, onUpdate, members , bannedMembers, userId}) => {
+  const { t } = useTranslation('team_settings');
+  const { speak, stop, isTTSEnabled } = useTTS();
   const [sidebarPage, setSidebarPage] = useState('general'); // State for managing sidebar page
   const [serverName, setServerName] = useState(teamData?.name ? teamData.name :'Your Server Name');
   const [isEditing, setIsEditing] = useState(false);
@@ -60,6 +65,8 @@ const TeamSettingsOverlay = ({ onClose, teamData, onUpdate, members , bannedMemb
   };
 
   const toggleVisibility = (event) => {
+    const { t } = useTranslation('team_settings');
+    const { speak, stop, isTTSEnabled } = useTTS();
     const newVisibility = event.target.checked ? "public" : "private";
     setIsPublic(event.target.checked);
     const data = { visibility: newVisibility };
@@ -70,7 +77,8 @@ const TeamSettingsOverlay = ({ onClose, teamData, onUpdate, members , bannedMemb
   };
 
   const handleImageUpload = async (base64Image, fileType) => {
-    
+    const { t } = useTranslation('team_settings');
+    const { speak, stop, isTTSEnabled } = useTTS();
 
     try {
         const type = "team"; // Assuming 'team' is the type for team images
@@ -104,6 +112,8 @@ const TeamSettingsOverlay = ({ onClose, teamData, onUpdate, members , bannedMemb
   };
 
   const handleKickUser = async (userId) => { // Assume teamId is passed or available in context
+    const { t } = useTranslation('team_settings');
+    const { speak, stop, isTTSEnabled } = useTTS();
     const teamId = teamData.teamId; // Assuming teamData contains your team's ID and is available in your component
     try {
       const token = await fb.getToken(); // Assume this method retrieves the current user's auth token
@@ -128,6 +138,8 @@ const TeamSettingsOverlay = ({ onClose, teamData, onUpdate, members , bannedMemb
   };
   
   const handleBanUser = async (userId) => {
+    const { t } = useTranslation('team_settings');
+    const { speak, stop, isTTSEnabled } = useTTS();
     const teamId = teamData.teamId; // Assuming teamData contains your team's ID and is available in your component
     console.log("banning user", userId, teamId)
     try {
@@ -152,6 +164,8 @@ const TeamSettingsOverlay = ({ onClose, teamData, onUpdate, members , bannedMemb
   };
   
   const handleUnbanUser = async (userId) => {
+    const { t } = useTranslation('team_settings');
+    const { speak, stop, isTTSEnabled } = useTTS();
     const teamId = teamData.teamId; // Similarly, ensure teamData and teamId are available
     try {
       const token = await fb.getToken(); // Get the auth token
@@ -175,6 +189,8 @@ const TeamSettingsOverlay = ({ onClose, teamData, onUpdate, members , bannedMemb
   };
  
   const handleRoleChange = async (newRole, userId) => {
+    const { t } = useTranslation('team_settings');
+    const { speak, stop, isTTSEnabled } = useTTS();
     try {
       const token = await fb.getToken(); // Assuming fb.getToken() gets your Firebase auth token
       const teamId = teamData.teamId; // Assuming teamData contains your team's ID
@@ -221,20 +237,20 @@ const TeamSettingsOverlay = ({ onClose, teamData, onUpdate, members , bannedMemb
             <div className="flex-grow ">
               <button className={`flex items-center justify-start p-2 w-full rounded-md mb-2 text-nowrap  font-semibold ${sidebarPage === 'general' ? 'bg-white text-primary' : ' hover:bg-gray-700'}`} onClick={() => handleSidebarPageChange('general')}>
                 <SettingsIcon sx={{ color: '#81c3d7', mr: 1 , fontSize: '2.3rem' }} />
-                General
+                {t('general')}
               </button>
               {userId == teamData?.owner && (<button className={`flex items-center justify-start p-2 w-full rounded-md mb-2 text-nowrap font-semibold ${sidebarPage === 'roles' ? 'bg-white text-primary' : ' hover:bg-gray-700'}`} onClick={() => handleSidebarPageChange('roles')}>
                 <AdminPanelSettingsIcon sx={{ color: '#81c3d7', mr: 1 , fontSize: '2.3rem' }} />
-                Roles
+                {t('roles')}
               </button>)}
               <button className={`flex items-center justify-start p-2 w-full rounded-md mb-2 text-nowrap font-semibold ${sidebarPage === 'userManagement' ? 'bg-white text-primary' : ' hover:bg-gray-700'}`} onClick={() => handleSidebarPageChange('userManagement')}>
   <GroupIcon sx={{ color: '#81c3d7', mr: 1 , fontSize: '2.3rem' }} />
-  User Management
+  {t('usr_mgmt')}
 </button>
 
 <button className={`flex items-center justify-start p-2 w-full rounded-md mb-2 text-nowrap font-semibold ${sidebarPage === 'bans' ? 'bg-white text-primary' : ' hover:bg-gray-700'}`} onClick={() => handleSidebarPageChange('bans')}>
   <RemoveCircleIcon sx={{ color: '#81c3d7', mr: 1, fontSize: '2.3rem'  }} />
-                Bans
+                {t('bans')}
               </button>
               
             </div>
@@ -288,10 +304,12 @@ const TeamSettingsOverlay = ({ onClose, teamData, onUpdate, members , bannedMemb
 };
 
 const GeneralTeamSettingsOverlay = ({ onClose, serverName, isEditing, toggleEdit, isPublic, toggleVisibility, serverImage, handleNameChange, handleImageUpload }) => {
+  const { t } = useTranslation('team_settings');
+  const { speak, stop, isTTSEnabled } = useTTS();
   return (
     <div className='flex-grow p-4 overflow-auto'>
       <div className="text-center mb-10">
-        <h2 className="text-3xl font-bold text-gray-900 mt-3">General</h2>
+        <h2 className="text-3xl font-bold text-gray-900 mt-3">{t('general')}</h2>
         <button
           className="absolute top-5 right-5 bg-transparent border-none cursor-pointer"
           onClick={onClose}
@@ -304,7 +322,7 @@ const GeneralTeamSettingsOverlay = ({ onClose, serverName, isEditing, toggleEdit
           <UploadButton onUpload={handleImageUpload} id={serverImage } type = {"team"}/>
         </div>
         <div className="flex justify-center mb-4">
-          <label className="block uppercase text-gray-700 text-lg font-bold mr-4">Server Name</label>
+          <label className="block uppercase text-gray-700 text-lg font-bold mr-4">{t('server_name')}</label>
         </div>
         <div className="flex justify-center mb-4">
           <input
@@ -318,11 +336,11 @@ const GeneralTeamSettingsOverlay = ({ onClose, serverName, isEditing, toggleEdit
             onClick={toggleEdit}
             className="ml-4 bg-primary hover:bg-gray-700  text-white font-bold py-2 px-4 rounded"
           >
-            {isEditing ? 'Save' : 'Edit'}
+            {isEditing ? t('save') : t('edit')}
           </button>
         </div>
         <div className="flex justify-center items-center">
-          <label className="block uppercase text-gray-700 text-lg font-bold mr-4">Server Visibility</label>
+          <label className="block uppercase text-gray-700 text-lg font-bold mr-4">{t('visib')}</label>
         </div>
         <div className="flex justify-center items-center">
           <Switch 
@@ -344,7 +362,7 @@ const GeneralTeamSettingsOverlay = ({ onClose, serverName, isEditing, toggleEdit
               },
             }}
           />
-          <span className="ml-2">{isPublic ? 'Public' : 'Private'}</span>
+          <span className="ml-2">{isPublic ? t('public') : t('private')}</span>
         </div>
       </div>
     </div>
@@ -352,6 +370,8 @@ const GeneralTeamSettingsOverlay = ({ onClose, serverName, isEditing, toggleEdit
 };
 
 const RolesTeamSettingsOverlay = ({ onClose, users, onRoleChange, teamData }) => {
+  const { t } = useTranslation('team_settings');
+  const { speak, stop, isTTSEnabled } = useTTS();
   const [searchQuery, setSearchQuery] = useState('');
   const getRoleWeight = (role) => {
     switch (role) {
@@ -383,7 +403,7 @@ const RolesTeamSettingsOverlay = ({ onClose, users, onRoleChange, teamData }) =>
         `}
       </style>
       <div className="text-center mb-10">
-        <h2 className="text-3xl font-bold text-gray-900 mt-3">Roles</h2>
+        <h2 className="text-3xl font-bold text-gray-900 mt-3">{t('roles')}</h2>
         <button
           className="absolute top-5 right-5 bg-transparent border-none cursor-pointer"
           onClick={onClose}
@@ -395,9 +415,10 @@ const RolesTeamSettingsOverlay = ({ onClose, users, onRoleChange, teamData }) =>
       <div className="mb-4">
         <input
           type="text"
-          placeholder="Search Users"
+          placeholder={t('search')}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
           onChange={handleSearchChange}
+          onMouseEnter={() => isTTSEnabled && speak("Type a user's name here")} onMouseLeave={stop}
         />
       </div>
       <div className="flex-grow overflow-y-auto"> {/* Adjust max height as needed */}
@@ -417,9 +438,9 @@ const RolesTeamSettingsOverlay = ({ onClose, users, onRoleChange, teamData }) =>
         sx={{ minWidth: 120 }}
         disabled={user.role === 'owner'} 
       >
-        <MenuItem value="Member">Member</MenuItem>
-        <MenuItem value="Admin">Admin</MenuItem>
-        <MenuItem value="Owner" disabled>Owner</MenuItem>
+        <MenuItem value="Member">{t('member')}</MenuItem>
+        <MenuItem value="Admin">{t('admin')}</MenuItem>
+        <MenuItem value="Owner" disabled>{t('owner')}</MenuItem>
       </Select>
     </ListItemSecondaryAction>
   </ListItem>
@@ -432,6 +453,8 @@ const RolesTeamSettingsOverlay = ({ onClose, users, onRoleChange, teamData }) =>
 
 
 const UserManagementOverlay = ({ onClose, users, onKickUser, onBanUser , teamData, userId}) => {
+  const { t } = useTranslation('team_settings');
+  const { speak, stop, isTTSEnabled } = useTTS();
   const [searchQuery, setSearchQuery] = useState(''); // State to store the search query
 
   const handleSearchChange = (event) => {
@@ -445,7 +468,7 @@ const UserManagementOverlay = ({ onClose, users, onKickUser, onBanUser , teamDat
   return (
     <div className='flex-grow p-4 overflow-auto flex flex-col'>
       <div className="text-center mb-10">
-        <h2 className="text-3xl font-bold text-gray-900 mt-3">User Management</h2>
+        <h2 className="text-3xl font-bold text-gray-900 mt-3">{t('usr_mgmt')}</h2>
         <button
           className="absolute top-5 right-5 bg-transparent border-none cursor-pointer"
           onClick={onClose}
@@ -457,9 +480,10 @@ const UserManagementOverlay = ({ onClose, users, onKickUser, onBanUser , teamDat
       <div className="mb-4">
         <input
           type="text"
-          placeholder="Search Users"
+          placeholder={t('search')}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
           onChange={handleSearchChange}
+          onMouseEnter={() => isTTSEnabled && speak("Type a user's name here")} onMouseLeave={stop}
         />
       </div>
       <div className="flex-grow overflow-y-auto">
@@ -475,13 +499,13 @@ const UserManagementOverlay = ({ onClose, users, onKickUser, onBanUser , teamDat
                   className="px-4 py-2 border-2 border-red-500 text-red-500 mr-2 hover:bg-red-500 hover:text-white transition-colors duration-200 ease-in-out"
                   onClick={() => onKickUser(user.id)}
                 >
-                  Kick
+                  {t('kick')}
                 </button>
                 <button
                   className="px-4 py-2 bg-primary text-white hover:bg-gray-800 transition-colors duration-200 ease-in-out"
                   onClick={() => onBanUser(user.id)}
                 >
-                  Ban
+                  {t('ban')}
                 </button>
               </ListItemSecondaryAction>
             </ListItem>
@@ -493,6 +517,8 @@ const UserManagementOverlay = ({ onClose, users, onKickUser, onBanUser , teamDat
 };
 
 const BansOverlay = ({ onClose, bannedUsers, handleUnbanUser, userId }) => {
+  const { t } = useTranslation('team_settings');
+  const { speak, stop, isTTSEnabled } = useTTS();
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleSearchChange = (event) => {
@@ -506,7 +532,7 @@ const BansOverlay = ({ onClose, bannedUsers, handleUnbanUser, userId }) => {
   return (
     <div className='flex-grow p-4 overflow-auto flex flex-col'>
     <div className="text-center mb-10">
-      <h2 className="text-3xl font-bold text-gray-900 mt-3">Bans</h2>
+      <h2 className="text-3xl font-bold text-gray-900 mt-3">{t('bans')}</h2>
       <button
         className="absolute top-5 right-5 bg-transparent border-none cursor-pointer"
         onClick={onClose}
@@ -518,9 +544,10 @@ const BansOverlay = ({ onClose, bannedUsers, handleUnbanUser, userId }) => {
       <div className="mb-4">
         <input
           type="text"
-          placeholder="Search Users"
+          placeholder={t('search')}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
           onChange={handleSearchChange}
+          onMouseEnter={() => isTTSEnabled && speak("Type a user's name here")} onMouseLeave={stop}
         />
       </div>
       {/* Banned users list */}
@@ -538,7 +565,7 @@ const BansOverlay = ({ onClose, bannedUsers, handleUnbanUser, userId }) => {
                   className="px-4 py-2 bg-primary text-white hover:bg-gray-800 transition-colors duration-200 ease-in-out"
                   onClick={() => handleUnbanUser(user.id)}
                 >
-                  Unban
+                  {t('unban')}
                 </button>
               </ListItemSecondaryAction>
             </ListItem>

@@ -7,6 +7,9 @@ import { useAuthState } from "@/app/_firebase/firebase";
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import Template from "@/components/ui/template/template";
 import GroupsIcon from '@mui/icons-material/Groups';
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
+import { useTranslation } from 'next-i18next';
 
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
@@ -17,6 +20,8 @@ const Leaderboard = () => {
   const [user, loading] = useAuthState();
   const [clickedRow, setClickedRow] = useState(null);
   const [hoveredRow, setHoveredRow] = useState(null);
+  const { t } = useTranslation('discover');
+  const { speak, stop, isTTSEnabled } = useTTS();
 
   const fetchTeams = async () => {
     try {
@@ -93,21 +98,25 @@ const Leaderboard = () => {
   return (
     <>
       <div className="container mx-auto px-4 lg:px-10 pt-8">
-        <p className="text-3xl font-md text-start text-primary bg-white mb-4">Discover Teams</p>
+        <p className="text-3xl font-md text-start text-primary bg-white mb-4"
+          onMouseEnter={() => isTTSEnabled && speak("Discover Teams")} onMouseLeave={stop}>{t('top')}</p>
         <div className="mt-4 flex justify-between items-center">
-          <p className="text-xl font-bold text-primary">Joined Teams</p>
+          <p className="text-xl font-bold text-primary"
+            onMouseEnter={() => isTTSEnabled && speak("Joined Teams")} onMouseLeave={stop}>{t('joined_teams')}</p>
         </div>
         {joinedTeams.length > 0 ? (
           <div className="flex text-white flex-wrap gap-2 mt-3 mb-5">
             {joinedTeams.map((teamId, index) => (
-              <div key={index} className="bg-primary rounded-lg p-2 flex items-center">
+              <div key={index} className="bg-primary rounded-lg p-2 flex items-center"
+              onMouseEnter={() => isTTSEnabled && speak(`Team ${teamId}`)}
+              onMouseLeave={stop}>
                 <GroupsIcon className="mr-2 text-secondary" />
                 <span>{teamData.find((team) => team.name === teamId)?.name || teamId}</span>
               </div>
             ))}
           </div>
         ) : (
-          <p className='mt-3 mb-5 text-gray-400'>No teams joined yet.</p>
+          <p className='mt-3 mb-5 text-gray-400'>{t('no_joins')}</p>
         )}
 
         <div className="border-gray-300 inner-shadow border-2 bg-aliceBlue rounded-md drop-shadow-md overflow-visible">
@@ -119,17 +128,23 @@ const Leaderboard = () => {
               value={searchQuery}
               onChange={handleSearchChange}
               onKeyDown={handleSearchKeyDown}
-              placeholder=" Search team... "
+              placeholder={t('search')}
               className="p-2 border border-gray-300 rounded-lg w-full"
+              onMouseEnter={() => isTTSEnabled && speak("Type a team's name here to search")}
+              onMouseLeave={stop}
             />
           </div>
 
           {/* Header row for team data */}
           <div className="flex text-start justify-start bg-primary font-bold px-4 py-2">
-            <span className="text-lg text-white w-1/4">Rank<EmojiEventsIcon className='pl-2 text-3xl' /></span>
-            <span className="text-lg text-white w-1/4">Name</span>
-            <span className="text-lg text-white w-1/4">Score</span>
-            <span className="text-lg text-white w-1/4">Actions</span>
+            <span className="text-lg text-white w-1/4" onMouseEnter={() => isTTSEnabled && speak("Team Rank")}
+              onMouseLeave={stop}>{t('rank')}<EmojiEventsIcon className='pl-2 text-3xl' /></span>
+            <span className="text-lg text-white w-1/4" onMouseEnter={() => isTTSEnabled && speak("Team Name")}
+              onMouseLeave={stop}>{t('name')}</span>
+            <span className="text-lg text-white w-1/4" onMouseEnter={() => isTTSEnabled && speak("Team Score")}
+              onMouseLeave={stop}>{t('score')}</span>
+            <span className="text-lg text-white w-1/4" onMouseEnter={() => isTTSEnabled && speak("Actions")}
+              onMouseLeave={stop}>{t('actions')}</span>
           </div>
 
           <div className="flex flex-col overflow-visible">
@@ -147,22 +162,30 @@ const Leaderboard = () => {
                   transform: clickedRow === team.name ? 'scale(1)' : 'scale(1)',
                 }}
               >
-                <span className="text-lg w-1/4 pl-2 text-primary "># {team.rank}</span>
-                <span className="text-lg w-1/4 text-start text-primary overflow-hidden">{team.name}</span>
-                <span className="text-lg text-center w-1/4 text-primary">{team.score}</span>
+                <span className="text-lg w-1/4 pl-2 text-primary "
+                  onMouseEnter={() => isTTSEnabled && speak(`Rank number ${team.rank}`)} 
+                  onMouseLeave={stop}># {team.rank}</span>
+                <span className="text-lg w-1/4 text-start text-primary overflow-hidden"
+                    onMouseEnter={() => isTTSEnabled && speak(`Team ${team.name}`)}
+                    onMouseLeave={stop}>{team.name}</span>
+                <span className="text-lg text-center w-1/4 text-primary"
+                    onMouseEnter={() => isTTSEnabled && speak(`Score ${team.score}`)}
+                    onMouseLeave={stop}>{team.score}</span>
                 {joinedTeams.includes(team.name) ? (
                   <button
                     className=" text-green-500 px-4 py-2 rounded-lg ml-2 cursor-default"
                     disabled
                   >
-                    Joined
+                    {t('joined')}
                   </button>
                 ) : (
                   <button
                     onClick={() => handleJoinTeam(team.id,team.name)}
                     className="bg-green-500 text-white px-2 lg:px-4 py-1 lg:py-2 rounded-lg ml-2"
+                    onMouseEnter={() => isTTSEnabled && speak("Join Team button")}
+                    onMouseLeave={stop}
                   >
-                    Join Team
+                    {t('join')}
                   </button>
                 )}
               </div>

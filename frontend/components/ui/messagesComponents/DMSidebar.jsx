@@ -8,8 +8,13 @@ import ChatIcon from '@mui/icons-material/Chat';
 import {fetchUser} from '@/app/utils/user';
 import { useEffect, useState } from 'react';
 import { ArrowForward } from '@mui/icons-material';
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
+import { useTranslation } from 'next-i18next';
 
 const DMSidebar = ({ userData, onMute, onDeafen, onSettings, chatList, openChat, showChat, setShowFriends, showFriends, openFriends }) => {
+    const { speak, stop, isTTSEnabled } = useTTS();
+    const { t } = useTranslation('dms');
     console.log("UserData informtion", userData)
     const [membersDetails, setMembersDetails] = useState({});
 
@@ -45,7 +50,9 @@ const DMSidebar = ({ userData, onMute, onDeafen, onSettings, chatList, openChat,
             <div id= "chats" >
             {/* <div className="flex items-center justify-center p-4 shadow-md bg-gray-100"> */}
             <div className="flex flex-col items-center justify-center p-4 shadow-md bg-gray-100">
-                <h2 className="text-xl text-center font-semibold">Chats</h2>
+                <h2 className="text-xl text-center font-semibold"                
+                onMouseEnter={() => isTTSEnabled && speak("Chats Sidebar")}
+                onMouseLeave={stop}>{t('chats')}</h2>
                 <button 
                 className='hidden max-sm:block ml-auto bg-primary text-white rounded-lg py-2 px-3 mt-2'
                 onClick={() => {

@@ -7,7 +7,12 @@ import { useState, useEffect } from 'react';
 import AddIcon from '@mui/icons-material/Add';
 import TeamChannelOptionsMenu from '@/components/ui/chatsComponents/teamChannelOptionsMenu';
 import AddChannelOverlay from '@/components/ui/overlays/addChannelOverlay';
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
+import { useTranslation } from 'next-i18next';
 const ChannelBar = ({ user, userUID, teamData, onUpdated, onInvite, onSettings, onLeave, onDelete, onViewDetails, onMute, onDeafen, handleChannelSelect, selectedChannel, onView }) => {
+    const { t } = useTranslation('team');
+    const { speak, stop, isTTSEnabled } = useTTS();
     const [isOwner, setIsOwner] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
     const [showAddChannelOverlay, setShowAddChannelOverlay] = useState(false); // State to control AddChannelOverlay visibility
@@ -66,10 +71,11 @@ const ChannelBar = ({ user, userUID, teamData, onUpdated, onInvite, onSettings, 
             <div className="flex flex-col justify-between h-full">
                 <div id="chats" >
                     <div className="flex flex-row items-center justify-between p-4 shadow-md bg-gray-100">
-                        <h2 className="text-xl text-center font-semibold">Channels</h2>
+                        <h2 className="text-xl text-center font-semibold"
+                        onMouseEnter={() => isTTSEnabled && speak("Team Channels")} onMouseLeave={stop}>{t('channels')}</h2>
                         <button onClick={handleAddChannelClick} className="bg-primary ml-2  text-white p-2 rounded-md h-8 w-8 flex items-center justify-center">
                             {/* Using a simple "+" text for the icon */}
-                            <AddIcon></AddIcon>
+                            <AddIcon onMouseEnter={() => isTTSEnabled && speak("Add Channel button")} onMouseLeave={stop}></AddIcon>
                         </button>
                     </div>
 
@@ -82,6 +88,9 @@ const ChannelBar = ({ user, userUID, teamData, onUpdated, onInvite, onSettings, 
                                 channel={channel}
                                 isSelected={selectedChannel === channel.name}
                                 onSelect={handleChannelSelect}
+                                speak={speak}
+                                stop={stop}
+                                isTTSEnabled={isTTSEnabled}
                             />
                         ))}
                     </List>

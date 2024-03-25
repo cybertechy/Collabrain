@@ -1,12 +1,16 @@
 import { Hash } from 'lucide-react';
+import { useTTS } from "@/app/utils/tts/TTSContext";
 const ChannelButton = ({ channel, isSelected, onSelect , channelId}) => {
     const handleClick = () => {
         onSelect(channel.name);
     };
+    const { speak, stop, isTTSEnabled } = useTTS();
 
     return (
         <button
             onClick={handleClick}
+            onMouseEnter={() => isTTSEnabled && speak(`${channel.name} channel`)}
+            onMouseLeave={stop}
             className={`flex font-sans  items-center w-full px-4 py-2 text-left text-lg rounded-lg ${
                 isSelected ? 'bg-primary text-white' : 'text-primary border-2 border-primary'
             } hover:bg-gray-500 hover:text-white transition-colors duration-150`}

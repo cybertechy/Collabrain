@@ -16,37 +16,44 @@ import {
 import axios from "axios";
 import CustomAvatar from "../messagesComponents/avatar";
 import { ToastContainer, toast } from "react-toastify";
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
+import { useTranslation } from 'next-i18next';
 import { fetchUser } from "@/app/utils/user";
 const fb = require("_firebase/firebase");
 
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
-const UserTile = ({ user, onInviteClick }) => (
-    <ListItem>
-        <ListItemAvatar>
-            <CustomAvatar username={user.username} />
-        </ListItemAvatar>
-        <ListItemText primary={user.username} />
-        <ListItemSecondaryAction>
-            <Button
-                sx={{
-                    borderColor: "#30475E",
-                    color: "#30475E",
-                    "&:hover": {
-                        backgroundColor: "#30475E",
-                        color: "#FFFFFF",
-                    },
-                }}
-                variant="outlined"
-                size="small"
-                onClick={() => onInviteClick(user)}
-            >
-                Invite
-            </Button>
-        </ListItemSecondaryAction>
-    </ListItem>
-);
 const InviteUsersOverlay = ({ onClose, teamData }) => {
+    const { t } = useTranslation('invite_users');
+    const { speak, stop, isTTSEnabled } = useTTS();
+
+    const UserTile = ({ user, onInviteClick }) => (
+        <ListItem>
+            <ListItemAvatar>
+                <CustomAvatar username={user.username} />
+            </ListItemAvatar>
+            <ListItemText primary={user.username} />
+            <ListItemSecondaryAction>
+                <Button
+                    sx={{
+                        borderColor: "#30475E",
+                        color: "#30475E",
+                        "&:hover": {
+                            backgroundColor: "#30475E",
+                            color: "#FFFFFF",
+                        },
+                    }}
+                    variant="outlined"
+                    size="small"
+                    onClick={() => onInviteClick(user)}
+                    onMouseEnter={() => isTTSEnabled && speak("Invite button")} onMouseLeave={stop}
+                >
+                    {t('invite')}
+                </Button>
+            </ListItemSecondaryAction>
+        </ListItem>
+    );
     const [searchQuery, setSearchQuery] = useState("");
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -176,15 +183,16 @@ const InviteUsersOverlay = ({ onClose, teamData }) => {
     };
     return (
         <Dialog open={true} onClose={onClose} maxWidth="sm" fullWidth>
-            <DialogTitle>Invite Users</DialogTitle>
+            <DialogTitle onMouseEnter={() => isTTSEnabled && speak("Invite users")} onMouseLeave={stop}>{t('inv_users')}</DialogTitle>
             <DialogContent>
                 <TextField
-                    label="Search Users"
+                    label={t('search')}
                     variant="outlined"
                     fullWidth
                     value={searchQuery}
                     onChange={handleSearchChange}
                     className="mb-4 mt-4"
+                    onMouseEnter={() => isTTSEnabled && speak("Type a user's name here")} onMouseLeave={stop}
                 />
                 {loading ? (
                     <div
@@ -211,15 +219,17 @@ const InviteUsersOverlay = ({ onClose, teamData }) => {
                                 ))
                             ) : searchQuery && !loading ? (
                                 <ListItem>
-                                    <ListItemText primary="No users found" />
+                                    <ListItemText primary={t('not_found')}
+                                    onMouseEnter={() => isTTSEnabled && speak("No users found")} onMouseLeave={stop} />
                                 </ListItem>
                             ) : null}
                         </List>
                     </div>
                 )}
                 <div className="flex justify-end gap-4 mt-4">
-                    <Button variant="outlined" onClick={handleDone}>
-                        Done
+                    <Button variant="outlined" onClick={handleDone} 
+                    onMouseEnter={() => isTTSEnabled && speak("Done button")} onMouseLeave={stop}>
+                        {t('done')}
                     </Button>
                 </div>
             </DialogContent>

@@ -5,7 +5,12 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import LeaderboardIcon from '@mui/icons-material/Leaderboard';
 import { List, ListItem, ListItemText, ListItemAvatar } from '@mui/material';
 import CustomAvatar from '../messagesComponents/avatar'; 
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
+import { useTranslation } from 'next-i18next';
 const TeamOverviewOverlay = ({ onClose,teamData, members }) => {
+  const { t } = useTranslation('team_overview');
+  const { speak, stop, isTTSEnabled } = useTTS();
   const [subPage, setSubPage] = useState('description'); // State for managing subpage
 console.log("Team Data",teamData, members, "members")
   const handleSubPageChange = (page) => {
@@ -21,12 +26,12 @@ console.log("Team Data",teamData, members, "members")
             
             <div className="flex-grow">
               <button className={`flex items-center justify-start p-2 w-full rounded-md mb-2 text-nowrap  font-semibold ${subPage === 'description' ? 'bg-white text-primary' : ' hover:bg-gray-700'}`} onClick={() => handleSubPageChange('description')}>
-                <DescriptionIcon sx={{ color: '#81c3d7', mr: 1 , fontSize: '2.3rem' }} />
-                Description
+                <DescriptionIcon sx={{ color: '#81c3d7', mr: 1 , fontSize: '2.3rem' }} onMouseEnter={() => isTTSEnabled && speak("Description section")} onMouseLeave={stop}/>
+                {t('desc')}
               </button>
               <button className={`flex items-center justify-start p-2 w-full rounded-md mb-2 text-nowrap font-semibold ${subPage === 'leaderboard' ? 'bg-white text-primary' : ' hover:bg-gray-700'}`} onClick={() => handleSubPageChange('leaderboard')}>
-                <LeaderboardIcon sx={{ color: '#81c3d7', mr: 1 , fontSize: '2.3rem' }} />
-                Leaderboard
+                <LeaderboardIcon sx={{ color: '#81c3d7', mr: 1 , fontSize: '2.3rem' }} onMouseEnter={() => isTTSEnabled && speak("Leaderboard section")} onMouseLeave={stop}/>
+                {t('leaderboard')}
               </button>
             </div>
           </div>
@@ -34,10 +39,11 @@ console.log("Team Data",teamData, members, "members")
         {/* Main Content */}
         <div className='flex-grow p-4 overflow-auto'>
           <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-gray-900 mt-3">{subPage === 'description' ? 'Description' : 'Leaderboard'}</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mt-3">{subPage === 'description' ? t('desc') : t('leaderboard')}</h2>
             <button
               className="absolute top-5 right-5 bg-transparent border-none cursor-pointer"
               onClick={onClose}
+              onMouseEnter={() => isTTSEnabled && speak("Close Team Overview button")} onMouseLeave={stop}
             >
               <CloseIcon className="text-basicallydark" fontSize="large" />
             </button>
@@ -58,6 +64,8 @@ console.log("Team Data",teamData, members, "members")
 };
 
 const DescriptionContent = ({ teamData, members }) => {
+  const { t } = useTranslation('team_overview');
+  const { speak, stop, isTTSEnabled } = useTTS();
     return (
         <div>
             {/* Centered team name with larger text */}
@@ -69,7 +77,7 @@ const DescriptionContent = ({ teamData, members }) => {
             </div>
 
             <div className="text-center">
-                <h4 className="text-lg font-semibold mb-2">Team Members</h4>
+                <h4 className="text-lg font-semibold mb-2">{t('members')}</h4>
                 {/* Fixed height for the scrollable list of team members */}
                 <div className="max-h-96 overflow-auto mx-auto" style={{ width: '90%' }}>
                     <List>
@@ -90,6 +98,8 @@ const DescriptionContent = ({ teamData, members }) => {
 
 
 const LeaderboardContent = ({ teamData, members }) => {
+  const { t } = useTranslation('team_overview');
+  const { speak, stop, isTTSEnabled } = useTTS();
     // Sort members by score in descending order if not already sorted
     const sortedMembers = [members].sort((a, b) => b.score - a.score);
     console.log("SORTED MEMBERS", sortedMembers, "members", members)
@@ -112,8 +122,8 @@ console.log("PODIUM MEMBERS", podiumMembers, "OTHER MEMBERS", otherMembers)
             <div className={`${colors[1]} w-24 h-24 flex items-center justify-center rounded-full shadow-lg`}>
               <span className="text-xl font-bold text-primary text-center" style={{ padding: '0 10px' }}>{podiumMembers[0][1]?.username}</span>
             </div>
-            <span className="mt-2">{podiumMembers[0][1]?.score} Points</span>
-            <span className="text-sm mt-1  font-sans font-semibold bg-primary p-2 rounded-xl text-white">2nd</span>
+            <span className="mt-2">{podiumMembers[0][1]?.score} {t('points')}</span>
+            <span className="text-sm mt-1  font-sans font-semibold bg-primary p-2 rounded-xl text-white">{t('2nd')}</span>
           </div>
           
           {/* First place (center, higher) */}
@@ -121,8 +131,8 @@ console.log("PODIUM MEMBERS", podiumMembers, "OTHER MEMBERS", otherMembers)
             <div className={`${colors[0]} w-28 h-28 flex items-center justify-center rounded-full shadow-lg`}>
               <span className="text-xl font-bold  text-primary text-center" style={{ padding: '0 10px' }}>{podiumMembers[0][0]?.username}</span>
             </div>
-            <span className="mt-2">{podiumMembers[0][0]?.score} Points</span>
-            <span className="text-sm mt-1 font-sans font-semibold bg-primary p-2 rounded-xl text-white">1st</span>
+            <span className="mt-2">{podiumMembers[0][0]?.score} {t('points')}</span>
+            <span className="text-sm mt-1 font-sans font-semibold bg-primary p-2 rounded-xl text-white">{t('1st')}</span>
           </div>
           
           {/* Third place (right side) */}
@@ -130,8 +140,8 @@ console.log("PODIUM MEMBERS", podiumMembers, "OTHER MEMBERS", otherMembers)
             <div className={`${colors[2]} w-24 h-24 flex items-center justify-center rounded-full shadow-lg`}>
               <span className="text-xl font-bold text-primary text-center" style={{ padding: '0 10px' }}>{podiumMembers[0][2]?.username}</span>
             </div>
-            <span className="mt-2">{podiumMembers[0][2]?.score} Points</span>
-            <span className="text-sm mt-1 font-sans font-semibold bg-primary p-2 rounded-xl text-white">3rd</span>
+            <span className="mt-2">{podiumMembers[0][2]?.score} {t('points')}</span>
+            <span className="text-sm mt-1 font-sans font-semibold bg-primary p-2 rounded-xl text-white">{t('3rd')}</span>
           </div>
         </div>
   
@@ -151,7 +161,7 @@ console.log("PODIUM MEMBERS", podiumMembers, "OTHER MEMBERS", otherMembers)
                   <ListItemText primary={member.username} secondary={member.role} className="flex-grow" />
 
                   {/* Points */}
-                  <span>{member.score} Points</span>
+                  <span>{member.score} {t('points')}</span>
                 </ListItem>
               ))}
             </List>

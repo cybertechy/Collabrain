@@ -26,13 +26,18 @@ import EditIcon from '@mui/icons-material/Edit';
 import axios from 'axios';
 import { useAuthState } from '_firebase/firebase';
 import CustomAvatar from './avatar';
+import "@/app/utils/i18n"
+import { useTranslation } from 'next-i18next';
+import { useTTS } from "@/app/utils/tts/TTSContext";
 import { updateFriendAlias,blockUser } from '@/app/utils/user';
 const fb = require("_firebase/firebase");
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 import { unblockUser } from '@/app/utils/user';
+
 import { ToastContainer, toast } from "react-toastify";
-const FriendTile = ({ friendData, openChat, setRefreshList , userInfo,id, handleAliasUpdate, handleChatUpdate, handleFriendListUpdate}) => {
-  console.log("Friend Data in friend tile" , friendData);
+const FriendTile = ({ friendData, openChat, setRefreshList , userInfo,id, handleAliasUpdate, handleChatUpdate}) => {
+  const { t } = useTranslation('dms');
+  const { speak, stop, isTTSEnabled } = useTTS();
   const [user, loading] = useAuthState();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
@@ -270,7 +275,7 @@ const renderActionIcons = () => {
     // Assume you have an unblockUser function similar to blockUser
     await unblockUser(friendData.id).then(()=>{handleChatUpdate()});;
     closeDialog();
-};
+  };
 
   const handleBlockUser = async () => {
     try {
@@ -287,14 +292,31 @@ const renderActionIcons = () => {
         console.error('Error blocking user:', error.response?.data || error.message);
         // Optionally, handle errors in the UI here
     }
-};
+  };
 
   const handleSetAlias = () => {
     // Add logic to set an alias for the user here
     console.log('Setting alias for user:', friendData);
     handleClose();
   };
-console.log("Friend Data in friend tile" , friendData);
+  console.log("Friend Data in friend tile" , friendData);
+
+  const handleAlias = () => {
+    if (isTTSEnabled) {
+      speak('Set Alias button');
+    }
+  };
+
+  const handleBlock = () => {
+    if (isTTSEnabled) {
+      speak('Block User button');
+    }
+  };
+
+  const handleLeave = () => {
+    stop();
+  };
+
   return (
     <ListItem
       sx={{
@@ -317,7 +339,7 @@ console.log("Friend Data in friend tile" , friendData);
   }
   secondary={friendData.email}
   primaryTypographyProps={{ color: 'text.primary' }}
-/>
+  />
 
       </Box>
 
@@ -334,7 +356,8 @@ console.log("Friend Data in friend tile" , friendData);
         fullWidth
         maxWidth="xs"
       >
-        <DialogTitle>Select an Option</DialogTitle>
+        <DialogTitle onMouseEnter={() => isTTSEnabled && speak("Select an Option")}
+              onMouseLeave={stop}>{t('friend_settings')}</DialogTitle>
         <DialogContent>
     {friendData.listType === 'blocked' ? (
         <List>
@@ -373,7 +396,7 @@ console.log("Friend Data in friend tile" , friendData);
             </ListItem>
         </List>
     )}
-</DialogContent>
+  </DialogContent>
 
         <DialogActions>
           {/* <Button onClick={handleDialogAction} color="primary">

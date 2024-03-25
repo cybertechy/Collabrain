@@ -2,6 +2,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ShortTextIcon from '@mui/icons-material/ShortText';
+import { useTTS } from "@/app/utils/tts/TTSContext";
 
 const { useSearchParams } = require('next/navigation');
 import { styled } from '@mui/material/styles';
@@ -28,6 +29,7 @@ const StyledListItem = styled(ListItem)(({ isSelected }) => ({
 }));
 
 const Channel = ({ channelName, onChannelSelect }) => {
+    const { speak, stop, isTTSEnabled } = useTTS();
     const params = useSearchParams();
     const paramchannelName = params.get('channelName');
     const isSelected = paramchannelName === channelName;
@@ -36,6 +38,8 @@ const Channel = ({ channelName, onChannelSelect }) => {
         <StyledListItem
             isSelected={isSelected}
             onClick={() => onChannelSelect(channelName)}
+            onMouseEnter={() => isTTSEnabled && speak(`${channelName} channel`)}
+            onMouseLeave={stop}
         >
             <ListItemIcon>
                 <ShortTextIcon style={{ color: isSelected ? 'white' : '#C9D6DF', opacity: '0.7' }} />

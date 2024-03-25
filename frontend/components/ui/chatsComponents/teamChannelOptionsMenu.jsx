@@ -9,7 +9,12 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import DeleteIcon from '@mui/icons-material/Delete';
 import InfoIcon from '@mui/icons-material/Info';
+import { useTTS } from "@/app/utils/tts/TTSContext";
+import "@/app/utils/i18n"
+import { useTranslation } from 'next-i18next';
 const TeamChannelOptionsMenu = ({ teamName, onOptionSelect, isOwner, isAdmin }) => {
+    const { t } = useTranslation('team');
+    const { speak, stop, isTTSEnabled } = useTTS();
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
 
@@ -34,6 +39,9 @@ const TeamChannelOptionsMenu = ({ teamName, onOptionSelect, isOwner, isAdmin }) 
                 onClick={handleClick}
                 className="w-full flex justify-between"
                 style={{ borderRadius: 0, justifyContent: 'space-around'}}
+                onMouseEnter={() => isTTSEnabled && speak("Team Options button")} 
+                onMouseLeave={stop}
+                
             >
                 <span className='text-basicallylight font-poppins text-lg'>{teamName}</span>
                 <MoreVertIcon style={{ color: '#FFFFFF' }} fontSize='medium' />
@@ -60,7 +68,8 @@ const TeamChannelOptionsMenu = ({ teamName, onOptionSelect, isOwner, isAdmin }) 
                         <ListItemIcon>
                             <GroupAddIcon style={{ color: '#30475E' }} />
                         </ListItemIcon>
-                        <span className='text-primary'>Invite People</span>
+                        <span className='text-primary'
+                        onMouseEnter={() => isTTSEnabled && speak("Invite People button")} onMouseLeave={stop}>{t('invite')}</span> 
                     </MenuItem>
                 )}
                 {(isOwner || isAdmin) && (
@@ -68,7 +77,8 @@ const TeamChannelOptionsMenu = ({ teamName, onOptionSelect, isOwner, isAdmin }) 
                         <ListItemIcon>
                             <SettingsIcon style={{ color: '#30475E' }} />
                         </ListItemIcon>
-                        <span className='text-primary'>Team Settings</span>
+                        <span className='text-primary'
+                        onMouseEnter={() => isTTSEnabled && speak("Team Settings button")} onMouseLeave={stop}>{t('team_settings')}</span>  
                     </MenuItem>
                 )}
                 {isOwner && (
@@ -76,7 +86,8 @@ const TeamChannelOptionsMenu = ({ teamName, onOptionSelect, isOwner, isAdmin }) 
                         <ListItemIcon>
                             <DeleteIcon style={{ color: '#30475E' }} />
                         </ListItemIcon>
-                        <span className='text-primary'>Delete Team</span>
+                        <span className='text-primary'
+                        onMouseEnter={() => isTTSEnabled && speak("Delete Team button")} onMouseLeave={stop}>{t('del_team')}</span> 
                     </MenuItem>
                 )}
                 {!isOwner && (
@@ -84,7 +95,8 @@ const TeamChannelOptionsMenu = ({ teamName, onOptionSelect, isOwner, isAdmin }) 
                         <ListItemIcon>
                             <ExitToAppIcon style={{ color: '#30475E' }} />
                         </ListItemIcon>
-                        <span className='text-primary'>Leave Team</span>
+                        <span className='text-primary'
+                        onMouseEnter={() => isTTSEnabled && speak("Leave Team button")} onMouseLeave={stop}>{t('leave_team')}</span> 
                     </MenuItem>
                 )}
                 {/* View Team Details - Available for all roles */}
@@ -92,7 +104,8 @@ const TeamChannelOptionsMenu = ({ teamName, onOptionSelect, isOwner, isAdmin }) 
                     <ListItemIcon>
                         <InfoIcon style={{ color: '#30475E' }} />
                     </ListItemIcon>
-                    <span className='text-primary'>View Team Details</span>
+                    <span className='text-primary'
+                    onMouseEnter={() => isTTSEnabled && speak("View Team Details button")} onMouseLeave={stop}>{t('view_details')}</span>
                 </MenuItem>
             </Menu>
         </div>
