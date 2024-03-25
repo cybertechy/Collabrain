@@ -127,6 +127,8 @@ router.get('/:id', async (req, res) =>
 	// Check if user has access to document
 	let docRef = fb.db.doc(`documents/${req.params.id}`);
 	let docData = await docRef.get()
+	if (!docData.data())
+		return res.status(401).json({ error: "No Access" });
 
 	let userAccess = false;
 	if (!docData.data().access[user.uid]) userAccess = false;
