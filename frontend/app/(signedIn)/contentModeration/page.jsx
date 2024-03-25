@@ -86,7 +86,7 @@ const Moderation = () => {
         <div className="flex pt-10">
           <div className="w-7/12 h-48 ml-10 border-gray-200 border-2 bg-white rounded-md drop-shadow-md">
             <div className="flex pt-5 pl-5 pb-2 gap-2 ">
-              <WarningAmberIcon className="text-red-500 h-24 w-24" />
+              <WarningAmberIcon className="text-red-500 h-8 w-8" />
               <p className="font-medium text-xl text-primary ">Warning!</p>
             </div>
             <div className="ml-5 p-2 w-11/12 h-20 border-t-2 border-gray-200">
