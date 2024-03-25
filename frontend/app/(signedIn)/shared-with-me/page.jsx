@@ -62,6 +62,7 @@ export default function SharedWithMe() {
       setSharedContentMapsLoading(true);
       setProjectsLoading(false);
       fetchSharedContentMaps(user.uid).then((contentMaps) => {
+        setProjects(contentMaps);
         setSharedContentMaps(contentMaps);
         setSharedContentMapsLoading(false);
         
@@ -75,7 +76,7 @@ export default function SharedWithMe() {
     setSortCriteria(newSortCriteria);
   };
 
-  const sortedProjects = useMemo(() => projects.filter(project => project.path === path).sort((a, b) => {
+  const sortedProjects = useMemo(() => projects.sort((a, b) => {2
     if (sortCriteria.sortName) {
       return sortCriteria.isAscending ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
     } else if (sortCriteria.sortDate) {
@@ -122,9 +123,15 @@ export default function SharedWithMe() {
                   key={project.id}
                   id={project.id}
                   title={project.name}
+                  project = {project}
                   createdAt={project.createdAt}
                   updatedAt={project.updatedAt}
-                  type={project.type}
+                  type={
+                    project.type === "document"
+                        ? "Document"
+                        : "Content Map"
+                }
+                OnClick={() => { setIsLoading(true); setLoadingState("FETCHING_FILES"); }}
                 />
               )) : (
                 <div className="text-primary font-poppins text-xl italic" 
