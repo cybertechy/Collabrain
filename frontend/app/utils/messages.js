@@ -58,7 +58,6 @@ const fetchDirectMessages = async () => {
     }
 };
 
-
 const updateMessage = async (chatId, messageId, updatedContent) => {
     try {
         const token = await fb.getToken();
@@ -116,8 +115,5 @@ const reportMessage = async ({ chatId, teamId, messageId, reason, source, sender
         return null;
     }
 };
-
-
-
 
 module.exports = { fetchMessages, fetchDirectMessages, reportMessage};
