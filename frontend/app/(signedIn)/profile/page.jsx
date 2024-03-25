@@ -114,7 +114,7 @@ const ProfilePage = () =>
 		console.log("Saving profile changes...");
 		console.log("education: ", education);
 		const updatedUserInfo = data
-
+		if(!updatedUserInfo) return;
 		if (Object.keys(updatedUserInfo).length === 0) return;
 
 		try
@@ -325,7 +325,9 @@ const ProfilePage = () =>
 		if (isBioEditMode)
 		{
 			// Attempt to save changes when exiting bio edit mode
-			await saveProfileChanges();
+			await saveProfileChanges({
+				bio: bio
+			});
 		}
 		setIsBioEditMode(!isBioEditMode); // Toggle edit mode regardless of save success
 	};

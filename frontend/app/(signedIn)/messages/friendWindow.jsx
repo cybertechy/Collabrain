@@ -17,6 +17,7 @@ import { ArrowForward } from '@mui/icons-material';
 import { useTTS } from "@/app/utils/tts/TTSContext";
 import "@/app/utils/i18n"
 import { useTranslation } from 'next-i18next';
+import { set } from 'react-hook-form';
 
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 
@@ -35,7 +36,13 @@ const FriendsWindow = ({userInfo, handleAliasUpdate, handleChatUpdate, showChat,
   const [user, loading] = fb.useAuthState();
   const searchDelay = 500;
   const searchTimerRef = useRef(null);
-
+  const handleFriendListUpdate = () => {
+    setRefreshList(refreshList + 1);
+  };
+  const handleNewAliasUpdate = (friendId, newAlias)  => {
+    handleAliasUpdate(friendId, newAlias);
+    setRefreshList(refreshList + 1);
+  }
   const searchUsers = async (username) => {
     try {
       const token = await fb.getToken();
@@ -215,7 +222,7 @@ const FriendsWindow = ({userInfo, handleAliasUpdate, handleChatUpdate, showChat,
       if (searchQuery && searchResults.length > 0) {
         // Render search results
         return searchResults.map((user) => (
-          <FriendTile key={user.id} friendData={user} onMoreOptions={handleMoreOptions} />
+          <FriendTile key={user.id} friendData={user}onMoreOptions={handleMoreOptions} handleAliasUpdate = {handleNewAliasUpdate}  userInfo = {userInfo} handleChatUpdate={handleChatUpdate} handleFriendListUpdate={()=> setRefreshList(refreshList+1)} />
         ));
       } else {
         // Render a message to encourage searching
@@ -231,7 +238,7 @@ const FriendsWindow = ({userInfo, handleAliasUpdate, handleChatUpdate, showChat,
 
       
   return filteredFriends.map((friend, index) => (
-    <FriendTile key={index} id = {friend.id} friendData={friend} onMoreOptions={handleMoreOptions} />
+    <FriendTile key={index} id = {friend.id} friendData={friend} onMoreOptions={handleMoreOptions} handleAliasUpdate = {handleNewAliasUpdate}  userInfo = {userInfo} handleChatUpdate={handleChatUpdate} handleFriendListUpdate={()=> setRefreshList(refreshList+1)} />
   ));
     }
   };
@@ -291,7 +298,7 @@ const FriendsWindow = ({userInfo, handleAliasUpdate, handleChatUpdate, showChat,
       <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
         {visibleList.length > 0 ? (
           visibleList.map((friend, index) => (
-            <FriendTile key = {index} id={friend.id} friendData={friend} onMoreOptions={handleMoreOptions} handleAliasUpdate = {handleAliasUpdate}  userInfo = {userInfo} handleChatUpdate={handleChatUpdate} handleFriendListUpdate={()=> setRefreshList(refreshList+1)} />
+            <FriendTile key = {index} id={friend.id} friendData={friend} onMoreOptions={handleMoreOptions} handleAliasUpdate = {handleNewAliasUpdate}  userInfo = {userInfo} handleChatUpdate={handleChatUpdate} handleFriendListUpdate={()=> setRefreshList(refreshList+1)} />
           ))
         ) : (
           // <Typography variant="body1" sx={{ p: 2 }}>
