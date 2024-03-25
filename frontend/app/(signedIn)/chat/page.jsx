@@ -249,35 +249,30 @@ export default function ChatRoom() {
 
 			console.log("Received team message:", data);
 
-			if (teamId !== data.chat) return;
+			if (teamId !== data.team) return;
 
 			data.msg = AES.decrypt(data.msg, teamId).toString(enc);
-
-			setMessages((prevMessage) => [
-				...prevMessage,
-				<MessageItem
-					key={data.id}
-					sender={data.sender}
-					senderId={data.sender}
-					message={data.msg}
-					timestamp={
-						sentAt.toDateString() +
-						", " +
-						sentAt.toLocaleTimeString()
-					}
-					messageId={data.id}
-					reactions={{}}
-					onReact={handleReact}
-					attachments={data.attachments}
-					userInfo={userInfo}
-					teamId={teamId}
-					source={"team"}
-					onEdit={handleEdit}
-					onDelete={() => onDeleteMessage(data.id)}
-					
-				/>,
-			]);
+			console.log("LOOK HEREEE MESSAGES", messages);
+			setMessages((prev) => [
+				...prev, 
+			<MessageItem
+				key={data.id}
+				sender={data.sender}
+				senderId = {data.senderID}
+				message={data.msg}
+				timestamp={sentAt.toDateString() + ", " + sentAt.toLocaleTimeString()}
+				messageId={data.id}
+				reactions={{}}
+				attachmentIds={data.attachments}
+				userInfo={userInfo}
+				teamId={teamId}
+				source={"team"}
+				onReact={handleReact}
+				onEdit={handleEdit}
+				onDelete= {() => onDeleteMessage(data.id)}
+			/>]);
 		});
+		console.log("LOOK HERE AFTER MESSAGES",messages)
 		setIsLoading(false);
 		return () => sockCli.current.off("teamMsg");
 	}, [user, teamId]);
@@ -326,7 +321,7 @@ export default function ChatRoom() {
 		};
 
 		if (sockCli.current) {
-			sockCli.current.on("updateTeamMessage", handleUpdateTeamMessage);
+			sockCli.current.on("updateTeamMessage", (X)=> {handleUpdateTeamMessage(X)});
 		}
 
 		// Cleanup on component unmount
@@ -351,7 +346,7 @@ export default function ChatRoom() {
 		};
 
 		if (sockCli.current) {
-			sockCli.current.on("deleteTeamMessage", handleDeleteTeamMessage);
+			sockCli.current.on("deleteTeamMessage", (X)=>{console.log("DELETING MESSAGE EVENT RECIEVED");handleDeleteTeamMessage(X);});
 		}
 
 		// Cleanup on component unmount
@@ -401,6 +396,7 @@ export default function ChatRoom() {
 							messageId = {messageData.id}
 							reactions={messageData.reactions || {}}
 							userId={messageData.sender}
+							attachmentIds={messageData.attachments}
 							teamId={teamId}
 							source={"team"}
 							onReact={handleReact}
@@ -615,6 +611,7 @@ export default function ChatRoom() {
 				source={"team"}
 				attachmentIds={attachmentIds} // Include the attachment IDs for rendering
 				onEdit={handleEdit}
+				onDelete={() => onDeleteMessage(msgId)}
 			/>
 		]);
 

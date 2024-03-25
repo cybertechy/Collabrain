@@ -6,7 +6,7 @@ const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 const apiBaseUrl = SERVERLOCATION + '/api/storage'; // Adjust accordingly to your actual API base URL
 
 // Function to add media to the bucket
-export const addMedia = async (MIMEtype, base64Data, type) => {
+export const addMedia = async (MIMEtype, base64Data, type = "user") => {
     console.log("In storage utils, ",  MIMEtype,base64Data)
     try {
         const token = await fb.getToken(); // Assuming getToken() retrieves the current user's auth token

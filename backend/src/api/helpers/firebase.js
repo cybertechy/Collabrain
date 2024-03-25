@@ -142,6 +142,7 @@ async function saveTeamMsg(data, newMessage = false) {
 			"sender": data.senderID,
 			"username": data.sender,
 			"sentAt": sentAt,
+			"attachments":(data.attachments) ? data.attachments : null,
 			"reactions": (data.reactions) ? data.reactions : {}
 		});
 		else{
