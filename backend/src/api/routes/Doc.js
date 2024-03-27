@@ -188,11 +188,11 @@ router.delete('/:id', async (req, res) =>
 	docRef.get()
 		.then((doc) =>
 		{
-			if (doc.data().access[user.uid].role !== roles.owner)
+			if (doc.data().Access[user.uid].role !== roles.owner)
 				return res.status(401).json({ error: "Unauthorized" });
 
 			// Get all users with access to document
-			let users = Object.keys(doc.data().access);
+			let users = Object.keys(doc.data().Access);
 			// Delete document from all users
 			fb.db.collection(`users`).where(fb.admin.firestore.FieldPath.documentId(), "in", users).get()
 				.then((snapshot) =>
@@ -235,14 +235,14 @@ router.patch('/:id', async (req, res) =>
 	docRef.get()
 		.then((doc) =>
 		{
-			if (doc.data().access[user.uid].role !== roles.owner)
+			if (doc.data().Access[user.uid].role !== roles.owner)
 				return res.status(401).json({ error: "Unauthorized" });
 
 			// Update document
 			let updateData = {};
 			if (req.body.name) updateData.name = req.body.name;
 			if (req.body.path) updateData.path = req.body.path;
-			if (req.body.access) updateData.access = req.body.access;
+			if (req.body.Access) updateData.Access = req.body.Access;
 
 			updateData.updatedAt = fb.admin.firestore.FieldValue.serverTimestamp();
 			docRef.update(updateData)
@@ -328,9 +328,9 @@ router.put("/:id", async (req, res) =>
 		if (req.body.path) updatedDocument.path = req.body.path;
 
 		// Revoke/grant access
-		if (req.body.access && req.body.user && (req.body.revokeAccess === true || req.body.revokeAccess === false))
+		if (req.body.Access && req.body.user && (req.body.revokeAccess === true || req.body.revokeAccess === false))
 		{
-			updatedDocument.Access = req.body.access;
+			updatedDocument.Access = req.body.Access;
 
 			if (req.body.revokeAccess)
 			{
@@ -345,7 +345,7 @@ router.put("/:id", async (req, res) =>
 			}
 		}
 
-		if (req.body.access && req.body.team && (req.body.revokeAccess === true || req.body.revokeAccess === false))
+		if (req.body.Access && req.body.team && (req.body.revokeAccess === true || req.body.revokeAccess === false))
 		{
 			// Get the members of the team
 			let team = await fb.db.collection("teams").doc(req.body.team).get();
@@ -370,10 +370,10 @@ router.put("/:id", async (req, res) =>
 						type: "document"
 					})
 				});
-				req.body.access[req.body.team].members = members;
+				req.body.Access[req.body.team].members = members;
 			}
 
-			updatedDocument.Access = req.body.access;
+			updatedDocument.Access = req.body.Access;
 		}
 
 		// Set public access
@@ -412,7 +412,7 @@ router.post('/:id/share/:user', async (req, res) =>
 		.then(async (doc) =>
 		{
 			// Check if user is owner of document
-			if (doc.data().access[user.uid].role !== roles.owner)
+			if (doc.data().Access[user.uid].role !== roles.owner)
 				return res.status(401).json({ error: "Unauthorized" });
 
 			let userRef = fb.db.doc(`users/${req.params.user}`);
@@ -458,7 +458,7 @@ router.delete('/:id/share/:user', async (req, res) =>
 		.then((doc) =>
 		{
 			// Check if user is owner of document
-			if (doc.data().access[user.uid].role !== roles.owner)
+			if (doc.data().Access[user.uid].role !== roles.owner)
 				return res.status(401).json({ error: "Unauthorized" });
 
 			// Remove document from user
