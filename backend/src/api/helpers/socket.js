@@ -327,7 +327,6 @@ function init(server)
 }
 
 async function broadcastMessage(data, type = "team", newMessage = false, deleteMsg = false) {
-	console.log("RECIEVED, ", data, type, newMessage, deleteMsg);
 	// If the message is a delete message, check if the message has the required fields
 	if(deleteMsg && type == "team" && !data.team && !data.channelId  && !data.channel&& !data.id) return;
 	if(deleteMsg && type == "direct" && !data.chat && !data.id) return;
