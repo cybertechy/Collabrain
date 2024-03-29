@@ -19,14 +19,15 @@ router.post("/", async (req, res) =>
 	if (!user)
 		return res.status(401).json({ error: "Unauthorized" });
 
-	//Check if chat already exists
-	if (!chatRef.empty) return res.status(400).json({ error: "Chat already exists" });
-
 	// Create new chat
 	let members = req.body.members?.concat(user.uid);
 
-	if (!members) return res.status(400).json({ error: "Missing required data" });
+	if(!members) return res.status(400).json({ error: "Missing required data" });
 	if (members?.length < 2) return res.status(400).json({ error: "Not enough members" });
+
+	//Check if chat already exists
+	let chatRef = await fb.db.collection("chats").where("members", "==", members).get();
+	if (!chatRef.empty) return res.status(400).json({ error: "Chat already exists" });
 
 	let ref = await fb.db.collection("chats").add({
 		members,
@@ -35,7 +36,7 @@ router.post("/", async (req, res) =>
 	// Add chat to each member's chats
 	members.forEach(async (member) =>
 	{
-
+		
 		let status = await fb.db.doc(`users/${member}`).update({
 			chats: fb.admin.firestore.FieldValue.arrayUnion(ref.id)
 		});

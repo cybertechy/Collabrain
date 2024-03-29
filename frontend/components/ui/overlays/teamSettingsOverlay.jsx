@@ -77,9 +77,6 @@ const TeamSettingsOverlay = ({ onClose, teamData, onUpdate, members , bannedMemb
   };
 
   const handleImageUpload = async (base64Image, fileType) => {
-    const { t } = useTranslation('team_settings');
-    const { speak, stop, isTTSEnabled } = useTTS();
-
     try {
         const type = "team"; // Assuming 'team' is the type for team images
         const response = await addMedia(fileType, base64Image, type); // Upload the image and get the media ID

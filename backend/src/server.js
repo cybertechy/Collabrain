@@ -34,7 +34,8 @@ const server = http.createServer(app);
 
 
 // Database usage counter
-let APIUsageCount = fb.getObjectFromRealtimeDB("usageCount").then((data) => { return data || 0; });
+let APIUsageCount = 0;
+APIUsageCount = fb.getObjectFromRealtimeDB("usageCount").then((data) => { return data || 0; });
 fb.listenToRealtimeDB("usageCount", (data) => {
 	if(Number.isInteger(data)) APIUsageCount = data || 0;
 });

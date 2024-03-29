@@ -428,7 +428,7 @@ const newDocument = async (getToken, callback, path) => {
     }, [user, folderChanges, path]);
 
     return (
-        <>
+        <div className="overflow-y-auto">
             <LoaderComponent
                 isLoading={isLoading}
                 loadingState={loadingState}
@@ -549,6 +549,6 @@ const newDocument = async (getToken, callback, path) => {
 
                 />
             )}
-        </>
+        </div>
     );
 }
