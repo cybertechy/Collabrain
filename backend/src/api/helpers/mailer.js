@@ -1,4 +1,7 @@
 const nodemailer = require('nodemailer');
+const dotenv = require("dotenv");
+
+dotenv.config();
 
 // create a transport object using the SMTP transport and specifying the SMTP host, port, and authentication options
 function mail(host, user, pass, msg, from, to, title) {
@@ -42,9 +45,9 @@ function mail(host, user, pass, msg, from, to, title) {
 
 
 async function sendMail(to, title, msg) {
-    const host = "smtp.email.uk-london-1.oci.oraclecloud.com";
-    const user = "ocid1.user.oc1..aaaaaaaa3ep3ygt2tf4u6uvfsnycknh65fksvqcucn7gb4szoowyj4sfnyva@ocid1.tenancy.oc1..aaaaaaaaji3lwlxyrbygb3tcsp4y3x2wr63zih77el7zs6nb3jypv33vgjya.nd.com";
-    const pass = "l.or1kG&}#DxlAHQ#-.!";
+    const host = process.env.MAIL_HOST;
+    const user = process.env.MAIL_USER;
+    const pass = process.env.MAIL_PASS;
     return mail(host, user, pass, msg, "Collabrain <collabrain@cybertech13.eu.org>", to, title);
 }
 

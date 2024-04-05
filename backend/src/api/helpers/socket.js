@@ -399,7 +399,7 @@ function connectToRedis(io)
 	if (!io) return null;
 
 	const pubClient = createClient({
-		url: "rediss://default:AVNS_oCy6bX7J5KUh0ssBCOv@redis-m1-siddhtailor96-db76.a.aivencloud.com:18227"
+		url: process.env.REDIS_URL
 	});
 	const subClient = pubClient.duplicate();
 
