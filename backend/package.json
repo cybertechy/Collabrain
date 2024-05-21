@@ -25,7 +25,7 @@
     "uuid": "^9.0.1"
   },
   "scripts": {
-    "start": "node src/server.js",
+    "start": "node --max-old-space-size=50 src/server.js",
     "dev": "nodemon src/server.js"
   },
   "name": "backend",
