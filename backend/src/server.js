@@ -37,18 +37,11 @@ const server = http.createServer(app);
 let APIUsageCount = 0;
 APIUsageCount = fb.getObjectFromRealtimeDB("usageCount").then((data) => { return data || 0; });
 fb.listenToRealtimeDB("usageCount", (data) => {
-	if(Number.isInteger(data)) APIUsageCount = data || 0;
+	if (Number.isInteger(data)) APIUsageCount = data || 0;
 });
 
 // Middleware to increment database usage count
 app.use((req, res, next) => {
-    APIUsageCount++;
-	fb.addObjectToRealtimeDB("usageCount", APIUsageCount);
-    next();
-});
-
-// Set headers 
-app.use(function(req, res, next) {
 
 	// allow requests from any origin
 	res.setHeader('Access-Control-Allow-Origin', '*');
@@ -66,7 +59,16 @@ app.use(function(req, res, next) {
 	res.setHeader("X-WebKit-CSP", "default-src 'self'");
 
 	// Content type
-	res.setHeader('Content-Type', 'application/json');	
+	res.setHeader('Content-Type', 'application/json');
+
+	if (req.method === "OPTIONS") return next();
+
+	// Increment usage count if APIUsageCount is a number
+	if (Number.isInteger(APIUsageCount)) {
+		APIUsageCount++;
+		fb.addObjectToRealtimeDB("usageCount", APIUsageCount);
+	}
+
 	next();
 });
 
@@ -81,7 +83,7 @@ app.use("/api/dashboard", dashboardRoute);
 app.use("/api/maps", mapRoute);
 app.use("/api/reports", reportReport);
 app.use("/api/notifications", notificationsRoute);
-app.use("/api/docs", docRoute); 
+app.use("/api/docs", docRoute);
 app.use("/api/storage", storageRoute);
 app.use("/api/stats", statsRoute);
 app.use("/api/ai", aiRoute);
@@ -90,19 +92,17 @@ app.use("/api/calls", callRoute);
 
 // Endpoint to display DB usage
 app.get("/api/dbUsage", (req, res) => {
-    res.json({ message: "Database Usage", count: APIUsageCount });
+	res.json({ message: "Database Usage", count: APIUsageCount });
 });
 
 // Endpoint to display server status
-app.get("/api/home", (req, res) =>
-{
+app.get("/api/home", (req, res) => {
 	res.json({ message: "Running" });
 
 });
 
 // Endpoint to display connected clients
-app.get("/api/cons", (req, res) =>
-{
+app.get("/api/cons", (req, res) => {
 	res.json({
 		count: Object.keys(sockServer.currLinks).length,
 		cons: sockServer.currLinks
@@ -110,8 +110,7 @@ app.get("/api/cons", (req, res) =>
 });
 
 // Endpoint to display memory usage
-app.get("/api/mem", (req, res) =>
-{
+app.get("/api/mem", (req, res) => {
 	const used = process.memoryUsage();
 	// convert to MB
 	for (let key in used) {
@@ -120,7 +119,6 @@ app.get("/api/mem", (req, res) =>
 	res.json(used);
 });
 
-server.listen(port, () =>
-{
+server.listen(port, () => {
 	console.log(`Server started at: http://localhost:${port}`);
 });
