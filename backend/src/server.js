@@ -92,17 +92,32 @@ app.use("/api/calls", callRoute);
 app.get("/api/dbUsage", (req, res) => {
     res.json({ message: "Database Usage", count: APIUsageCount });
 });
+
+// Endpoint to display server status
 app.get("/api/home", (req, res) =>
 {
 	res.json({ message: "Running" });
+
 });
 
+// Endpoint to display connected clients
 app.get("/api/cons", (req, res) =>
 {
 	res.json({
 		count: Object.keys(sockServer.currLinks).length,
 		cons: sockServer.currLinks
 	});
+});
+
+// Endpoint to display memory usage
+app.get("/api/mem", (req, res) =>
+{
+	const used = process.memoryUsage();
+	// convert to MB
+	for (let key in used) {
+		used[key] = Math.round(used[key] / 1024 / 1024 * 100) / 100;
+	}
+	res.json(used);
 });
 
 server.listen(port, () =>
