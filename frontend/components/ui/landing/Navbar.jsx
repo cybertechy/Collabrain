@@ -10,15 +10,17 @@ const Navbar = () => {
   const [user, loading] = fb.useAuthState();
   
   return (
-    <div className='flex mx-36'> {/* Changed from flex-col to flex for horizontal layout */}
+    <div className='flex lg:mx-28 lg:mr-44'> {/* Changed from flex-col to flex for horizontal layout */}
         
         <div className=" flex flex-col lg:flex-row py-2 justify-between items-center w-full">
             
-            <Image src={logo}
-            className="sm:h-40 sm:w-40 h-40 w-40"
-            alt="logo" 
-            height={90} 
-            width={130} />
+        <div className="relative h-28 w-40 sm:h-40 sm:w-56"> {/* Container to control size */}
+              <Image src={logo}
+                layout="fill" // Makes the image fill the container
+                objectFit="contain" // Keeps the aspect ratio, prevents stretching
+                alt="logo" 
+              />
+            </div>
             
             <div className="flex items-center gap-4">
                 <p className='text-base font-medium cursor-pointer' onClick={() => router.push("/contact")}>Contact Us</p>
