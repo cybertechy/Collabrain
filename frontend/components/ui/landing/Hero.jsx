@@ -1,5 +1,5 @@
 import React from "react";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import PublicSvg from "@/public/assets/svg/public.svg";
 import ThinkSvg from "@/public/assets/svg/think.svg";
 import landingImg from "@/public/assets/images/LandingHome.png";

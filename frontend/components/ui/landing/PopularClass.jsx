@@ -1,5 +1,5 @@
 import React from "react";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import messagingImg from "@/public/assets/images/messaging.png";
 import ContentMapsSvg from "@/public/assets/svg/contentmaps.svg";
 import documentsImg from "@/public/assets/images/documents.webp";

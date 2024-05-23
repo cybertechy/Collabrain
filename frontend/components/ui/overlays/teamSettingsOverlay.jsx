@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
+import Image from "next/legacy/image";
 import CloseIcon from "@mui/icons-material/Close";
 import { Switch } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';

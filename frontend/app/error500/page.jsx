@@ -2,7 +2,7 @@
 import React from 'react'
 import { useRouter } from 'next/navigation' 
 import logo from '@/public/assets/images/logo_whitebackground.png'
-import Image from 'next/image'
+import Image from "next/legacy/image"
 import ErrorJSON from "@/public/assets/json/Error.json";
 import dynamic from 'next/dynamic'
 const Lottie = dynamic(() => import('lottie-react'), { ssr: false });

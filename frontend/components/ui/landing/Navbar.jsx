@@ -1,7 +1,7 @@
 "use client";
 import React,{useEffect, useState} from 'react'
 import logo from '@/public/assets/images/logo_whitebackground.png'
-import Image from 'next/image'
+import Image from "next/legacy/image"
 import { useRouter } from 'next/navigation' 
 const fb = require("_firebase/firebase");
 import { ToastContainer, toast } from 'react-toastify';

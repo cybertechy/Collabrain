@@ -2,7 +2,7 @@
 "use client";
 import React from "react";
 
-import Image from "next/image";
+import Image from "next/legacy/image";
 import LogoIcon from "_public/assets/images/logo_whitebackground.png";
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
