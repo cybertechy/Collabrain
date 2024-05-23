@@ -17,7 +17,7 @@ import dynamic from 'next/dynamic';
 const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
 import FileToolbar from "@/components/ui/FileToolbar/fileToolbar";
 import logo from "@/public/assets/images/logo_whitebackground.png";
-import Image from "next/image";
+import Image from "next/legacy/image";
 import { parseMermaidToExcalidraw } from "@excalidraw/mermaid-to-excalidraw";
 import { useTTS } from "@/app/utils/tts/TTSContext";
 import "@/app/utils/i18n"

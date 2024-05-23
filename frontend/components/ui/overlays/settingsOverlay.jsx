@@ -3,7 +3,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import UploadButton from "../button/uploadButton";
 import PersonIcon from "@mui/icons-material/Person";
 import SentimentVeryDissatisfiedIcon from "@mui/icons-material/SentimentVeryDissatisfied";
-import Image from 'next/image';
+import Image from "next/legacy/image";
 import axios from "axios";
 import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button,
     List, ListItem, ListItemText, Radio, RadioGroup, FormControlLabel} from '@mui/material';

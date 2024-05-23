@@ -69,6 +69,7 @@ app.use((req, res, next) => {
 		fb.addObjectToRealtimeDB("usageCount", APIUsageCount);
 	}
 
+
 	next();
 });
 
@@ -103,7 +104,11 @@ app.get("/api/home", (req, res) => {
 
 // Endpoint to display connected clients
 app.get("/api/cons", (req, res) => {
-	res.json({
+	// trigger gc
+	if (global.gc) {
+		global.gc();
+	}
+	return res.json({
 		count: Object.keys(sockServer.currLinks).length,
 		cons: sockServer.currLinks
 	});
