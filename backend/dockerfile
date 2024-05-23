@@ -1,13 +1,17 @@
-FROM node:21-alpine
+FROM node
 
 WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install
+RUN yarn install
 
 COPY . .
 
+COPY start.sh .
+
+RUN chmod +x start.sh
+
 EXPOSE 8080
 
-CMD ["npm","run", "start"]
+CMD ["./start.sh"]
