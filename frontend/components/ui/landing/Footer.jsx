@@ -12,6 +12,7 @@ const Footer = () => {
 
                 <div className="flex flex-col gap-2 items-center text-center">
                     <p className='text-gray-500 text-xl font-semibold'>Company</p>
+                    <a href="https://collabrain-status.cybertech13.eu.org/" className='text-lg font-medium'>System status</a>
                     <p className='text-lg font-medium'>About Us</p>
                     <p className='text-lg font-medium'>Career</p>
                     <p className='text-lg font-medium'>Press</p>
