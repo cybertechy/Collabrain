@@ -23,7 +23,7 @@ router.get("/", async (req, res) => {
 	fb.db.collection("users").limit(1000).get().then(records => {
 		let users = [];
 		records.forEach(doc => { users.push(doc.data()); });
-		res.json(users);
+		return res.json(users);
 	});
 });
 
@@ -78,7 +78,7 @@ router.get("/:user", async (req, res) => {
 		return res.status(401).json({ error: "Unauthorized" });
 
 	fb.db.doc(`users/${req.params.user}`).get()
-		.then(doc => { res.json(doc.data())})
+		.then(doc => { return res.json(doc.data())})
 		.catch(err => { return res.status(500).json({ error: err }); });
 
 });
