@@ -13,7 +13,7 @@ import MapIcon from "@mui/icons-material/Map";
 import ContextMenu from "@/components/ui/contextMenu/contextMenu";
 import CreateFolderOverlay from "@/components/ui/overlays/CreateFolderOverlay";
 import dynamic from 'next/dynamic';
-const Lottie = dynamic(() => import('lottie-react'), { ssr: false }); 
+const Lottie = dynamic(() => import('lottie-react'), { ssr: false });
 import smallLoader from '@/public/assets/json/smallLoaderLottie.json';
 import axios from "axios";
 import {
@@ -25,7 +25,7 @@ import { hasUsername } from "@/app/utils/user";
 import { TTSProvider, useTTS } from "@/app/utils/tts/TTSContext";
 import "@/app/utils/i18n"
 import { useTranslation } from 'next-i18next';
-const  LoaderComponent = dynamic(() => import('@/components/ui/loader/loaderComponent'), { ssr: false });
+const LoaderComponent = dynamic(() => import('@/components/ui/loader/loaderComponent'), { ssr: false });
 const SERVERLOCATION = process.env.NEXT_PUBLIC_SERVER_LOCATION;
 export default function Dashboard() {
     const { t } = useTranslation('dashboard');
@@ -88,10 +88,22 @@ export default function Dashboard() {
             onMouseEnter: () => isTTSEnabled && speak("New map"),
             onMouseLeave: stop
         },
-        { text: t('new_doc_rclick'), icon: <DescriptionIcon />, onClick: () => { createDocument();}, 
-        onMouseEnter: () => isTTSEnabled && speak("New document"),
-        onMouseLeave: stop},
+        {
+            text: t('new_doc_rclick'), icon: <DescriptionIcon />, onClick: () => { createDocument(); },
+            onMouseEnter: () => isTTSEnabled && speak("New document"),
+            onMouseLeave: stop
+        },
     ];
+
+    async function CheckServerStatus() {
+        try {
+            let res = await fetch(SERVERLOCATION + '/api/home')
+            if (res.status === 200) return true;
+            else return false;
+        } catch (error) {
+            return false;
+        }
+    }
 
 
 
@@ -125,7 +137,24 @@ export default function Dashboard() {
             }
         }
     }, [user, loading, router]);
+
     useEffect(() => {
+        const checkServer = async () => {
+            try {
+                const serverStatus = await CheckServerStatus();
+                console.log("Server status is", serverStatus);
+                if (!serverStatus) {
+                    console.log("Server is down");
+                    router.push("/error500");
+                    return false;
+                } else  return true;
+            } catch (error) {
+                console.error("Error checking server status:", error);
+                router.push("/error500");
+                return false;
+            }
+        };
+
         const checkUserUsername = async () => {
             if (user) {
                 setLoadingState("");
@@ -141,7 +170,9 @@ export default function Dashboard() {
             }
         };
 
-        checkUserUsername();
+        checkServer().then((status) => {
+           if(status) checkUserUsername();
+        });
     }, [user]);
     const handleSort = (newSortCriteria) => {
         setSortCriteria(newSortCriteria);
@@ -250,7 +281,7 @@ export default function Dashboard() {
         setIsLoading(false);
         setProjectChanges((prevCount) => prevCount + 1);
     };
-const createDocument = async () => {
+    const createDocument = async () => {
         setIsLoading(true);
         console.log("Creating new document", path);
         await newDocument(fb.getToken, (url) => {
@@ -260,7 +291,7 @@ const createDocument = async () => {
         setIsLoading(false);
         setProjectChanges((prevCount) => prevCount + 1);
     };
-const newDocument = async (getToken, callback, path) => {
+    const newDocument = async (getToken, callback, path) => {
         try {
             const token = await getToken();
             const response = await axios.post(
@@ -288,43 +319,43 @@ const newDocument = async (getToken, callback, path) => {
 
 
     // const NewDocument = async () =>
-	// {
-	// 	let token = await fb.getToken();
-	// 	if (!token) return null;
+    // {
+    // 	let token = await fb.getToken();
+    // 	if (!token) return null;
 
-	// 	try
-	// 	{
-	// 		const res = await axios.post(`${SERVERLOCATION}/api/docs`, {
-	// 			name: "New Document",
-	// 			path: "/",
-	// 		}, {
-	// 			headers: {
-	// 				authorization: `Bearer ${token}`,
-	// 			},
-	// 		});
-
-
-	// 		if (res.status !== 200) return null;
+    // 	try
+    // 	{
+    // 		const res = await axios.post(`${SERVERLOCATION}/api/docs`, {
+    // 			name: "New Document",
+    // 			path: "/",
+    // 		}, {
+    // 			headers: {
+    // 				authorization: `Bearer ${token}`,
+    // 			},
+    // 		});
 
 
-	// 		setOpenModal();
-	// 		router.push(`/document?id=${res.data.id}`);
-	// 	}
-	// 	catch (err)
-	// 	{
-	// 		console.log(err);
-	// 		toast.error("Error creating new content map", {
-	// 			position: "bottom-right",
-	// 			autoClose: 5000,
-	// 			hideProgressBar: false,
-	// 			closeOnClick: true,
-	// 			pauseOnHover: true,
-	// 			theme: "colored"
-	// 		});
+    // 		if (res.status !== 200) return null;
 
-	// 		return null;
-	// 	}
-	// };
+
+    // 		setOpenModal();
+    // 		router.push(`/document?id=${res.data.id}`);
+    // 	}
+    // 	catch (err)
+    // 	{
+    // 		console.log(err);
+    // 		toast.error("Error creating new content map", {
+    // 			position: "bottom-right",
+    // 			autoClose: 5000,
+    // 			hideProgressBar: false,
+    // 			closeOnClick: true,
+    // 			pauseOnHover: true,
+    // 			theme: "colored"
+    // 		});
+
+    // 		return null;
+    // 	}
+    // };
     const handleContextMenu = (e) => {
         e.preventDefault(); // Prevent the default right-click context menu
         const xPos = e.clientX;
@@ -337,38 +368,38 @@ const newDocument = async (getToken, callback, path) => {
         setContextMenuVisible(false);
     };
     const moveProjectToPath = async (projectId, newPath, type) => {
-        console.log("MOving project to path", projectId,newPath, type);
+        console.log("MOving project to path", projectId, newPath, type);
         try {
-          const token = await fb.getToken(); // Assuming you have a function to get the user's token
-          const response = await axios.patch(
-            `${SERVERLOCATION}/api/dashboard/moveFile/${projectId}`, // Adjust the endpoint URL
-            {
-              to: newPath, // Specify the new path you want to move the project to
-              fileType: type, // Specify the file type ('contentMap' or 'document')
-            },
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          );
-          if (response.status === 200) {
-            // Project moved successfully, you can update your UI here if needed
-            console.log('Project moved successfully');
-            setProjectChanges((prevCount) => prevCount + 1);
+            const token = await fb.getToken(); // Assuming you have a function to get the user's token
+            const response = await axios.patch(
+                `${SERVERLOCATION}/api/dashboard/moveFile/${projectId}`, // Adjust the endpoint URL
+                {
+                    to: newPath, // Specify the new path you want to move the project to
+                    fileType: type, // Specify the file type ('contentMap' or 'document')
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+            if (response.status === 200) {
+                // Project moved successfully, you can update your UI here if needed
+                console.log('Project moved successfully');
+                setProjectChanges((prevCount) => prevCount + 1);
 
-            // For example, you might want to navigate the user to the new project location or refresh the project list
-            router.push(`/dashboard?path=${newPath}`); // Adjust according to your routing logic
-          } else {
-            // Handle the case where the request was not successful
-            console.error('Failed to move project');
-          }
+                // For example, you might want to navigate the user to the new project location or refresh the project list
+                router.push(`/dashboard?path=${newPath}`); // Adjust according to your routing logic
+            } else {
+                // Handle the case where the request was not successful
+                console.error('Failed to move project');
+            }
         } catch (error) {
-          // Handle any errors that occur during the request
-          console.error('Error moving project:', error);
+            // Handle any errors that occur during the request
+            console.error('Error moving project:', error);
         }
-      };
-      
+    };
+
     useEffect(() => {
         console.log(loading);
         console.log(user);
@@ -458,8 +489,8 @@ const newDocument = async (getToken, callback, path) => {
 
                 <div>
                     <p className="text-2xl text-left text-primary ml-4 mb-4"
-                    onMouseEnter={() => isTTSEnabled && speak("Folders")}
-                    onMouseLeave={stop}>
+                        onMouseEnter={() => isTTSEnabled && speak("Folders")}
+                        onMouseLeave={stop}>
                         {t('folders')}
                     </p>
 
@@ -493,8 +524,8 @@ const newDocument = async (getToken, callback, path) => {
 
                 <div>
                     <p className="text-2xl text-left text-primary ml-4 mb-4 mt-5"
-                    onMouseEnter={() => isTTSEnabled && speak("Projects")}
-                    onMouseLeave={stop}>
+                        onMouseEnter={() => isTTSEnabled && speak("Projects")}
+                        onMouseLeave={stop}>
                         {t('projects')}
                     </p>
                     <div
@@ -531,8 +562,8 @@ const newDocument = async (getToken, callback, path) => {
                                 ))
                             ) : (
                                 <div className="text-primary font-poppins text-xl italic"
-                                onMouseEnter={() => isTTSEnabled && speak("Right click to make your first project!")}
-                                onMouseLeave={stop}>
+                                    onMouseEnter={() => isTTSEnabled && speak("Right click to make your first project!")}
+                                    onMouseLeave={stop}>
                                     {t('rclick_msg')}
                                 </div>
                             )}
