@@ -43,20 +43,33 @@ const poppins = localFont({
             style: 'italic'
         }
     ],
-    
+
     variable: '--font-poppins'
-  })
+})
 export const metadata = {
     title: "Collabrain",
     description: "An Interactive Collaborative Platform, Now you can socially interact and collaborate with your friends and colleagues with ease.",
 };
-  
+
 export default function RootLayout({ children }) {
     return (
         <TTSProvider>
-        <html lang="en">
-            <body className={`${poppins.variable} font-sans h-screen w-screen`}>{children}</body>
-        </html>
+            <html lang="en">
+                <head>
+                    <meta name="application-name" content="Collabrain" />
+                    <meta name="apple-mobile-web-app-capable" content="yes" />
+                    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+                    <meta name="apple-mobile-web-app-title" content="Collabrain" />
+                    <meta name="description" content="An all in one Collaborative socially interactive platform" />
+                    <meta name="format-detection" content="telephone=no" />
+                    <meta name="mobile-web-app-capable" content="yes" />
+                    <meta name="msapplication-TileColor" content="#2B5797" />
+                    <meta name="msapplication-tap-highlight" content="no" />
+                    <meta name="theme-color" content="#000000" />
+                    <link rel="manifest" href="/manifest.json" />
+                </head>
+                <body className={`${poppins.variable} font-sans h-screen w-screen`}>{children}</body>
+            </html>
         </TTSProvider>
     );
 }

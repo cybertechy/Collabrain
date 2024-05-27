@@ -36,8 +36,7 @@ frontend/.env
 next-env.d.ts
 
 # Builds
-android/
-ios/
+
 
 .env
 
