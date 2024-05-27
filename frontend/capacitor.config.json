@@ -1,8 +1,0 @@
-{
-  "appId": "com.collabrain.app",
-  "appName": "collabrain",
-  "webDir": "out",
-  "server": {
-    "androidScheme": "https"
-  }
-}
