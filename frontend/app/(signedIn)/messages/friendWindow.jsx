@@ -55,7 +55,7 @@ const FriendsWindow = ({userInfo, handleAliasUpdate, handleChatUpdate, showChat,
   const searchUsers = async (username) => {
     try {
       const token = await fb.getToken();
-      const response = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/users/search`, {
+      const response = await axios.get(`${SERVERLOCATION}/api/users/search`, {
         headers: {
           authorization: `Bearer ${token}`,
         },
@@ -109,7 +109,7 @@ const FriendsWindow = ({userInfo, handleAliasUpdate, handleChatUpdate, showChat,
       if (!token) {
         return;
       }
-      const response = await axios.get("https://collabrain-backend.cybertech13.eu.org/api/users/f/friends", {
+      const response = await axios.get(SERVERLOCATION+"/api/users/f/friends", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -119,7 +119,7 @@ const FriendsWindow = ({userInfo, handleAliasUpdate, handleChatUpdate, showChat,
   
       // Create an array of promises to fetch detailed information for each friend
       const friendPromises = friends.map(async (friendId) => {
-        const friendResponse = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/users/${friendId}`, {
+        const friendResponse = await axios.get(`${SERVERLOCATION}/api/users/${friendId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -143,7 +143,7 @@ const FriendsWindow = ({userInfo, handleAliasUpdate, handleChatUpdate, showChat,
   const getFriendRequests = async () => {
     try {
       const token = await fb.getToken();
-      const response = await axios.get("https://collabrain-backend.cybertech13.eu.org/api/users/friends/requests", {
+      const response = await axios.get(SERVERLOCATION+"/api/users/friends/requests", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -151,7 +151,7 @@ const FriendsWindow = ({userInfo, handleAliasUpdate, handleChatUpdate, showChat,
       console.log("friend Request recieved ", response.data);
       const friendRequests = response.data.map(async (friendRequest) => {
         // Fetch user data for each friend request by ID
-        const userResponse = await axios.get(`https://collabrain-backend.cybertech13.eu.org/api/users/${friendRequest}`, {
+        const userResponse = await axios.get(`${SERVERLOCATION}/api/users/${friendRequest}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
